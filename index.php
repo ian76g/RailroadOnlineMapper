@@ -23,10 +23,24 @@ echo '<hr><a href="upload.php" target="_upload">Add your Savegame here</a><br>mo
 
     echo '';
 		krsort($files);
+
+		$hard_limit = 400;
+		$soft_limit = 120;
 		echo '<span style="float:left;padding-right:50px;">'.$tableHeader;
-		for($i=0; $i<120; $i++){
+		for($i=0; $i<sizeof($files); $i++){
 			$file = array_shift($files);
 			if(!$file) break;
+
+			if($i>$hard_limit){
+			    unlink("done/'.substr($file,5,-5).'.html");
+            }
+
+			if($i>$soft_limit) {
+			    continue;
+            }
+
+
+
 			echo '<tr><td><A href="done/'.substr($file,5,-5).'.html">'.substr($file,5,-5).'</A></td>
 <td align="right">'.round($db[substr($file,5,-5).'.sav'][0]/100000,2).'km</td>
 <td align="right">'.$db[substr($file,5,-5).'.sav'][1].'</td>
