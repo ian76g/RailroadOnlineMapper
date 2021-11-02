@@ -1,7 +1,7 @@
 <?php
 ini_set('memory_limit', -1);
 set_time_limit(50);
-$v = 44;
+$v = 46;
 echo "\n".'running converter version 0.'.$v."\n";
 
 /**
