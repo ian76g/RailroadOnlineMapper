@@ -25,7 +25,7 @@ echo '<hr><a href="upload.php" target="_upload">Add your Savegame here</a><br>mo
 		krsort($files);
 
 		$hard_limit = 400;
-		$soft_limit = 120;
+		$soft_limit = 135;
 		echo '<span style="float:left;padding-right:50px;">'.$tableHeader;
 		for($i=0; $i<sizeof($files); $i++){
 			$file = array_shift($files);
@@ -35,7 +35,7 @@ echo '<hr><a href="upload.php" target="_upload">Add your Savegame here</a><br>mo
 			    unlink("done/'.substr($file,5,-5).'.html");
             }
 
-			if($i>$soft_limit) {
+			if($i>=$soft_limit) {
 			    continue;
             }
 
@@ -48,8 +48,11 @@ echo '<hr><a href="upload.php" target="_upload">Add your Savegame here</a><br>mo
 <td align="right">'.$db[substr($file,5,-5).'.sav'][3].'</td>
 <td align="right">'.round($db[substr($file,5,-5).'.sav'][4]).'%</td>
 </tr>';
-			if(!(($i+1)%30)){
-			    echo '</table></span><span style="float:left;padding-right:50px;">'.$tableHeader;
+			if(!(($i+1)%35)){
+			    echo '</table></span>';
+			    if(($i+1)<$soft_limit) {
+			        echo '<span style="float:left;padding-right:50px;">'.$tableHeader;
+                }
             }
 
 		}
