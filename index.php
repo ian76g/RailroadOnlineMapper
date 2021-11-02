@@ -60,6 +60,7 @@ echo '<hr><a href="upload.php" target="_upload">Add your Savegame here</a><br>mo
 
 	?>
 	</div><hr style="clear:both">
-made by ian76g#6577 on discord - used by people <?php file_put_contents('counter', $counter = file_get_contents('counter')+1); echo $counter?> times
+made by ian76g#6577 on discord - used by people <?php file_put_contents('counter', $counter = file_get_contents('counter')+1); echo $counter?> times<br>
+if you want to help to cover hosting costs - maybe share a buck on papypal@pordi.de - thx.
 </body>
 </html>
