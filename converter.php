@@ -11,7 +11,7 @@ $start = microtime(true);
 $imagewidth = 8000; // desired images width (x,y) aproximately
 //set the path to find the save games.... last line wins
 $path = 'uploads';
-$fontFile = 'ARIAL.TTF';
+$fontFile = 'OpenSans-Regular.ttf';
 
 if (isset($argv[1]) && !empty($argv[1])) {
     $path = pathinfo($argv[1])['dirname'];
