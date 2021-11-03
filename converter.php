@@ -1075,6 +1075,7 @@ class dtString
     var $string;
     var $x;
     var $position;
+    var $writeNullByteString = true;
 
     /**
      * @param $fromX
@@ -1143,7 +1144,9 @@ class dtString
         //$data = mb_convert_encoding($this->string, "UTF-16LE", "UTF-8");
         //$strLength = -(strlen($data) / 2);
         //$length = pack('i', $strLength);
-
+        if(!$this->string){
+            $this->string=' ';
+        }
 
         $data = pack('i',strlen($this->string)) . $this->string;
 
