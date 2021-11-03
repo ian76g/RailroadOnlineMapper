@@ -1000,6 +1000,77 @@ function getBoundingBox($intAngle, $intWidth, $intHeight)
     return array($intWidthRotated, $intHeightRotated);
 }
 
+class dtHeader
+{
+    var $a = array(
+        'SHeader' => 32,
+        'cSaveGameVersion' => 32,
+        'PackageVersion' => 32,
+        'EngineVersion.Major' => 16,
+        'EngineVersion.Minor' => 16,
+        'EngineVersion.Patch' => 16,
+        'EngineVersion.Build' => 16,
+        'EngineVersion.BuildId' => 32,
+        'CustomFormatVersion' => 32,
+        'CustomFormatData' => 32,
+    );
+
+    var $content = '';
+
+    function unserialize($fromX, $position){
+        foreach ($this->a as $elem => $bits) {
+//            echo $elem . " ";
+            $value = mb_substr($fromX, $position, $bits / 8);
+            if (mb_substr($elem, 0, 1) == 'S') {
+                $value = array('1' => $value);
+            } else {
+                if ($bits == 16) {
+                    $value = unpack('S', $value);
+                }
+                if ($bits == 32) {
+                    $value = unpack('I', $value);
+                }
+            }
+//            echo $value[1] . "\n";
+            $position += $bits / 8;
+
+            $this->content.=$value[1];
+
+            if ($elem == 'EngineVersion.BuildId') {
+                $str = substr($fromX, $position, $value[1]);
+                $position += $value[1];
+                $this->content.=$str;
+//                echo "String is [$str]\n";
+            }
+        }
+        $dataObjects = $value[1];
+//        echo "Reading $dataObjects data objects...\n";
+
+        for ($i = 0; $i < $dataObjects; $i++) {
+            $id = substr($fromX, $position, 16);
+            $position += 16;
+            $this->content.=$id;
+
+            $val = unpack('I', substr($fromX, $position, 4))[1];
+            $position += 4;
+//            echo "($val)";
+//            echo "index now at $this->position\n";
+            $this->content.=$val;
+        }
+        $this->content.=substr($fromX, $position, 2); // ???
+        $position += 2;
+
+        return $position;
+    }
+
+    function serialize()
+    {
+        return $this->content;
+    }
+
+}
+
+
 class GVASParser
 {
 
@@ -1019,60 +1090,17 @@ class GVASParser
 
         $this->goldenBucket = array();
 
-        $a = array(
-            'SHeader' => 32,
-            'cSaveGameVersion' => 32,
-            'PackageVersion' => 32,
-            'EngineVersion.Major' => 16,
-            'EngineVersion.Minor' => 16,
-            'EngineVersion.Patch' => 16,
-            'EngineVersion.Build' => 16,
-            'EngineVersion.BuildId' => 32,
-            'CustomFormatVersion' => 32,
-            'CustomFormatData' => 32,
-        );
-
 
         $this->position = 0;
-        foreach ($a as $elem => $bits) {
-//            echo $elem . " ";
-            $value = mb_substr($x, $this->position, $bits / 8);
-            if (mb_substr($elem, 0, 1) == 'S') {
-                $value = array('1' => $value);
-            } else {
-                if ($bits == 16) {
-                    $value = unpack('S', $value);
-                }
-                if ($bits == 32) {
-                    $value = unpack('I', $value);
-                }
-            }
-//            echo $value[1] . "\n";
-            $this->position += $bits / 8;
+        $myHeader = new dtHeader();
+        $this->position = $myHeader->unserialize($this->x, $this->position);
 
-            if ($elem == 'EngineVersion.BuildId') {
-                $str = substr($x, $this->position, $value[1]);
-                $this->position += $value[1];
-//                echo "String is [$str]\n";
-            }
-        }
-        $dataObjects = $value[1];
-//        echo "Reading $dataObjects data objects...\n";
 
-        for ($i = 0; $i < $dataObjects; $i++) {
-            $id = substr($x, $this->position, 16);
-            $this->position += 16;
-
-            $val = unpack('I', substr($x, $this->position, 4))[1];
-            $this->position += 4;
-//            echo "($val)";
-//            echo "index now at $this->position\n";
-        }
-        $this->position += 2;
 
 //        echo "\n";
 //        echo "File pointer is now at $this->position\n";
         $this->readUEString();
+
         while ($this->position < strlen($x)) {
             $this->readUEProperty();
         }
