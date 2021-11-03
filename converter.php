@@ -1157,13 +1157,318 @@ class dtString
 
 }
 
+class dtProperty
+{
+    var $x;
+    var $position;
+    var $last = false;
+
+    var $content;
+
+    function unserialize($fromX, $position)
+    {
+        $this->x = $fromX;
+        $this->position = $position;
+
+        $resultRows = $this->readUEProperty();
+        return array($resultRows, $this->position);
+    }
+
+    /**
+     * @return array|stdClass|void
+     */
+    function readUEProperty()
+    {
+
+    //echo "Filepointer is now at $this->position\n";
+
+        if (substr($this->x, $this->position, 1) < 0) {
+        echo "YYYYyYYYY";
+            $this->content = substr($this->x, $this->position, 1);
+            return array(null, null, $this->position+1);
+        }
+
+        $myString = new dtString();
+        $results = $myString->unserialize($this->x, $this->position);
+        $name = $results[0];
+//        echo "$name ";
+        $this->position = $results[1];
+
+        if ($name == "None") {
+            echo "XXXxXXX";
+            return new stdClass();
+        }
+
+        $myString = new dtString();
+        $results = $myString->unserialize($this->x, $this->position);
+        $type = $results[0];
+//        echo "$type ";
+        $this->position = $results[1];
+
+        $value = substr($this->x, $this->position, 8);
+        $this->position += 8;
+        if ($this->position > strlen($this->x)) {
+            return 'EOF'; // EOF
+        }
+        $value = unpack('q', $value)[1];
+//        echo "$value ";
+
+        return $this->dUEDeserialize($name, trim($type), $value);
+    }
+
+    /**
+     * @param $name
+     * @param $type
+     * @param $propertyLength
+     */
+    function dUEDeserialize($name, $type, $propertyLength)
+    {
+
+        $name = trim(str_replace(
+            array('PointsArray', 'Array', 'GeneratorValveValue', 'ReverserValue', 'BrakeValue', 'RegulatorValue', 'SmokestackType', 'SwitchState',
+                'XP', 'Control', 'FuelAmount', 'WaterTemp', 'WaterLevel', 'FireTemp',
+                'AirPressure', 'WaterAmount', 'State', 'ValveValue', 'Assets'),
+
+            array('PointsArr', '', 'Generatorvalvevalue', 'Reverservalue', 'Brakevalue', 'Regulatorvalue', 'Smokestacktype', 'SwitchSide', 'Xp',
+                '', 'Fuelamount', 'Watertemp', 'Waterlevel', 'Firetemp', 'Airpressure', 'Wateramount', '', 'Valvevalue', '')
+            , $name));
+
+        $pieces = preg_split('/(?=[A-Z])/', $name);
+        if (!$pieces[0]) array_shift($pieces);
+
+        //echo "\n\nType: $type, Name: $name, Length: $propertyLength\n";
+
+        switch ($type) {
+            case 'StrProperty':
+                $this->position++;
+                $myString = new dtString();
+                $results = $myString->unserialize($this->x, $this->position);
+                $propertyLength = $results[0];
+                $this->position = $results[1];
+                //$goldenBucket[$name][] = $propertyLength;
+//                echo "[$propertyLength]";
+                return array(array($pieces, $propertyLength));
+                break;
+            case 'ArrayProperty':
+                $myString = new dtString();
+                $results = $myString->unserialize($this->x, $this->position);
+                $itemType = trim($results[0]);
+//                echo "$itemType ";
+                $this->position = $results[1];
+                //echo "ITEMTYPE:[$itemType]";
+                $this->position++;
+                $arrayCount = $val = unpack('I', substr($this->x, $this->position, 4))[1];
+                $this->position += 4;
+//                echo "ARRAYCOUNT:[$arrayCount] ";
+                switch ($itemType) {
+                    case 'StrProperty':
+                        for ($i = 0; $i < $arrayCount; $i++) {
+                            $myString = new dtString();
+                            $results = $myString->unserialize($this->x, $this->position);
+                            $str = trim($results[0]);
+                            $this->position = $results[1];
+                            //@$goldenBucket[$name][]= $str;
+                            $elem[] = array($pieces, $str);
+                        }
+                        return $elem;
+                        break;
+                    case 'StructProperty' :
+                        $myString = new dtString();
+                        $results = $myString->unserialize($this->x, $this->position);
+                        $name = trim($results[0]);
+                        $this->position = $results[1];
+                        $myString = new dtString();
+                        $results = $myString->unserialize($this->x, $this->position);
+                        $type = trim($results[0]);
+                        $this->position = $results[1];
+                        $lenght = $val = unpack('P', substr($this->x, $this->position, 8))[1];
+                        $this->position += 8;
+//                    echo "[[$type][$lenght]]";
+                        $myString = new dtString();
+                        $results = $myString->unserialize($this->x, $this->position);
+                        $subType = trim($results[0]);
+                        $this->position = $results[1];
+
+                        $this->position++;
+                        $this->position += 16;
+                        switch ($subType) {
+                            case "Vector":
+                            case "Rotator":
+                                for ($i = 0; $i < $arrayCount; $i++) {
+                                    $notX = unpack('g', substr($this->x, $this->position, 4))[1];
+                                    $this->position += 4;
+                                    $y = unpack('g', substr($this->x, $this->position, 4))[1];
+                                    $this->position += 4;
+                                    $z = unpack('g', substr($this->x, $this->position, 4))[1];
+                                    $this->position += 4;
+                                    //$goldenBucket[$name][] = array($notX, $y, $z);
+                                    $elem[]= array($pieces, array($notX, $y, $z));
+                                }
+                                return $elem;
+                                break;
+                            default:
+                                echo "$name not implemented BOO\n";
+                                die();
+                        }
+                        break;
+
+                    case 'FloatProperty':
+                        for ($i = 0; $i < $arrayCount; $i++) {
+                            $float = unpack('g', substr($this->x, $this->position, 4))[1];
+                            $this->position += 4;
+                            //@$goldenBucket[$name][]= $float;
+                            $elem[] = array($pieces, $float);
+                        }
+                        return $elem;
+                        break;
+
+                    case 'IntProperty':
+                        for ($i = 0; $i < $arrayCount; $i++) {
+                            $int = unpack('V', substr($this->x, $this->position, 4))[1];
+                            $this->position += 4;
+                            //@$goldenBucket[$name][]= $int;
+                            $elem[] = array($pieces, $int);
+                        }
+                        return $elem;
+                        break;
+
+                    case 'BoolProperty':
+                        for ($i = 0; $i < $arrayCount; $i++) {
+                            $bool = unpack('C', substr($this->x, $this->position, 1))[1];
+                            $this->position += 1;
+                            //@$goldenBucket[$name][]= $int;
+                            $elem[] = array($pieces, $bool);
+                        }
+                        return $elem;
+                        break;
+
+                    case 'TextProperty':
+                        //echo "Textproperty incoming at " . $this->position . " for Name $name\n";
+                        for ($i = 0; $i < $arrayCount; $i++) {
+                            $cartText = $this->readTextProperty();
+                            $elem[]= array($pieces, $cartText);
+                            //echo "...-[$cartText]-..."
+                        }
+                        //$index+=$propertyLength-4;
+//                    echo "... done\n";
+                    return $elem;
+                        break;
+
+                    default:
+                        //print_r($goldenBucket);
+
+                        die($itemType . ' not implemented');
+                }
+                break;
+
+            default:
+                echo "unhandled type [$type]\n";
+                die();
+        }
+
+//    echo "Type: ".substr($type,0,20).", Name: ".substr($name,0,20).", Lenght: ".substr($propertyLength,0,20);
+    }
+
+
+    function xxmagic($pieces, $something)
+    {
+
+        $current = implode('', $pieces);
+        if ($current != $this->last) {
+            //echo "(" . implode('', $pieces) . ")\n";
+            $this->last = $current;
+        }
+        $code = '$this->goldenBucket[\'' . implode("']['", $pieces) . '\'][]=$something;';
+        eval($code);
+
+        return array($pieces, $something);
+    }
+
+    /**
+     * @return mixed|string|string[]
+     */
+    function readTextProperty()
+    {
+        $terminator = unpack('C', substr($this->x, $this->position, 1))[1];
+        $this->position++;
+        $firstFour = unpack('i', substr($this->x, $this->position, 4))[1];
+        $this->position += 4;
+        $secondFour = unpack('i', substr($this->x, $this->position, 4))[1];
+        $this->position += 4;
+
+        switch ($terminator) {
+            case 0 :
+                $cartText = "";
+                break;
+
+            case 1:
+                $s = $this->position - 9;
+                $this->position += 5;
+                $myString = new dtString();
+                $results = $myString->unserialize($this->x, $this->position);
+                $typeOfNextThing = $results[0];
+                $this->position = $results[1];
+
+                $myString = new dtString();
+                $results = $myString->unserialize($this->x, $this->position);
+                $stringFormatter = $results[0];
+                $this->position = $results[1];
+
+                $fourByteInt = unpack('i', substr($this->x, $this->position, 4))[1];
+                $this->position += 4;
+                for ($pp = 0; $pp < $fourByteInt; $pp++) {
+                    $myString = new dtString();
+                    $results = $myString->unserialize($this->x, $this->position);
+                    $rowId = $results[0];
+                    $this->position = $results[1];
+                    $test = unpack('C', substr($this->x, $this->position, 1))[1];
+                    $this->position++;
+                    if ($test != 4) {
+                        die('horribly');
+                    } else {
+                        $cartText[] = $this->readTextProperty()[0];
+                    }
+                }
+                foreach ($cartText as $placeholder => $elem) {
+                    $stringFormatter = str_replace('{' . $placeholder . '}', $elem, $stringFormatter);
+                }
+                $cartText = $stringFormatter;
+
+                $e = $this->position;
+                //$cartText.='{'.($e-$s).'}';
+                break;
+
+            case 2:
+                if ($secondFour == 0) {
+                    $cartText = '';
+                    break;
+                }
+                if ($secondFour == 1) {
+                    $myString = new dtString();
+                    $results = $myString->unserialize($this->x, $this->position);
+                    $cartText = $results[0];
+                    $this->position = $results[1];
+                    break;
+                }
+                die('what is an exception?');
+                break;
+
+            default:
+                die('oooops' . $terminator);
+        }
+
+        return array($cartText, $this->position);
+    }
+}
+
 class GVASParser
 {
 
     var $position = 0;
     var $x = '';
     var $goldenBucket = array();
-    var $last = false;
+
+    var $saveObject=array();
 
     /**
      * @param $x
@@ -1181,6 +1486,8 @@ class GVASParser
         $myHeader = new dtHeader();
         $this->position = $myHeader->unserialize($this->x, $this->position);
 
+        $this->saveObject['objects'][]=$myHeader;
+
 
 //        echo "\n";
 //        echo "File pointer is now at $this->position\n";
@@ -1188,9 +1495,26 @@ class GVASParser
         $results = $myString->unserialize($x, $this->position);
         $string = $results[0];
         $this->position = $results[1];
+        $this->saveObject['objects'][]=$myString;
 
         while ($this->position < strlen($x)) {
-            $this->readUEProperty();
+            $myProperty = new dtProperty();
+            $results = $myProperty->unserialize($this->x, $this->position);
+            if($results['0']!='EOF') {
+                $this->position = $results[1];
+                $resultRows = $results[0];
+                foreach($resultRows as $row){
+                    $pieces = $row[0];
+                    $something = $row[1];
+                    if(is_array($something) && sizeof($something)==2){
+                        $something = $something[0];
+                    }
+                    $code = '$this->goldenBucket[\'' . implode("']['", $pieces) . '\'][]=$something;';
+                    eval($code);
+                }
+            } else {
+                break;
+            }
         }
 
         $silverPlate = array();
@@ -1321,273 +1645,5 @@ class GVASParser
         file_put_contents('xx.json', $json);
         return $json;
 
-    }
-
-
-    /**
-     * @return stdClass|void|null
-     */
-    function readUEProperty()
-    {
-
-//    echo "Filepointer is now at $index\n";
-
-        if (substr($this->x, $this->position, 1) < 0) {
-//        echo "y";
-            return null;
-        }
-
-        $myString = new dtString();
-        $results = $myString->unserialize($this->x, $this->position);
-        $name = $results[0];
-        $this->position = $results[1];
-
-        if ($name == "None")
-            return new stdClass();
-
-        $myString = new dtString();
-        $results = $myString->unserialize($this->x, $this->position);
-        $type = $results[0];
-        $this->position = $results[1];
-
-        $value = substr($this->x, $this->position, 8);
-        $this->position += 8;
-        if ($this->position > strlen($this->x)) return; // EOF
-        $value = unpack('q', $value)[1];
-
-        $this->dUEDeserialize($name, trim($type), $value);
-    }
-
-    function magic($pieces, $something)
-    {
-
-        $current = implode('', $pieces);
-        if ($current != $this->last) {
-            //echo "(" . implode('', $pieces) . ")\n";
-            $this->last = $current;
-        }
-//    if($current=='SplineStart'){
-//        $goldenBucket['Spline']['Start'][] = $goldenBucket['Spline']['Points'][$something];
-//    } elseif ($current=='SplineEnd') {
-//        $goldenBucket['Spline']['End'][] = $goldenBucket['Spline']['Points'][$something];
-//    } else {
-        $code = '$this->goldenBucket[\'' . implode("']['", $pieces) . '\'][]=$something;';
-        eval($code);
-//    }
-    }
-
-
-    function dUEDeserialize($name, $type, $propertyLength)
-    {
-
-        $name = trim(str_replace(
-            array('PointsArray', 'Array', 'GeneratorValveValue', 'ReverserValue', 'BrakeValue', 'RegulatorValue', 'SmokestackType', 'SwitchState',
-                'XP', 'Control', 'FuelAmount', 'WaterTemp', 'WaterLevel', 'FireTemp',
-                'AirPressure', 'WaterAmount', 'State', 'ValveValue', 'Assets'),
-
-            array('PointsArr', '', 'Generatorvalvevalue', 'Reverservalue', 'Brakevalue', 'Regulatorvalue', 'Smokestacktype', 'SwitchSide', 'Xp',
-                '', 'Fuelamount', 'Watertemp', 'Waterlevel', 'Firetemp', 'Airpressure', 'Wateramount', '', 'Valvevalue', '')
-            , $name));
-
-        $pieces = preg_split('/(?=[A-Z])/', $name);
-        if (!$pieces[0]) array_shift($pieces);
-
-        //echo "\n\nType: $type, Name: $name, Length: $propertyLength\n";
-
-        switch ($type) {
-            case 'StrProperty':
-                $this->position++;
-                $myString = new dtString();
-                $results = $myString->unserialize($this->x, $this->position);
-                $propertyLength = $results[0];
-                $this->position = $results[1];
-                //$goldenBucket[$name][] = $propertyLength;
-                $this->magic($pieces, $propertyLength);
-                //echo "[$value]";
-                break;
-            case 'ArrayProperty':
-                $myString = new dtString();
-                $results = $myString->unserialize($this->x, $this->position);
-                $itemType = trim($results[0]);
-                $this->position = $results[1];
-                //echo "ITEMTYPE:[$itemType]";
-                $this->position++;
-                $arrayCount = $val = unpack('I', substr($this->x, $this->position, 4))[1];
-                $this->position += 4;
-                //echo "ARRAYCOUNT:[$arrayCount]";
-                switch ($itemType) {
-                    case 'StrProperty':
-                        for ($i = 0; $i < $arrayCount; $i++) {
-                            $myString = new dtString();
-                            $results = $myString->unserialize($this->x, $this->position);
-                            $str = trim($results[0]);
-                            $this->position = $results[1];
-                            //@$goldenBucket[$name][]= $str;
-                            $this->magic($pieces, $str);
-                        }
-                        break;
-                    case 'StructProperty' :
-                        $myString = new dtString();
-                        $results = $myString->unserialize($this->x, $this->position);
-                        $name = trim($results[0]);
-                        $this->position = $results[1];
-                        $myString = new dtString();
-                        $results = $myString->unserialize($this->x, $this->position);
-                        $type = trim($results[0]);
-                        $this->position = $results[1];
-                        $lenght = $val = unpack('P', substr($this->x, $this->position, 8))[1];
-                        $this->position += 8;
-//                    echo "[[$type][$lenght]]";
-                        $myString = new dtString();
-                        $results = $myString->unserialize($this->x, $this->position);
-                        $subType = trim($results[0]);
-                        $this->position = $results[1];
-
-                        $this->position++;
-                        $this->position += 16;
-                        switch ($subType) {
-                            case "Vector":
-                            case "Rotator":
-                                for ($i = 0; $i < $arrayCount; $i++) {
-                                    $notX = unpack('g', substr($this->x, $this->position, 4))[1];
-                                    $this->position += 4;
-                                    $y = unpack('g', substr($this->x, $this->position, 4))[1];
-                                    $this->position += 4;
-                                    $z = unpack('g', substr($this->x, $this->position, 4))[1];
-                                    $this->position += 4;
-                                    //$goldenBucket[$name][] = array($notX, $y, $z);
-                                    $this->magic($pieces, array($notX, $y, $z));
-                                }
-                                break;
-                            default:
-                                echo "$name not implemented BOO\n";
-                                die();
-                        }
-                        break;
-
-                    case 'FloatProperty':
-                        for ($i = 0; $i < $arrayCount; $i++) {
-                            $float = unpack('g', substr($this->x, $this->position, 4))[1];
-                            $this->position += 4;
-                            //@$goldenBucket[$name][]= $float;
-                            $this->magic($pieces, $float);
-                        }
-                        break;
-
-                    case 'IntProperty':
-                        for ($i = 0; $i < $arrayCount; $i++) {
-                            $int = unpack('V', substr($this->x, $this->position, 4))[1];
-                            $this->position += 4;
-                            //@$goldenBucket[$name][]= $int;
-                            $this->magic($pieces, $int);
-                        }
-                        break;
-
-                    case 'BoolProperty':
-                        for ($i = 0; $i < $arrayCount; $i++) {
-                            $bool = unpack('C', substr($this->x, $this->position, 1))[1];
-                            $this->position += 1;
-                            //@$goldenBucket[$name][]= $int;
-                            $this->magic($pieces, $bool);
-                        }
-                        break;
-
-                    case 'TextProperty':
-                        //echo "Textproperty incoming at " . $this->position . " for Name $name\n";
-                        for ($i = 0; $i < $arrayCount; $i++) {
-                            $cartText = $this->readTextProperty();
-                            $this->magic($pieces, $cartText);
-                            //echo "...-[$cartText]-..."
-                        }
-                        //$index+=$propertyLength-4;
-//                    echo "... done\n";
-                        break;
-
-                    default:
-                        //print_r($goldenBucket);
-
-                        die($itemType . ' not implemented');
-                }
-                break;
-
-            default:
-                echo "unhandled type [$type]\n";
-        }
-
-//    echo "Type: ".substr($type,0,20).", Name: ".substr($name,0,20).", Lenght: ".substr($propertyLength,0,20);
-    }
-
-
-    function readTextProperty()
-    {
-        $terminator = unpack('C', substr($this->x, $this->position, 1))[1];
-        $this->position++;
-        $firstFour = unpack('i', substr($this->x, $this->position, 4))[1];
-        $this->position += 4;
-        $secondFour = unpack('i', substr($this->x, $this->position, 4))[1];
-        $this->position += 4;
-
-        switch ($terminator) {
-            case 0 :
-                $cartText = "";
-                break;
-
-            case 1:
-                $s = $this->position - 9;
-                $this->position += 5;
-                $myString = new dtString();
-                $results = $myString->unserialize($this->x, $this->position);
-                $typeOfNextThing = $results[0];
-                $this->position = $results[1];
-
-                $myString = new dtString();
-                $results = $myString->unserialize($this->x, $this->position);
-                $stringFormatter = $results[0];
-                $this->position = $results[1];
-
-                $fourByteInt = unpack('i', substr($this->x, $this->position, 4))[1];
-                $this->position += 4;
-                for ($pp = 0; $pp < $fourByteInt; $pp++) {
-                    $myString = new dtString();
-                    $results = $myString->unserialize($this->x, $this->position);
-                    $rowId = $results[0];
-                    $this->position = $results[1];
-                    $test = unpack('C', substr($this->x, $this->position, 1))[1];
-                    $this->position++;
-                    if ($test != 4) {
-                        die('horribly');
-                    } else {
-                        $cartText[] = $this->readTextProperty();
-                    }
-                }
-                foreach ($cartText as $placeholder => $elem) {
-                    $stringFormatter = str_replace('{' . $placeholder . '}', $elem, $stringFormatter);
-                }
-                $cartText = $stringFormatter;
-
-                $e = $this->position;
-                //$cartText.='{'.($e-$s).'}';
-                break;
-
-            case 2:
-                if ($secondFour == 0) {
-                    $cartText = '';
-                    break;
-                }
-                if ($secondFour == 1) {
-                    $myString = new dtString();
-                    $results = $myString->unserialize($this->x, $this->position);
-                    $cartText = $results[0];
-                    $this->position = $results[1];
-                    break;
-                }
-                die('what is an exception?');
-                break;
-
-            default:
-                die('oooops' . $terminator);
-        }
-
-        return $cartText;
     }
 }
