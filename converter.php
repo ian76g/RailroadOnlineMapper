@@ -2,7 +2,7 @@
 ini_set('memory_limit', -1);
 set_time_limit(50);
 $v = 46;
-echo "\n".'running converter version 0.'.$v."\n";
+echo "\n" . 'running converter version 0.' . $v . "\n";
 
 /**
  * define some stuff we need later
@@ -380,7 +380,7 @@ foreach ($files as $file) {
         // fix given angles and convert to radiant - subtract 90 - because ingame coordinates do not point NORTH (!?)
         $rotation = deg2rad($switch['Rotation'][1] - 90);
         $rotSide = deg2rad($switch['Rotation'][1] - 90 + $dir);
-        $rotCross = deg2rad($switch['Rotation'][1]+180);
+        $rotCross = deg2rad($switch['Rotation'][1] + 180);
 
 // circle the switch - used to debug angles and sizes
 //            imageellipse($img,
@@ -440,7 +440,7 @@ foreach ($files as $file) {
                 if ($state) {
 //                    $svg .= '<text x="' . $x . '" y="' . $y . '">   ' . $type . '/' . $state . '</text>';
                     $svg .= '<line x1="' . $x . '" y1="' . $y . '" x2="' . $xStraight . '" y2="' . $yStraight . '" stroke="red" stroke-width="3"/>' . "\n";
-                    $svg .= '<line x1="' . $x . '" y1="' . $y . '" x2="' . $xSide . '" y2="' .$ySide. '" stroke="black" stroke-width="3"/>' . "\n";
+                    $svg .= '<line x1="' . $x . '" y1="' . $y . '" x2="' . $xSide . '" y2="' . $ySide . '" stroke="black" stroke-width="3"/>' . "\n";
                 } else {
 //                    $svg .= '<text x="' . $x . '" y="' . $y . '">   ' . $type . '/' . $state . '</text>';
                     $svg .= '<line x1="' . $x . '" y1="' . $y . '" x2="' . $xSide . '" y2="' . $ySide . '" stroke="red" stroke-width="3"/>' . "\n";
@@ -563,10 +563,10 @@ foreach ($files as $file) {
                 ', ' . ($imx - (int)(($vehicle['Location'][0] - $minX) / 100 * $scale)) . ', ' . ($imy - (int)(($vehicle['Location'][1] - $minY) / 100 * $scale)) . ')"
               />';
 
-            if($vehicle['Location'][2]<1000){
+            if ($vehicle['Location'][2] < 1000) {
                 $svg .= '<ellipse cx="' . ($imx - (int)(($vehicle['Location'][0] - $minX) / 100 * $scale)) .
-                    '" cy="' . ($imy - (int)(($vehicle['Location'][1] - $minY) / 100 * $scale)) . '" rx="' . (($engineRadius / 2) *10).
-                    '" ry="' . (($engineRadius / 2)*10) .
+                    '" cy="' . ($imy - (int)(($vehicle['Location'][1] - $minY) / 100 * $scale)) . '" rx="' . (($engineRadius / 2) * 10) .
+                    '" ry="' . (($engineRadius / 2) * 10) .
                     '" style="fill:none;stroke:red;stroke-width:10" transform="rotate(' . $vehicle['Rotation'][1] .
                     ', ' . ($imx - (int)(($vehicle['Location'][0] - $minX) / 100 * $scale)) . ', ' . ($imy - (int)(($vehicle['Location'][1] - $minY) / 100 * $scale)) . ')"
               />';
@@ -1017,7 +1017,8 @@ class dtHeader
 
     var $content = '';
 
-    function unserialize($fromX, $position){
+    function unserialize($fromX, $position)
+    {
         foreach ($this->a as $elem => $bits) {
 //            echo $elem . " ";
             $value = mb_substr($fromX, $position, $bits / 8);
@@ -1034,12 +1035,12 @@ class dtHeader
 //            echo $value[1] . "\n";
             $position += $bits / 8;
 
-            $this->content.=$value[1];
+            $this->content .= $value[1];
 
             if ($elem == 'EngineVersion.BuildId') {
                 $str = substr($fromX, $position, $value[1]);
                 $position += $value[1];
-                $this->content.=$str;
+                $this->content .= $str;
 //                echo "String is [$str]\n";
             }
         }
@@ -1049,15 +1050,15 @@ class dtHeader
         for ($i = 0; $i < $dataObjects; $i++) {
             $id = substr($fromX, $position, 16);
             $position += 16;
-            $this->content.=$id;
+            $this->content .= $id;
 
             $val = unpack('I', substr($fromX, $position, 4))[1];
             $position += 4;
 //            echo "($val)";
 //            echo "index now at $this->position\n";
-            $this->content.=$val;
+            $this->content .= $val;
         }
-        $this->content.=substr($fromX, $position, 2); // ???
+        $this->content .= substr($fromX, $position, 2); // ???
         $position += 2;
 
         return $position;
@@ -1071,6 +1072,9 @@ class dtHeader
 }
 
 
+/**
+ * Class dtString
+ */
 class dtString
 {
     var $content;
@@ -1078,13 +1082,22 @@ class dtString
     var $x;
     var $position;
 
-    function unserialize($fromX, $position){
+    /**
+     * @param $fromX
+     * @param $position
+     * @return array
+     */
+    function unserialize($fromX, $position)
+    {
         $this->x = $fromX;
         $this->position = $position;
         $this->readUEString();
         return array($this->string, $this->position);
     }
 
+    /**
+     *
+     */
     function readUEString()
     {
 
@@ -1108,7 +1121,7 @@ class dtString
         }
         if ($value == 1) {
 //        echo "l";
-            $this->string='';
+            $this->string = '';
             return;
         }
         if ($value < 0) {
@@ -1116,16 +1129,30 @@ class dtString
             $value *= -2;
             $string = mb_convert_encoding(substr($this->x, $this->position, $value), "UTF-8", "UTF-16LE");
             $this->string = $string;
-            $this->content.=substr($this->x, $this->position, $value);
+            $this->content .= substr($this->x, $this->position, $value);
             //echo "[$string]";
             $this->position += $value;
         } else {
             $this->string = substr($this->x, $this->position, $value);
             $this->position += $value;
-            $this->content.=$this->string;
+            $this->content .= $this->string;
         }
 
         return;
+    }
+
+    /**
+     * @return string
+     */
+    function serialize()
+    {
+        $data = mb_convert_encoding($this->string,  "UTF-16LE", "UTF-8");
+        $strLength = -(strlen($data)/2);
+        $length = pack('i', $strLength);
+
+        $data = $length.$data;
+
+        return $data;
     }
 
 }
@@ -1153,7 +1180,6 @@ class GVASParser
         $this->position = 0;
         $myHeader = new dtHeader();
         $this->position = $myHeader->unserialize($this->x, $this->position);
-
 
 
 //        echo "\n";
@@ -1383,7 +1409,7 @@ class GVASParser
                 $myString = new dtString();
                 $results = $myString->unserialize($this->x, $this->position);
                 $itemType = trim($results[0]);
-                $this->position=$results[1];
+                $this->position = $results[1];
                 //echo "ITEMTYPE:[$itemType]";
                 $this->position++;
                 $arrayCount = $val = unpack('I', substr($this->x, $this->position, 4))[1];
@@ -1404,11 +1430,11 @@ class GVASParser
                         $myString = new dtString();
                         $results = $myString->unserialize($this->x, $this->position);
                         $name = trim($results[0]);
-                        $this->position=$results[1];
+                        $this->position = $results[1];
                         $myString = new dtString();
                         $results = $myString->unserialize($this->x, $this->position);
                         $type = trim($results[0]);
-                        $this->position=$results[1];
+                        $this->position = $results[1];
                         $lenght = $val = unpack('P', substr($this->x, $this->position, 8))[1];
                         $this->position += 8;
 //                    echo "[[$type][$lenght]]";
@@ -1512,7 +1538,7 @@ class GVASParser
                 $myString = new dtString();
                 $results = $myString->unserialize($this->x, $this->position);
                 $typeOfNextThing = $results[0];
-                $this->position=$results[1];
+                $this->position = $results[1];
 
                 $myString = new dtString();
                 $results = $myString->unserialize($this->x, $this->position);
