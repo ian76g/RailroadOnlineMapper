@@ -840,7 +840,7 @@ foreach ($files as $file) {
 //        @unlink($jpegFileName);
 //        @unlink($htmlFileName);
 //    }
-    echo "redered in " . (microtime(true) - $start) . " microseconds\n";
+    echo "rendered in " . (microtime(true) - $start) . " microseconds\n";
     unlink('uploads/' . $NEWUPLOADEDFILE);
 }
 //debug
@@ -991,6 +991,7 @@ function getBoundingBox($intAngle, $intWidth, $intHeight)
 
 class dtHeader
 {
+    var $NAME = 'HEADER';
     var $a = array(
         'SHeader' => 32,
         'cSaveGameVersion' => 32,
@@ -1075,7 +1076,9 @@ class dtString
     var $string;
     var $x;
     var $position;
-    var $writeNullByteString = true;
+    var $nullBytes;
+    var $NAME = 'STRING';
+    var $skipNullByteStrings = true;
 
     /**
      * @param $fromX
@@ -1101,7 +1104,8 @@ class dtString
 //        echo "reading string started with 0\n";
             $this->position++;
             $this->content = NULL;
-            $this->string = '';
+            $this->string = NULL;
+            $this->nullBytes=0;
             return;
         }
         $value = substr($this->x, $this->position, 4);
@@ -1110,13 +1114,13 @@ class dtString
         $value = unpack('i', $value)[1];
 //    echo "trying to read $value Bytes of string\n";
         if ($value == 0) {
-//        echo "j";
-            $this->string = '';
+            $this->string = null;
+            $this->nullBytes=0;
             return;
         }
         if ($value == 1) {
-//        echo "l";
             $this->string = '';
+            $this->nullBytes=0;
             return;
         }
         if ($value < 0) {
@@ -1125,12 +1129,17 @@ class dtString
             $string = mb_convert_encoding(substr($this->x, $this->position, $value), "UTF-8", "UTF-16LE");
             $this->string = $string;
             $this->content .= substr($this->x, $this->position, $value);
-            //echo "[$string]";
+//            echo "[$string] having ";
+            $this->nullBytes=
+                strlen(substr($this->x, $this->position, $value))-
+                strlen(rtrim(substr($this->x, $this->position, $value),"\0"));
             $this->position += $value;
+//            echo $this->nullBytes." 0-Bytes\n";
         } else {
             $this->string = substr($this->x, $this->position, $value);
             $this->position += $value;
             $this->content .= $this->string;
+            $this->nullBytes = strlen($this->string)-strlen(rtrim($this->string));
         }
 
         return;
@@ -1141,16 +1150,26 @@ class dtString
      */
     public function serialize()
     {
-        //$data = mb_convert_encoding($this->string, "UTF-16LE", "UTF-8");
-        //$strLength = -(strlen($data) / 2);
-        //$length = pack('i', $strLength);
-        if(!$this->string){
-            $this->string=' ';
+
+        if($this->skipNullByteStrings && $this->string === NULL){
+            return NULL;
         }
 
-        $data = pack('i',strlen($this->string)) . $this->string;
+        if(!$this->skipNullByteStrings && $this->string === NULL){
+            return pack('i', 0);
+        }
 
-//        var_dump($this->string);die();
+        if(mb_detect_encoding($this->string)=='UTF-8'){
+            $data = mb_convert_encoding($this->string, "UTF-16LE", "UTF-8");
+            $strLength = -(strlen($data) / 2);
+            $data = pack('i', $strLength).rtrim($data, "\0");
+        } else {
+            $data = pack('i',strlen($this->string)) . rtrim($this->string);
+        }
+
+        for($i=0; $i<$this->nullBytes; $i++){
+            $data.=hex2bin('00');
+        }
 
         return $data;
     }
@@ -1217,10 +1236,11 @@ class dtProperty
         $myString = new dtString();
         $results = $myString->unserialize($this->x, $this->position);
         $name = $results[0];
-//        echo "$name ";
+//    echo "$name ";
         $this->position = $results[1];
         $this->NAME = $name;
-//        echo "[$name]";
+        $this->CONTENTOBJECTS[] = $myString;
+//    echo "[$name]";
         if ($name == "None") {
             echo "XXXxXXX";
             return new stdClass();
@@ -1229,19 +1249,19 @@ class dtProperty
         $myString = new dtString();
         $results = $myString->unserialize($this->x, $this->position);
         $type = $results[0];
-//        echo "$type ";
+//   echo "$type ";
         $this->position = $results[1];
-        $this->TYPE = $type;
-
+        $this->TYPE = trim($type);
+        $this->CONTENTOBJECTS[]=$myString;
         $value = substr($this->x, $this->position, 8);
+        $this->CONTENTOBJECTS[] = substr($this->x, $this->position, 8);
         $this->position += 8;
         $this->GUID = $value;
 
         if ($this->position > strlen($this->x)) {
             return 'EOF'; // EOF
         }
-
-        $stuff = $this->dUEDeserialize($name, trim($type));
+        $stuff = $this->dUEDeserialize($name, $type);
 
         return $stuff;
     }
@@ -1268,8 +1288,9 @@ class dtProperty
 
         //echo "\n\nType: $type, Name: $name, Length: $propertyLength\n";
 
-        switch ($type) {
+        switch (trim($type)) {
             case 'StrProperty':
+                $this->CONTENTOBJECTS[]=substr($this->x, $this->position,1);
                 $this->position++;  // WHY??
                 $myString = new dtString();
                 $results = $myString->unserialize($this->x, $this->position);
@@ -1285,20 +1306,23 @@ class dtProperty
                 $myString = new dtString();
                 $results = $myString->unserialize($this->x, $this->position);
                 $itemType = trim($results[0]);
-//                echo "$itemType ";
+                $this->ITEMTYPE = $itemType;
                 $this->position = $results[1];
-                //echo "ITEMTYPE:[$itemType]";
-                $this->position++;
                 $this->CONTENTOBJECTS[] = $myString;
 
+                $this->CONTENTOBJECTS[]=substr($this->x, $this->position,1);
+                $this->position++;
+
                 $arrayCount = unpack('I', substr($this->x, $this->position, 4))[1];
+                $this->CONTENTOBJECTS[] = pack('I', $arrayCount);
                 $this->position += 4;
-                $this->CONTENTOBJECTS[] = $arrayCount;
+
 //                echo "ARRAYCOUNT:[$arrayCount] ";
                 switch ($itemType) {
                     case 'StrProperty':
                         for ($i = 0; $i < $arrayCount; $i++) {
                             $myString = new dtString();
+                            $myString->skipNullByteStrings = false;
                             $results = $myString->unserialize($this->x, $this->position);
                             $str = trim($results[0]);
                             $this->position = $results[1];
@@ -1323,31 +1347,32 @@ class dtProperty
 
                         $lenght = $val = unpack('P', substr($this->x, $this->position, 8))[1];
                         $this->position += 8;
-                        $this->CONTENTOBJECTS[] = $lenght;
+                        $this->CONTENTOBJECTS[] = pack('P', $lenght);
 
 //                    echo "[[$type][$lenght]]";
                         $myString = new dtString();
                         $results = $myString->unserialize($this->x, $this->position);
                         $subType = trim($results[0]);
+                        $this->SUBTYPE = $subType;
                         $this->position = $results[1];
                         $this->CONTENTOBJECTS[] = $myString;
 
+                        $this->CONTENTOBJECTS[] = substr($this->x, $this->position, 17);
                         $this->position++;
                         $this->position += 16;
-                        $this->CONTENTOBJECTS[] = substr($this->x, $this->position, 17);
 
                         switch ($subType) {
                             case "Vector":
                             case "Rotator":
                                 for ($i = 0; $i < $arrayCount; $i++) {
                                     $notX = unpack('g', substr($this->x, $this->position, 4))[1];
-                                    $this->CONTENTOBJECTS[] = substr($this->x, $this->position, 4);
+                                    $this->CONTENTOBJECTS[] = pack('g', $notX);
                                     $this->position += 4;
                                     $y = unpack('g', substr($this->x, $this->position, 4))[1];
-                                    $this->CONTENTOBJECTS[] = substr($this->x, $this->position, 4);
+                                    $this->CONTENTOBJECTS[] = pack('g', $y);
                                     $this->position += 4;
                                     $z = unpack('g', substr($this->x, $this->position, 4))[1];
-                                    $this->CONTENTOBJECTS[] = substr($this->x, $this->position, 4);
+                                    $this->CONTENTOBJECTS[] = pack('g', $z);
                                     $this->position += 4;
                                     //$goldenBucket[$name][] = array($notX, $y, $z);
                                     $elem[] = array($pieces, array($notX, $y, $z));
@@ -1362,7 +1387,7 @@ class dtProperty
                     case 'FloatProperty':
                         for ($i = 0; $i < $arrayCount; $i++) {
                             $float = unpack('g', substr($this->x, $this->position, 4))[1];
-                            $this->CONTENTOBJECTS[] = substr($this->x, $this->position, 4);
+                            $this->CONTENTOBJECTS[] = pack('g', $float);
                             $this->position += 4;
                             //@$goldenBucket[$name][]= $float;
                             $elem[] = array($pieces, $float);
@@ -1539,12 +1564,24 @@ class GVASParser
         $string = $results[0];
         $this->position = $results[1];
         $this->saveObject['objects'][] = $myString;
+//        echo "[$string]\n";
 
         while ($this->position < strlen($x)) {
             $myProperty = new dtProperty();
             $results = $myProperty->unserialize($this->x, $this->position);
             if ($results['0'] != 'EOF') {
+
+                $original = substr($this->x, $this->position, $results[1]-$this->position);
+                $test = $myProperty->serialize();
+                if($original != $test) {
+                    file_put_contents('tmp_'.trim($myProperty->NAME), $original);
+                    file_put_contents('tmp_'.trim($myProperty->NAME).'.test', $test);
+
+                }
+
                 $this->saveObject['objects'][] = $myProperty;
+
+
                 $this->position = $results[1];
                 $resultRows = $results[0];
                 foreach ($resultRows as $row) {
@@ -1561,43 +1598,30 @@ class GVASParser
             }
         }
 
-//        foreach($this->saveObject['objects'] as $object){
-//            if(is_object($object)){
-//                if(is_callable(array($object, 'serialize'))){
-//                    echo "+";
-//                } else {
-//                    echo "-";
-//                }
-//                if(isset($object->NAME)){
-//                    echo "OBJECT " . $object->NAME . ' of ' . $object->TYPE . " is a " . get_class($object) . "\n";
-//                } else {
-//                    echo get_class($object) . "\n";
-//                }
-//            } else {
-//                echo '###';
-//            }
-//        }
+        $tests = array('PlayerNameArray','FrameNumberArray', 'FrameNameArray');
 
         $output = '';
         foreach($this->saveObject['objects'] as $object){
             if(is_object($object)){
+                //echo $object->NAME."\n";
+//                if(trim($object->NAME) == 'SaveGameDate'){
+//                    echo get_class($object);
+//                    $object->x='DEAD';
+//                    foreach ($object->CONTENTOBJECTS as $o) {
+//                        if(is_object($o)){
+//                            $o->x='DEAD';
+//                        }
+//
+//                    }
+//                    file_put_contents('tmp', $object->serialize());
+//                }
                 $output.=$object->serialize();
             } else {
                 die('WHOPSI');
             }
         }
-file_put_contents('slot10.sav', $output);
 
-//        foreach ($myProperty->CONTENTOBJECTS as $contentObject) {
-//            if (is_object($contentObject)) {
-//                $contentObject->x = 'DEAD';
-//                echo "OBJECT " . $myProperty->NAME . ' of ' . $myProperty->TYPE . " is a " . get_class($contentObject) . "\n";
-//            } else {
-//                echo "#";
-//            }
-//        }
-
-
+//file_put_contents('slot10.sav', $output);
 
         $silverPlate = array();
         $keys = array_keys($this->goldenBucket);
