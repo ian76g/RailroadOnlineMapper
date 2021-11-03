@@ -1071,6 +1071,65 @@ class dtHeader
 }
 
 
+class dtString
+{
+    var $content;
+    var $string;
+    var $x;
+    var $position;
+
+    function unserialize($fromX, $position){
+        $this->x = $fromX;
+        $this->position = $position;
+        $this->readUEString();
+        return array($this->string, $this->position);
+    }
+
+    function readUEString()
+    {
+
+//        echo "trying to read string at pos $this->position\n";
+        if (substr($this->x, $this->position, 1) == NULL) {
+//        echo "reading string started with 0\n";
+            $this->position++;
+            $this->content = NULL;
+            $this->string = '';
+            return;
+        }
+        $value = substr($this->x, $this->position, 4);
+        $this->position += 4;
+        $this->content = $value;
+        $value = unpack('i', $value)[1];
+//    echo "trying to read $value Bytes of string\n";
+        if ($value == 0) {
+//        echo "j";
+            $this->string = '';
+            return;
+        }
+        if ($value == 1) {
+//        echo "l";
+            $this->string='';
+            return;
+        }
+        if ($value < 0) {
+            //special encoding
+            $value *= -2;
+            $string = mb_convert_encoding(substr($this->x, $this->position, $value), "UTF-8", "UTF-16LE");
+            $this->string = $string;
+            $this->content.=substr($this->x, $this->position, $value);
+            //echo "[$string]";
+            $this->position += $value;
+        } else {
+            $this->string = substr($this->x, $this->position, $value);
+            $this->position += $value;
+            $this->content.=$this->string;
+        }
+
+        return;
+    }
+
+}
+
 class GVASParser
 {
 
@@ -1099,7 +1158,10 @@ class GVASParser
 
 //        echo "\n";
 //        echo "File pointer is now at $this->position\n";
-        $this->readUEString();
+        $myString = new dtString();
+        $results = $myString->unserialize($x, $this->position);
+        $string = $results[0];
+        $this->position = $results[1];
 
         while ($this->position < strlen($x)) {
             $this->readUEProperty();
@@ -1235,41 +1297,10 @@ class GVASParser
 
     }
 
-    function readUEString()
-    {
 
-//        echo "trying to read string at pos $this->position\n";
-        if (substr($this->x, $this->position, 1) == NULL) {
-//        echo "reading string started with 0\n";
-            $this->position++;
-            return null;
-        }
-        $value = substr($this->x, $this->position, 4);
-        $this->position += 4;
-        $value = unpack('i', $value)[1];
-//    echo "trying to read $value Bytes of string\n";
-        if ($value == 0) {
-//        echo "j";
-            return null;
-        }
-        if ($value == 1) {
-//        echo "l";
-            return "";
-        }
-        if ($value < 0) {
-            //special encoding
-            $value *= -2;
-            $string = mb_convert_encoding(substr($this->x, $this->position, $value), "UTF-8", "UTF-16LE");
-            //echo "[$string]";
-            $this->position += $value;
-        } else {
-            $string = substr($this->x, $this->position, $value);
-            $this->position += $value;
-        }
-
-        return trim($string); //Utf8.GetString(valueBytes, 0, valueBytes.Length - 1);
-    }
-
+    /**
+     * @return stdClass|void|null
+     */
     function readUEProperty()
     {
 
@@ -1280,16 +1311,19 @@ class GVASParser
             return null;
         }
 
-        $name = $this->readUEString();
-        if ($name == null) {
-//        echo "NAME IS NULL\n";
-            return null;
-        }
+        $myString = new dtString();
+        $results = $myString->unserialize($this->x, $this->position);
+        $name = $results[0];
+        $this->position = $results[1];
 
         if ($name == "None")
             return new stdClass();
 
-        $type = $this->readUEString();
+        $myString = new dtString();
+        $results = $myString->unserialize($this->x, $this->position);
+        $type = $results[0];
+        $this->position = $results[1];
+
         $value = substr($this->x, $this->position, 8);
         $this->position += 8;
         if ($this->position > strlen($this->x)) return; // EOF
@@ -1337,13 +1371,19 @@ class GVASParser
         switch ($type) {
             case 'StrProperty':
                 $this->position++;
-                $propertyLength = $this->readUEString();
+                $myString = new dtString();
+                $results = $myString->unserialize($this->x, $this->position);
+                $propertyLength = $results[0];
+                $this->position = $results[1];
                 //$goldenBucket[$name][] = $propertyLength;
                 $this->magic($pieces, $propertyLength);
                 //echo "[$value]";
                 break;
             case 'ArrayProperty':
-                $itemType = trim($this->readUEString());
+                $myString = new dtString();
+                $results = $myString->unserialize($this->x, $this->position);
+                $itemType = trim($results[0]);
+                $this->position=$results[1];
                 //echo "ITEMTYPE:[$itemType]";
                 $this->position++;
                 $arrayCount = $val = unpack('I', substr($this->x, $this->position, 4))[1];
@@ -1352,18 +1392,31 @@ class GVASParser
                 switch ($itemType) {
                     case 'StrProperty':
                         for ($i = 0; $i < $arrayCount; $i++) {
-                            $str = trim($this->readUEString());
+                            $myString = new dtString();
+                            $results = $myString->unserialize($this->x, $this->position);
+                            $str = trim($results[0]);
+                            $this->position = $results[1];
                             //@$goldenBucket[$name][]= $str;
                             $this->magic($pieces, $str);
                         }
                         break;
                     case 'StructProperty' :
-                        $name = trim($this->readUEString());
-                        $type = trim($this->readUEString());
+                        $myString = new dtString();
+                        $results = $myString->unserialize($this->x, $this->position);
+                        $name = trim($results[0]);
+                        $this->position=$results[1];
+                        $myString = new dtString();
+                        $results = $myString->unserialize($this->x, $this->position);
+                        $type = trim($results[0]);
+                        $this->position=$results[1];
                         $lenght = $val = unpack('P', substr($this->x, $this->position, 8))[1];
                         $this->position += 8;
 //                    echo "[[$type][$lenght]]";
-                        $subType = trim($this->readUEString());
+                        $myString = new dtString();
+                        $results = $myString->unserialize($this->x, $this->position);
+                        $subType = trim($results[0]);
+                        $this->position = $results[1];
+
                         $this->position++;
                         $this->position += 16;
                         switch ($subType) {
@@ -1456,12 +1509,23 @@ class GVASParser
             case 1:
                 $s = $this->position - 9;
                 $this->position += 5;
-                $typeOfNextThing = $this->readUEString();
-                $stringFormatter = $this->readUEString();
+                $myString = new dtString();
+                $results = $myString->unserialize($this->x, $this->position);
+                $typeOfNextThing = $results[0];
+                $this->position=$results[1];
+
+                $myString = new dtString();
+                $results = $myString->unserialize($this->x, $this->position);
+                $stringFormatter = $results[0];
+                $this->position = $results[1];
+
                 $fourByteInt = unpack('i', substr($this->x, $this->position, 4))[1];
                 $this->position += 4;
                 for ($pp = 0; $pp < $fourByteInt; $pp++) {
-                    $rowId = $this->readUEString();
+                    $myString = new dtString();
+                    $results = $myString->unserialize($this->x, $this->position);
+                    $rowId = $results[0];
+                    $this->position = $results[1];
                     $test = unpack('C', substr($this->x, $this->position, 1))[1];
                     $this->position++;
                     if ($test != 4) {
@@ -1485,7 +1549,10 @@ class GVASParser
                     break;
                 }
                 if ($secondFour == 1) {
-                    $cartText = $this->readUEString();
+                    $myString = new dtString();
+                    $results = $myString->unserialize($this->x, $this->position);
+                    $cartText = $results[0];
+                    $this->position = $results[1];
                     break;
                 }
                 die('what is an exception?');
