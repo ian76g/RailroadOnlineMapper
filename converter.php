@@ -45,14 +45,15 @@ $bgOffsets = array(
 //print_r($bgOffsets[$bg]);
 // devine the SVG structure
 $htmlSvg = '<!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <title>Railroads Online Map</title>
     <script src="svg-pan-zoom.js"></script>
     <style>.myStuff {font-family: Verdana; font-size: 8pt;}</style>
   </head>
   <body>
     <div id="container" style="width: 850px; height: 850px; border:1px solid black; float:left">
-      <svg id="demo-tiger" xmlns="http://www.w3.org/2000/svg" style="display: inline; width: inherit; min-width: inherit; max-width: inherit; height: inherit; min-height: inherit; max-height: inherit; " viewBox="0 0 8000 8000" version="1.1">
+      <svg id="demo-tiger" xmlns="http://www.w3.org/2000/svg" style="display: inline; width: inherit; min-width: inherit; max-width: inherit; height: inherit; min-height: inherit; max-height: inherit; " viewBox="0 0 8000 8000">
     <defs>
     <pattern id="bild" x="0" y="0" width="' . $bgOffsets[$bg][0] . '" height="' . $bgOffsets[$bg][1] . '" patternUnits="userSpaceOnUse">
       <image x="' .
@@ -259,7 +260,7 @@ foreach ($files as $file) {
         if ($doJpg) imagesetthickness($img, $optionsArr[0]);
         foreach ($data['Splines'] as $spline) {
             $type = $spline['Type'];
-            @$types[$type]++;
+
             if ($type != $current) continue;            // if this spline is not the current type, skip it
             $segments = $spline['Segments'];
             foreach ($segments as $segment) {
@@ -299,15 +300,6 @@ foreach ($files as $file) {
                     $maxSlope = max($maxSlope,
                         ($height * 100 / $length));
                 }
-                if ($distance < 100) {
-                    if ($doJpg) {
-//                        imageellipse($img,
-//                            $imx - (int)(($segment['LocationStart']['X'] - $minX) / 100 * $scale),
-//                            $imy - (int)(($segment['LocationStart']['Y'] - $minY) / 100 * $scale),
-//                            20, 20, $colorSwitchActive);
-                    }
-                    @$distances[$current . '_' . $distance]++;
-                }
 
                 if (false && $distance > 0 && in_array($type, array(4, 0))) {
                     $slope = asin(($segment['LocationEnd']['Y'] - $segment['LocationStart']['Y']) / $distance) / pi() * 180;
@@ -331,7 +323,7 @@ foreach ($files as $file) {
     foreach ($data['Switchs'] as $switch) {
         $dir = false;
         $type = trim($switch['Type']);
-        @$types[$type]++;
+
         /**
          * 0 = SwitchLeft           = lever left switch going left
          * 1 = SwitchRight          = lever right switch going right
@@ -471,13 +463,10 @@ foreach ($files as $file) {
          * 0 = regular
          * 1 = light and nice
          */
-        @$totalTurntables += 1;
+
         // fix given angles and convert to radiant - subtract 90 - because ingame coordinates do not point NORTH (!?)
         $rotation = deg2rad($table['Rotator'][1] + 90);
         $rotation2 = deg2rad($table['Rotator'][1] + 90 - $table['Deck'][1]);
-
-        if ($doJpg) {
-        }
 
         if ($doSvg) {
             $turnTableRadius = 25;
@@ -618,8 +607,6 @@ foreach ($files as $file) {
      * add the industries to the map
      */
     foreach ($data['Industries'] as $site) {
-
-        @$types[$site['Type']]++;
         /**
          * again - fix some issues with wrong INPUT from json
          */
@@ -712,6 +699,8 @@ foreach ($files as $file) {
 //                $name .="\nI:".implode(',', $site['EductsStored'])."\nO:".implode(',', $site['ProductsStored']);
                 $rotation = 0;
                 break;
+            default:
+                die('unknown industry');
         }
 
 
@@ -1017,6 +1006,11 @@ class dtHeader
 
     var $content = '';
 
+    /**
+     * @param $fromX
+     * @param $position
+     * @return float|int|mixed
+     */
     function unserialize($fromX, $position)
     {
         foreach ($this->a as $elem => $bits) {
@@ -1175,7 +1169,7 @@ class dtProperty
     }
 
     /**
-     * @return array|stdClass|void
+     * @return array|array[]|stdClass|string
      */
     function readUEProperty()
     {
@@ -1248,8 +1242,9 @@ class dtProperty
                 //$goldenBucket[$name][] = $propertyLength;
 //                echo "[$propertyLength]";
                 return array(array($pieces, $propertyLength));
-                break;
+
             case 'ArrayProperty':
+                $elem = array();
                 $myString = new dtString();
                 $results = $myString->unserialize($this->x, $this->position);
                 $itemType = trim($results[0]);
@@ -1271,7 +1266,7 @@ class dtProperty
                             $elem[] = array($pieces, $str);
                         }
                         return $elem;
-                        break;
+
                     case 'StructProperty' :
                         $myString = new dtString();
                         $results = $myString->unserialize($this->x, $this->position);
@@ -1305,12 +1300,11 @@ class dtProperty
                                     $elem[]= array($pieces, array($notX, $y, $z));
                                 }
                                 return $elem;
-                                break;
+
                             default:
                                 echo "$name not implemented BOO\n";
                                 die();
                         }
-                        break;
 
                     case 'FloatProperty':
                         for ($i = 0; $i < $arrayCount; $i++) {
@@ -1320,7 +1314,6 @@ class dtProperty
                             $elem[] = array($pieces, $float);
                         }
                         return $elem;
-                        break;
 
                     case 'IntProperty':
                         for ($i = 0; $i < $arrayCount; $i++) {
@@ -1330,7 +1323,6 @@ class dtProperty
                             $elem[] = array($pieces, $int);
                         }
                         return $elem;
-                        break;
 
                     case 'BoolProperty':
                         for ($i = 0; $i < $arrayCount; $i++) {
@@ -1340,7 +1332,6 @@ class dtProperty
                             $elem[] = array($pieces, $bool);
                         }
                         return $elem;
-                        break;
 
                     case 'TextProperty':
                         //echo "Textproperty incoming at " . $this->position . " for Name $name\n";
@@ -1352,14 +1343,12 @@ class dtProperty
                         //$index+=$propertyLength-4;
 //                    echo "... done\n";
                     return $elem;
-                        break;
 
                     default:
                         //print_r($goldenBucket);
 
                         die($itemType . ' not implemented');
                 }
-                break;
 
             default:
                 echo "unhandled type [$type]\n";
@@ -1416,6 +1405,7 @@ class dtProperty
 
                 $fourByteInt = unpack('i', substr($this->x, $this->position, 4))[1];
                 $this->position += 4;
+                $cartText=array();
                 for ($pp = 0; $pp < $fourByteInt; $pp++) {
                     $myString = new dtString();
                     $results = $myString->unserialize($this->x, $this->position);
@@ -1451,7 +1441,6 @@ class dtProperty
                     break;
                 }
                 die('what is an exception?');
-                break;
 
             default:
                 die('oooops' . $terminator);
@@ -1461,6 +1450,9 @@ class dtProperty
     }
 }
 
+/**
+ * Class GVASParser
+ */
 class GVASParser
 {
 
