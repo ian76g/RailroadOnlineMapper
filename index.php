@@ -6,7 +6,7 @@
     <script src="js-image-zoom.js"></script>
 	<style>* {font-family: Verdana; font-size: 9pt;}</style>
 </head>
-<body style="background-image: url('indexbg.jpg'); background-position: 50% 50%; padding:50px;">
+<body style="background-image: url('indexbg.jpg'); background-position: 50% 50%; padding:50px;background-repeat: no-repeat">
 	<div width="100%" >
 	<?php
 		$dh=opendir('done/');

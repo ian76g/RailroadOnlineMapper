@@ -58,7 +58,7 @@ include('converter.php');
 ?>
 <!DOCTYPE html>
 <html><head><style>* {font-family:Verdana; font-size:12pt;}</style></head>
-<body style="background-image: url('indexbg.jpg'); background-position: 50% 50%; padding:50px;">
+<body style="background-image: url('indexbg.jpg'); background-position: 50% 50%; padding:50px;background-repeat: no-repeat">
 <div style="padding:100px;">
 <!--H1>I AM IN BED NOW. GAMING COMPUTER SHUT DOWN! YOUR UPLOADS WILL BE QUEUED UNTIL I WAKE UP TOMORROW.</H1>
 <H2>Due to some technical limitations this mapping can yet not be done plainely on Webservers (yet!)</H2>
