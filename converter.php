@@ -504,7 +504,7 @@ foreach ($files as $file) {
 
     //print_r($types);
     /**
-     * draw some vehicles ontop of that image
+     * draw some vehicles on top of that image
      * define size and color of vehicle here
      */
 
@@ -547,7 +547,8 @@ foreach ($files as $file) {
             rotatedellipse($img,
                 $imx - (int)(($vehicle['Location'][0] - $minX) / 100 * $scale), $imy - (int)(($vehicle['Location'][1] - $minY) / 100 * $scale),
                 $engineRadius * 1.1, ($engineRadius * 1.1) / 2, $vehicle['Rotation'][1], $colorTrack, false);
-//            if($vehicle['Type'] == 'flatcar_hopper'){
+
+//            if($vehicle['Location'][2]<-1000){
 //                imagettftext($img, $engineRadius / 4 * 3, 0,
 //                    $imx - (int)(($vehicle['Location']['X'] - $minX) / 100 * $scale), $imy - (int)(($vehicle['Location']['Y'] - $minY) / 100 * $scale),
 //                    $colorTrack, $fontFile, '  ' . $vehicle['Location']['X'].'/'.$vehicle['Location']['Y'].'/'.$vehicle['Location']['Z']);
@@ -561,6 +562,18 @@ foreach ($files as $file) {
                 '" style="fill:' . $cartColors[$vehicle['Type']][2] . ';stroke:black;stroke-width:1" transform="rotate(' . $vehicle['Rotation'][1] .
                 ', ' . ($imx - (int)(($vehicle['Location'][0] - $minX) / 100 * $scale)) . ', ' . ($imy - (int)(($vehicle['Location'][1] - $minY) / 100 * $scale)) . ')"
               />';
+
+            if($vehicle['Location'][2]<1000){
+                $svg .= '<ellipse cx="' . ($imx - (int)(($vehicle['Location'][0] - $minX) / 100 * $scale)) .
+                    '" cy="' . ($imy - (int)(($vehicle['Location'][1] - $minY) / 100 * $scale)) . '" rx="' . (($engineRadius / 2) *10).
+                    '" ry="' . (($engineRadius / 2)*10) .
+                    '" style="fill:none;stroke:red;stroke-width:10" transform="rotate(' . $vehicle['Rotation'][1] .
+                    ', ' . ($imx - (int)(($vehicle['Location'][0] - $minX) / 100 * $scale)) . ', ' . ($imy - (int)(($vehicle['Location'][1] - $minY) / 100 * $scale)) . ')"
+              />';
+                $svg .= '<text x="' . ($imx - (int)(($vehicle['Location'][0] - $minX) / 100 * $scale)) .
+                    '" y="' . ($imy - (int)(($vehicle['Location'][1] - $minY) / 100 * $scale)) . '" >' . '&nbsp;&nbsp;' . $vehicle['Location'][2] . '</text>' . "\n";
+
+            }
         }
 
         // add some names to the locomotives

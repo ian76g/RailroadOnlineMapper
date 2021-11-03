@@ -58,7 +58,7 @@ include('converter.php');
 ?>
 <!DOCTYPE html>
 <html><head><style>* {font-family:Verdana; font-size:12pt;}</style></head>
-<body>
+<body style="background-image: url('indexbg.jpg'); background-position: 50% 50%; padding:50px;">
 <div style="padding:100px;">
 <!--H1>I AM IN BED NOW. GAMING COMPUTER SHUT DOWN! YOUR UPLOADS WILL BE QUEUED UNTIL I WAKE UP TOMORROW.</H1>
 <H2>Due to some technical limitations this mapping can yet not be done plainely on Webservers (yet!)</H2>
@@ -70,13 +70,13 @@ Open explorer at %localappdata%\arr\saved\savegames\<br>
     Your Name on Discord or similar: <input name="discordName" maxlength="8"><br>
     <fieldset>
         <input type="radio" id="bg" name="background" value="bg">
-        <label for="bg"> <img src="done/bg.png" width="90" height="90"> old background </label><br>
+        <label for="bg"> <img border="2" src="done/bg.png" width="90" height="90"> old background </label><br>
         <input  type="radio" id="bg3" name="background" value="bg3">
-        <label for="bg3"> <img src="done/bg3.png" width="90" height="90"> new background </label><br>
+        <label for="bg3"> <img border="2" src="done/bg3.png" width="90" height="90"> new background </label><br>
         <input  type="radio" id="bg4" name="background" value="bg4">
-        <label for="bg4"> <img src="done/bg4.png" width="90" height="90"> Psawhns background </label><br>
+        <label for="bg4"> <img border="2" src="done/bg4.png" width="90" height="90"> Psawhns background </label><br>
         <input checked type="radio" id="bg5" name="background" value="bg5">
-        <label for="bg5"> <img src="done/bg4.png" width="90" height="90"> Psawhns background with Kanados overlay</label><br>
+        <label for="bg5"> <img border="2" src="done/bg4.png" width="90" height="90"> Psawhns background with Kanados overlay</label><br>
     </fieldset><br>
     <hr>expert settings: DON'T TOUCH when you are no expert!<hr>
     background image offset X: <input name="xoff" value=""><br>

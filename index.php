@@ -6,8 +6,8 @@
     <script src="js-image-zoom.js"></script>
 	<style>* {font-family: Verdana; font-size: 9pt;}</style>
 </head>
-<body>
-	<div width="100%">
+<body style="background-image: url('indexbg.jpg'); background-position: 50% 50%; padding:50px;">
+	<div width="100%" >
 	<?php
 		$dh=opendir('done/');
 		while($file=readdir($dh)){
@@ -25,7 +25,7 @@ echo '<hr><a href="upload.php" target="_upload">Add your Savegame here</a><br>mo
 		krsort($files);
 
 		$hard_limit = 400;
-		$soft_limit = 135;
+		$soft_limit = 140;
 		echo '<span style="float:left;padding-right:50px;">'.$tableHeader;
 		for($i=0; $i<sizeof($files); $i++){
 			$file = array_shift($files);
