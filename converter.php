@@ -550,7 +550,7 @@ foreach ($files as $file) {
     foreach ($data['Frames'] as $cartIndex => $vehicle) {
         $trow = '<tr>
 <td>###1###</td>
-<td>###2###</td>
+<td>              <input size="5" maxlength="15" name="name_' . $cartIndex . '" value="###2###"></td>
 <td align="right"><input size="5" maxlength="15" name="number_' . $cartIndex . '" value="###3###"></td>
 <td>###4###</td>
 <td>###5###</td>
@@ -1505,6 +1505,9 @@ class dtProperty
                             if (trim($this->NAME) == 'FrameNumberArray') {
                                 $createEmptyNumber = true;
                             }
+                            if (trim($this->NAME) == 'FrameNameArray') {
+                                $createEmptyNumber = true;
+                            }
                             $cartText = $this->readTextProperty($i, $createEmptyNumber);
                             $elem[] = array($pieces, $cartText);
                             //echo "...-[$cartText]-..."
@@ -1716,6 +1719,19 @@ class GVASParser
                         }
                     }
                 }
+//                if (trim($object->NAME) == 'FrameNameArray') {
+//                    foreach ($object->CONTENTOBJECTS as $co) {
+//                        if (is_object($co) && trim($co->NAME) == 'STRING') {
+//                            if (
+//                                ($co->ARRCOUNTER !== '') &&
+//                                isset($_POST['name_' . $co->ARRCOUNTER]) &&
+//                                $_POST['name_' . $co->ARRCOUNTER] != trim($co->string)
+//                            ) {
+//                                $co->string = strip_tags(trim($_POST['name_' . $co->ARRCOUNTER])) . hex2bin('00');
+//                            }
+//                        }
+//                    }
+//                }
                 if (trim($object->NAME) == 'FreightAmountArray') {
                     foreach ($object->CONTENTOBJECTS as $co) {
                         if(is_object($co) && trim($co->NAME) == 'Int'){
@@ -1755,9 +1771,9 @@ class GVASParser
             echo '<A href="saves/' . $this->NEWUPLOADEDFILE . '.modified' . '">Download your modified save here </A><br>';
             echo 'Want to upload this map again?<A href="upload.php">Add your renumbered save again</A><br>';
         } else {
-            echo "RESAVING FILE TO DISK - EMPTY NUMBERS BECAME A DOT " . $this->NEWUPLOADEDFILE . "<br>\n";
-            file_put_contents('uploads/'.$this->NEWUPLOADEDFILE, $output);
-            if($againAllowed) {
+            if($againAllowed){
+                echo "RESAVING FILE TO DISK - EMPTY NUMBERS BECAME A DOT " . $this->NEWUPLOADEDFILE . "<br>\n";
+                file_put_contents('uploads/'.$this->NEWUPLOADEDFILE, $output);
                 return 'AGAIN';
             }
         }
