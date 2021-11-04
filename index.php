@@ -42,8 +42,12 @@
             continue;
         }
 
+        $dl = '';
+        if(file_exists('public/'.substr($file, 5, -5).'.sav')){
+            $dl = ' (DL)';
+        }
 
-        echo '<tr><td><A href="done/' . substr($file, 5, -5) . '.html?t=' . time() . '">' . substr($file, 5, -5) . '</A></td>
+        echo '<tr><td><A href="done/' . substr($file, 5, -5) . '.html?t=' . time() . '">' . substr($file, 5, -5) . $dl .'</A></td>
 <td align="right">' . round($db[substr($file, 5, -5) . '.sav'][0] / 100000, 2) . 'km</td>
 <td align="right">' . $db[substr($file, 5, -5) . '.sav'][1] . '</td>
 <td align="right">' . $db[substr($file, 5, -5) . '.sav'][2] . '</td>

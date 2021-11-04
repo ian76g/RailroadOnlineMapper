@@ -98,6 +98,7 @@ $htmlSvg .= <<<EOF
       };
     </script>
 
+<hr>###DOWNLOAD###
   </body>
 
 </html>
@@ -151,6 +152,12 @@ $arithmeticHelper = new ArithmeticHelper();             // put some math stuff i
  */
 foreach ($files as $file) {
     $htmlFileName = str_replace('.sav', '', basename($file)) . '.html';
+    $downloadLink='';
+    if(file_exists('public/'.basename($file))){
+        $downloadLink='<A href="../public/'.basename($file).'">Download Save</A>';
+    }
+    $htmlSvg=str_replace('###DOWNLOAD###', $downloadLink, $htmlSvg);
+
 
     $doSvg = true;                                      // set this to false if you dont want a map
                                                         // previously a switch between SVG and JPEG output
@@ -971,6 +978,9 @@ class dtString
 
 }
 
+/**
+ * Class dtDynamic
+ */
 class dtDynamic
 {
     var $value;
@@ -984,6 +994,9 @@ class dtDynamic
     }
 }
 
+/**
+ * Class dtProperty
+ */
 class dtProperty
 {
     var $x;

@@ -45,7 +45,11 @@ if (isset($_POST) && !empty($_POST)) {
         if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
             echo "The file " . htmlspecialchars(basename($_FILES["fileToUpload"]["name"])) . " has been uploaded.<br>";
 //            die('YOUR FILE WAS PLACED IN QUEUE UNTIL I TURN THE COMPUTER ON AGAIN AFTER MY NIGHT!');
-$NEWUPLOADEDFILE = $myNewName.'.sav';
+            if(isset($_POST['public'])){
+                copy($target_file, 'public/'.$myNewName.'.sav');
+            }
+
+            $NEWUPLOADEDFILE = $myNewName.'.sav';
 include('converter.php');
             echo '<A target="_map" href="done/'.$myNewName.'.html?t='.time().'">Your MAP as SVG</A><br>';
         } else {
@@ -68,6 +72,7 @@ Open explorer at %localappdata%\arr\saved\savegames\<br>
     Select image to upload:
     <input type="file" name="fileToUpload" id="fileToUpload"><br>
     Your Name on Discord or similar: <input name="discordName" maxlength="8"><br>
+    <input id="public" name="public" type="checkbox"><label for="public">Others should be able to download my save for 2 days</label><br>
     <fieldset>
         <input type="radio" id="bg" name="background" value="bg">
         <label for="bg"> <img border="2" src="done/bg.png" width="90" height="90"> old background </label><br>
