@@ -46,62 +46,18 @@ $bgOffsets = array(
 );
 
 // devine the SVG structure of the output-map
-$htmlSvg = '<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <title>Railroads Online Map</title>
-    <script src="svg-pan-zoom.js"></script>
-    <style>.myStuff {font-family: Verdana; font-size: 8pt;}</style>
-  </head>
-  <body>
-    <div id="container" style="width: 850px; height: 850px; border:1px solid black; float:left">
-      <svg id="demo-tiger" xmlns="http://www.w3.org/2000/svg" style="display: inline; width: inherit; min-width: inherit; max-width: inherit; height: inherit; min-height: inherit; max-height: inherit; " viewBox="0 0 8000 8000">
-    <defs>
-    <pattern id="bild" x="0" y="0" width="' . $bgOffsets[$bg][0] . '" height="' . $bgOffsets[$bg][1] . '" patternUnits="userSpaceOnUse">
-      <image x="' .
+$htmlSvg = file_get_contents('map.template.html');
+$pattern = '
+<pattern id="bild" x="0" y="0" width="' . $bgOffsets[$bg][0] . '" height="' . $bgOffsets[$bg][1] . '" patternUnits="userSpaceOnUse">
+                <image x="' .
     ((isset($_POST['xoff']) && $_POST['xoff'] !== '') ? ($_POST['xoff']) : $bgOffsets[$bg][2]) . '" y="' .
     ((isset($_POST['yoff']) && $_POST['xoff'] !== '') ? ($_POST['yoff']) : $bgOffsets[$bg][3]) . '" width="' .
     ((isset($_POST['xsoff']) && $_POST['xoff'] !== '') ? ($_POST['xsoff']) : $bgOffsets[$bg][4]) . '" height="' .
     ((isset($_POST['ysoff']) && $_POST['xoff'] !== '') ? ($_POST['ysoff']) : $bgOffsets[$bg][5]) . '" href="' . $bg . '.png" />
-    </pattern>
-  </defs>
-  <rect x="0" y="0" width="8000" height="8000" fill="url(#bild)" stroke="black"/>
-    ###SVG###
+            </pattern>
 ';
-$htmlSvg .= <<<EOF
-</svg>
-    <button id="enable">enable</button>
-    <button id="disable">disable</button>
-    </div>
-    <div style="float:left" class="myStuff">###EXTRAS###</div>
+$htmlSvg = str_replace('###PATTERN###', $pattern, $htmlSvg);
 
-
-    <script>
-      // Don't use window.onLoad like this in production, because it can only listen to one function.
-      window.onload = function() {
-        // Expose to window namespase for testing purposes
-        window.zoomTiger = svgPanZoom('#demo-tiger', {
-          zoomEnabled: true,
-          controlIconsEnabled: true,
-          fit: true,
-          center: true,
-          // viewportSelector: document.getElementById('demo-tiger').querySelector('#g4') // this option will make library to misbehave. Viewport should have no transform attribute
-        });
-
-        document.getElementById('enable').addEventListener('click', function() {
-          window.zoomTiger.enableControlIcons();
-        })
-        document.getElementById('disable').addEventListener('click', function() {
-          window.zoomTiger.disableControlIcons();
-        })
-      };
-    </script>
-
-<hr>###DOWNLOAD###
-  </body>
-
-</html>
-EOF;
 
 // later you can switch cargo on carts - maybe this can be done by editing the save via the mapper later?
 $possibleCargos = array(
