@@ -20,7 +20,7 @@
     }
     @$db = unserialize(@file_get_contents('db.db'));
     //array($totalTrackLength, $totalSwitches, $totalLocos, $totalCarts, $maxSlope);
-    echo '<hr><a href="upload.php" target="_upload">Add your Savegame here</a><br>most recent maps are: <hr>';
+    echo '<hr><a href="upload.php" target="_upload">Add your Savegame here</a><br>most recent maps are: (DL) indicates public download availabe<hr>';
     $tableHeader = '<table>
 <tr><th>NAME</th><th>Track Length</th><th># Y</th><th>Locos</th><th>Carts</th><th>max Slope</th></tr>';
 

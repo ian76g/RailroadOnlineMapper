@@ -63,7 +63,7 @@ include('converter.php');
 <!DOCTYPE html>
 <html><head><style>* {font-family:Verdana; font-size:12pt;}</style></head>
 <body style="background-image: url('indexbg.jpg'); background-position: 50% 50%; padding:50px;background-repeat: no-repeat">
-<div style="padding:100px;">
+<div style="float:left;padding:100px;" width="700px">
 <!--H1>I AM IN BED NOW. GAMING COMPUTER SHUT DOWN! YOUR UPLOADS WILL BE QUEUED UNTIL I WAKE UP TOMORROW.</H1>
 <H2>Due to some technical limitations this mapping can yet not be done plainely on Webservers (yet!)</H2>
 <H3>hence we miss some cruicial bits needed to display a map.</H3-->
@@ -92,5 +92,6 @@ Open explorer at %localappdata%\arr\saved\savegames\<br>
     <input type="submit" value="Upload save game" name="submit">
 </form>
 </div>
+<div style="float:left;padding-top:100px;" width="30%"><img src="hint.png" width="900"></div>
 </body>
 </html>

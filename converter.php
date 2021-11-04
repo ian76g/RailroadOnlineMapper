@@ -1538,6 +1538,7 @@ class GVASParser
                 die('WHOPSI');
             }
         }
+        $output.=hex2bin('050000004e6f6e650000000000');
 
         if (isset($_POST['save'])) {
             echo "SAVING FILE " . $this->NEWUPLOADEDFILE . '.modified' . "<br>\n";
