@@ -11,7 +11,6 @@ $start = microtime(true);           // to caclulate runtime at end
 $imageWidth = 8000;                        // desired images width (x,y) aproximately
 
 $path = 'uploads';                         // set the path to find the save games.... last line wins
-$fontFile = 'OpenSans-Regular.ttf';        // for texts we need a font
 
 if (isset($argv[1]) && !empty($argv[1])) {
     $path = pathinfo($argv[1])['dirname']; // run from commandline grabbing path from parameter
@@ -66,7 +65,7 @@ $htmlSvg = '<!DOCTYPE html>
     ((isset($_POST['ysoff']) && $_POST['xoff'] !== '') ? ($_POST['ysoff']) : $bgOffsets[$bg][5]) . '" href="' . $bg . '.png" />
     </pattern>
   </defs>
-  <rect x="0" y="0" width="8000" height="8000" fill="url(#bild)" stroke="black"/>  
+  <rect x="0" y="0" width="8000" height="8000" fill="url(#bild)" stroke="black"/>
     ###SVG###
 ';
 $htmlSvg .= <<<EOF
@@ -392,7 +391,7 @@ foreach ($files as $file) {
 // debugging
 //            imagettftext($img, 20, 0,
 //        $imx - (int)(($switch['Location']['X'] - $minX) /100* $scale), $imy - (int)(($switch['Location']['Y'] - $minY) /100* $scale),
-//    $colorTrack, $fontFile, $type);
+//    $colorTrack, $type);
 
     }
 

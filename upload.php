@@ -2,7 +2,7 @@
 if (isset($_POST) && !empty($_POST)) {
 
     $target_dir = "uploads/";
-    $myNewName = str_replace(array('#','&',' ',"'",'`', '´'), '_', substr($_POST['discordName'],0,8));
+    $myNewName = str_replace(array('#','&',' ',"'",'`', 'ï¿½'), '_', substr($_POST['discordName'],0,8));
     $target_file = $target_dir . $myNewName . '.sav';
     $uploadOk = 1;
     $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
@@ -51,7 +51,7 @@ if (isset($_POST) && !empty($_POST)) {
 
             $NEWUPLOADEDFILE = $myNewName.'.sav';
 include('converter.php');
-            echo '<A target="_map" href="done/'.$myNewName.'.html?t='.time().'">Your MAP as SVG</A><br>';
+            echo '<a target="_map" href="done/'.$myNewName.'.html?t='.time().'">Your MAP as SVG</a><br>';
         } else {
             echo "Sorry, there was an error uploading your file.";
         }
@@ -61,37 +61,97 @@ include('converter.php');
 
 ?>
 <!DOCTYPE html>
-<html><head><style>* {font-family:Verdana; font-size:12pt;}</style></head>
-<body style="background-image: url('indexbg.jpg'); background-position: 50% 50%; padding:50px;background-repeat: no-repeat">
-<div style="float:left;padding:100px;" width="700px">
-<!--H1>I AM IN BED NOW. GAMING COMPUTER SHUT DOWN! YOUR UPLOADS WILL BE QUEUED UNTIL I WAKE UP TOMORROW.</H1>
-<H2>Due to some technical limitations this mapping can yet not be done plainely on Webservers (yet!)</H2>
-<H3>hence we miss some cruicial bits needed to display a map.</H3-->
-Open explorer at %localappdata%\arr\saved\savegames\<br>
-<form method="post" enctype="multipart/form-data">
-    Select image to upload:
-    <input type="file" name="fileToUpload" id="fileToUpload"><br>
-    Your Name on Discord or similar: <input name="discordName" maxlength="8"><br>
-    <input id="public" name="public" type="checkbox"><label for="public">Others should be able to download my save for 2 days</label><br>
-    <fieldset>
-        <input type="radio" id="bg" name="background" value="bg">
-        <label for="bg"> <img border="2" src="done/bg.png" width="90" height="90"> old background </label><br>
-        <input  type="radio" id="bg3" name="background" value="bg3">
-        <label for="bg3"> <img border="2" src="done/bg3.png" width="90" height="90"> new background </label><br>
-        <input  type="radio" id="bg4" name="background" value="bg4">
-        <label for="bg4"> <img border="2" src="done/bg4.png" width="90" height="90"> Psawhns background </label><br>
-        <input checked type="radio" id="bg5" name="background" value="bg5">
-        <label for="bg5"> <img border="2" src="done/bg4.png" width="90" height="90"> Psawhns background with Kanados overlay</label><br>
-    </fieldset><br>
-    <hr>expert settings: DON'T TOUCH when you are no expert!<hr>
-    background image offset X: <input name="xoff" value=""><br>
-    background image offset Y: <input name="yoff" value=""><br>
-    background image width: <input name="xsoff" value=""><br>
-    background image height: <input name="ysoff" value=""><br>
-    <input type="checkbox" name="empty"> include unnamed rolling stock to list <br>
-    <input type="submit" value="Upload save game" name="submit">
-</form>
-</div>
-<div style="float:left;padding-top:100px;" width="30%"><img src="hint.png" width="900"></div>
+<html lang="en">
+<?php
+    $PageTitle="Upload";
+    include_once('includes/head.php');
+?>
+<body>
+    <!--H1>I AM IN BED NOW. GAMING COMPUTER SHUT DOWN! YOUR UPLOADS WILL BE QUEUED UNTIL I WAKE UP TOMORROW.</H1>
+    <H2>Due to some technical limitations this mapping can yet not be done plainely on Webservers (yet!)</H2>
+    <H3>hence we miss some cruicial bits needed to display a map.</H3-->
+
+    <header class="header">
+        <a class="button" href="/">Go Back</a>
+    </header>
+
+    <main>
+        <form class="upload-form" method="post" enctype="multipart/form-data">
+            <h1>Upload your savefile</h1>
+            <p>Open explorer at %localappdata%\arr\saved\savegames\</p>
+            <br>
+
+            <section>
+                <h3>1. Select savefile</h3>
+                <input type="file" name="fileToUpload" id="fileToUpload">
+            </section>
+
+            <section>
+                <h3>2. Enter your name</h3>
+                <div class="input-group">
+                    <label for="discordName">Your Name on Discord or similar:</label>
+                    <input placeholder="Enter your name" id="discordName" type="text" name="discordName" maxlength="8">
+                </div>
+
+            </section>
+
+            <section class="upload-form__background">
+                <h3>3. Select your background</h3>
+                <fieldset>
+                    <div>
+                        <input type="radio" id="bg" name="background" value="bg">
+                        <label for="bg"> <img border="2" src="done/bg.png" width="90" height="90"> old background </label>
+                    </div>
+                    <div>
+                        <input type="radio" id="bg3" name="background" value="bg3">
+                        <label for="bg3"> <img border="2" src="done/bg3.png" width="90" height="90"> new background </label>
+                    </div>
+                    <div>
+                        <input  type="radio" id="bg4" name="background" value="bg4">
+                        <label for="bg4"> <img border="2" src="done/bg4.png" width="90" height="90"> Psawhns background </label>
+                    </div>
+                    <div>
+                        <input checked type="radio" id="bg5" name="background" value="bg5">
+                        <label for="bg5"> <img border="2" src="done/bg4.png" width="90" height="90"> Psawhns background with Kanados overlay</label>
+                    </div>
+                </fieldset>
+            </section>
+
+            <section>
+                <h3>4. Expert settings</h3>
+                <p><b>expert settings: DON'T TOUCH when you are no expert!</b></p>
+
+                <div class="input-group">
+                    <label for="xoff">background image offset X:</label>
+                    <input placeholder="0px" type="text" id="xoff" name="xoff" value="">
+                </div>
+
+                <div class="input-group">
+                    <label for="yoff">background image offset Y:</label>
+                    <input placeholder="0px" type="text" id="yoff" name="yoff" value="">
+                </div>
+
+                <div class="input-group">
+                    <label for="xsoff">background image width:</label>
+                    <input placeholder="0px" type="text" id="xsoff" name="xsoff" value="">
+                </div>
+
+                <div class="input-group">
+                    <label for="ysoff">background image height:</label>
+                    <input placeholder="0px" type="text" id="ysoff" name="ysoff" value="">
+                </div>
+
+                <div class="input-group input-group--row">
+                    <input type="checkbox" id="empty" name="empty">
+                    <label for="empty">include unnamed rolling stock to list</label>
+                </div>
+
+                <input class="button" type="submit" value="Upload" name="submit">
+            </section>
+        </form>
+    </main>
+
+    <?php include_once('includes/footer.php') ?>
+
 </body>
 </html>
