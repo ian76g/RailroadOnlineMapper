@@ -1,6 +1,6 @@
 # RailroadOnlineMapper
 
-Currnetly hosted on https://minizwerg.online/
+Currently hosted on https://minizwerg.online/
 
 ## Getting Started
 
