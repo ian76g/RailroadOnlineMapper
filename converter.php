@@ -1,27 +1,28 @@
 <?php
-ini_set('memory_limit', -1);
-set_time_limit(10);
-$v = 46;
+ini_set('memory_limit', -1);  // just in case - previous versions had 8000x8000 px truecolor images JPEG
+set_time_limit(10);                // just in case something wents really bad -- kill script after 10 seconds
+$v = 46;                                  //version - totally not used except in next line
 echo "\n" . 'running converter version 0.' . $v . "\n";
 
 /**
  * define some stuff we need later
  */
-$start = microtime(true);
-$imageWidth = 8000; // desired images width (x,y) aproximately
-//set the path to find the save games.... last line wins
-$path = 'uploads';
-$fontFile = 'OpenSans-Regular.ttf';
+$start = microtime(true);           // to caclulate runtime at end
+$imageWidth = 8000;                        // desired images width (x,y) aproximately
+
+$path = 'uploads';                         // set the path to find the save games.... last line wins
+$fontFile = 'OpenSans-Regular.ttf';        // for texts we need a font
 
 if (isset($argv[1]) && !empty($argv[1])) {
-    $path = pathinfo($argv[1])['dirname'];
-}
-$empty = false;
-if (isset($_POST['empty']) && $_POST['empty']) {
-    $empty = true;
+    $path = pathinfo($argv[1])['dirname']; // run from commandline grabbing path from parameter
 }
 
-$bg = 'bg5';
+$empty = false;
+if (isset($_POST['empty']) && $_POST['empty']) {
+    $empty = true;                          // render table of rolling stock without names?
+}
+
+$bg = 'bg5';                                // choose a background image
 if (isset($_POST['background'])) {
     if ($_POST['background'] == 'bg') {
         $bg = 'bg';
@@ -36,14 +37,16 @@ if (isset($_POST['background'])) {
         $bg = 'bg5';
     }
 }
+
+// each different background image needs different croping and stretching params
 $bgOffsets = array(
     'bg5' => array(9400, 9600, -720, -770, 9400, 9600),
     'bg4' => array(9400, 9600, -720, -770, 9400, 9600),
     'bg3' => array(8000, 8000, 0, 50, 8000, 8000),
     'bg' => array(8000, 8000, 0, 0, 8000, 8000),
 );
-//print_r($bgOffsets[$bg]);
-// devine the SVG structure
+
+// devine the SVG structure of the output-map
 $htmlSvg = '<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -100,6 +103,7 @@ $htmlSvg .= <<<EOF
 </html>
 EOF;
 
+// later you can switch cargo on carts - maybe this can be done by editing the save via the mapper later?
 $possibleCargos = array(
     'flatcar_logs' => array('log'),
     'flatcar_stakes' => array('rail', 'lumber', 'beam', 'rawiron'),
@@ -107,11 +111,11 @@ $possibleCargos = array(
     'flatcar_cordwood' => array('cordwood'),
 );
 
-$dh = opendir($path);
 
 /**
  * read all save files
  */
+$dh = opendir($path);
 $files = array();
 while ($file = readdir($dh)) {
     if (substr($file, -4) == '.sav') {
@@ -125,48 +129,51 @@ while ($file = readdir($dh)) {
  */
 krsort($files);
 
-if (!isset($NEWUPLOADEDFILE)) {
+if (!isset($NEWUPLOADEDFILE)) {                         // will be set in upload.php after upload.
     if (isset($argv[1])) {
-        $NEWUPLOADEDFILE = $argv[1];
+        $NEWUPLOADEDFILE = $argv[1];                    // or we find it on command line
     } else {
-        if (isset($_POST['save']) && $_POST['save']) {
+        if (isset($_POST['save']) && $_POST['save']) {  // but this can also be aquired after editing the save out of the map.html
             $path = 'saves';
             $NEWUPLOADEDFILE = $_POST['save'];
         } else {
-            die('no file submitted' . "\n");
+            die('no file submitted' . "\n");            // you either call it from commandline, upload or edit.
         }
     }
 }
 
-$files = array($NEWUPLOADEDFILE);
+$files = array($NEWUPLOADEDFILE);                       // override allFiles with just the one file specified
 
-$arithmeticHelper = new ArithmeticHelper();
+$arithmeticHelper = new ArithmeticHelper();             // put some math stuff in an extra class
 /**
  * /*
- * do all files that need to be done
+ * do all files that need to be done  (was overriden by a single file)
  */
 foreach ($files as $file) {
     $htmlFileName = str_replace('.sav', '', basename($file)) . '.html';
 
-    $doSvg = true;
+    $doSvg = true;                                      // set this to false if you dont want a map
+                                                        // previously a switch between SVG and JPEG output
 
     $svg = '';
     $savegame = $path . "/" . $file;
 
-    $myParser = new GVASParser();
-    $myParser->NEWUPLOADEDFILE = $NEWUPLOADEDFILE;
-    /**
-     * read whole file into memory
-     */
+    $myParser = new GVASParser();                       // grab a Parser
+    $myParser->NEWUPLOADEDFILE = $NEWUPLOADEDFILE;      // give the parser a filename
+
     $data = $myParser->parseData(file_get_contents($path . '/' . $file));
     if ($data == 'AGAIN') {
+        // hack - we read a small struct - and inject new structure elements (empty cart numbers)
+        // therefore we need to parse the new struct again.
         $data = $myParser->parseData(file_get_contents($path . '/' . $file), false);
     }
     $data = json_decode($data, true);
 
     /**
-     * find min and max X and Y values inthe save
+     * find min and max X and Y values in the save
      * whoever built track built it "somewhere"....
+     *
+     * initially to scale the network - but was skipped after getting the high quality backgrounds
      */
     $minX = 0;
     $maxX = 0;
@@ -187,25 +194,20 @@ foreach ($files as $file) {
     $x = $maxX - $minX;
     $y = $maxY - $minY;
 
-//echo "X: $x, Y: $y\n";
-
     /**
      * Now we need a factor to scale the ingame coordinates of the network to our 8000px image
      */
 
     $max = max($x, $y);
     $scale = ($imageWidth * 100 / $max);
-//echo "scale $scale\n";
-// : 100
-    $switchRadius = (80 / 2.2107077) * $scale;   // (size an armlength of switches)
-    $engineRadius = 6 * $scale;                // (radius of locomotives and carts)
 
-    $turnTableRadius = (10 / 2.2107077) * $scale;
+    $switchRadius = (80 / 2.2107077) * $scale;              // (size an armlength of switches)
+    $engineRadius = 6 * $scale;                             // (radius of locomotives and carts)
+
+    $turnTableRadius = (10 / 2.2107077) * $scale;           // size of turntables
 
     $imx = (int)$x / 100 * $scale;
     $imy = (int)$y / 100 * $scale;
-
-//echo "[$imx][$imy]\n";
 
     /**
      * set some basic order on what to draw first, rails of course should be painted last
@@ -214,21 +216,23 @@ foreach ($files as $file) {
      */
 
     $order = array(
-        '1' => array(15, 'darkkhaki'), // variable bank
-        '2' => array(15, 'darkkhaki'),  //  constant bank
-        '5' => array(15, 'darkgrey'), // variable wall
-        '6' => array(15, 'darkgrey'),   // constant wall
-        '7' => array(15, 'lightblue'),   //  iron bridge
-        '3' => array(15, 'orange'),  //  wooden bridge
-        '4' => array( 3, 'black'), // trendle track
-        '0' => array( 3, 'black'),  // track  darkkhaki, darkgrey,orange,blue,black
+        '1' => array(15, 'darkkhaki'),                      // variable bank
+        '2' => array(15, 'darkkhaki'),                      //  constant bank
+        '5' => array(15, 'darkgrey'),                       // variable wall
+        '6' => array(15, 'darkgrey'),                       // constant wall
+        '7' => array(15, 'lightblue'),                      //  iron bridge
+        '3' => array(15, 'orange'),                         //  wooden bridge
+        '4' => array( 3, 'black'),                          // trendle track
+        '0' => array( 3, 'black'),                          // track  darkkhaki, darkgrey,orange,blue,black
     );
 
+    // statistics for the webpage index
     $totalTrackLength = 0;
     $totalSwitches = 0;
     $totalLocos = 0;
     $totalCarts = 0;
     $maxSlope = 0;
+
     /**
      * Loop the order array painting one type over the next
      */
@@ -1225,9 +1229,9 @@ class dtProperty
                             if (trim($this->NAME) == 'FrameNumberArray') {
                                 $createEmptyNumber = true;
                             }
-                            if (trim($this->NAME) == 'FrameNameArray') {
-                                $createEmptyNumber = true;
-                            }
+//                            if (trim($this->NAME) == 'FrameNameArray') {
+//                                $createEmptyNumber = true;
+//                            }
                             $cartText = $this->readTextProperty($i, $createEmptyNumber);
                             $elem[] = array($pieces, $cartText);
                             //echo "...-[$cartText]-..."
