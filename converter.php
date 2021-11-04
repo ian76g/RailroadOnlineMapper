@@ -1,6 +1,6 @@
 <?php
 ini_set('memory_limit', -1);
-set_time_limit(50);
+set_time_limit(10);
 $v = 46;
 echo "\n" . 'running converter version 0.' . $v . "\n";
 
@@ -8,7 +8,7 @@ echo "\n" . 'running converter version 0.' . $v . "\n";
  * define some stuff we need later
  */
 $start = microtime(true);
-$imagewidth = 8000; // desired images width (x,y) aproximately
+$imageWidth = 8000; // desired images width (x,y) aproximately
 //set the path to find the save games.... last line wins
 $path = 'uploads';
 $fontFile = 'OpenSans-Regular.ttf';
@@ -102,8 +102,8 @@ EOF;
 
 $possibleCargos = array(
     'flatcar_logs' => array('log'),
-    'flatcar_stakes' => array('rail','lumber','beam','rawiron'),
-    'flatcar_hopper' => array('ironore','coal'),
+    'flatcar_stakes' => array('rail', 'lumber', 'beam', 'rawiron'),
+    'flatcar_hopper' => array('ironore', 'coal'),
     'flatcar_cordwood' => array('cordwood'),
 );
 
@@ -140,21 +140,15 @@ if (!isset($NEWUPLOADEDFILE)) {
 
 $files = array($NEWUPLOADEDFILE);
 
-
+$arithmeticHelper = new ArithmeticHelper();
 /**
  * /*
  * do all files that need to be done
  */
 foreach ($files as $file) {
-    $jpegFileName = str_replace('.sav', '', basename($file)) . '.jpeg';
     $htmlFileName = str_replace('.sav', '', basename($file)) . '.html';
 
     $doSvg = true;
-    $doJpg = false;
-//    if (file_exists($htmlFileName)) $doSvg = false;
-//    if (file_exists($jpegFileName)) $doJpg = false;
-
-    if (!$doSvg && !$doJpg) continue;
 
     $svg = '';
     $savegame = $path . "/" . $file;
@@ -165,7 +159,7 @@ foreach ($files as $file) {
      * read whole file into memory
      */
     $data = $myParser->parseData(file_get_contents($path . '/' . $file));
-    if($data=='AGAIN'){
+    if ($data == 'AGAIN') {
         $data = $myParser->parseData(file_get_contents($path . '/' . $file), false);
     }
     $data = json_decode($data, true);
@@ -200,7 +194,7 @@ foreach ($files as $file) {
      */
 
     $max = max($x, $y);
-    $scale = ($imagewidth * 100 / $max);
+    $scale = ($imageWidth * 100 / $max);
 //echo "scale $scale\n";
 // : 100
     $switchRadius = (80 / 2.2107077) * $scale;   // (size an armlength of switches)
@@ -214,55 +208,20 @@ foreach ($files as $file) {
 //echo "[$imx][$imy]\n";
 
     /**
-     * create an empty image and define some colors, paint the canvas white
-     */
-    if ($doJpg) {
-        $img = imagecreate($imx, $imy);
-        $white = imagecolorallocate($img, 208, 240, 200);
-        $colorBanks = imagecolorallocate($img, 163, 163, 143);
-        $colorBridgeWooden = imagecolorallocate($img, 224, 224, 82);
-        $colorBridgeSteel = imagecolorallocate($img, 148, 148, 163);
-        $colorTrack = imagecolorallocate($img, 0, 0, 0);
-        $colorSwitchActive = imagecolorallocate($img, 255, 0, 0);
-        $colorSwitchInactive = imagecolorallocate($img, 255, 155, 155);
-        $colorGreen = imagecolorallocate($img, 50, 255, 50);
-        imagefill($img, 1, 1, $white);
-
-        //assumption 400.000 pixel ingame
-        $bg = imagecreatefrompng('bg.png');
-        $bgPixel = imagesx($bg);
-
-        imagecopyresampled($img, $bg, 0, 0, 0, 0, $imagewidth, $imagewidth, $bgPixel, $bgPixel);
-
-//        $rs = imagecreatefrompng('rollingstock.png');
-//        imagecopyresampled($img, $rs, $imagewidth - 3 * imagesx($rs), 0, 0, 0, 3 * imagesx($rs), 3 * imagesy($rs), imagesx($rs), imagesy($rs));
-
-    } else {
-        $img = imagecreate(10, 10); //dummy
-        $colorBanks = imagecolorallocate($img, 163, 163, 143);
-        $colorBridgeWooden = imagecolorallocate($img, 224, 224, 82);
-        $colorBridgeSteel = imagecolorallocate($img, 148, 148, 163);
-        $colorTrack = imagecolorallocate($img, 0, 0, 0);
-        $colorSwitchActive = imagecolorallocate($img, 255, 0, 0);
-        $colorSwitchInactive = imagecolorallocate($img, 255, 155, 155);
-        $colorGreen = imagecolorallocate($img, 50, 255, 50);
-    }
-
-    /**
      * set some basic order on what to draw first, rails of course should be painted last
      *
      * some info in the JSON is wrong - issue on github is created
      */
 
     $order = array(
-        '1' => array(15, $colorBanks, 'darkkhaki'), // variable bank
-        '2' => array(15, $colorBanks, 'darkkhaki'),  //  constant bank
-        '5' => array(15, $colorBanks, 'darkgrey'), // variable wall
-        '6' => array(15, $colorBanks, 'darkgrey'),   // constant wall
-        '7' => array(15, $colorBridgeSteel, 'lightblue'),   //  iron bridge
-        '3' => array(15, $colorBridgeWooden, 'orange'),  //  wooden bridge
-        '4' => array(3, $colorTrack, 'black'), // trendle track
-        '0' => array(3, $colorTrack, 'black'),  // track  darkkhaki, darkgrey,orange,blue,black
+        '1' => array(15, 'darkkhaki'), // variable bank
+        '2' => array(15, 'darkkhaki'),  //  constant bank
+        '5' => array(15, 'darkgrey'), // variable wall
+        '6' => array(15, 'darkgrey'),   // constant wall
+        '7' => array(15, 'lightblue'),   //  iron bridge
+        '3' => array(15, 'orange'),  //  wooden bridge
+        '4' => array( 3, 'black'), // trendle track
+        '0' => array( 3, 'black'),  // track  darkkhaki, darkgrey,orange,blue,black
     );
 
     $totalTrackLength = 0;
@@ -274,7 +233,6 @@ foreach ($files as $file) {
      * Loop the order array painting one type over the next
      */
     foreach ($order as $current => $optionsArr) {
-        if ($doJpg) imagesetthickness($img, $optionsArr[0]);
         foreach ($data['Splines'] as $spline) {
             $type = $spline['Type'];
 
@@ -282,14 +240,6 @@ foreach ($files as $file) {
             $segments = $spline['Segments'];
             foreach ($segments as $segment) {
                 if ($segment['Visible'] != 1) continue; // skip invisible tracks
-                // draw the line
-                if ($doJpg) {
-                    imageline($img,
-                        $imx - (int)(($segment['LocationStart']['X'] - $minX) / 100 * $scale), $imy - (int)(($segment['LocationStart']['Y'] - $minY) / 100 * $scale),
-                        $imx - (int)(($segment['LocationEnd']['X'] - $minX) / 100 * $scale), $imy - (int)(($segment['LocationEnd']['Y'] - $minY) / 100 * $scale),
-                        $optionsArr[1]
-                    );
-                }
 
                 if ($doSvg) {
                     $svg .= '<line x1="' .
@@ -297,7 +247,7 @@ foreach ($files as $file) {
                         ($imy - (int)(($segment['LocationStart']['Y'] - $minY) / 100 * $scale))
                         . '" x2="' . ($imx - (int)(($segment['LocationEnd']['X'] - $minX) / 100 * $scale)) . '" y2="' .
                         ($imy - (int)(($segment['LocationEnd']['Y'] - $minY) / 100 * $scale))
-                        . '" stroke="' . $optionsArr[2] . '" stroke-width="' . $optionsArr[0] . '"/>' . "\n";
+                        . '" stroke="' . $optionsArr[1] . '" stroke-width="' . $optionsArr[0] . '"/>' . "\n";
                 }
 
 
@@ -321,11 +271,6 @@ foreach ($files as $file) {
                 if (false && $distance > 0 && in_array($type, array(4, 0))) {
                     $slope = asin(($segment['LocationEnd']['Y'] - $segment['LocationStart']['Y']) / $distance) / pi() * 180;
                     if ($slope < -2 || $slope > 2) {
-                        if ($doJpg) {
-                            imagettftext($img, 10, 0, ($imx - (int)(($segment['LocationStart']['X'] - $minX) / 100 * $scale)) + 10,
-                                ($imy - (int)(($segment['LocationStart']['Y'] - $minY) / 100 * $scale)) + 10, $colorTrack, $fontFile,
-                                round($slope, 1));
-                        }
                     }
                 }
             }
@@ -358,16 +303,12 @@ foreach ($files as $file) {
                 $state = !$state;
                 break;
             case 1 :
+            case 3 :
+            case 4:
                 $dir = 7;
                 break;
             case 2 :
                 $dir = -7;
-                break;
-            case 3 :
-                $dir = 7;
-                break;
-            case 4 :
-                $dir = 7;
                 break;
             case 5 :
                 $state = !$state;
@@ -391,37 +332,12 @@ foreach ($files as $file) {
         $rotSide = deg2rad($switch['Rotation'][1] - 90 + $dir);
         $rotCross = deg2rad($switch['Rotation'][1] + 180);
 
-// circle the switch - used to debug angles and sizes
-//            imageellipse($img,
-//        $imx - (int)(($switch['Location']['X'] - $minX) /100* $scale), $imy - (int)(($switch['Location']['Y'] - $minY) /100* $scale),
-//        80, 80, $colorSwitchInactive);
-
-
-        // straight MAIN
-        if ($doJpg) {
-            $active = $colorTrack;
-            $inactive = $colorSwitchActive;
-            imageline($img,
-                $imx - (int)(($switch['Location'][0] - $minX) / 100 * $scale), $imy - (int)(($switch['Location'][1] - $minY) / 100 * $scale),
-                $imx - (int)(($switch['Location'][0] - $minX) / 100 * $scale) + (cos($rotation) * $switchRadius / 2),
-                $imy - (int)(($switch['Location'][1] - $minY) / 100 * $scale) + (sin($rotation) * $switchRadius / 2),
-                $state ? $active : $inactive
-            );
-            // curve SIDE
-            imageline($img,
-                $imx - (int)(($switch['Location'][0] - $minX) / 100 * $scale), $imy - (int)(($switch['Location'][1] - $minY) / 100 * $scale),
-                $imx - (int)(($switch['Location'][0] - $minX) / 100 * $scale) + (cos($rotSide) * $switchRadius / 2),
-                $imy - (int)(($switch['Location'][1] - $minY) / 100 * $scale) + (sin($rotSide) * $switchRadius / 2),
-                $state ? $inactive : $active
-            );
-        }
-
         if ($doSvg) {
+            $x = ($imx - (int)(($switch['Location'][0] - $minX) / 100 * $scale));
+            $y = ($imy - (int)(($switch['Location'][1] - $minY) / 100 * $scale));
             if ($dir == 99) { //CROSS
                 $crosslength = $switchRadius / 10;
 
-                $x = ($imx - (int)(($switch['Location'][0] - $minX) / 100 * $scale));
-                $y = ($imy - (int)(($switch['Location'][1] - $minY) / 100 * $scale));
                 $x2 = ($imx - (int)(($switch['Location'][0] - $minX) / 100 * $scale) + (cos($rotCross) * $crosslength));
                 $y2 = ($imy - (int)(($switch['Location'][1] - $minY) / 100 * $scale) + (sin($rotCross) * $crosslength));
 
@@ -439,12 +355,10 @@ foreach ($files as $file) {
                     '" stroke="black" stroke-width="3"/>' . "\n";
 
             } else {
-                $x = ($imx - (int)(($switch['Location'][0] - $minX) / 100 * $scale));
-                $y = ($imy - (int)(($switch['Location'][1] - $minY) / 100 * $scale));
                 $xStraight = ($imx - (int)(($switch['Location'][0] - $minX) / 100 * $scale) + (cos($rotation) * $switchRadius / 2));
                 $yStraight = ($imy - (int)(($switch['Location'][1] - $minY) / 100 * $scale) + (sin($rotation) * $switchRadius / 2));
-                $xSide = ($imx - (int)(($switch['Location'][0] - $minX) / 100 * $scale) + (cos($rotSide) * $switchRadius / 2));
-                $ySide = ($imy - (int)(($switch['Location'][1] - $minY) / 100 * $scale) + (sin($rotSide) * $switchRadius / 2));
+                $xSide     = ($imx - (int)(($switch['Location'][0] - $minX) / 100 * $scale) + (cos($rotSide) * $switchRadius / 2));
+                $ySide     = ($imy - (int)(($switch['Location'][1] - $minY) / 100 * $scale) + (sin($rotSide) * $switchRadius / 2));
 
                 if ($state) {
 //                    $svg .= '<text x="' . $x . '" y="' . $y . '">   ' . $type . '/' . $state . '</text>';
@@ -515,25 +429,23 @@ foreach ($files as $file) {
      */
 
     $cartColors = array(
-        'handcar' => array($engineRadius, imagecolorallocate($img, 200, 200, 200), 'black'),
-        'porter_040' => array($engineRadius, imagecolorallocate($img, 224, 224, 82), 'black'),
-        'porter_042' => array($engineRadius, imagecolorallocate($img, 30, 30, 30), 'black'),
-        'eureka' => array($engineRadius, imagecolorallocate($img, 30, 30, 30), 'black'),
-        'eureka_tender' => array($engineRadius, imagecolorallocate($img, 30, 30, 30), 'black'),
-        'climax' => array($engineRadius, imagecolorallocate($img, 30, 30, 30), 'black'),
-        'heisler' => array($engineRadius, imagecolorallocate($img, 30, 30, 30), 'black'),
-        'class70' => array($engineRadius, imagecolorallocate($img, 30, 30, 30), 'black'),
-        'class70_tender' => array($engineRadius, imagecolorallocate($img, 30, 30, 30), 'black'),
-        'cooke260' => array($engineRadius, imagecolorallocate($img, 30, 30, 30), 'black'),
-        'cooke260_tender' => array($engineRadius, imagecolorallocate($img, 30, 30, 30), 'black'),
-        'flatcar_logs' => array($engineRadius / 3, imagecolorallocate($img, 224, 50, 224), 'red'),
-        'flatcar_cordwood' => array($engineRadius / 3 * 2, imagecolorallocate($img, 224, 50, 50), 'orange'),
-        'flatcar_stakes' => array($engineRadius / 3 * 2, imagecolorallocate($img, 224, 224, 50), 'yellow'),
-        'flatcar_hopper' => array($engineRadius / 3 * 2, imagecolorallocate($img, 20, 20, 20), 'brown'),
-        'flatcar_tanker' => array($engineRadius / 3 * 2, imagecolorallocate($img, 100, 100, 100), 'grey'),
+        'handcar' => array($engineRadius, 'black'),
+        'porter_040' => array($engineRadius, 'black'),
+        'porter_042' => array($engineRadius,  'black'),
+        'eureka' => array($engineRadius,  'black'),
+        'eureka_tender' => array($engineRadius,  'black'),
+        'climax' => array($engineRadius,  'black'),
+        'heisler' => array($engineRadius,  'black'),
+        'class70' => array($engineRadius,  'black'),
+        'class70_tender' => array($engineRadius,  'black'),
+        'cooke260' => array($engineRadius,  'black'),
+        'cooke260_tender' => array($engineRadius,  'black'),
+        'flatcar_logs' => array($engineRadius / 3,  'red'),
+        'flatcar_cordwood' => array($engineRadius / 3 * 2,  'orange'),
+        'flatcar_stakes' => array($engineRadius / 3 * 2,  'yellow'),
+        'flatcar_hopper' => array($engineRadius / 3 * 2,  'brown'),
+        'flatcar_tanker' => array($engineRadius / 3 * 2,  'grey'),
     );
-
-    imagesetthickness($img, 1);
 
     $cartExtraStr = '<form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $NEWUPLOADEDFILE . '">
 <table class="myStuff">
@@ -558,13 +470,13 @@ foreach ($files as $file) {
 </tr>';
         $exArr = array($vehicle['Type'], strtoupper(strip_tags($vehicle['Name'])), strip_tags(trim($vehicle['Number'])));
         if ($empty || strip_tags($vehicle['Name']) || (trim($vehicle['Number']) != '.' && trim($vehicle['Number']))) {
-            $exArr[] = nearestIndustry($vehicle['Location']);
-            if($vehicle['Tender']['Fuelamount']) {
+            $exArr[] = $arithmeticHelper->nearestIndustry($vehicle['Location'], $data['Industries']);
+            if ($vehicle['Tender']['Fuelamount']) {
                 $exArr[] = 'firewood';
                 $exArr[] = $vehicle['Tender']['Fuelamount'];
                 $exArr[] = 'tenderamount_';
             } else {
-                if($vehicle['Freight']['Type']) {
+                if ($vehicle['Freight']['Type']) {
                     $exArr[] = $vehicle['Freight']['Type'];
                     $exArr[] = $vehicle['Freight']['Amount'];
                     $exArr[] = 'freightamount_';
@@ -576,8 +488,8 @@ foreach ($files as $file) {
                 }
 
             }
-            if($exArr[6]){
-                $template = '<input size="2" maxlength="2" name="'.$exArr[6].$cartIndex.'" value="'.$exArr[5].'">';
+            if ($exArr[6]) {
+                $template = '<input size="2" maxlength="2" name="' . $exArr[6] . $cartIndex . '" value="' . $exArr[5] . '">';
             } else {
                 $template = $exArr[5];
             }
@@ -587,27 +499,11 @@ foreach ($files as $file) {
 
         }
 
-        if ($doJpg) {
-            rotatedellipse($img,
-                $imx - (int)(($vehicle['Location'][0] - $minX) / 100 * $scale), $imy - (int)(($vehicle['Location'][1] - $minY) / 100 * $scale),
-                $engineRadius * 1.1, ($engineRadius * 1.1) / 2, $vehicle['Rotation'][1], $cartColors[$vehicle['Type']][1], true);
-            // draw the outline (black)
-            rotatedellipse($img,
-                $imx - (int)(($vehicle['Location'][0] - $minX) / 100 * $scale), $imy - (int)(($vehicle['Location'][1] - $minY) / 100 * $scale),
-                $engineRadius * 1.1, ($engineRadius * 1.1) / 2, $vehicle['Rotation'][1], $colorTrack, false);
-
-//            if($vehicle['Location'][2]<-1000){
-//                imagettftext($img, $engineRadius / 4 * 3, 0,
-//                    $imx - (int)(($vehicle['Location']['X'] - $minX) / 100 * $scale), $imy - (int)(($vehicle['Location']['Y'] - $minY) / 100 * $scale),
-//                    $colorTrack, $fontFile, '  ' . $vehicle['Location']['X'].'/'.$vehicle['Location']['Y'].'/'.$vehicle['Location']['Z']);
-//            }
-        }
-
         if ($doSvg) {
             $svg .= '<ellipse cx="' . ($imx - (int)(($vehicle['Location'][0] - $minX) / 100 * $scale)) .
                 '" cy="' . ($imy - (int)(($vehicle['Location'][1] - $minY) / 100 * $scale)) . '" rx="' . ($engineRadius / 2) .
                 '" ry="' . ($engineRadius / 3) .
-                '" style="fill:' . $cartColors[$vehicle['Type']][2] . ';stroke:black;stroke-width:1" transform="rotate(' . $vehicle['Rotation'][1] .
+                '" style="fill:' . $cartColors[$vehicle['Type']][1] . ';stroke:black;stroke-width:1" transform="rotate(' . $vehicle['Rotation'][1] .
                 ', ' . ($imx - (int)(($vehicle['Location'][0] - $minX) / 100 * $scale)) . ', ' . ($imy - (int)(($vehicle['Location'][1] - $minY) / 100 * $scale)) . ')"
               />';
 
@@ -641,11 +537,6 @@ foreach ($files as $file) {
             }
             //$name.=' ('.$vehicle['Location']['Z'].')';
             // label locomotives
-            if ($doJpg) {
-                imagettftext($img, $engineRadius / 4 * 3, 0,
-                    $imx - (int)(($vehicle['Location'][0] - $minX) / 100 * $scale), $imy - (int)(($vehicle['Location'][1] - $minY) / 100 * $scale),
-                    $colorTrack, $fontFile, '  ' . $name);
-            }
             if ($doSvg) {
                 $svg .= '<text x="' . ($imx - (int)(($vehicle['Location'][0] - $minX) / 100 * $scale)) .
                     '" y="' . ($imy - (int)(($vehicle['Location'][1] - $minY) / 100 * $scale)) . '" >' . '&nbsp;&nbsp;' . $name . '</text>' . "\n";
@@ -755,7 +646,7 @@ foreach ($files as $file) {
                 break;
             case '10':
                 $name = 'F';
-                $name .="(".array_sum($site['ProductsStored']).")";
+                $name .= "(" . array_sum($site['ProductsStored']) . ")";
                 $rotation = 0;
                 break;
             default:
@@ -767,12 +658,6 @@ foreach ($files as $file) {
         $db[$NEWUPLOADEDFILE] = array($totalTrackLength, $totalSwitches, $totalLocos, $totalCarts, $maxSlope);
         @file_put_contents('db.db', serialize($db));
         // label the industries
-        if ($doJpg) {
-            imagettftext($img, 20, $rotation,
-                $imx - (int)(($site['Location'][0] - $minX) / 100 * $scale) + $xoff, $imy - (int)(($site['Location'][1] - $minY) / 100 * $scale) + $yoff,
-                $colorTrack, $fontFile, '' . strip_tags($name));
-        }
-
         if ($doSvg) {
             $svg .= '<text x="' . ($imx - (int)(($site['Location'][0] - $minX) / 100 * $scale) + $xoff) .
                 '" y="' . ($imy - (int)(($site['Location'][1] - $minY) / 100 * $scale) + $yoff) . '" transform="rotate(' . $rotation .
@@ -788,9 +673,6 @@ foreach ($files as $file) {
     foreach ($data['Watertowers'] as $site) {
         $x = $imx - (int)(($site['Location'][0] - $minX) / 100 * $scale);
         $y = $imy - (int)(($site['Location'][1] - $minY) / 100 * $scale);
-        if ($doJpg) {
-            imagettftext($img, 20, 0, $x, $y, $colorTrack, $fontFile, 'W');
-        }
         if ($doSvg) {
             $svg .= '<text x="' . ($x) . '" y="' . ($y) . '" >W</text>' . "\n";
         }
@@ -809,14 +691,6 @@ foreach ($files as $file) {
         $text .= str_pad($player['Name'], 20, ' ', STR_PAD_BOTH) . "\n\n";
         $text2 .= ' (XP ' . str_pad($player['Xp'], 7, ' ', STR_PAD_RIGHT) . '  ' .
             str_pad($player['Money'], 8, ' ', STR_PAD_LEFT) . '$)' . "\n\n";
-    }
-    if ($doJpg) {
-        imagettftext($img, 20, 0,
-            50, 50,
-            $colorTrack, $fontFile, $text);
-        imagettftext($img, 20, 0,
-            350, 50,
-            $colorTrack, $fontFile, $text2);
     }
     if ($doSvg) {
         $svg .= '<text x="50" y="50" font-size="20" dy="0">';
@@ -839,33 +713,25 @@ foreach ($files as $file) {
      * chart
      */
     $carts = array(
-        'flatcar_logs' => array($engineRadius / 3, imagecolorallocate($img, 224, 50, 224), 'red'),
-        'flatcar_cordwood' => array($engineRadius / 3 * 2, imagecolorallocate($img, 224, 50, 50), 'orange'),
-        'flatcar_stakes' => array($engineRadius / 3 * 2, imagecolorallocate($img, 224, 224, 50), 'yellow'),
-        'flatcar_hopper' => array($engineRadius / 3 * 2, imagecolorallocate($img, 20, 20, 20), 'brown'),
-        'flatcar_tanker' => array($engineRadius / 3 * 2, imagecolorallocate($img, 100, 100, 100), 'grey'),
+        'flatcar_logs' => array($engineRadius / 3, 'red'),
+        'flatcar_cordwood' => array($engineRadius / 3 * 2, 'orange'),
+        'flatcar_stakes' => array($engineRadius / 3 * 2, 'yellow'),
+        'flatcar_hopper' => array($engineRadius / 3 * 2, 'brown'),
+        'flatcar_tanker' => array($engineRadius / 3 * 2, 'grey'),
     );
 
-    if ($doJpg) imagesetthickness($img, 1);
     $cartsDrawn = 0;
     foreach ($carts as $cartType => $cart) {
-        $x = $imagewidth / 4;
+        $x = $imageWidth / 4;
         $y = 100 + $cartsDrawn * 5 * ($engineRadius * 1.1) / 2;
         $rx = $engineRadius * 1.1 * 2;
         $ry = ($engineRadius * 1.1);
-        if ($doJpg) {
-            rotatedellipse($img, $x, $y, $rx, $ry, 0, $carts[$cartType][1], true);
-            // draw the outline (black)
-            rotatedellipse($img, $x, $y, $rx, $ry, 0, $colorTrack, false);
-            imagettftext($img, 3 * ($engineRadius * 1.1) / 2, 0,
-                $x + $rx, $y, $colorTrack, $fontFile, $cartType);
-        }
         if ($doSvg) {
             $svg .= '<ellipse cx="' . $x .
                 '" cy="' . $y .
                 '" rx="' . $rx .
                 '" ry="' . $ry .
-                '" style="fill:' . $cart[2] . ';stroke:black;stroke-width:1" />' . "\n";
+                '" style="fill:' . $cart[1] . ';stroke:black;stroke-width:1" />' . "\n";
         }
         $cartsDrawn++;
 
@@ -880,14 +746,6 @@ foreach ($files as $file) {
     }
 
 
-//output the image
-//    header('Content-Type: image/jpeg');
-
-    if ($doJpg) {
-        imagejpeg($img, 'done/' . $jpegFileName, 75);
-        $cmd = '"c:\Program Files (x86)\WinSCP\WinSCP.com" /command "open ftp://user:password@server.de/" "put ' . $jpegFileName . ' /html/minizwerg/" "exit"';
-//        passthru($cmd);
-    }
     //@print_r($distances);
     if ($doSvg) {
         file_put_contents('done/' . $htmlFileName, str_replace('&nbsp;', ' ', str_replace('###SVG###', $svg, $htmlSvg)));
@@ -895,10 +753,6 @@ foreach ($files as $file) {
 //        passthru($cmd);
     }
 
-//    if (isset($argv[1])) {
-//        @unlink($jpegFileName);
-//        @unlink($htmlFileName);
-//    }
     echo "rendered in " . (microtime(true) - $start) . " microseconds\n";
     if (!isset($_POST['save'])) {
         rename('uploads/' . $NEWUPLOADEDFILE, 'saves/' . $NEWUPLOADEDFILE);
@@ -907,148 +761,6 @@ foreach ($files as $file) {
 //debug
 // print_r($types);
 
-
-function nearestIndustry($coords)
-{
-    $minDist = 800000;
-    global $data;
-    foreach ($data['Industries'] as $i) {
-        if ($i['Type'] < 10) {
-            $d = dist($i['Location'], $coords);
-            if ($d < $minDist) {
-                $minDist = $d;
-                $ind = $i['Type'];
-            }
-        }
-    }
-
-    switch ($ind) {
-        case '1':
-            $name = 'Logging Camp';
-            break;
-        case '2':
-            $name = 'Sawmill';
-            break;
-        case '3':
-            $name = 'Smelter';
-            break;
-        case '4':
-            $name = 'Ironworks';
-            break;
-        case '5':
-            $name = 'Oilfield';
-            break;
-        case '6':
-            $name = 'Refinery';
-            break;
-        case '7':
-            $name = 'Coal Mine';
-            break;
-        case '8':
-            $name = 'Iron Mine';
-            break;
-        case '9':
-            $name = 'Freight Depot';
-            break;
-    }
-
-    return $name;
-}
-
-function dist($coords, $coords2)
-{
-    $distance = sqrt(
-        pow($coords[0] - $coords2[0], 2) +
-        pow($coords[1] - $coords2[1], 2) +
-        pow($coords[2] - $coords2[2], 2)
-    );
-
-    return $distance;
-}
-
-
-function rotatedellipse($im, $cx, $cy, $width, $height, $rotateangle, $colour, $filled = false)
-{
-    // modified here from nojer's version
-    // Rotates from the three o-clock position clockwise with increasing angle.
-    // Arguments are compatible with imageellipse.
-
-//    imageroundedrectangle($im, $cx-$width/2, $cy-$height/2, $cx+$width/2, $cy+$height/2, 2, $colour, $rotateangle);
-//    return;
-
-
-    $width = $width / 2;
-    $height = $height / 2;
-
-    // This affects how coarse the ellipse is drawn.
-    $step = 3;
-
-    $cosangle = cos(deg2rad($rotateangle));
-    $sinangle = sin(deg2rad($rotateangle));
-
-    // $px and $py are initialised to values corresponding to $angle=0.
-    $px = $width * $cosangle;
-    $py = $width * $sinangle;
-
-    for ($angle = $step; $angle <= (180 + $step); $angle += $step) {
-
-        $ox = $width * cos(deg2rad($angle));
-        $oy = $height * sin(deg2rad($angle));
-
-        $x = ($ox * $cosangle) - ($oy * $sinangle);
-        $y = ($ox * $sinangle) + ($oy * $cosangle);
-
-        if ($filled) {
-            triangle($im, $cx, $cy, $cx + $px, $cy + $py, $cx + $x, $cy + $y, $colour);
-            triangle($im, $cx, $cy, $cx - $px, $cy - $py, $cx - $x, $cy - $y, $colour);
-        } else {
-            imageline($im, $cx + $px, $cy + $py, $cx + $x, $cy + $y, $colour);
-            imageline($im, $cx - $px, $cy - $py, $cx - $x, $cy - $y, $colour);
-        }
-        $px = $x;
-        $py = $y;
-    }
-}
-
-function triangle($im, $x1, $y1, $x2, $y2, $x3, $y3, $colour)
-{
-    $coords = array($x1, $y1, $x2, $y2, $x3, $y3);
-    imagefilledpolygon($im, $coords, 3, $colour);
-}
-
-function imageroundedrectangle(&$img, $x1, $y1, $x2, $y2, $r, $color, $angle)
-{
-
-    $centerX = $x2 - $x1;
-    $centerY = $y2 - $y1;
-    $res = getBoundingBox($angle, $centerX, $centerY);
-    $rDiffX = $centerX - $res[0];
-    $rDiffY = $centerY - $res[1];
-    $x1 += $rDiffX / 2;
-    $x2 -= $rDiffX / 2;
-    $y1 += $rDiffY / 2;
-    $y2 -= $rDiffY / 2;
-
-    $r = min($r, floor(min(($x2 - $x1) / 2, ($y2 - $y1) / 2)));
-    // render corners
-    imagefilledarc($img, $x1 + $r, $y1 + $r, $r * 2, $r * 2, 0, 360, $color, IMG_ARC_PIE);
-    imagefilledarc($img, $x2 - $r, $y1 + $r, $r * 2, $r * 2, 0, 360, $color, IMG_ARC_PIE);
-    imagefilledarc($img, $x2 - $r, $y2 - $r, $r * 2, $r * 2, 0, 360, $color, IMG_ARC_PIE);
-    imagefilledarc($img, $x1 + $r, $y2 - $r, $r * 2, $r * 2, 0, 360, $color, IMG_ARC_PIE);
-    // middle fill, left fill, right fill
-    imagerectangle($img, $x1 + $r, $y1, $x2 - $r, $y2, $color);
-    imagerectangle($img, $x1, $y1 + $r, $x1 + $r, $y2 - $r, $color);
-    imagerectangle($img, $x2 - $r, $y1 + $r, $x2, $y2 - $r, $color);
-}
-
-function getBoundingBox($intAngle, $intWidth, $intHeight)
-{
-    $fltRadians = deg2rad($intAngle);
-    $intWidthRotated = $intHeight * abs(sin($fltRadians)) + $intWidth * abs(cos($fltRadians));
-    $intHeightRotated = $intHeight * abs(cos($fltRadians)) + $intWidth * abs(sin($fltRadians));
-
-    return array($intWidthRotated, $intHeightRotated);
-}
 
 class dtHeader
 {
@@ -1260,6 +972,9 @@ class dtProperty
     var $NAME;
     var $TYPE;
     var $RESULTROWS;
+    var $ITEMTYPE='';
+    var $SUBTYPE='';
+    var $GUID='';
 
     var $content;
 
@@ -1531,7 +1246,31 @@ class dtProperty
     }
 
     /**
-     * @return mixed|string|string[]
+     * @param $i
+     * @param false $createEmptyNumer
+     * @return array
+     *
+     * Jenny — heute um 08:16 Uhr
+    There is another format (the strange one you sent me)
+    Basically when you finish reading an entry and start reading the next one, you need to read the first int32 to know whether it’s formatted or not
+    Usually you get 02 00 00 00 if there’s a regular text entry, 00 00 00 00 if it’s a null text entry, and 01 00 00 00 if it’s formatted
+    If you get 02 or 00, then read the separator ff and the « opt » which is 01 00 00 00 if there’s a UEString, and 00 00 00 00 if there’s not.
+    And then onto the next index of the array
+    However if you get 01 00 00 00 as first value, then it’s formatted, the separator is 03, then int64 08 00 00 00 00 00 00 00 and empty byte 00
+    Then the format specifiers : UEString (the magic string I don’t know what it does but is always the same), UEString (formatted) int 32 with value 02 00 00 00 (probably the number of field in the formatter) and one last UEString with "0"
+    Then a special separator 04
+    And then the first line as a special text property:
+    02 00 00 00
+    ff
+    01 00 00 00
+    Then 2 UEString
+    The first one being the actual content of the first line, the second one being the "1" we always see, but that can be discarded when reading and put back when writing
+    And that field ends with one byte 04
+    And then the second line, which will always start with 02 00 00 00
+    Then ff
+    Then if it’s empty 00 00 00 00, or else 01 00 00 00 then UEString
+    I don’t think it ends with 04 for that one (writing that from memory)
+    And that’s the full formatted TextProperty array index
      */
     function readTextProperty($i, $createEmptyNumer = false)
     {
@@ -1649,9 +1388,10 @@ class GVASParser
 
     /**
      * @param $x
+     * @param bool $againAllowed
      * @return false|string
      */
-    public function parseData($x, $againAllowed=true)
+    public function parseData($x, $againAllowed = true)
     {
         $this->x = $x;
         $this->position = 0;
@@ -1734,7 +1474,7 @@ class GVASParser
 //                }
                 if (trim($object->NAME) == 'FreightAmountArray') {
                     foreach ($object->CONTENTOBJECTS as $co) {
-                        if(is_object($co) && trim($co->NAME) == 'Int'){
+                        if (is_object($co) && trim($co->NAME) == 'Int') {
                             if (
                                 ($co->ARRCOUNTER !== '') &&
                                 isset($_POST['freightamount_' . $co->ARRCOUNTER]) &&
@@ -1747,7 +1487,7 @@ class GVASParser
                 }
                 if (trim($object->NAME) == 'TenderFuelAmountArray') {
                     foreach ($object->CONTENTOBJECTS as $co) {
-                        if(is_object($co) && trim($co->NAME) == 'Int'){
+                        if (is_object($co) && trim($co->NAME) == 'Int') {
                             if (
                                 ($co->ARRCOUNTER !== '') &&
                                 isset($_POST['tenderamount_' . $co->ARRCOUNTER]) &&
@@ -1767,19 +1507,19 @@ class GVASParser
 
         if (isset($_POST['save'])) {
             echo "SAVING FILE " . $this->NEWUPLOADEDFILE . '.modified' . "<br>\n";
-            file_put_contents('saves/'.$this->NEWUPLOADEDFILE . '.modified', $output);
+            file_put_contents('saves/' . $this->NEWUPLOADEDFILE . '.modified', $output);
             echo '<A href="saves/' . $this->NEWUPLOADEDFILE . '.modified' . '">Download your modified save here </A><br>';
             echo 'Want to upload this map again?<A href="upload.php">Add your renumbered save again</A><br>';
         } else {
-            if($againAllowed){
+            if ($againAllowed) {
                 echo "RESAVING FILE TO DISK - EMPTY NUMBERS BECAME A DOT " . $this->NEWUPLOADEDFILE . "<br>\n";
-                file_put_contents('uploads/'.$this->NEWUPLOADEDFILE, $output);
+                file_put_contents('uploads/' . $this->NEWUPLOADEDFILE, $output);
                 return 'AGAIN';
             }
         }
 
         $silverPlate = array();
-        $keys = array_keys($this->goldenBucket);
+
         $keys = array('Player', 'Freight', 'Compressor', 'Tender', 'Coupler', 'Boiler', 'Headlight', 'Frame', 'Watertower', 'Switch');
         foreach ($keys as $key) {
             $silverPlate[$key . 's'] = array();
@@ -1907,4 +1647,66 @@ class GVASParser
         return $json;
 
     }
+}
+
+class ArithmeticHelper
+{
+
+    function nearestIndustry($coords, $industryCoords)
+    {
+        $minDist = 800000;
+        foreach ($industryCoords as $i) {
+            if ($i['Type'] < 10) {
+                $d = $this->dist($i['Location'], $coords);
+                if ($d < $minDist) {
+                    $minDist = $d;
+                    $ind = $i['Type'];
+                }
+            }
+        }
+
+        switch ($ind) {
+            case '1':
+                $name = 'Logging Camp';
+                break;
+            case '2':
+                $name = 'Sawmill';
+                break;
+            case '3':
+                $name = 'Smelter';
+                break;
+            case '4':
+                $name = 'Ironworks';
+                break;
+            case '5':
+                $name = 'Oilfield';
+                break;
+            case '6':
+                $name = 'Refinery';
+                break;
+            case '7':
+                $name = 'Coal Mine';
+                break;
+            case '8':
+                $name = 'Iron Mine';
+                break;
+            case '9':
+                $name = 'Freight Depot';
+                break;
+        }
+
+        return $name;
+    }
+
+    function dist($coords, $coords2)
+    {
+        $distance = sqrt(
+            pow($coords[0] - $coords2[0], 2) +
+            pow($coords[1] - $coords2[1], 2) +
+            pow($coords[2] - $coords2[2], 2)
+        );
+
+        return $distance;
+    }
+
 }
