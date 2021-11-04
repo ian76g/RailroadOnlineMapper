@@ -3,6 +3,11 @@
 <?php
     $PageTitle="RailroadsOnlineMapper";
     include_once('includes/head.php');
+
+    $tableHeader = '<thead>
+                        <th>NAME</th><th>Track Length</th><th># Y</th><th>Locos</th><th>Carts</th><th>max Slope</th>
+                    </thead>';
+
 ?>
 <body>
     <header class="header">
@@ -14,10 +19,8 @@
             <h2>Latest uploads</h2>
             <div class="uploads__tables">
                 <table>
-                    <thead>
-                        <th>NAME</th><th>Track Length</th><th># Y</th><th>Locos</th><th>Carts</th><th>max Slope</th>
-                    </thead>
                     <?php
+                    echo $tableHeader;
                     $dh = opendir('done/');
                     while ($file = readdir($dh)) {
                         if (substr($file, -5) == '.html') {
@@ -29,7 +32,7 @@
                     krsort($files);
 
                     $hard_limit = 400;
-                    $soft_limit = 140;
+                    $soft_limit = 90;
                     for ($i = 0; $i < sizeof($files); $i++) {
                         $file = array_shift($files);
                         if (!$file) break;
@@ -47,21 +50,21 @@
             $dl = ' (DL)';
         }
 
-                        echo '<tr><td><a href="done/' . substr($file, 5, -5) . '.html?t=' . time() . '">' . substr($file, 5, -5) . '</a></td>
+                        echo '<tr><td><a href="done/' . substr($file, 5, -5) . '.html?t=' . time() . '">' . substr($file, 5, -5) . $dl . '</a></td>
                                 <td>' . round($db[substr($file, 5, -5) . '.sav'][0] / 100000, 2) . 'km</td>
                                 <td>' . $db[substr($file, 5, -5) . '.sav'][1] . '</td>
                                 <td>' . $db[substr($file, 5, -5) . '.sav'][2] . '</td>
                                 <td>' . $db[substr($file, 5, -5) . '.sav'][3] . '</td>
                                 <td >' . round($db[substr($file, 5, -5) . '.sav'][4]) . '%</td>
                                 </tr>';
-                        if (!(($i + 1) % 35)) {
-                            echo '</table>';
+                        if (!(($i + 1) % 15)) {
                             if (($i + 1) < $soft_limit) {
-                                echo $tableHeader;
+                                echo '</table><table>'.$tableHeader;
                             }
                         }
 
                     }
+                    echo '</table>';
                     ?>
                 </table>
             </div>

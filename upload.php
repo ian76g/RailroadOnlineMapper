@@ -85,7 +85,7 @@ include('converter.php');
                 <h3>1. Select savefile</h3>
                 <input type="file" name="fileToUpload" id="fileToUpload">
             </section>
-
+            <!--img src="hint.png" width="700"-->
             <section>
                 <h3>2. Enter your name</h3>
                 <div class="input-group">
@@ -95,8 +95,18 @@ include('converter.php');
 
             </section>
 
+            <section>
+                <h3>3. Make it public</h3>
+                <div class="input-group input-group--row">
+                    <input id="public" type="checkbox" name="public">
+                    <label for="public">Others are allowed to download this for 2 days</label>
+
+                </div>
+
+            </section>
+
             <section class="upload-form__background">
-                <h3>3. Select your background</h3>
+                <h3>4. Select your background</h3>
                 <fieldset>
                     <div>
                         <input type="radio" id="bg" name="background" value="bg">
@@ -118,7 +128,7 @@ include('converter.php');
             </section>
 
             <section>
-                <h3>4. Expert settings</h3>
+                <h3>5. Expert settings</h3>
                 <p><b>expert settings: DON'T TOUCH when you are no expert!</b></p>
 
                 <div class="input-group">
