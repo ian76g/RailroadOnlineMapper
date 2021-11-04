@@ -209,6 +209,9 @@ foreach ($files as $file) {
     $imx = (int)$x / 100 * $scale;
     $imy = (int)$y / 100 * $scale;
 
+
+    // OK - Now lets draw a map
+
     /**
      * set some basic order on what to draw first, rails of course should be painted last
      *
@@ -272,6 +275,8 @@ foreach ($files as $file) {
                         ($height * 100 / $length));
                 }
 
+                // label some splines with their slope - not yet working
+                // main problem: find a spot for the text that is near to track but do not override other stuff
                 if (false && $distance > 0 && in_array($type, array(4, 0))) {
                     $slope = asin(($segment['LocationEnd']['Y'] - $segment['LocationStart']['Y']) / $distance) / pi() * 180;
                     if ($slope < -2 || $slope > 2) {
@@ -280,8 +285,7 @@ foreach ($files as $file) {
             }
         }
     }
-//print_r($types);
-//        exit;
+
     /**
      * Fill in the missing gaps AKA switches
      */
@@ -387,7 +391,7 @@ foreach ($files as $file) {
 
 
     /**
-     * Fill in the missing gaps AKA turntables
+     * Fill in more missing gaps AKA turntables
      */
     if (!isset($data['Turntables'])) {
         $data['Turntables'] = array();
@@ -426,7 +430,6 @@ foreach ($files as $file) {
     }
 
 
-    //print_r($types);
     /**
      * draw some vehicles on top of that image
      * define size and color of vehicle here
@@ -451,6 +454,7 @@ foreach ($files as $file) {
         'flatcar_tanker' => array($engineRadius / 3 * 2,  'grey'),
     );
 
+    // build some extra HTML for a form to edit cart data
     $cartExtraStr = '<form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $NEWUPLOADEDFILE . '">
 <table class="myStuff">
 <tr>
@@ -474,6 +478,7 @@ foreach ($files as $file) {
 </tr>';
         $exArr = array($vehicle['Type'], strtoupper(strip_tags($vehicle['Name'])), strip_tags(trim($vehicle['Number'])));
         if (
+            // trim out empty carts without number and without name
             $empty ||
             (strip_tags($vehicle['Name']) && trim($vehicle['Name']) != '.'  ) ||
             (trim($vehicle['Number']) != '.' && trim($vehicle['Number']))
@@ -508,23 +513,21 @@ foreach ($files as $file) {
 
         }
 
+        $x = ($imx - (int)(($vehicle['Location'][0] - $minX) / 100 * $scale));
+        $y = ($imy - (int)(($vehicle['Location'][1] - $minY) / 100 * $scale));
         if ($doSvg) {
-            $svg .= '<ellipse cx="' . ($imx - (int)(($vehicle['Location'][0] - $minX) / 100 * $scale)) .
-                '" cy="' . ($imy - (int)(($vehicle['Location'][1] - $minY) / 100 * $scale)) . '" rx="' . ($engineRadius / 2) .
-                '" ry="' . ($engineRadius / 3) .
+            $svg .= '<ellipse cx="' . $x . '" cy="' . $y . '" rx="' . ($engineRadius / 2) . '" ry="' . ($engineRadius / 3) .
                 '" style="fill:' . $cartColors[$vehicle['Type']][1] . ';stroke:black;stroke-width:1" transform="rotate(' . $vehicle['Rotation'][1] .
                 ', ' . ($imx - (int)(($vehicle['Location'][0] - $minX) / 100 * $scale)) . ', ' . ($imy - (int)(($vehicle['Location'][1] - $minY) / 100 * $scale)) . ')"
               />';
 
             if ($vehicle['Location'][2] < 1000) {
-                $svg .= '<ellipse cx="' . ($imx - (int)(($vehicle['Location'][0] - $minX) / 100 * $scale)) .
-                    '" cy="' . ($imy - (int)(($vehicle['Location'][1] - $minY) / 100 * $scale)) . '" rx="' . (($engineRadius / 2) * 10) .
+                $svg .= '<ellipse cx="' . $x . '" cy="' . $y . '" rx="' . (($engineRadius / 2) * 10) .
                     '" ry="' . (($engineRadius / 2) * 10) .
                     '" style="fill:none;stroke:red;stroke-width:10" transform="rotate(' . $vehicle['Rotation'][1] .
                     ', ' . ($imx - (int)(($vehicle['Location'][0] - $minX) / 100 * $scale)) . ', ' . ($imy - (int)(($vehicle['Location'][1] - $minY) / 100 * $scale)) . ')"
               />';
-                $svg .= '<text x="' . ($imx - (int)(($vehicle['Location'][0] - $minX) / 100 * $scale)) .
-                    '" y="' . ($imy - (int)(($vehicle['Location'][1] - $minY) / 100 * $scale)) . '" >' . '&nbsp;&nbsp;' . $vehicle['Location'][2] . '</text>' . "\n";
+                $svg .= '<text x="' . $x . '" y="' . $y . '" >' . '&nbsp;&nbsp;' . $vehicle['Location'][2] . '</text>' . "\n";
 
             }
         }
@@ -547,8 +550,7 @@ foreach ($files as $file) {
             //$name.=' ('.$vehicle['Location']['Z'].')';
             // label locomotives
             if ($doSvg) {
-                $svg .= '<text x="' . ($imx - (int)(($vehicle['Location'][0] - $minX) / 100 * $scale)) .
-                    '" y="' . ($imy - (int)(($vehicle['Location'][1] - $minY) / 100 * $scale)) . '" >' . '&nbsp;&nbsp;' . $name . '</text>' . "\n";
+                $svg .= '<text x="' . $x . '" y="' . $y . '" >' . '&nbsp;&nbsp;' . $name . '</text>' . "\n";
 
             }
         } else {
@@ -663,9 +665,11 @@ foreach ($files as $file) {
         }
 
 
+        // create a "database" and store some infos about this file for the websies index page
         @$db = unserialize(@file_get_contents('db.db'));
         $db[$NEWUPLOADEDFILE] = array($totalTrackLength, $totalSwitches, $totalLocos, $totalCarts, $maxSlope);
         @file_put_contents('db.db', serialize($db));
+
         // label the industries
         if ($doSvg) {
             $svg .= '<text x="' . ($imx - (int)(($site['Location'][0] - $minX) / 100 * $scale) + $xoff) .
@@ -719,7 +723,7 @@ foreach ($files as $file) {
 
 
     /**
-     * chart
+     * chart (Legende) of carts
      */
     $carts = array(
         'flatcar_logs' => array($engineRadius / 3, 'red'),
@@ -758,11 +762,16 @@ foreach ($files as $file) {
     //@print_r($distances);
     if ($doSvg) {
         file_put_contents('done/' . $htmlFileName, str_replace('&nbsp;', ' ', str_replace('###SVG###', $svg, $htmlSvg)));
+
+        // optionally pushing this automatically to a webserver
+        // if you run this script as deamon - it uploads on each save automatically
         $cmd = '"c:\Program Files (x86)\WinSCP\WinSCP.com" /command "open ftp://user:password@server.de/" "put ' . $htmlFileName . ' /html/minizwerg/" "exit"';
 //        passthru($cmd);
     }
 
     echo "rendered in " . (microtime(true) - $start) . " microseconds\n";
+
+    // store save for 5 minutes in case someone wants to edit the cart texts/numbers
     if (!isset($_POST['save'])) {
         rename('uploads/' . $NEWUPLOADEDFILE, 'saves/' . $NEWUPLOADEDFILE);
     }
@@ -771,6 +780,9 @@ foreach ($files as $file) {
 // print_r($types);
 
 
+/**
+ * Class dtHeader for the Fileheader
+ */
 class dtHeader
 {
     var $NAME = 'HEADER';
