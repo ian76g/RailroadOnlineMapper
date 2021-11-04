@@ -47,7 +47,7 @@ if (isset($_POST) && !empty($_POST)) {
 //            die('YOUR FILE WAS PLACED IN QUEUE UNTIL I TURN THE COMPUTER ON AGAIN AFTER MY NIGHT!');
 $NEWUPLOADEDFILE = $myNewName.'.sav';
 include('converter.php');
-            echo '<A target="_map" href="done/'.$myNewName.'.html">Your MAP as SVG</A><br>';
+            echo '<A target="_map" href="done/'.$myNewName.'.html?t='.time().'">Your MAP as SVG</A><br>';
         } else {
             echo "Sorry, there was an error uploading your file.";
         }
