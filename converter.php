@@ -1206,13 +1206,14 @@ class dtProperty
                         //echo "Textproperty incoming at " . $this->position . " for Name $name\n";
                         for ($i = 0; $i < $arrayCount; $i++) {
                             $createEmptyNumber = false;
+                            $createEmptyName = false;
                             if (trim($this->NAME) == 'FrameNumberArray') {
                                 $createEmptyNumber = true;
                             }
-//                            if (trim($this->NAME) == 'FrameNameArray') {
-//                                $createEmptyNumber = true;
-//                            }
-                            $cartText = $this->readTextProperty($i, $createEmptyNumber);
+                            if (trim($this->NAME) == 'FrameNameArray') {
+                                $createEmptyName = true;
+                            }
+                            $cartText = $this->readTextProperty($i, $createEmptyNumber, $createEmptyName);
                             $elem[] = array($pieces, $cartText);
                             //echo "...-[$cartText]-..."
                         }
@@ -1239,29 +1240,58 @@ class dtProperty
      * @param false $createEmptyNumer
      * @return array
      *
-     * Jenny — heute um 08:16 Uhr
-    There is another format (the strange one you sent me)
-    Basically when you finish reading an entry and start reading the next one, you need to read the first int32 to know whether it’s formatted or not
-    Usually you get 02 00 00 00 if there’s a regular text entry, 00 00 00 00 if it’s a null text entry, and 01 00 00 00 if it’s formatted
-    If you get 02 or 00, then read the separator ff and the « opt » which is 01 00 00 00 if there’s a UEString, and 00 00 00 00 if there’s not.
-    And then onto the next index of the array
-    However if you get 01 00 00 00 as first value, then it’s formatted, the separator is 03, then int64 08 00 00 00 00 00 00 00 and empty byte 00
-    Then the format specifiers : UEString (the magic string I don’t know what it does but is always the same), UEString (formatted) int 32 with value 02 00 00 00 (probably the number of field in the formatter) and one last UEString with "0"
-    Then a special separator 04
-    And then the first line as a special text property:
-    02 00 00 00
-    ff
-    01 00 00 00
-    Then 2 UEString
-    The first one being the actual content of the first line, the second one being the "1" we always see, but that can be discarded when reading and put back when writing
-    And that field ends with one byte 04
-    And then the second line, which will always start with 02 00 00 00
-    Then ff
-    Then if it’s empty 00 00 00 00, or else 01 00 00 00 then UEString
-    I don’t think it ends with 04 for that one (writing that from memory)
-    And that’s the full formatted TextProperty array index
+     *
+     * There is another format (the strange one you sent me)
+     * Basically when you finish reading an entry and start reading the next one,
+     * you need to read the first int32 to know whether it’s formatted or not
+
+     * Usually you get
+     * 02 00 00 00 if there’s a regular text entry,
+     * 00 00 00 00 if it’s a null text entry, and
+     * 01 00 00 00 if it’s formatted
+
+     * If you get 02 or 00, then read the separator ff and the « opt » which is 01 00 00 00
+     * if there’s a UEString, and 00 00 00 00 if there’s not.
+
+     * And then onto the next index of the array
+
+     * However if you get 01 00 00 00 as first value, then it’s formatted,
+     * the separator is 03, then int64 08 00 00 00 00 00 00 00 and empty byte 00
+
+     * Then the format specifiers :
+     * UEString (the magic string I don’t know what it does but is always the same),
+     * UEString (formatted) int 32 with value
+     * 02 00 00 00 (probably the number of field in the formatter)
+     * and one last UEString with "0"
+
+     * Then a special separator 04
+
+     * And then the first line as a special text property:
+
+     * 02 00 00 00
+
+     * ff
+
+     * 01 00 00 00
+
+     * Then 2 UEString
+
+     * The first one being the actual content of the first line,
+     * the second one being the "1" we always see, but that can be discarded when reading and put back when writing
+
+     * And that field ends with one byte 04
+
+     * And then the second line, which will always start with 02 00 00 00
+
+     * Then ff
+
+     * Then if it’s empty 00 00 00 00, or else 01 00 00 00 then UEString
+
+     * I don’t think it ends with 04 for that one (writing that from memory)
+
+     * And that’s the full formatted TextProperty array index
      */
-    function readTextProperty($i, $createEmptyNumer = false)
+    function readTextProperty($i, $createEmptyNumer = false, $createEmptyName = false)
     {
         $terminator = unpack('C', substr($this->x, $this->position, 1))[1];
         $this->CONTENTOBJECTS[] = substr($this->x, $this->position, 1);
@@ -1288,6 +1318,11 @@ class dtProperty
             $newText->string = '.' . hex2bin('00');
             $this->CONTENTOBJECTS[] = $newText;
         }
+
+        if ($terminator == 0 && $createEmptyName) {
+
+        }
+
 
         switch ($terminator) {
             case 0 :
