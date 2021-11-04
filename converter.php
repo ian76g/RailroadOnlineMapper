@@ -469,7 +469,12 @@ foreach ($files as $file) {
 <td>###6###</td>
 </tr>';
         $exArr = array($vehicle['Type'], strtoupper(strip_tags($vehicle['Name'])), strip_tags(trim($vehicle['Number'])));
-        if ($empty || strip_tags($vehicle['Name']) || (trim($vehicle['Number']) != '.' && trim($vehicle['Number']))) {
+        if (
+            $empty ||
+            (strip_tags($vehicle['Name']) && trim($vehicle['Name']) != '.'  ) ||
+            (trim($vehicle['Number']) != '.' && trim($vehicle['Number']))
+        )
+        {
             $exArr[] = $arithmeticHelper->nearestIndustry($vehicle['Location'], $data['Industries']);
             if ($vehicle['Tender']['Fuelamount']) {
                 $exArr[] = 'firewood';
