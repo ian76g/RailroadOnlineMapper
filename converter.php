@@ -100,6 +100,13 @@ $htmlSvg .= <<<EOF
 </html>
 EOF;
 
+$possibleCargos = array(
+    'flatcar_logs' => array('log'),
+    'flatcar_stakes' => array('rail','lumber','beam','rawiron'),
+    'flatcar_hopper' => array('ironore','coal'),
+    'flatcar_cordwood' => array('cordwood'),
+);
+
 $dh = opendir($path);
 
 /**
@@ -527,14 +534,56 @@ foreach ($files as $file) {
     );
 
     imagesetthickness($img, 1);
-    $cartExtraStr = '<form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $NEWUPLOADEDFILE . '"><table class="myStuff"><tr><th>Type</th><th>Name</th><th>Number</th><th>near</th></tr>###TROWS###</table><input type="submit" value="RENUMBER"></form>';
+
+    $cartExtraStr = '<form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $NEWUPLOADEDFILE . '">
+<table class="myStuff">
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Number</th>
+<th>near</th>
+<th>Cargo</th>
+<th>Amount</th>
+</tr>
+###TROWS###</table><input type="submit" value="RENUMBER"></form>';
     $trows = '';
     foreach ($data['Frames'] as $cartIndex => $vehicle) {
-        $trow = '<tr><td>###1###</td><td><input name="name_' . $cartIndex . '" value="###2###"></td><td align="right"><input name="number_' . $cartIndex . '" value="###3###"></td><td>###4###</td></tr>';
+        $trow = '<tr>
+<td>###1###</td>
+<td>###2###</td>
+<td align="right"><input size="5" maxlength="15" name="number_' . $cartIndex . '" value="###3###"></td>
+<td>###4###</td>
+<td>###5###</td>
+<td>###6###</td>
+</tr>';
         $exArr = array($vehicle['Type'], strtoupper(strip_tags($vehicle['Name'])), strip_tags(trim($vehicle['Number'])));
-        if ($empty || strip_tags($vehicle['Name']) || $vehicle['Number']) {
+        if ($empty || strip_tags($vehicle['Name']) || (trim($vehicle['Number']) != '.' && trim($vehicle['Number']))) {
             $exArr[] = nearestIndustry($vehicle['Location']);
-            $trows .= str_replace(array('###1###', '###2###', '###3###', '###4###'), $exArr, $trow);
+            if($vehicle['Tender']['Fuelamount']) {
+                $exArr[] = 'firewood';
+                $exArr[] = $vehicle['Tender']['Fuelamount'];
+                $exArr[] = 'tenderamount_';
+            } else {
+                if($vehicle['Freight']['Type']) {
+                    $exArr[] = $vehicle['Freight']['Type'];
+                    $exArr[] = $vehicle['Freight']['Amount'];
+                    $exArr[] = 'freightamount_';
+                } else {
+                    $exArr[] = '-';
+                    $exArr[] = '-';
+                    $exArr[] = false;
+
+                }
+
+            }
+            if($exArr[6]){
+                $template = '<input size="2" maxlength="2" name="'.$exArr[6].$cartIndex.'" value="'.$exArr[5].'">';
+            } else {
+                $template = $exArr[5];
+            }
+            $exArr[5] = $template;
+
+            $trows .= str_replace(array('###1###', '###2###', '###3###', '###4###', '###5###', '###6###'), $exArr, $trow);
 
         }
 
@@ -706,7 +755,7 @@ foreach ($files as $file) {
                 break;
             case '10':
                 $name = 'F';
-//                $name .="\nI:".implode(',', $site['EductsStored'])."\nO:".implode(',', $site['ProductsStored']);
+                $name .="(".array_sum($site['ProductsStored']).")";
                 $rotation = 0;
                 break;
             default:
@@ -1189,6 +1238,19 @@ class dtString
 
 }
 
+class dtDynamic
+{
+    var $value;
+    var $NAME = 'dynamic';
+    var $ARRCOUNTER = false;
+    var $pack;
+
+    function serialize()
+    {
+        return pack($this->pack, $this->value);
+    }
+}
+
 class dtProperty
 {
     var $x;
@@ -1414,7 +1476,12 @@ class dtProperty
                     case 'IntProperty':
                         for ($i = 0; $i < $arrayCount; $i++) {
                             $int = unpack('V', substr($this->x, $this->position, 4))[1];
-                            $this->CONTENTOBJECTS[] = substr($this->x, $this->position, 4);
+                            $nD = new dtDynamic();
+                            $nD->NAME = 'Int';
+                            $nD->value = $int;
+                            $nD->ARRCOUNTER = $i;
+                            $nD->pack = 'V';
+                            $this->CONTENTOBJECTS[] = $nD;
                             $this->position += 4;
                             //@$goldenBucket[$name][]= $int;
                             $elem[] = array($pieces, $int);
@@ -1635,6 +1702,7 @@ class GVASParser
         $output = '';
         foreach ($this->saveObject['objects'] as $object) {
             if (is_object($object)) {
+//                echo 'ON: '.trim($object->NAME).", ";
                 if (trim($object->NAME) == 'FrameNumberArray') {
                     foreach ($object->CONTENTOBJECTS as $co) {
                         if (is_object($co) && trim($co->NAME) == 'STRING') {
@@ -1644,6 +1712,32 @@ class GVASParser
                                 $_POST['number_' . $co->ARRCOUNTER] != trim($co->string)
                             ) {
                                 $co->string = strip_tags(trim($_POST['number_' . $co->ARRCOUNTER])) . hex2bin('00');
+                            }
+                        }
+                    }
+                }
+                if (trim($object->NAME) == 'FreightAmountArray') {
+                    foreach ($object->CONTENTOBJECTS as $co) {
+                        if(is_object($co) && trim($co->NAME) == 'Int'){
+                            if (
+                                ($co->ARRCOUNTER !== '') &&
+                                isset($_POST['freightamount_' . $co->ARRCOUNTER]) &&
+                                $_POST['freightamount_' . $co->ARRCOUNTER] != trim($co->value)
+                            ) {
+                                $co->value = strip_tags(trim($_POST['freightamount_' . $co->ARRCOUNTER]));
+                            }
+                        }
+                    }
+                }
+                if (trim($object->NAME) == 'TenderFuelAmountArray') {
+                    foreach ($object->CONTENTOBJECTS as $co) {
+                        if(is_object($co) && trim($co->NAME) == 'Int'){
+                            if (
+                                ($co->ARRCOUNTER !== '') &&
+                                isset($_POST['tenderamount_' . $co->ARRCOUNTER]) &&
+                                $_POST['tenderamount_' . $co->ARRCOUNTER] != trim($co->value)
+                            ) {
+                                $co->value = strip_tags(trim($_POST['tenderamount_' . $co->ARRCOUNTER]));
                             }
                         }
                     }
