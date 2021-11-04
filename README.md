@@ -1,27 +1,40 @@
 # RailroadOnlineMapper
 
-Two options to set this up
+Currnetly hosted on https://minizwerg.online/
 
-# run locally
-- get/download PHP (v<8)
+## Getting Started
 
-https://windows.php.net/downloads/releases/php-7.4.25-Win32-vc15-x64.zip
+### Run locally
 
-- rename php.ini.development to php.ini
-- in ini file set extension_dir to ext
-  
-extension_dir = "ext"
+#### PHP Setup
 
-- in ini file enable extensions mb
+1. Ensure you have PHP (v<8) installed, or [download here](https://windows.php.net/downloads/releases/php-7.4.25-Win32-vc15-x64.zip)
 
-extension=mbstring
+2. Rename `php.ini.development` to `php.ini`
+3. Set the extension_dir of `php.ini` to `ext`
 
-- download this repo content in a local folder
-- copy your save from %localappdata%/arr/Saved/SaveGames to your local folder (eg. slot1.sav)
-- php converter.php slot1.sav
-- done (output in done folder)
+   > `extension_dir = "ext"`
 
+4. in ini file enable extensions mb
+   > `extension=mbstring`
 
-# host on webserver
-- copy everything to a folder of your webserver
-- done
+#### Project setup
+
+5. Clone this repo to your local machine
+6. Copy your save file from `%localappdata%/arr/Saved/SaveGames` to the root of the project (eg. `./slot1.sav`)
+7. Run the convertor
+   > `php converter.php slot1.sav`
+8. Find output html in `./done`
+
+### Host on webserver
+
+1. Copy everything to a folder of your webserver
+2. Done
+
+### Output
+
+`xx.json`
+The save in nice readable JSON
+
+`db.db`
+A database used for hosting with filename, user, switches, trains, etc.
