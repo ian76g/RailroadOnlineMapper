@@ -51,7 +51,7 @@ if (isset($_POST) && !empty($_POST)) {
 
             $NEWUPLOADEDFILE = $myNewName . '.sav';
             include('converter.php');
-            header('Location: https://minizwerg.online/done/' . $myNewName . '.html?t=' . time());
+            header('Location: /done/' . $myNewName . '.html?t=' . time());
             die();
         } else {
             echo "Sorry, there was an error uploading your file.";
