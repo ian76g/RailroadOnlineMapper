@@ -110,11 +110,11 @@ include('converter.php');
                 <fieldset>
                     <div>
                         <input type="radio" id="bg" name="background" value="bg">
-                        <label for="bg"> <img border="2" src="done/bg.png" width="90" height="90"> old background </label>
+                        <label for="bg"> <img border="2" src="done/bg.png" width="90" height="90"> Old background </label>
                     </div>
                     <div>
                         <input type="radio" id="bg3" name="background" value="bg3">
-                        <label for="bg3"> <img border="2" src="done/bg3.png" width="90" height="90"> new background </label>
+                        <label for="bg3"> <img border="2" src="done/bg3.png" width="90" height="90"> New background </label>
                     </div>
                     <div>
                         <input  type="radio" id="bg4" name="background" value="bg4">
