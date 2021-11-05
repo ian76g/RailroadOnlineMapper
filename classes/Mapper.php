@@ -206,7 +206,8 @@ class Mapper
                 $this->totalLocos,
                 $this->totalCarts,
                 $this->maxSlope,
-                getUserIpAddr()
+                getUserIpAddr(),
+                sizeof($this->data['Removed']['Vegetation'])
             );
             @file_put_contents('db.db', serialize($db));
 
@@ -499,10 +500,7 @@ class Mapper
     }
 
     /**
-     * @param $data
-     * @param $doSvg
-     * @param $svg
-     * @return array
+     * @return string
      */
     public function drawTurntables()
     {
@@ -552,7 +550,7 @@ class Mapper
 
     /**
      * @param $htmlSvg
-     * @return array
+     * @return string
      */
     public function drawRollingStocks(&$htmlSvg)
     {
@@ -661,7 +659,7 @@ class Mapper
 
             $exArr = array(
                 $vehicle['Type'],
-                strtoupper(strip_tags($vehicle['Name'])),
+                strtoupper(strip_tags(trim($vehicle['Name']))),
                 strip_tags(trim($vehicle['Number']))
             );
             if (
@@ -694,9 +692,7 @@ class Mapper
                     $template = $exArr[5];
                 }
                 $exArr[5] = $template;
-
                 $trows .= str_replace(array('###1###', '###2###', '###3###', '###4###', '###5###', '###6###'), $exArr, $trow);
-
             }
 
             $x = ($this->imx - (int)(($vehicle['Location'][0] - $this->minX) / 100 * $this->scale));
@@ -747,7 +743,8 @@ class Mapper
 
         $cartExtraStr = str_replace('###TROWS###', $trows, $cartExtraStr);
         $htmlSvg = str_replace('###EXTRAS###', $cartExtraStr, $htmlSvg);
-        return array($x, $y, $svg, $totalLocos, $name, $totalCarts, $htmlSvg);
+
+        return $svg;
     }
 
 }

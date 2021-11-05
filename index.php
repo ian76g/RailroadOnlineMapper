@@ -5,7 +5,7 @@
     include_once('includes/head.php');
 
     $tableHeader = '<thead>
-                        <th>NAME</th><th>Track Length</th><th># Y</th><th>Locos</th><th>Carts</th><th>max Slope</th>
+                        <th>NAME</th><th>Track Length</th><th>#Y / #T</th><th>Locos</th><th>Carts</th><th>max Slope</th>
                     </thead>';
 
 ?>
@@ -52,7 +52,7 @@
 
                         echo '<tr><td><a href="done/' . substr($file, 5, -5) . '.html?t=' . time() . '">' . substr($file, 5, -5) . $dl . '</a></td>
                                 <td>' . round($db[substr($file, 5, -5) . '.sav'][0] / 100000, 2) . 'km</td>
-                                <td>' . $db[substr($file, 5, -5) . '.sav'][1] . '</td>
+                                <td>' . $db[substr($file, 5, -5) . '.sav'][1] . ' / ' . $db[substr($file, 5, -5) . '.sav'][6] .'</td>
                                 <td>' . $db[substr($file, 5, -5) . '.sav'][2] . '</td>
                                 <td>' . $db[substr($file, 5, -5) . '.sav'][3] . '</td>
                                 <td >' . round($db[substr($file, 5, -5) . '.sav'][4]) . '%</td>

@@ -14,6 +14,11 @@ require_once 'classes/Mapper.php';
 
 function getUserIpAddr()
 {
+    global $argv;
+
+    if(isset($argv) && $argv){
+        return 'local';
+    }
     if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
         $ip = $_SERVER['HTTP_CLIENT_IP'];
     } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
@@ -159,4 +164,7 @@ foreach ($files as $file) {
     if (!isset($_POST['save'])) {
         rename('uploads/' . $NEWUPLOADEDFILE, 'saves/' . $NEWUPLOADEDFILE);
     }
+
+
+
 }
