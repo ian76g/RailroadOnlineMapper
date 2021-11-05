@@ -4,12 +4,13 @@ set_time_limit(10);                // just in case something wents really bad --
 $v = 46;                                  //version - totally not used except in next line
 //echo "\n" . 'running converter version 0.' . $v . "\n";
 
-function getUserIpAddr(){
-    if(!empty($_SERVER['HTTP_CLIENT_IP'])){
+function getUserIpAddr()
+{
+    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
         $ip = $_SERVER['HTTP_CLIENT_IP'];
-    }elseif(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])){
+    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
         $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-    }else{
+    } else {
         $ip = $_SERVER['REMOTE_ADDR'];
     }
     return $ip;
@@ -108,20 +109,20 @@ $arithmeticHelper = new ArithmeticHelper();             // put some math stuff i
  * do all files that need to be done  (was overriden by a single file)
  */
 foreach ($files as $file) {
-    if(!file_exists($path . '/' . $file)){
+    if (!file_exists($path . '/' . $file)) {
         header('Location: https://minizwerg.online/');
         die();
     }
     $htmlFileName = str_replace('.sav', '', basename($file)) . '.html';
-    $downloadLink='';
-    if(file_exists('public/'.basename($file))){
-        $downloadLink='<A href="../public/'.basename($file).'">Download Save</A>';
+    $downloadLink = '';
+    if (file_exists('public/' . basename($file))) {
+        $downloadLink = '<A href="../public/' . basename($file) . '">Download Save</A>';
     }
-    $htmlSvg=str_replace('###DOWNLOAD###', $downloadLink, $htmlSvg);
+    $htmlSvg = str_replace('###DOWNLOAD###', $downloadLink, $htmlSvg);
 
 
     $doSvg = true;                                      // set this to false if you dont want a map
-                                                        // previously a switch between SVG and JPEG output
+    // previously a switch between SVG and JPEG output
 
     $svg = '';
     $savegame = $path . "/" . $file;
@@ -193,8 +194,8 @@ foreach ($files as $file) {
         '6' => array(15, 'darkgrey'),                       // constant wall
         '7' => array(15, 'lightblue'),                      //  iron bridge
         '3' => array(15, 'orange'),                         //  wooden bridge
-        '4' => array( 3, 'black'),                          // trendle track
-        '0' => array( 3, 'black'),                          // track  darkkhaki, darkgrey,orange,blue,black
+        '4' => array(3, 'black'),                          // trendle track
+        '0' => array(3, 'black'),                          // track  darkkhaki, darkgrey,orange,blue,black
     );
 
     // statistics for the webpage index
@@ -333,8 +334,8 @@ foreach ($files as $file) {
             } else {
                 $xStraight = ($imx - (int)(($switch['Location'][0] - $minX) / 100 * $scale) + (cos($rotation) * $switchRadius / 2));
                 $yStraight = ($imy - (int)(($switch['Location'][1] - $minY) / 100 * $scale) + (sin($rotation) * $switchRadius / 2));
-                $xSide     = ($imx - (int)(($switch['Location'][0] - $minX) / 100 * $scale) + (cos($rotSide) * $switchRadius / 2));
-                $ySide     = ($imy - (int)(($switch['Location'][1] - $minY) / 100 * $scale) + (sin($rotSide) * $switchRadius / 2));
+                $xSide = ($imx - (int)(($switch['Location'][0] - $minX) / 100 * $scale) + (cos($rotSide) * $switchRadius / 2));
+                $ySide = ($imy - (int)(($switch['Location'][1] - $minY) / 100 * $scale) + (sin($rotSide) * $switchRadius / 2));
 
                 if ($state) {
 //                    $svg .= '<text x="' . $x . '" y="' . $y . '">   ' . $type . '/' . $state . '</text>';
@@ -406,20 +407,20 @@ foreach ($files as $file) {
     $cartColors = array(
         'handcar' => array($engineRadius, 'black'),
         'porter_040' => array($engineRadius, 'black'),
-        'porter_042' => array($engineRadius,  'black'),
-        'eureka' => array($engineRadius,  'black'),
-        'eureka_tender' => array($engineRadius,  'black'),
-        'climax' => array($engineRadius,  'black'),
-        'heisler' => array($engineRadius,  'black'),
-        'class70' => array($engineRadius,  'black'),
-        'class70_tender' => array($engineRadius,  'black'),
-        'cooke260' => array($engineRadius,  'black'),
-        'cooke260_tender' => array($engineRadius,  'black'),
-        'flatcar_logs' => array($engineRadius / 3,  'red'),
-        'flatcar_cordwood' => array($engineRadius / 3 * 2,  'orange'),
-        'flatcar_stakes' => array($engineRadius / 3 * 2,  'yellow'),
-        'flatcar_hopper' => array($engineRadius / 3 * 2,  'brown'),
-        'flatcar_tanker' => array($engineRadius / 3 * 2,  'grey'),
+        'porter_042' => array($engineRadius, 'black'),
+        'eureka' => array($engineRadius, 'black'),
+        'eureka_tender' => array($engineRadius, 'black'),
+        'climax' => array($engineRadius, 'black'),
+        'heisler' => array($engineRadius, 'black'),
+        'class70' => array($engineRadius, 'black'),
+        'class70_tender' => array($engineRadius, 'black'),
+        'cooke260' => array($engineRadius, 'black'),
+        'cooke260_tender' => array($engineRadius, 'black'),
+        'flatcar_logs' => array($engineRadius / 3, 'red'),
+        'flatcar_cordwood' => array($engineRadius / 3 * 2, 'orange'),
+        'flatcar_stakes' => array($engineRadius / 3 * 2, 'yellow'),
+        'flatcar_hopper' => array($engineRadius / 3 * 2, 'brown'),
+        'flatcar_tanker' => array($engineRadius / 3 * 2, 'grey'),
     );
 
     // build some extra HTML for a form to edit cart data
@@ -444,8 +445,20 @@ foreach ($files as $file) {
         'flatcar_cordwood' => array('cordwood'),
     );
 
-
-
+    $cargoNames = array(
+        "log" => "Logs",
+        "cordwood" => "Cordwood",
+        "beam" => "Beams",
+        "lumber" => "Lumber",
+        "ironore" => "Iron Ore",
+        "rail" => "Rails",
+        "rawiron" => "Raw Iron",
+        "coal" => "Coal",
+        "steelpipe" => "Steel Pipes",
+        "crate_tools" => "Tools",
+        "crudeoil" => "Crude Oil",
+        "oilbarrel" => "Oil Barrels",
+    );
 
 
     foreach ($data['Frames'] as $cartIndex => $vehicle) {
@@ -463,10 +476,10 @@ foreach ($files as $file) {
 
         $optionsStringArray = array();
         $selectString = $vehicle['Freight']['Type'];
-        if(isset($possibleCargos[$vehicle['Type']])){
+        if (isset($possibleCargos[$vehicle['Type']])) {
             $options = '';
-            foreach($possibleCargos[$vehicle['Type']] as $type){
-                if($vehicle['Freight']['Type'] == $type){
+            foreach ($possibleCargos[$vehicle['Type']] as $type) {
+                if ($vehicle['Freight']['Type'] == $type) {
                     $selected = ' selected';
                 } else {
                     $selected = '';
@@ -475,7 +488,7 @@ foreach ($files as $file) {
                 $optionName = $type;
                 $optionsStringArray[] = str_replace(
                     array('###OPTIONVALUE###', '###SELECTED###', '###OPTIONNAME###'),
-                    array($optionValue, $selected, $optionName),
+                    array($optionValue, $selected, $cargoNames[$optionName]),
                     $optionTemplate
                 );
             }
@@ -494,10 +507,9 @@ foreach ($files as $file) {
         if (
             // trim out empty carts without number and without name
             $empty ||
-            (strip_tags($vehicle['Name']) && trim($vehicle['Name']) != '.'  ) ||
+            (strip_tags($vehicle['Name']) && trim($vehicle['Name']) != '.') ||
             (trim($vehicle['Number']) != '.' && trim($vehicle['Number']))
-        )
-        {
+        ) {
             $exArr[] = $arithmeticHelper->nearestIndustry($vehicle['Location'], $data['Industries']);
             if ($vehicle['Tender']['Fuelamount']) {
                 $exArr[] = 'firewood';
@@ -1013,9 +1025,9 @@ class dtProperty
     var $NAME;
     var $TYPE;
     var $RESULTROWS;
-    var $ITEMTYPE='';
-    var $SUBTYPE='';
-    var $GUID='';
+    var $ITEMTYPE = '';
+    var $SUBTYPE = '';
+    var $GUID = '';
 
     var $content;
 
@@ -1301,34 +1313,34 @@ class dtProperty
      * There is another format (the strange one you sent me)
      * Basically when you finish reading an entry and start reading the next one,
      * you need to read the first int32 to know whether it’s formatted or not
- * Usually you get
+     * Usually you get
      * 02 00 00 00 if there’s a regular text entry,
      * 00 00 00 00 if it’s a null text entry, and
      * 01 00 00 00 if it’s formatted
- * If you get 02 or 00, then read the separator ff and the « opt » which is 01 00 00 00
+     * If you get 02 or 00, then read the separator ff and the « opt » which is 01 00 00 00
      * if there’s a UEString, and 00 00 00 00 if there’s not.
- * And then onto the next index of the array
- * However if you get 01 00 00 00 as first value, then it’s formatted,
+     * And then onto the next index of the array
+     * However if you get 01 00 00 00 as first value, then it’s formatted,
      * the separator is 03, then int64 08 00 00 00 00 00 00 00 and empty byte 00
- * Then the format specifiers :
+     * Then the format specifiers :
      * UEString (the magic string I don’t know what it does but is always the same),
      * UEString (formatted) int 32 with value
      * 02 00 00 00 (probably the number of field in the formatter)
      * and one last UEString with "0"
- * Then a special separator 04
- * And then the first line as a special text property:
- * 02 00 00 00
- * ff
- * 01 00 00 00
- * Then 2 UEString
- * The first one being the actual content of the first line,
+     * Then a special separator 04
+     * And then the first line as a special text property:
+     * 02 00 00 00
+     * ff
+     * 01 00 00 00
+     * Then 2 UEString
+     * The first one being the actual content of the first line,
      * the second one being the "1" we always see, but that can be discarded when reading and put back when writing
- * And that field ends with one byte 04
- * And then the second line, which will always start with 02 00 00 00
- * Then ff
- * Then if it’s empty 00 00 00 00, or else 01 00 00 00 then UEString
- * I don’t think it ends with 04 for that one (writing that from memory)
- * And that’s the full formatted TextProperty array index
+     * And that field ends with one byte 04
+     * And then the second line, which will always start with 02 00 00 00
+     * Then ff
+     * Then if it’s empty 00 00 00 00, or else 01 00 00 00 then UEString
+     * I don’t think it ends with 04 for that one (writing that from memory)
+     * And that’s the full formatted TextProperty array index
      */
     function readTextProperty($cartIndex, $createEmptyNumber = false, $createEmptyName = false)
     {
@@ -1365,27 +1377,27 @@ class dtProperty
             $this->CONTENTOBJECTS[sizeof($this->CONTENTOBJECTS) - 2] = hex2bin(str_replace(' ', '', '00 00 00 03'));
             // then int64 08 00 00 00 00 00 00 00 and empty byte 00
             $this->CONTENTOBJECTS[sizeof($this->CONTENTOBJECTS) - 1] =
-                              hex2bin(str_replace(' ', '', '08 00 00 00 00 00 00 00 00'));
+                hex2bin(str_replace(' ', '', '08 00 00 00 00 00 00 00 00'));
             //* Then the format specifiers :
             //* UEString (the magic string I don’t know what it does but is always the same),
             $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '', '21 00 00 00')); // length of formatter
-            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ','',
-                '35 36 46 38 44 32 37 31 34 39 '.
-                '43 43 35 45 32 44 31 32 31 30 '.
-                '33 42 42 45 42 46 43 41 39 30 '.
+            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '',
+                '35 36 46 38 44 32 37 31 34 39 ' .
+                '43 43 35 45 32 44 31 32 31 30 ' .
+                '33 42 42 45 42 46 43 41 39 30 ' .
                 '39 37 00 '));
-            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ','',
-                    '0b 00 00 00 '.
-                            '7b 30 7d 3c 62 72 3e 7b 31 7d 00')  // {0} <br> {1}
+            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '',
+                '0b 00 00 00 ' .
+                '7b 30 7d 3c 62 72 3e 7b 31 7d 00')  // {0} <br> {1}
             ); // formatter
             //* 02 00 00 00 (probably the number of field in the formatter)
             $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '', '02 00 00 00')); // 2 texts coming
 
             $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '', '02 00 00 00 30 00')); // text rowid with line number 0
             //* Then a special separator 04
-            $this->CONTENTOBJECTS[]=hex2bin('04');
-            $this->CONTENTOBJECTS[]=hex2bin('02'); // terminator 2
-            $this->CONTENTOBJECTS[]=hex2bin(str_replace(' ', '', '00 00 00 ff 01 00 00 00')); // first 4 and second 4
+            $this->CONTENTOBJECTS[] = hex2bin('04');
+            $this->CONTENTOBJECTS[] = hex2bin('02'); // terminator 2
+            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '', '00 00 00 ff 01 00 00 00')); // first 4 and second 4
             // first Text
             $newText = new dtString();
             $newText->nullBytes = 1;
@@ -1394,7 +1406,7 @@ class dtProperty
 
             $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '', '02 00 00 00 31 00')); // text rowid with line number 1
             //* Then a special separator 04
-            $this->CONTENTOBJECTS[]=hex2bin('04');
+            $this->CONTENTOBJECTS[] = hex2bin('04');
             // second Text
             $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '', '02 00 00 00 ff 00 00 00 00'));
         }
@@ -1559,15 +1571,15 @@ class GVASParser
                 if (trim($object->NAME) == 'FrameNameArray') {
                     foreach ($object->CONTENTOBJECTS as $co) {
                         if (is_object($co) && trim($co->NAME) == 'STRING') {
-                            if($co->ARRCOUNTER)
+                            if ($co->ARRCOUNTER)
                                 //echo "(".$co->string.")";
-                            if (
-                                ($co->ARRCOUNTER !== '') &&
-                                isset($_POST['name_' . $co->ARRCOUNTER]) &&
-                                $_POST['name_' . $co->ARRCOUNTER] != trim($co->string)
-                            ) {
-                                $co->string = strip_tags(trim($_POST['name_' . $co->ARRCOUNTER])) . hex2bin('00');
-                            }
+                                if (
+                                    ($co->ARRCOUNTER !== '') &&
+                                    isset($_POST['name_' . $co->ARRCOUNTER]) &&
+                                    $_POST['name_' . $co->ARRCOUNTER] != trim($co->string)
+                                ) {
+                                    $co->string = strip_tags(trim($_POST['name_' . $co->ARRCOUNTER])) . hex2bin('00');
+                                }
                         }
                     }
                 }
@@ -1599,13 +1611,13 @@ class GVASParser
                 }
                 if (trim($object->NAME) == 'FreightTypeArray') {
                     foreach ($object->CONTENTOBJECTS as $co) {
-                        if (is_object($co) && $co->ARRCOUNTER){
+                        if (is_object($co) && $co->ARRCOUNTER) {
                             if (
                                 ($co->ARRCOUNTER !== '') &&
                                 isset($_POST['freightType_' . $co->ARRCOUNTER]) &&
                                 $_POST['freightType_' . $co->ARRCOUNTER] != trim($co->string)
                             ) {
-                                $co->string = strip_tags(trim($_POST['freightType_' . $co->ARRCOUNTER])).hex2bin('00');
+                                $co->string = strip_tags(trim($_POST['freightType_' . $co->ARRCOUNTER])) . hex2bin('00');
                             }
                         }
                     }
@@ -1616,14 +1628,14 @@ class GVASParser
                 die('WHOPSI');
             }
         }
-        $output.=hex2bin('050000004e6f6e650000000000');
+        $output .= hex2bin('050000004e6f6e650000000000');
 
         if (isset($_POST['save'])) {
             $db = unserialize(file_get_contents('db.db'));
-            if(getUserIpAddr() != $db[$this->NEWUPLOADEDFILE][5]){
+            if (getUserIpAddr() != $db[$this->NEWUPLOADEDFILE][5]) {
                 die("This does not seem to be your save file.");
             }
-             echo "SAVING FILE " . $this->NEWUPLOADEDFILE . '.modified' . "<br>\n";
+            echo "SAVING FILE " . $this->NEWUPLOADEDFILE . '.modified' . "<br>\n";
             file_put_contents('saves/' . $this->NEWUPLOADEDFILE . '.modified', $output);
             echo '<A href="saves/' . $this->NEWUPLOADEDFILE . '.modified' . '">Download your modified save here </A><br>';
             echo 'Want to upload this map again?<A href="upload.php">Add your renumbered save again</A><br>';
