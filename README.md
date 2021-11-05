@@ -1,5 +1,7 @@
 # RailroadOnlineMapper
 
+[@ian76g#6577](https://discordapp.com/users/306158630145753090)
+
 Currently hosted on https://minizwerg.online/
 
 ## Getting Started
@@ -38,3 +40,7 @@ The save in nice readable JSON
 
 `db.db`
 A database used for hosting with filename, user, switches, trains, etc.
+
+## Contributers
+
+[@JKD#0205](https://discordapp.com/users/905751614357372938)
