@@ -8,7 +8,7 @@
 }
 
 html {
-  font-size: 85%;
+  font-size: 80%;
 }
 
 @media only screen and (min-width: 960px) {
@@ -46,6 +46,7 @@ h3,
 h4 {
   margin-bottom: 1rem;
   font-family: "Graduate", cursive;
+  line-height: 1;
 }
 
 h1 {
@@ -173,10 +174,14 @@ label:hover {
 
 .logo {
   margin-bottom: 1rem;
+  font-size: 1.8rem;
+  max-width: 100%;
+  word-break: break-all;
 }
 @media only screen and (min-width: 960px) {
   .logo {
     margin-bottom: 0;
+    font-size: 2.2rem;
   }
 }
 
@@ -240,13 +245,12 @@ thead {
 }
 
 thead th {
-  padding: 0.05rem;
+  padding: 0.5rem;
   white-space: nowrap;
   background: var(--primary-color);
   color: white;
   border-bottom: 1px solid var(--secondary-color);
 }
-
 @media only screen and (min-width: 1250px) {
   thead th {
     padding: 1rem;
@@ -254,13 +258,14 @@ thead th {
 }
 
 tbody td {
-  padding: 0.5rem;
+  padding: 1rem;
 }
 
 /* UPLOAD */
 
 .upload-form {
   width: 500px;
+  max-width: 100%;
   margin: 0 auto;
 }
 
