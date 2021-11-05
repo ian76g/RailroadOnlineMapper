@@ -418,7 +418,7 @@ foreach ($files as $file) {
 <th>Cargo</th>
 <th>Amount</th>
 </tr>
-###TROWS###</table><input type="submit" value="RENUMBER"></form>';
+###TROWS###</table><input type="submit" value="!APPLY ABOVE CHANGES TO MY SAVE!"></form>';
     $trows = '';
 
     // later you can switch cargo on carts - maybe this can be done by editing the save via the mapper later?
@@ -1278,62 +1278,44 @@ class dtProperty
     }
 
     /**
-     * @param $i
-     * @param false $createEmptyNumer
+     * @param $cartIndex
+     * @param false $createEmptyNumber
      * @return array
      *
      *
      * There is another format (the strange one you sent me)
      * Basically when you finish reading an entry and start reading the next one,
      * you need to read the first int32 to know whether it’s formatted or not
-
-     * Usually you get
+ * Usually you get
      * 02 00 00 00 if there’s a regular text entry,
      * 00 00 00 00 if it’s a null text entry, and
      * 01 00 00 00 if it’s formatted
-
-     * If you get 02 or 00, then read the separator ff and the « opt » which is 01 00 00 00
+ * If you get 02 or 00, then read the separator ff and the « opt » which is 01 00 00 00
      * if there’s a UEString, and 00 00 00 00 if there’s not.
-
-     * And then onto the next index of the array
-
-     * However if you get 01 00 00 00 as first value, then it’s formatted,
+ * And then onto the next index of the array
+ * However if you get 01 00 00 00 as first value, then it’s formatted,
      * the separator is 03, then int64 08 00 00 00 00 00 00 00 and empty byte 00
-
-     * Then the format specifiers :
+ * Then the format specifiers :
      * UEString (the magic string I don’t know what it does but is always the same),
      * UEString (formatted) int 32 with value
      * 02 00 00 00 (probably the number of field in the formatter)
      * and one last UEString with "0"
-
-     * Then a special separator 04
-
-     * And then the first line as a special text property:
-
-     * 02 00 00 00
-
-     * ff
-
-     * 01 00 00 00
-
-     * Then 2 UEString
-
-     * The first one being the actual content of the first line,
+ * Then a special separator 04
+ * And then the first line as a special text property:
+ * 02 00 00 00
+ * ff
+ * 01 00 00 00
+ * Then 2 UEString
+ * The first one being the actual content of the first line,
      * the second one being the "1" we always see, but that can be discarded when reading and put back when writing
-
-     * And that field ends with one byte 04
-
-     * And then the second line, which will always start with 02 00 00 00
-
-     * Then ff
-
-     * Then if it’s empty 00 00 00 00, or else 01 00 00 00 then UEString
-
-     * I don’t think it ends with 04 for that one (writing that from memory)
-
-     * And that’s the full formatted TextProperty array index
+ * And that field ends with one byte 04
+ * And then the second line, which will always start with 02 00 00 00
+ * Then ff
+ * Then if it’s empty 00 00 00 00, or else 01 00 00 00 then UEString
+ * I don’t think it ends with 04 for that one (writing that from memory)
+ * And that’s the full formatted TextProperty array index
      */
-    function readTextProperty($i, $createEmptyNumer = false, $createEmptyName = false)
+    function readTextProperty($cartIndex, $createEmptyNumber = false, $createEmptyName = false)
     {
         $terminator = unpack('C', substr($this->x, $this->position, 1))[1];
         $this->CONTENTOBJECTS[] = substr($this->x, $this->position, 1);
@@ -1345,7 +1327,7 @@ class dtProperty
         $this->CONTENTOBJECTS[] = substr($this->x, $this->position, 4); //00000000 in case of terminator 0
         $this->position += 4;
 
-        if ($terminator == 0 && $createEmptyNumer) {
+        if ($terminator == 0 && $createEmptyNumber) {
             // HERE WE HAVE TO IMPLEMENT A NEW CART NUMBER (eg. a dot)
             // TERMINATOR must be 02
             // firstFour have to be 000000FF
@@ -1362,7 +1344,44 @@ class dtProperty
         }
 
         if ($terminator == 0 && $createEmptyName) {
+            //* However if you get 01 00 00 00 as first value, then it’s formatted,
+            $this->CONTENTOBJECTS[sizeof($this->CONTENTOBJECTS) - 3] = pack('C', 1);
+            //* the separator is 03,
+            $this->CONTENTOBJECTS[sizeof($this->CONTENTOBJECTS) - 2] = hex2bin(str_replace(' ', '', '00 00 00 03'));
+            // then int64 08 00 00 00 00 00 00 00 and empty byte 00
+            $this->CONTENTOBJECTS[sizeof($this->CONTENTOBJECTS) - 1] =
+                              hex2bin(str_replace(' ', '', '08 00 00 00 00 00 00 00 00'));
+            //* Then the format specifiers :
+            //* UEString (the magic string I don’t know what it does but is always the same),
+            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '', '21 00 00 00')); // length of formatter
+            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ','',
+                '35 36 46 38 44 32 37 31 34 39 '.
+                '43 43 35 45 32 44 31 32 31 30 '.
+                '33 42 42 45 42 46 43 41 39 30 '.
+                '39 37 00 '));
+            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ','',
+                    '0b 00 00 00 '.
+                            '7b 30 7d 3c 62 72 3e 7b 31 7d 00')  // {0} <br> {1}
+            ); // formatter
+            //* 02 00 00 00 (probably the number of field in the formatter)
+            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '', '02 00 00 00')); // 2 texts coming
 
+            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '', '02 00 00 00 30 00')); // text rowid with line number 0
+            //* Then a special separator 04
+            $this->CONTENTOBJECTS[]=hex2bin('04');
+            $this->CONTENTOBJECTS[]=hex2bin('02'); // terminator 2
+            $this->CONTENTOBJECTS[]=hex2bin(str_replace(' ', '', '00 00 00 ff 01 00 00 00')); // first 4 and second 4
+            // first Text
+            $newText = new dtString();
+            $newText->nullBytes = 1;
+            $newText->string = '.' . hex2bin('00');
+            $this->CONTENTOBJECTS[] = $newText;
+
+            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '', '02 00 00 00 31 00')); // text rowid with line number 1
+            //* Then a special separator 04
+            $this->CONTENTOBJECTS[]=hex2bin('04');
+            // second Text
+            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '', '02 00 00 00 ff 00 00 00 00'));
         }
 
 
@@ -1382,22 +1401,21 @@ class dtProperty
 
                 $myString = new dtString();
                 $results = $myString->unserialize($this->x, $this->position);
-                $stringFormatter = $results[0];
+                $stringFormatter = trim($results[0]);
                 $this->position = $results[1];
                 $this->CONTENTOBJECTS[] = $myString;
 
-                $fourByteInt = unpack('i', substr($this->x, $this->position, 4))[1];
+                $numberOfTextLines = unpack('i', substr($this->x, $this->position, 4))[1];
                 $this->position += 4;
                 $this->CONTENTOBJECTS[] = substr($this->x, $this->position, 4);
 
-                $cartText = array();
-                for ($pp = 0; $pp < $fourByteInt; $pp++) {
+                $cartTexts = array();
+                for ($lineNumber = 0; $lineNumber < $numberOfTextLines; $lineNumber++) {
                     $myString = new dtString();
                     $results = $myString->unserialize($this->x, $this->position);
                     //$rowId = $results[0];
                     $this->position = $results[1];
-                    $myString->ARRCOUNTER = $i;
-                    $this->CONTENTOBJECTS[] = $myString;
+                    $this->CONTENTOBJECTS[] = $myString;  // string contains $lineNumber
 
                     $test = unpack('C', substr($this->x, $this->position, 1))[1];
                     $this->CONTENTOBJECTS[] = substr($this->x, $this->position, 1);
@@ -1405,13 +1423,11 @@ class dtProperty
                     if ($test != 4) {
                         die('horribly');
                     } else {
-                        $cartText[] = $this->readTextProperty($pp)[0];
+                        $cartTexts[] = $this->readTextProperty($cartIndex)[0];
                     }
                 }
-                foreach ($cartText as $placeholder => $elem) {
-                    $stringFormatter = str_replace('{' . $placeholder . '}', $elem, $stringFormatter);
-                }
-                $cartText = $stringFormatter;
+                $cartText = implode('', $cartTexts);
+//                echo "($cartText)";
 
                 break;
 
@@ -1425,7 +1441,7 @@ class dtProperty
                     $results = $myString->unserialize($this->x, $this->position);
                     $cartText = $results[0];
                     $this->position = $results[1];
-                    $myString->ARRCOUNTER = $i;
+                    $myString->ARRCOUNTER = $cartIndex;
                     $this->CONTENTOBJECTS[] = $myString;
 
                     break;
@@ -1525,19 +1541,21 @@ class GVASParser
                         }
                     }
                 }
-//                if (trim($object->NAME) == 'FrameNameArray') {
-//                    foreach ($object->CONTENTOBJECTS as $co) {
-//                        if (is_object($co) && trim($co->NAME) == 'STRING') {
-//                            if (
-//                                ($co->ARRCOUNTER !== '') &&
-//                                isset($_POST['name_' . $co->ARRCOUNTER]) &&
-//                                $_POST['name_' . $co->ARRCOUNTER] != trim($co->string)
-//                            ) {
-//                                $co->string = strip_tags(trim($_POST['name_' . $co->ARRCOUNTER])) . hex2bin('00');
-//                            }
-//                        }
-//                    }
-//                }
+                if (trim($object->NAME) == 'FrameNameArray') {
+                    foreach ($object->CONTENTOBJECTS as $co) {
+                        if (is_object($co) && trim($co->NAME) == 'STRING') {
+                            if($co->ARRCOUNTER)
+                                //echo "(".$co->string.")";
+                            if (
+                                ($co->ARRCOUNTER !== '') &&
+                                isset($_POST['name_' . $co->ARRCOUNTER]) &&
+                                $_POST['name_' . $co->ARRCOUNTER] != trim($co->string)
+                            ) {
+                                $co->string = strip_tags(trim($_POST['name_' . $co->ARRCOUNTER])) . hex2bin('00');
+                            }
+                        }
+                    }
+                }
                 if (trim($object->NAME) == 'FreightAmountArray') {
                     foreach ($object->CONTENTOBJECTS as $co) {
                         if (is_object($co) && trim($co->NAME) == 'IntProperty') {
