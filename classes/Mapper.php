@@ -368,6 +368,11 @@ class Mapper
                         $height = abs($height);
                         $length = sqrt(pow($segment['LocationEnd']['X'] - $segment['LocationStart']['X'], 2) +
                             pow($segment['LocationEnd']['Y'] - $segment['LocationStart']['Y'], 2));
+
+                        if(($height * 100 / $length)>$this->maxSlope){
+                            $slopecoords=array(($this->imx - (int)(($segment['LocationStart']['X'] - $this->minX) / 100 * $this->scale)),
+                                ($this->imy - (int)(($segment['LocationStart']['Y'] - $this->minY) / 100 * $this->scale)));
+                        }
                         $this->maxSlope = max($this->maxSlope,
                             ($height * 100 / $length));
                     }
@@ -382,6 +387,12 @@ class Mapper
                 }
             }
         }
+//print_r($slopecoords);
+        $svg .= '<circle cx="' . $slopecoords[0] . '" cy="' . $slopecoords[1] . '" r="' . ($this->turnTableRadius*5) . '" stroke="orange" stroke-width="5" fill="none"/>' . "\n";
+        $svg .= '<circle cx="' . $slopecoords[0] . '" cy="' . $slopecoords[1] . '" r="' . ($this->turnTableRadius*4) . '" stroke="orange" stroke-width="5" fill="none"/>' . "\n";
+        $svg .= '<circle cx="' . $slopecoords[0] . '" cy="' . $slopecoords[1] . '" r="' . ($this->turnTableRadius*3) . '" stroke="orange" stroke-width="5" fill="none"/>' . "\n";
+        $svg .= '<circle cx="' . $slopecoords[0] . '" cy="' . $slopecoords[1] . '" r="' . ($this->turnTableRadius*2) . '" stroke="orange" stroke-width="5" fill="none"/>' . "\n";
+
         return $svg;
 
     }

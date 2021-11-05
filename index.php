@@ -5,7 +5,7 @@
     include_once('includes/head.php');
 
     $tableHeader = '<thead>
-                        <th>NAME</th><th>Track Length</th><th>#Y / #T</th><th>Locos</th><th>Carts</th><th>max Slope</th>
+                        <th>NAME</th><th>Track Length</th><th>#Y / #T</th><th>Locos</th><th>Carts</th><th>Slope</th>
                     </thead>';
 
     function mysort($a, $b){
@@ -101,7 +101,7 @@ $dh = opendir($dir);
 
 while($file=readdir($dh)){
     if($file && (substr($file,-4) == '.sav' || substr($file,-13) == '.sav.modified')){
-        if(filemtime($dir.'/'.$file)<time()-300){
+        if(filemtime($dir.'/'.$file)<time()-600){
             unlink($dir.'/'.$file);
         }
     }
