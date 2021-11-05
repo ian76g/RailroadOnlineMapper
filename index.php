@@ -8,6 +8,24 @@
                         <th>NAME</th><th>Track Length</th><th>#Y / #T</th><th>Locos</th><th>Carts</th><th>max Slope</th>
                     </thead>';
 
+    function mysort($a, $b){
+        global $db;
+        $x=1;
+        if(strtolower($db[substr($a, 5, -5) . '.sav'][$_GET['sortby']]) == strtolower($db[substr($b, 5, -5) . '.sav'][$_GET['sortby']])){
+            return 0;
+        }
+        if(strtolower($db[substr($a, 5, -5) . '.sav'][$_GET['sortby']]) > strtolower($db[substr($b, 5, -5) . '.sav'][$_GET['sortby']])){
+            $x=-1;
+        } else {
+            $x=1;
+        }
+        if($_GET['sortorder']=='desc'){
+            return $x;
+        } else {
+            return -$x;
+        }
+    }
+
 ?>
 <body>
     <header class="header">
@@ -29,7 +47,11 @@
                     }
                     @$db = unserialize(@file_get_contents('db.db'));
                     //array($totalTrackLength, $totalSwitches, $totalLocos, $totalCarts, $maxSlope);
-                    krsort($files);
+                    if(!isset($_GET['sortby']) || !isset($_GET['sortorder'])) {
+                        krsort($files);
+                    } else {
+                        usort($files, 'mysort');
+                    }
 
                     $hard_limit = 400;
                     $soft_limit = 90;
