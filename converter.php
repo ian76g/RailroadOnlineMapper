@@ -2,7 +2,18 @@
 ini_set('memory_limit', -1);  // just in case - previous versions had 8000x8000 px truecolor images JPEG
 set_time_limit(10);                // just in case something wents really bad -- kill script after 10 seconds
 $v = 46;                                  //version - totally not used except in next line
-echo "\n" . 'running converter version 0.' . $v . "\n";
+//echo "\n" . 'running converter version 0.' . $v . "\n";
+
+function getUserIpAddr(){
+    if(!empty($_SERVER['HTTP_CLIENT_IP'])){
+        $ip = $_SERVER['HTTP_CLIENT_IP'];
+    }elseif(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])){
+        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+    }else{
+        $ip = $_SERVER['REMOTE_ADDR'];
+    }
+    return $ip;
+}
 
 /**
  * define some stuff we need later
@@ -97,6 +108,10 @@ $arithmeticHelper = new ArithmeticHelper();             // put some math stuff i
  * do all files that need to be done  (was overriden by a single file)
  */
 foreach ($files as $file) {
+    if(!file_exists($path . '/' . $file)){
+        header('Location: https://minizwerg.online/');
+        die();
+    }
     $htmlFileName = str_replace('.sav', '', basename($file)) . '.html';
     $downloadLink='';
     if(file_exists('public/'.basename($file))){
@@ -666,7 +681,7 @@ foreach ($files as $file) {
 
         // create a "database" and store some infos about this file for the websies index page
         @$db = unserialize(@file_get_contents('db.db'));
-        $db[$NEWUPLOADEDFILE] = array($totalTrackLength, $totalSwitches, $totalLocos, $totalCarts, $maxSlope);
+        $db[$NEWUPLOADEDFILE] = array($totalTrackLength, $totalSwitches, $totalLocos, $totalCarts, $maxSlope, getUserIpAddr());
         @file_put_contents('db.db', serialize($db));
 
         // label the industries
@@ -768,7 +783,7 @@ foreach ($files as $file) {
 //        passthru($cmd);
     }
 
-    echo "rendered in " . (microtime(true) - $start) . " microseconds\n";
+    //echo "rendered in " . (microtime(true) - $start) . " microseconds\n";
 
     // store save for 5 minutes in case someone wants to edit the cart texts/numbers
     if (!isset($_POST['save'])) {
@@ -1604,13 +1619,17 @@ class GVASParser
         $output.=hex2bin('050000004e6f6e650000000000');
 
         if (isset($_POST['save'])) {
-            echo "SAVING FILE " . $this->NEWUPLOADEDFILE . '.modified' . "<br>\n";
+            $db = unserialize(file_get_contents('db.db'));
+            if(getUserIpAddr() != $db[$this->NEWUPLOADEDFILE][5]){
+                die("This does not seem to be your save file.");
+            }
+             echo "SAVING FILE " . $this->NEWUPLOADEDFILE . '.modified' . "<br>\n";
             file_put_contents('saves/' . $this->NEWUPLOADEDFILE . '.modified', $output);
             echo '<A href="saves/' . $this->NEWUPLOADEDFILE . '.modified' . '">Download your modified save here </A><br>';
             echo 'Want to upload this map again?<A href="upload.php">Add your renumbered save again</A><br>';
         } else {
             if ($againAllowed) {
-                echo "RESAVING FILE TO DISK - EMPTY NUMBERS BECAME A DOT " . $this->NEWUPLOADEDFILE . "<br>\n";
+                //echo "RESAVING FILE TO DISK - EMPTY NUMBERS BECAME A DOT " . $this->NEWUPLOADEDFILE . "<br>\n";
                 file_put_contents('uploads/' . $this->NEWUPLOADEDFILE, $output);
                 return 'AGAIN';
             }
