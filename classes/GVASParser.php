@@ -168,13 +168,15 @@ class GVASParser
         $keys = array('Player', 'Freight', 'Compressor', 'Tender', 'Coupler', 'Boiler', 'Headlight', 'Frame', 'Watertower', 'Switch');
         foreach ($keys as $key) {
             $silverPlate[$key . 's'] = array();
-            foreach ($this->goldenBucket[$key] as $index => $value) {
-                foreach ($value as $idx => $v) {
-                    $silverPlate[$key . 's'][$idx][$index] = $v;
+            if(isset($this->goldenBucket[$key])) {
+                foreach ($this->goldenBucket[$key] as $index => $value) {
+                    foreach ($value as $idx => $v) {
+                        $silverPlate[$key . 's'][$idx][$index] = $v;
+                    }
                 }
+                unset($this->goldenBucket[$key]);
+                $this->goldenBucket[$key . 's'] = $silverPlate[$key . 's'];
             }
-            unset($this->goldenBucket[$key]);
-            $this->goldenBucket[$key . 's'] = $silverPlate[$key . 's'];
         }
 
         foreach ($this->goldenBucket['Frames'] as $i => $frame) {
