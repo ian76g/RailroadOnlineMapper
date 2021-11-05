@@ -160,6 +160,3 @@ foreach ($files as $file) {
         rename('uploads/' . $NEWUPLOADEDFILE, 'saves/' . $NEWUPLOADEDFILE);
     }
 }
-//debug
-// print_r($types);
-

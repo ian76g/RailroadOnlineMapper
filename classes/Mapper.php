@@ -5,6 +5,26 @@ class Mapper
 {
 
     var $data;
+    private $imageWidth = 8000;
+
+    /**
+     * find min and max X and Y values in the save
+     * whoever built track built it "somewhere"....
+     *
+     * initially to scale the network - but was skipped after getting the high quality backgrounds
+     */
+    private $minX=0;
+    private $maxX=0;
+    private $minY=0;
+    private $maxY=0;
+    private $scale;
+    private $switchRadius;
+    private $engineRadius;
+    private $imx;
+    private $imy;
+    private $turnTableRadius;
+    private $totalTrackLength;
+    private $maxSlope;
 
     /**
      * Mapper constructor.
@@ -24,54 +44,42 @@ class Mapper
      */
     function gethtmlSVG(&$htmlSvg, $NEWUPLOADEDFILE, $empty, $arithmeticHelper)
     {
-        $imageWidth = 8000;                        // desired images width (x,y) aproximately
         $doSvg = true;
 
-        /**
-         * find min and max X and Y values in the save
-         * whoever built track built it "somewhere"....
-         *
-         * initially to scale the network - but was skipped after getting the high quality backgrounds
-         */
-        $minX = 0;
-        $maxX = 0;
-
-        $minY = 0;
-        $maxY = 0;
 
         $types = array();
 
         /**
          * since the 0,0 of the map is not like in an image the top left corner, we have to normalize the coordinates
          */
-        $minX = -200000;
-        $maxX = 200000;
-        $minY = -200000;
-        $maxY = 200000;
+        $this->minX = -200000;
+        $this->maxX = 200000;
+        $this->minY = -200000;
+        $this->maxY = 200000;
 
-        $x = $maxX - $minX;
-        $y = $maxY - $minY;
+        $x = $this->maxX - $this->minX;
+        $y = $this->maxY - $this->minY;
 
         /**
          * Now we need a factor to scale the ingame coordinates of the network to our 8000px image
          */
 
         $max = max($x, $y);
-        $scale = ($imageWidth * 100 / $max);
+        $this->scale = ($this->imageWidth * 100 / $max);
 
-        $switchRadius = (80 / 2.2107077) * $scale;              // (size an armlength of switches)
-        $engineRadius = 6 * $scale;                             // (radius of locomotives and carts)
+        $this->switchRadius = (80 / 2.2107077) * $this->scale;              // (size an armlength of switches)
+        $this->engineRadius = 6 * $this->scale;                             // (radius of locomotives and carts)
 
-        $turnTableRadius = (10 / 2.2107077) * $scale;           // size of turntables
+        $this->turnTableRadius = (10 / 2.2107077) * $this->scale;           // size of turntables
 
-        $imx = (int)$x / 100 * $scale;
-        $imy = (int)$y / 100 * $scale;
+        $this->imx = (int)$x / 100 * $this->scale;
+        $this->imy = (int)$y / 100 * $this->scale;
 
 
         // OK - Now lets draw a map
-        $totalTrackLength = 0;
-        $maxSlope = 0;
-        $svg = $this->drawTracksAndBeds( $maxSlope, $totalTrackLength, $imx, $imy, $minX, $minY, $scale);
+        $this->totalTrackLength = 0;
+        $this->maxSlope = 0;
+        $svg = $this->drawTracksAndBeds( );
 
         /**
          * Fill in the missing gaps AKA switches
@@ -128,13 +136,13 @@ class Mapper
             $rotCross = deg2rad($switch['Rotation'][1] + 180);
 
             if ($doSvg) {
-                $x = ($imx - (int)(($switch['Location'][0] - $minX) / 100 * $scale));
-                $y = ($imy - (int)(($switch['Location'][1] - $minY) / 100 * $scale));
+                $x = ($this->imx - (int)(($switch['Location'][0] - $this->minX) / 100 * $this->scale));
+                $y = ($this->imy - (int)(($switch['Location'][1] - $this->minY) / 100 * $this->scale));
                 if ($dir == 99) { //CROSS
-                    $crosslength = $switchRadius / 10;
+                    $crosslength = $this->switchRadius / 10;
 
-                    $x2 = ($imx - (int)(($switch['Location'][0] - $minX) / 100 * $scale) + (cos($rotCross) * $crosslength));
-                    $y2 = ($imy - (int)(($switch['Location'][1] - $minY) / 100 * $scale) + (sin($rotCross) * $crosslength));
+                    $x2 = ($this->imx - (int)(($switch['Location'][0] - $this->minX) / 100 * $this->scale) + (cos($rotCross) * $crosslength));
+                    $y2 = ($this->imy - (int)(($switch['Location'][1] - $this->minY) / 100 * $this->scale) + (sin($rotCross) * $crosslength));
 
                     $cx = $x + ($x2 - $x) / 2;
                     $cy = $y + ($y2 - $y) / 2;
@@ -150,10 +158,10 @@ class Mapper
                         '" stroke="black" stroke-width="3"/>' . "\n";
 
                 } else {
-                    $xStraight = ($imx - (int)(($switch['Location'][0] - $minX) / 100 * $scale) + (cos($rotation) * $switchRadius / 2));
-                    $yStraight = ($imy - (int)(($switch['Location'][1] - $minY) / 100 * $scale) + (sin($rotation) * $switchRadius / 2));
-                    $xSide = ($imx - (int)(($switch['Location'][0] - $minX) / 100 * $scale) + (cos($rotSide) * $switchRadius / 2));
-                    $ySide = ($imy - (int)(($switch['Location'][1] - $minY) / 100 * $scale) + (sin($rotSide) * $switchRadius / 2));
+                    $xStraight = ($this->imx - (int)(($switch['Location'][0] - $this->minX) / 100 * $this->scale) + (cos($rotation) * $this->switchRadius / 2));
+                    $yStraight = ($this->imy - (int)(($switch['Location'][1] - $this->minY) / 100 * $this->scale) + (sin($rotation) * $this->switchRadius / 2));
+                    $xSide = ($this->imx - (int)(($switch['Location'][0] - $this->minX) / 100 * $this->scale) + (cos($rotSide) * $this->switchRadius / 2));
+                    $ySide = ($this->imy - (int)(($switch['Location'][1] - $this->minY) / 100 * $this->scale) + (sin($rotSide) * $this->switchRadius / 2));
 
                     if ($state) {
 //                    $svg .= '<text x="' . $x . '" y="' . $y . '">   ' . $type . '/' . $state . '</text>';
@@ -195,22 +203,22 @@ class Mapper
             $rotation2 = deg2rad($table['Rotator'][1] + 90 - $table['Deck'][1]);
 
             if ($doSvg) {
-                $turnTableRadius = 25;
+                $this->turnTableRadius = 25;
 
-                $x = ($imx - (int)(($table['Location'][0] - $minX) / 100 * $scale));
-                $y = ($imx - (int)(($table['Location'][1] - $minX) / 100 * $scale));
-                $x2 = ($imx - (int)(($table['Location'][0] - $minX) / 100 * $scale) + (cos($rotation) * $turnTableRadius));
-                $y2 = ($imy - (int)(($table['Location'][1] - $minY) / 100 * $scale) + (sin($rotation) * $turnTableRadius));
+                $x = ($this->imx - (int)(($table['Location'][0] - $this->minX) / 100 * $this->scale));
+                $y = ($this->imx - (int)(($table['Location'][1] - $this->minX) / 100 * $this->scale));
+                $x2 = ($this->imx - (int)(($table['Location'][0] - $this->minX) / 100 * $this->scale) + (cos($rotation) * $this->turnTableRadius));
+                $y2 = ($this->imy - (int)(($table['Location'][1] - $this->minY) / 100 * $this->scale) + (sin($rotation) * $this->turnTableRadius));
 
                 $cx = $x + ($x2 - $x) / 2;
                 $cy = $y + ($y2 - $y) / 2;
 
-                $svg .= '<circle cx="' . $cx . '" cy="' . $cy . '" r="' . ($turnTableRadius / 2) . '" stroke="black" stroke-width="1" fill="lightyellow" />' . "\n";
+                $svg .= '<circle cx="' . $cx . '" cy="' . $cy . '" r="' . ($this->turnTableRadius / 2) . '" stroke="black" stroke-width="1" fill="lightyellow" />' . "\n";
 
-                $svg .= '<line x1="' . ($cx - (cos($rotation2) * $turnTableRadius / 2)) .
-                    '" y1="' . ($cy - (sin($rotation2) * $turnTableRadius / 2))
-                    . '" x2="' . ($cx + (cos($rotation2) * $turnTableRadius / 2)) .
-                    '" y2="' . ($cy + (sin($rotation2) * $turnTableRadius / 2))
+                $svg .= '<line x1="' . ($cx - (cos($rotation2) * $this->turnTableRadius / 2)) .
+                    '" y1="' . ($cy - (sin($rotation2) * $this->turnTableRadius / 2))
+                    . '" x2="' . ($cx + (cos($rotation2) * $this->turnTableRadius / 2)) .
+                    '" y2="' . ($cy + (sin($rotation2) * $this->turnTableRadius / 2))
                     . '" stroke="black" stroke-width="3"/>' . "\n";
 
             }
@@ -223,22 +231,22 @@ class Mapper
          */
 
         $cartColors = array(
-            'handcar' => array($engineRadius, 'black'),
-            'porter_040' => array($engineRadius, 'black'),
-            'porter_042' => array($engineRadius, 'black'),
-            'eureka' => array($engineRadius, 'black'),
-            'eureka_tender' => array($engineRadius, 'black'),
-            'climax' => array($engineRadius, 'black'),
-            'heisler' => array($engineRadius, 'black'),
-            'class70' => array($engineRadius, 'black'),
-            'class70_tender' => array($engineRadius, 'black'),
-            'cooke260' => array($engineRadius, 'black'),
-            'cooke260_tender' => array($engineRadius, 'black'),
-            'flatcar_logs' => array($engineRadius / 3, 'red'),
-            'flatcar_cordwood' => array($engineRadius / 3 * 2, 'orange'),
-            'flatcar_stakes' => array($engineRadius / 3 * 2, 'yellow'),
-            'flatcar_hopper' => array($engineRadius / 3 * 2, 'brown'),
-            'flatcar_tanker' => array($engineRadius / 3 * 2, 'grey'),
+            'handcar' => array($this->engineRadius, 'black'),
+            'porter_040' => array($this->engineRadius, 'black'),
+            'porter_042' => array($this->engineRadius, 'black'),
+            'eureka' => array($this->engineRadius, 'black'),
+            'eureka_tender' => array($this->engineRadius, 'black'),
+            'climax' => array($this->engineRadius, 'black'),
+            'heisler' => array($this->engineRadius, 'black'),
+            'class70' => array($this->engineRadius, 'black'),
+            'class70_tender' => array($this->engineRadius, 'black'),
+            'cooke260' => array($this->engineRadius, 'black'),
+            'cooke260_tender' => array($this->engineRadius, 'black'),
+            'flatcar_logs' => array($this->engineRadius / 3, 'red'),
+            'flatcar_cordwood' => array($this->engineRadius / 3 * 2, 'orange'),
+            'flatcar_stakes' => array($this->engineRadius / 3 * 2, 'yellow'),
+            'flatcar_hopper' => array($this->engineRadius / 3 * 2, 'brown'),
+            'flatcar_tanker' => array($this->engineRadius / 3 * 2, 'grey'),
         );
 
 // build some extra HTML for a form to edit cart data
@@ -357,19 +365,19 @@ class Mapper
 
             }
 
-            $x = ($imx - (int)(($vehicle['Location'][0] - $minX) / 100 * $scale));
-            $y = ($imy - (int)(($vehicle['Location'][1] - $minY) / 100 * $scale));
+            $x = ($this->imx - (int)(($vehicle['Location'][0] - $this->minX) / 100 * $this->scale));
+            $y = ($this->imy - (int)(($vehicle['Location'][1] - $this->minY) / 100 * $this->scale));
             if ($doSvg) {
-                $svg .= '<ellipse cx="' . $x . '" cy="' . $y . '" rx="' . ($engineRadius / 2) . '" ry="' . ($engineRadius / 3) .
+                $svg .= '<ellipse cx="' . $x . '" cy="' . $y . '" rx="' . ($this->engineRadius / 2) . '" ry="' . ($this->engineRadius / 3) .
                     '" style="fill:' . $cartColors[$vehicle['Type']][1] . ';stroke:black;stroke-width:1" transform="rotate(' . $vehicle['Rotation'][1] .
-                    ', ' . ($imx - (int)(($vehicle['Location'][0] - $minX) / 100 * $scale)) . ', ' . ($imy - (int)(($vehicle['Location'][1] - $minY) / 100 * $scale)) . ')"
+                    ', ' . ($this->imx - (int)(($vehicle['Location'][0] - $this->minX) / 100 * $this->scale)) . ', ' . ($this->imy - (int)(($vehicle['Location'][1] - $this->minY) / 100 * $this->scale)) . ')"
               />';
 
                 if ($vehicle['Location'][2] < 1000) {
-                    $svg .= '<ellipse cx="' . $x . '" cy="' . $y . '" rx="' . (($engineRadius / 2) * 10) .
-                        '" ry="' . (($engineRadius / 2) * 10) .
+                    $svg .= '<ellipse cx="' . $x . '" cy="' . $y . '" rx="' . (($this->engineRadius / 2) * 10) .
+                        '" ry="' . (($this->engineRadius / 2) * 10) .
                         '" style="fill:none;stroke:red;stroke-width:10" transform="rotate(' . $vehicle['Rotation'][1] .
-                        ', ' . ($imx - (int)(($vehicle['Location'][0] - $minX) / 100 * $scale)) . ', ' . ($imy - (int)(($vehicle['Location'][1] - $minY) / 100 * $scale)) . ')"
+                        ', ' . ($this->imx - (int)(($vehicle['Location'][0] - $this->minX) / 100 * $this->scale)) . ', ' . ($this->imy - (int)(($vehicle['Location'][1] - $this->minY) / 100 * $this->scale)) . ')"
               />';
                     $svg .= '<text x="' . $x . '" y="' . $y . '" >' . '&nbsp;&nbsp;' . $vehicle['Location'][2] . '</text>' . "\n";
 
@@ -511,15 +519,15 @@ class Mapper
 
             // create a "database" and store some infos about this file for the websies index page
             @$db = unserialize(@file_get_contents('db.db'));
-            $db[$NEWUPLOADEDFILE] = array($totalTrackLength, $totalSwitches, $totalLocos, $totalCarts, $maxSlope, getUserIpAddr());
+            $db[$NEWUPLOADEDFILE] = array($this->totalTrackLength, $totalSwitches, $totalLocos, $totalCarts, $this->maxSlope, getUserIpAddr());
             @file_put_contents('db.db', serialize($db));
 
             // label the industries
             if ($doSvg) {
-                $svg .= '<text x="' . ($imx - (int)(($site['Location'][0] - $minX) / 100 * $scale) + $xoff) .
-                    '" y="' . ($imy - (int)(($site['Location'][1] - $minY) / 100 * $scale) + $yoff) . '" transform="rotate(' . $rotation .
-                    ',' . ($imx - (int)(($site['Location'][0] - $minX) / 100 * $scale) + $xoff) .
-                    ', ' . ($imy - (int)(($site['Location'][1] - $minY) / 100 * $scale) + $yoff) . ')" >' . $name . '</text>' . "\n";
+                $svg .= '<text x="' . ($this->imx - (int)(($site['Location'][0] - $this->minX) / 100 * $this->scale) + $xoff) .
+                    '" y="' . ($this->imy - (int)(($site['Location'][1] - $this->minY) / 100 * $this->scale) + $yoff) . '" transform="rotate(' . $rotation .
+                    ',' . ($this->imx - (int)(($site['Location'][0] - $this->minX) / 100 * $this->scale) + $xoff) .
+                    ', ' . ($this->imy - (int)(($site['Location'][1] - $this->minY) / 100 * $this->scale) + $yoff) . ')" >' . $name . '</text>' . "\n";
             }
 
         }
@@ -529,8 +537,8 @@ class Mapper
          */
         if (isset($this->data['Watertowers'])) {
             foreach ($this->data['Watertowers'] as $site) {
-                $x = $imx - (int)(($site['Location'][0] - $minX) / 100 * $scale);
-                $y = $imy - (int)(($site['Location'][1] - $minY) / 100 * $scale);
+                $x = $this->imx - (int)(($site['Location'][0] - $this->minX) / 100 * $this->scale);
+                $y = $this->imy - (int)(($site['Location'][1] - $this->minY) / 100 * $this->scale);
                 if ($doSvg) {
                     $svg .= '<text x="' . ($x) . '" y="' . ($y) . '" >W</text>' . "\n";
                 }
@@ -572,19 +580,19 @@ class Mapper
          * chart (Legende) of carts
          */
         $carts = array(
-            'flatcar_logs' => array($engineRadius / 3, 'red'),
-            'flatcar_cordwood' => array($engineRadius / 3 * 2, 'orange'),
-            'flatcar_stakes' => array($engineRadius / 3 * 2, 'yellow'),
-            'flatcar_hopper' => array($engineRadius / 3 * 2, 'brown'),
-            'flatcar_tanker' => array($engineRadius / 3 * 2, 'grey'),
+            'flatcar_logs' => array($this->engineRadius / 3, 'red'),
+            'flatcar_cordwood' => array($this->engineRadius / 3 * 2, 'orange'),
+            'flatcar_stakes' => array($this->engineRadius / 3 * 2, 'yellow'),
+            'flatcar_hopper' => array($this->engineRadius / 3 * 2, 'brown'),
+            'flatcar_tanker' => array($this->engineRadius / 3 * 2, 'grey'),
         );
 
         $cartsDrawn = 0;
         foreach ($carts as $cartType => $cart) {
-            $x = $imageWidth / 4;
-            $y = 100 + $cartsDrawn * 5 * ($engineRadius * 1.1) / 2;
-            $rx = $engineRadius * 1.1 * 2;
-            $ry = ($engineRadius * 1.1);
+            $x = $this->imageWidth / 4;
+            $y = 100 + $cartsDrawn * 5 * ($this->engineRadius * 1.1) / 2;
+            $rx = $this->engineRadius * 1.1 * 2;
+            $ry = ($this->engineRadius * 1.1);
             if ($doSvg) {
                 $svg .= '<ellipse cx="' . $x .
                     '" cy="' . $y .
@@ -616,7 +624,7 @@ class Mapper
      * @param $minY
      * @param $scale
      */
-    function drawTracksAndBeds(&$maxSlope, &$totalTrackLength, $imx, $imy, $minX, $minY, $scale)
+    function drawTracksAndBeds()
     {
         $doSvg = true;
         $svg = '';
@@ -656,10 +664,10 @@ class Mapper
 
                     if ($doSvg) {
                         $svg .= '<line x1="' .
-                            ($imx - (int)(($segment['LocationStart']['X'] - $minX) / 100 * $scale)) . '" y1="' .
-                            ($imy - (int)(($segment['LocationStart']['Y'] - $minY) / 100 * $scale))
-                            . '" x2="' . ($imx - (int)(($segment['LocationEnd']['X'] - $minX) / 100 * $scale)) . '" y2="' .
-                            ($imy - (int)(($segment['LocationEnd']['Y'] - $minY) / 100 * $scale))
+                            ($this->imx - (int)(($segment['LocationStart']['X'] - $this->minX) / 100 * $this->scale)) . '" y1="' .
+                            ($this->imy - (int)(($segment['LocationStart']['Y'] - $this->minY) / 100 * $this->scale))
+                            . '" x2="' . ($this->imx - (int)(($segment['LocationEnd']['X'] - $this->minX) / 100 * $this->scale)) . '" y2="' .
+                            ($this->imy - (int)(($segment['LocationEnd']['Y'] - $this->minY) / 100 * $this->scale))
                             . '" stroke="' . $optionsArr[1] . '" stroke-width="' . $optionsArr[0] . '"/>' . "\n";
                     }
 
