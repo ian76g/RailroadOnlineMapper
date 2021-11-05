@@ -23,7 +23,7 @@ Currently hosted on https://minizwerg.online/
 #### Project setup
 
 5. Clone this repo to your local machine
-6. Copy your save file from `%localappdata%/arr/Saved/SaveGames` to the root of the project (eg. `./slot1.sav`)
+6. Copy your save file from `%localappdata%/arr/Saved/SaveGames` (or `./setup`) to the root of the project (eg. `./slot1.sav`)
 7. Run the convertor
    > `php converter.php slot1.sav`
 8. Find output html in `./done`
