@@ -1,14 +1,26 @@
 <?php
+include_once 'GVAS.php';
 ini_set('memory_limit', -1);  // just in case - previous versions had 8000x8000 px truecolor images JPEG
-set_time_limit(10);                // just in case something went really bad -- kill script after 10 seconds
+set_time_limit(10);                // just in case something wents really bad -- kill script after 10 seconds
 $v = 46;                                  //version - totally not used except in next line
-echo "\n" . 'running converter version 0.' . $v . "\n";
+//echo "\n" . 'running converter version 0.' . $v . "\n";
+
+function getUserIpAddr() {
+    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+        $ip = $_SERVER['HTTP_CLIENT_IP'];
+    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+    } else {
+        $ip = $_SERVER['REMOTE_ADDR'];
+    }
+    return $ip;
+}
 
 /**
  * define some stuff we need later
  */
-$start = microtime(true);           // to calculate runtime at end
-$imageWidth = 8000;                        // desired images width (x,y) approximately
+$start = microtime(true);           // to caclulate runtime at end
+$imageWidth = 8000;                        // desired images width (x,y) aproximately
 
 $path = 'uploads';                         // set the path to find the save games.... last line wins
 
@@ -37,7 +49,7 @@ if (isset($_POST['background'])) {
     }
 }
 
-// each different background image needs different cropping and stretching params
+// each different background image needs different croping and stretching params
 $bgOffsets = array(
     'bg5' => array(9400, 9600, -720, -770, 9400, 9600),
     'bg4' => array(9400, 9600, -720, -770, 9400, 9600),
@@ -45,7 +57,7 @@ $bgOffsets = array(
     'bg' => array(8000, 8000, 0, 0, 8000, 8000),
 );
 
-// define the SVG structure of the output-map
+// devine the SVG structure of the output-map
 $htmlSvg = file_get_contents('map.template.html');
 $pattern = '
 <pattern id="bild" x="0" y="0" width="' . $bgOffsets[$bg][0] . '" height="' . $bgOffsets[$bg][1] . '" patternUnits="userSpaceOnUse">
@@ -80,7 +92,7 @@ if (!isset($NEWUPLOADEDFILE)) {                         // will be set in upload
     if (isset($argv[1])) {
         $NEWUPLOADEDFILE = $argv[1];                    // or we find it on command line
     } else {
-        if (isset($_POST['save']) && $_POST['save']) {  // but this can also be acquired after editing the save out of the map.html
+        if (isset($_POST['save']) && $_POST['save']) {  // but this can also be aquired after editing the save out of the map.html
             $path = 'saves';
             $NEWUPLOADEDFILE = $_POST['save'];
         } else {
@@ -91,22 +103,25 @@ if (!isset($NEWUPLOADEDFILE)) {                         // will be set in upload
 
 $files = array($NEWUPLOADEDFILE);                       // override allFiles with just the one file specified
 
-include_once 'GVAS.php';
 $arithmeticHelper = new ArithmeticHelper();             // put some math stuff in an extra class
 /**
  * /*
- * do all files that need to be done  (was overridden by a single file)
+ * do all files that need to be done  (was overriden by a single file)
  */
 foreach ($files as $file) {
+    if (!file_exists($path . '/' . $file)) {
+        header('Location: https://minizwerg.online/');
+        die();
+    }
     $htmlFileName = str_replace('.sav', '', basename($file)) . '.html';
     $downloadLink = '';
-    if (file_exists('../public/' . basename($file))) {
-        $downloadLink = '<a href="../public/' . basename($file) . '">Download Save</a>';
+    if (file_exists('public/' . basename($file))) {
+        $downloadLink = '<A href="../public/' . basename($file) . '">Download Save</A>';
     }
     $htmlSvg = str_replace('###DOWNLOAD###', $downloadLink, $htmlSvg);
 
 
-    $doSvg = true;                                      // set this to false if you don't want a map
+    $doSvg = true;                                      // set this to false if you dont want a map
     // previously a switch between SVG and JPEG output
 
     $svg = '';
@@ -169,7 +184,7 @@ foreach ($files as $file) {
     /**
      * set some basic order on what to draw first, rails of course should be painted last
      *
-     * some info in the JSON is wrong - issue on GitHub is created
+     * some info in the JSON is wrong - issue on github is created
      */
 
     $order = array(
@@ -231,11 +246,11 @@ foreach ($files as $file) {
 
                 // label some splines with their slope - not yet working
                 // main problem: find a spot for the text that is near to track but do not override other stuff
-//                if (false && $distance > 0 && in_array($type, array(4, 0))) {
-//                    $slope = asin(($segment['LocationEnd']['Y'] - $segment['LocationStart']['Y']) / $distance) / pi() * 180;
-//                    if ($slope < -2 || $slope > 2) {
-//                    }
-//                }
+                if (false && $distance > 0 && in_array($type, array(4, 0))) {
+                    $slope = asin(($segment['LocationEnd']['Y'] - $segment['LocationStart']['Y']) / $distance) / pi() * 180;
+                    if ($slope < -2 || $slope > 2) {
+                    }
+                }
             }
         }
     }
@@ -419,7 +434,7 @@ foreach ($files as $file) {
 <th>Cargo</th>
 <th>Amount</th>
 </tr>
-###TROWS###</table><input type="submit" value="RENUMBER"></form>';
+###TROWS###</table><input type="submit" value="!APPLY ABOVE CHANGES TO MY SAVE!"></form>';
     $trows = '';
 
     // later you can switch cargo on carts - maybe this can be done by editing the save via the mapper later?
@@ -660,7 +675,6 @@ foreach ($files as $file) {
                 die('unknown industry');
         }
 
-
         // label the industries
         if ($doSvg) {
             $svg .= '<text x="' . ($imx - (int)(($site['Location'][0] - $minX) / 100 * $scale) + $xoff) .
@@ -673,7 +687,7 @@ foreach ($files as $file) {
 
     // create a "database" and store some infos about this file for the websies index page
     include_once 'database.php';
-    addSave($NEWUPLOADEDFILE, $totalTrackLength, $totalSwitches, $totalLocos, $totalCarts, $maxSlope);
+    addSave($NEWUPLOADEDFILE, $totalTrackLength, $totalSwitches, $totalLocos, $totalCarts, $maxSlope, getUserIpAddr());
 
     /**
      * add Watertowers to the map
@@ -760,11 +774,11 @@ foreach ($files as $file) {
 
         // optionally pushing this automatically to a webserver
         // if you run this script as deamon - it uploads on each save automatically
-//        $cmd = '"c:\Program Files (x86)\WinSCP\WinSCP.com" /command "open ftp://user:password@server.de/" "put ' . $htmlFileName . ' /html/minizwerg/" "exit"';
+        $cmd = '"c:\Program Files (x86)\WinSCP\WinSCP.com" /command "open ftp://user:password@server.de/" "put ' . $htmlFileName . ' /html/minizwerg/" "exit"';
 //        passthru($cmd);
     }
 
-    echo "rendered in " . (microtime(true) - $start) . " microseconds\n";
+    //echo "rendered in " . (microtime(true) - $start) . " microseconds\n";
 
     // store save for 5 minutes in case someone wants to edit the cart texts/numbers
     if (!isset($_POST['save'])) {

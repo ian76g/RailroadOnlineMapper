@@ -495,12 +495,12 @@ class dtProperty
                 die();
         }
 
-//    echo "Type: ".substr($type,0,20).", Name: ".substr($name,0,20).", Length: ".substr($propertyLength,0,20);
+//    echo "Type: ".substr($type,0,20).", Name: ".substr($name,0,20).", Lenght: ".substr($propertyLength,0,20);
     }
 
     /**
-     * @param $i
-     * @param false $createEmptyNumer
+     * @param $cartIndex
+     * @param false $createEmptyNumber
      * @return array
      *
      *
@@ -514,7 +514,7 @@ class dtProperty
      * If you get 02 or 00, then read the separator ff and the « opt » which is 01 00 00 00
      * if there’s a UEString, and 00 00 00 00 if there’s not.
      * And then onto the next index of the array
-     * However, if you get 01 00 00 00 as first value, then it’s formatted,
+     * However if you get 01 00 00 00 as first value, then it’s formatted,
      * the separator is 03, then int64 08 00 00 00 00 00 00 00 and empty byte 00
      * Then the format specifiers :
      * UEString (the magic string I don’t know what it does but is always the same),
@@ -536,7 +536,7 @@ class dtProperty
      * I don’t think it ends with 04 for that one (writing that from memory)
      * And that’s the full formatted TextProperty array index
      */
-    function readTextProperty($i, $createEmptyNumer = false, $createEmptyName = false)
+    function readTextProperty($cartIndex, $createEmptyNumber = false, $createEmptyName = false)
     {
         $terminator = unpack('C', substr($this->x, $this->position, 1))[1];
         $this->CONTENTOBJECTS[] = substr($this->x, $this->position, 1);
@@ -548,7 +548,7 @@ class dtProperty
         $this->CONTENTOBJECTS[] = substr($this->x, $this->position, 4); //00000000 in case of terminator 0
         $this->position += 4;
 
-        if ($terminator == 0 && $createEmptyNumer) {
+        if ($terminator == 0 && $createEmptyNumber) {
             // HERE WE HAVE TO IMPLEMENT A NEW CART NUMBER (eg. a dot)
             // TERMINATOR must be 02
             // firstFour have to be 000000FF
@@ -565,7 +565,44 @@ class dtProperty
         }
 
         if ($terminator == 0 && $createEmptyName) {
-            
+            //* However if you get 01 00 00 00 as first value, then it’s formatted,
+            $this->CONTENTOBJECTS[sizeof($this->CONTENTOBJECTS) - 3] = pack('C', 1);
+            //* the separator is 03,
+            $this->CONTENTOBJECTS[sizeof($this->CONTENTOBJECTS) - 2] = hex2bin(str_replace(' ', '', '00 00 00 03'));
+            // then int64 08 00 00 00 00 00 00 00 and empty byte 00
+            $this->CONTENTOBJECTS[sizeof($this->CONTENTOBJECTS) - 1] =
+                hex2bin(str_replace(' ', '', '08 00 00 00 00 00 00 00 00'));
+            //* Then the format specifiers :
+            //* UEString (the magic string I don’t know what it does but is always the same),
+            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '', '21 00 00 00')); // length of formatter
+            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '',
+                '35 36 46 38 44 32 37 31 34 39 ' .
+                '43 43 35 45 32 44 31 32 31 30 ' .
+                '33 42 42 45 42 46 43 41 39 30 ' .
+                '39 37 00 '));
+            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '',
+                '0b 00 00 00 ' .
+                '7b 30 7d 3c 62 72 3e 7b 31 7d 00')  // {0} <br> {1}
+            ); // formatter
+            //* 02 00 00 00 (probably the number of field in the formatter)
+            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '', '02 00 00 00')); // 2 texts coming
+
+            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '', '02 00 00 00 30 00')); // text rowid with line number 0
+            //* Then a special separator 04
+            $this->CONTENTOBJECTS[] = hex2bin('04');
+            $this->CONTENTOBJECTS[] = hex2bin('02'); // terminator 2
+            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '', '00 00 00 ff 01 00 00 00')); // first 4 and second 4
+            // first Text
+            $newText = new dtString();
+            $newText->nullBytes = 1;
+            $newText->string = '.' . hex2bin('00');
+            $this->CONTENTOBJECTS[] = $newText;
+
+            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '', '02 00 00 00 31 00')); // text rowid with line number 1
+            //* Then a special separator 04
+            $this->CONTENTOBJECTS[] = hex2bin('04');
+            // second Text
+            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '', '02 00 00 00 ff 00 00 00 00'));
         }
 
 
@@ -585,22 +622,21 @@ class dtProperty
 
                 $myString = new dtString();
                 $results = $myString->unserialize($this->x, $this->position);
-                $stringFormatter = $results[0];
+                $stringFormatter = trim($results[0]);
                 $this->position = $results[1];
                 $this->CONTENTOBJECTS[] = $myString;
 
-                $fourByteInt = unpack('i', substr($this->x, $this->position, 4))[1];
+                $numberOfTextLines = unpack('i', substr($this->x, $this->position, 4))[1];
                 $this->position += 4;
                 $this->CONTENTOBJECTS[] = substr($this->x, $this->position, 4);
 
-                $cartText = array();
-                for ($pp = 0; $pp < $fourByteInt; $pp++) {
+                $cartTexts = array();
+                for ($lineNumber = 0; $lineNumber < $numberOfTextLines; $lineNumber++) {
                     $myString = new dtString();
                     $results = $myString->unserialize($this->x, $this->position);
                     //$rowId = $results[0];
                     $this->position = $results[1];
-                    $myString->ARRCOUNTER = $i;
-                    $this->CONTENTOBJECTS[] = $myString;
+                    $this->CONTENTOBJECTS[] = $myString;  // string contains $lineNumber
 
                     $test = unpack('C', substr($this->x, $this->position, 1))[1];
                     $this->CONTENTOBJECTS[] = substr($this->x, $this->position, 1);
@@ -608,13 +644,11 @@ class dtProperty
                     if ($test != 4) {
                         die('horribly');
                     } else {
-                        $cartText[] = $this->readTextProperty($pp)[0];
+                        $cartTexts[] = $this->readTextProperty($cartIndex)[0];
                     }
                 }
-                foreach ($cartText as $placeholder => $elem) {
-                    $stringFormatter = str_replace('{' . $placeholder . '}', $elem, $stringFormatter);
-                }
-                $cartText = $stringFormatter;
+                $cartText = implode('', $cartTexts);
+//                echo "($cartText)";
 
                 break;
 
@@ -628,7 +662,7 @@ class dtProperty
                     $results = $myString->unserialize($this->x, $this->position);
                     $cartText = $results[0];
                     $this->position = $results[1];
-                    $myString->ARRCOUNTER = $i;
+                    $myString->ARRCOUNTER = $cartIndex;
                     $this->CONTENTOBJECTS[] = $myString;
 
                     break;

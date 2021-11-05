@@ -1,5 +1,6 @@
 <?php
 include_once 'types.php';
+include_once 'database.php';
 
 /**
  * Class GVASParser
@@ -48,6 +49,7 @@ class GVASParser
                 if ($original != $test) {
                     file_put_contents('tmp_' . trim($myProperty->NAME), $original);
                     file_put_contents('tmp_' . trim($myProperty->NAME) . '.test', $test);
+
                 }
 
                 $this->saveObject['objects'][] = $myProperty;
@@ -85,19 +87,21 @@ class GVASParser
                         }
                     }
                 }
-//                if (trim($object->NAME) == 'FrameNameArray') {
-//                    foreach ($object->CONTENTOBJECTS as $co) {
-//                        if (is_object($co) && trim($co->NAME) == 'STRING') {
-//                            if (
-//                                ($co->ARRCOUNTER !== '') &&
-//                                isset($_POST['name_' . $co->ARRCOUNTER]) &&
-//                                $_POST['name_' . $co->ARRCOUNTER] != trim($co->string)
-//                            ) {
-//                                $co->string = strip_tags(trim($_POST['name_' . $co->ARRCOUNTER])) . hex2bin('00');
-//                            }
-//                        }
-//                    }
-//                }
+                if (trim($object->NAME) == 'FrameNameArray') {
+                    foreach ($object->CONTENTOBJECTS as $co) {
+                        if (is_object($co) && trim($co->NAME) == 'STRING') {
+                            if ($co->ARRCOUNTER)
+                                //echo "(".$co->string.")";
+                                if (
+                                    ($co->ARRCOUNTER !== '') &&
+                                    isset($_POST['name_' . $co->ARRCOUNTER]) &&
+                                    $_POST['name_' . $co->ARRCOUNTER] != trim($co->string)
+                                ) {
+                                    $co->string = strip_tags(trim($_POST['name_' . $co->ARRCOUNTER])) . hex2bin('00');
+                                }
+                        }
+                    }
+                }
                 if (trim($object->NAME) == 'FreightAmountArray') {
                     foreach ($object->CONTENTOBJECTS as $co) {
                         if (is_object($co) && trim($co->NAME) == 'IntProperty') {
@@ -146,13 +150,18 @@ class GVASParser
         $output .= hex2bin('050000004e6f6e650000000000');
 
         if (isset($_POST['save'])) {
+            $save = getSave($this->NEWUPLOADEDFILE);
+
+            if (getUserIpAddr() != $save['ip_address']) {
+                die("This does not seem to be your save file.");
+            }
             echo "SAVING FILE " . $this->NEWUPLOADEDFILE . '.modified' . "<br>\n";
             file_put_contents('saves/' . $this->NEWUPLOADEDFILE . '.modified', $output);
-            echo '<A href="saves/' . $this->NEWUPLOADEDFILE . '.modified' . '">Download your modified save here </A><br>';
-            echo 'Want to upload this map again?<A href="upload.php">Add your renumbered save again</A><br>';
+            echo '<a href="saves/' . $this->NEWUPLOADEDFILE . '.modified' . '">Download your modified save here </A><br>';
+            echo 'Want to upload this map again? <a href="upload.php">Add your renumbered save again</a><br>';
         } else {
             if ($againAllowed) {
-                echo "RESAVING FILE TO DISK - EMPTY NUMBERS BECAME A DOT " . $this->NEWUPLOADEDFILE . "<br>\n";
+                //echo "RESAVING FILE TO DISK - EMPTY NUMBERS BECAME A DOT " . $this->NEWUPLOADEDFILE . "<br>\n";
                 file_put_contents('uploads/' . $this->NEWUPLOADEDFILE, $output);
                 return 'AGAIN';
             }
