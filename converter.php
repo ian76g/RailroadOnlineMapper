@@ -465,7 +465,7 @@ foreach ($files as $file) {
 
             }
             if ($exArr[6]) {
-                $template = '<input size="2" maxlength="2" name="' . $exArr[6] . $cartIndex . '" value="' . $exArr[5] . '">';
+                $template = '<input size="2" maxlength="4" name="' . $exArr[6] . $cartIndex . '" value="' . $exArr[5] . '">';
             } else {
                 $template = $exArr[5];
             }
@@ -1170,7 +1170,12 @@ class dtProperty
                     case 'FloatProperty':
                         for ($i = 0; $i < $arrayCount; $i++) {
                             $float = unpack('g', substr($this->x, $this->position, 4))[1];
-                            $this->CONTENTOBJECTS[] = pack('g', $float);
+                            $nD = new dtDynamic();
+                            $nD->NAME = 'FloatProperty';
+                            $nD->value = $float;
+                            $nD->ARRCOUNTER = $i;
+                            $nD->pack = 'g';
+                            $this->CONTENTOBJECTS[] = $nD;
                             $this->position += 4;
                             //@$goldenBucket[$name][]= $float;
                             $elem[] = array($pieces, $float);
@@ -1181,7 +1186,7 @@ class dtProperty
                         for ($i = 0; $i < $arrayCount; $i++) {
                             $int = unpack('V', substr($this->x, $this->position, 4))[1];
                             $nD = new dtDynamic();
-                            $nD->NAME = 'Int';
+                            $nD->NAME = 'IntProperty';
                             $nD->value = $int;
                             $nD->ARRCOUNTER = $i;
                             $nD->pack = 'V';
@@ -1498,7 +1503,7 @@ class GVASParser
 //                }
                 if (trim($object->NAME) == 'FreightAmountArray') {
                     foreach ($object->CONTENTOBJECTS as $co) {
-                        if (is_object($co) && trim($co->NAME) == 'Int') {
+                        if (is_object($co) && trim($co->NAME) == 'IntProperty') {
                             if (
                                 ($co->ARRCOUNTER !== '') &&
                                 isset($_POST['freightamount_' . $co->ARRCOUNTER]) &&
@@ -1511,7 +1516,7 @@ class GVASParser
                 }
                 if (trim($object->NAME) == 'TenderFuelAmountArray') {
                     foreach ($object->CONTENTOBJECTS as $co) {
-                        if (is_object($co) && trim($co->NAME) == 'Int') {
+                        if (is_object($co) && trim($co->NAME) == 'FloatProperty') {
                             if (
                                 ($co->ARRCOUNTER !== '') &&
                                 isset($_POST['tenderamount_' . $co->ARRCOUNTER]) &&
