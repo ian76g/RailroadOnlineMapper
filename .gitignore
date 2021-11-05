@@ -1,3 +1,8 @@
 xx.json
-db.db
+data.sqlite3
 counter
+tmp_FrameNumberArray
+tmp_FrameNumberArray.test
+public/*
+uploads/*
+saves/*
