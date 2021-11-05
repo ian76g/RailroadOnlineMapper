@@ -59,15 +59,6 @@ $pattern = '
 $htmlSvg = str_replace('###PATTERN###', $pattern, $htmlSvg);
 
 
-// later you can switch cargo on carts - maybe this can be done by editing the save via the mapper later?
-$possibleCargos = array(
-    'flatcar_logs' => array('log'),
-    'flatcar_stakes' => array('rail', 'lumber', 'beam', 'rawiron'),
-    'flatcar_hopper' => array('ironore', 'coal'),
-    'flatcar_cordwood' => array('cordwood'),
-);
-
-
 /**
  * read all save files
  */
@@ -429,6 +420,19 @@ foreach ($files as $file) {
 </tr>
 ###TROWS###</table><input type="submit" value="RENUMBER"></form>';
     $trows = '';
+
+    // later you can switch cargo on carts - maybe this can be done by editing the save via the mapper later?
+    $possibleCargos = array(
+        'flatcar_logs' => array('log'),
+        'flatcar_stakes' => array('rail', 'lumber', 'beam', 'rawiron'),
+        'flatcar_hopper' => array('ironore', 'coal'),
+        'flatcar_cordwood' => array('cordwood'),
+    );
+
+
+
+
+
     foreach ($data['Frames'] as $cartIndex => $vehicle) {
         $trow = '<tr>
 <td>###1###</td>
@@ -438,7 +442,40 @@ foreach ($files as $file) {
 <td>###5###</td>
 <td>###6###</td>
 </tr>';
-        $exArr = array($vehicle['Type'], strtoupper(strip_tags($vehicle['Name'])), strip_tags(trim($vehicle['Number'])));
+
+        $selectTemplate = '<select name="freightType_###INDEX###">###OPTIONS###</select>';
+        $optionTemplate = '<option value="###OPTIONVALUE###" ###SELECTED###>###OPTIONNAME###</option>';
+
+        $optionsStringArray = array();
+        $selectString = $vehicle['Freight']['Type'];
+        if(isset($possibleCargos[$vehicle['Type']])){
+            $options = '';
+            foreach($possibleCargos[$vehicle['Type']] as $type){
+                if($vehicle['Freight']['Type'] == $type){
+                    $selected = ' selected';
+                } else {
+                    $selected = '';
+                }
+                $optionValue = $type;
+                $optionName = $type;
+                $optionsStringArray[] = str_replace(
+                    array('###OPTIONVALUE###', '###SELECTED###', '###OPTIONNAME###'),
+                    array($optionValue, $selected, $optionName),
+                    $optionTemplate
+                );
+            }
+            $selectString = str_replace(
+                array('###OPTIONS###', '###INDEX###'),
+                array(implode('', $optionsStringArray), $cartIndex),
+                $selectTemplate
+            );
+        }
+
+        $exArr = array(
+            $vehicle['Type'],
+            strtoupper(strip_tags($vehicle['Name'])),
+            strip_tags(trim($vehicle['Number']))
+        );
         if (
             // trim out empty carts without number and without name
             $empty ||
@@ -453,7 +490,7 @@ foreach ($files as $file) {
                 $exArr[] = 'tenderamount_';
             } else {
                 if ($vehicle['Freight']['Type']) {
-                    $exArr[] = $vehicle['Freight']['Type'];
+                    $exArr[] = $selectString;
                     $exArr[] = $vehicle['Freight']['Amount'];
                     $exArr[] = 'freightamount_';
                 } else {
@@ -464,7 +501,7 @@ foreach ($files as $file) {
                 }
 
             }
-            if ($exArr[6]) {
+            if (isset($exArr[6])) {
                 $template = '<input size="2" maxlength="4" name="' . $exArr[6] . $cartIndex . '" value="' . $exArr[5] . '">';
             } else {
                 $template = $exArr[5];
@@ -1523,6 +1560,19 @@ class GVASParser
                                 $_POST['tenderamount_' . $co->ARRCOUNTER] != trim($co->value)
                             ) {
                                 $co->value = strip_tags(trim($_POST['tenderamount_' . $co->ARRCOUNTER]));
+                            }
+                        }
+                    }
+                }
+                if (trim($object->NAME) == 'FreightTypeArray') {
+                    foreach ($object->CONTENTOBJECTS as $co) {
+                        if (is_object($co) && $co->ARRCOUNTER){
+                            if (
+                                ($co->ARRCOUNTER !== '') &&
+                                isset($_POST['freightType_' . $co->ARRCOUNTER]) &&
+                                $_POST['freightType_' . $co->ARRCOUNTER] != trim($co->string)
+                            ) {
+                                $co->string = strip_tags(trim($_POST['freightType_' . $co->ARRCOUNTER])).hex2bin('00');
                             }
                         }
                     }
