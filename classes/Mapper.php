@@ -25,6 +25,12 @@ class Mapper
     private $turnTableRadius;
     private $totalTrackLength;
     private $maxSlope;
+    private $totalSwitches;
+    private $totalLocos;
+    private $totalCarts;
+    private $NEWUPLOADEDFILE;
+    private $empty;
+    private $arithmeticHelper;
 
     /**
      * Mapper constructor.
@@ -45,7 +51,8 @@ class Mapper
     function gethtmlSVG(&$htmlSvg, $NEWUPLOADEDFILE, $empty, $arithmeticHelper)
     {
         $doSvg = true;
-
+        $this->empty = $empty;
+        $this->arithmeticHelper = $arithmeticHelper;
 
         $types = array();
 
@@ -79,340 +86,14 @@ class Mapper
         // OK - Now lets draw a map
         $this->totalTrackLength = 0;
         $this->maxSlope = 0;
+
         $svg = $this->drawTracksAndBeds( );
 
-        /**
-         * Fill in the missing gaps AKA switches
-         */
-        $types = array();
-        foreach ($this->data['Switchs'] as $switch) {
-            $dir = false;
-            $type = trim($switch['Type']);
+        $svg .= $this->drawSwitches();
 
-            /**
-             * 0 = SwitchLeft           = lever left switch going left
-             * 1 = SwitchRight          = lever right switch going right
-             * 2 =                      = Y
-             * 3 =                      = Y mirror
-             * 4 = SwitchRightMirror    = lever left switch going right
-             * 5 = SwitchLeftMirror     = lever right switch going left
-             * 6 = SwitchCross90        = cross
-             */
-            $state = $switch['Side'];
+        $svg .= $this->drawTurntables();
 
-            switch ($type) {
-                case 0 :
-                    $dir = -7;
-                    $state = !$state;
-                    break;
-                case 1 :
-                case 3 :
-                case 4:
-                    $dir = 7;
-                    break;
-                case 2 :
-                    $dir = -7;
-                    break;
-                case 5 :
-                    $state = !$state;
-                    $dir = -7;
-                    break;
-                case 6 :
-                    $dir = '99';
-                    break;
-                default:
-                    $dir = 1;
-            }
-
-            if (!$dir) {
-                var_dump($type);
-                die('WHOOPS');
-            }
-            $totalSwitches += 1;
-            $segments = $switch['Location'];
-            // fix given angles and convert to radiant - subtract 90 - because ingame coordinates do not point NORTH (!?)
-            $rotation = deg2rad($switch['Rotation'][1] - 90);
-            $rotSide = deg2rad($switch['Rotation'][1] - 90 + $dir);
-            $rotCross = deg2rad($switch['Rotation'][1] + 180);
-
-            if ($doSvg) {
-                $x = ($this->imx - (int)(($switch['Location'][0] - $this->minX) / 100 * $this->scale));
-                $y = ($this->imy - (int)(($switch['Location'][1] - $this->minY) / 100 * $this->scale));
-                if ($dir == 99) { //CROSS
-                    $crosslength = $this->switchRadius / 10;
-
-                    $x2 = ($this->imx - (int)(($switch['Location'][0] - $this->minX) / 100 * $this->scale) + (cos($rotCross) * $crosslength));
-                    $y2 = ($this->imy - (int)(($switch['Location'][1] - $this->minY) / 100 * $this->scale) + (sin($rotCross) * $crosslength));
-
-                    $cx = $x + ($x2 - $x) / 2;
-                    $cy = $y + ($y2 - $y) / 2;
-
-
-                    $svg .= '<line x1="' . $x . '" y1="' . $y . '" x2="' . $x2 . '" y2="' . $y2 . '" stroke="black" stroke-width="3"/>' . "\n";
-                    $svg .= '<line x1="' .
-                        ($cx - (cos($rotation) * $crosslength)) .
-                        '" y1="' .
-                        ($cy - (sin($rotation) * $crosslength)) .
-                        '" x2="' . ($cx + (cos($rotation) * $crosslength)) .
-                        '" y2="' . ($cy + (sin($rotation) * $crosslength)) .
-                        '" stroke="black" stroke-width="3"/>' . "\n";
-
-                } else {
-                    $xStraight = ($this->imx - (int)(($switch['Location'][0] - $this->minX) / 100 * $this->scale) + (cos($rotation) * $this->switchRadius / 2));
-                    $yStraight = ($this->imy - (int)(($switch['Location'][1] - $this->minY) / 100 * $this->scale) + (sin($rotation) * $this->switchRadius / 2));
-                    $xSide = ($this->imx - (int)(($switch['Location'][0] - $this->minX) / 100 * $this->scale) + (cos($rotSide) * $this->switchRadius / 2));
-                    $ySide = ($this->imy - (int)(($switch['Location'][1] - $this->minY) / 100 * $this->scale) + (sin($rotSide) * $this->switchRadius / 2));
-
-                    if ($state) {
-//                    $svg .= '<text x="' . $x . '" y="' . $y . '">   ' . $type . '/' . $state . '</text>';
-                        $svg .= '<line x1="' . $x . '" y1="' . $y . '" x2="' . $xStraight . '" y2="' . $yStraight . '" stroke="red" stroke-width="3"/>' . "\n";
-                        $svg .= '<line x1="' . $x . '" y1="' . $y . '" x2="' . $xSide . '" y2="' . $ySide . '" stroke="black" stroke-width="3"/>' . "\n";
-                    } else {
-//                    $svg .= '<text x="' . $x . '" y="' . $y . '">   ' . $type . '/' . $state . '</text>';
-                        $svg .= '<line x1="' . $x . '" y1="' . $y . '" x2="' . $xSide . '" y2="' . $ySide . '" stroke="red" stroke-width="3"/>' . "\n";
-                        $svg .= '<line x1="' . $x . '" y1="' . $y . '" x2="' . $xStraight . '" y2="' . $yStraight . '" stroke="black" stroke-width="3"/>' . "\n";
-
-                    }
-                }
-            }
-
-
-// debugging
-//            imagettftext($img, 20, 0,
-//        $imx - (int)(($switch['Location']['X'] - $minX) /100* $scale), $imy - (int)(($switch['Location']['Y'] - $minY) /100* $scale),
-//    $colorTrack, $type);
-
-        }
-
-
-        /**
-         * Fill in more missing gaps AKA turntables
-         */
-        if (!isset($data['Turntables'])) {
-            $data['Turntables'] = array();
-        }
-        foreach ($data['Turntables'] as $table) {
-            $type = trim($table['Type']);
-            /**
-             * 0 = regular
-             * 1 = light and nice
-             */
-
-            // fix given angles and convert to radiant - subtract 90 - because ingame coordinates do not point NORTH (!?)
-            $rotation = deg2rad($table['Rotator'][1] + 90);
-            $rotation2 = deg2rad($table['Rotator'][1] + 90 - $table['Deck'][1]);
-
-            if ($doSvg) {
-                $this->turnTableRadius = 25;
-
-                $x = ($this->imx - (int)(($table['Location'][0] - $this->minX) / 100 * $this->scale));
-                $y = ($this->imx - (int)(($table['Location'][1] - $this->minX) / 100 * $this->scale));
-                $x2 = ($this->imx - (int)(($table['Location'][0] - $this->minX) / 100 * $this->scale) + (cos($rotation) * $this->turnTableRadius));
-                $y2 = ($this->imy - (int)(($table['Location'][1] - $this->minY) / 100 * $this->scale) + (sin($rotation) * $this->turnTableRadius));
-
-                $cx = $x + ($x2 - $x) / 2;
-                $cy = $y + ($y2 - $y) / 2;
-
-                $svg .= '<circle cx="' . $cx . '" cy="' . $cy . '" r="' . ($this->turnTableRadius / 2) . '" stroke="black" stroke-width="1" fill="lightyellow" />' . "\n";
-
-                $svg .= '<line x1="' . ($cx - (cos($rotation2) * $this->turnTableRadius / 2)) .
-                    '" y1="' . ($cy - (sin($rotation2) * $this->turnTableRadius / 2))
-                    . '" x2="' . ($cx + (cos($rotation2) * $this->turnTableRadius / 2)) .
-                    '" y2="' . ($cy + (sin($rotation2) * $this->turnTableRadius / 2))
-                    . '" stroke="black" stroke-width="3"/>' . "\n";
-
-            }
-        }
-
-
-        /**
-         * draw some vehicles on top of that image
-         * define size and color of vehicle here
-         */
-
-        $cartColors = array(
-            'handcar' => array($this->engineRadius, 'black'),
-            'porter_040' => array($this->engineRadius, 'black'),
-            'porter_042' => array($this->engineRadius, 'black'),
-            'eureka' => array($this->engineRadius, 'black'),
-            'eureka_tender' => array($this->engineRadius, 'black'),
-            'climax' => array($this->engineRadius, 'black'),
-            'heisler' => array($this->engineRadius, 'black'),
-            'class70' => array($this->engineRadius, 'black'),
-            'class70_tender' => array($this->engineRadius, 'black'),
-            'cooke260' => array($this->engineRadius, 'black'),
-            'cooke260_tender' => array($this->engineRadius, 'black'),
-            'flatcar_logs' => array($this->engineRadius / 3, 'red'),
-            'flatcar_cordwood' => array($this->engineRadius / 3 * 2, 'orange'),
-            'flatcar_stakes' => array($this->engineRadius / 3 * 2, 'yellow'),
-            'flatcar_hopper' => array($this->engineRadius / 3 * 2, 'brown'),
-            'flatcar_tanker' => array($this->engineRadius / 3 * 2, 'grey'),
-        );
-
-// build some extra HTML for a form to edit cart data
-        $cartExtraStr = '<form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $NEWUPLOADEDFILE . '">
-<table class="myStuff">
-<tr>
-<th>Type</th>
-<th>Name</th>
-<th>Number</th>
-<th>near</th>
-<th>Cargo</th>
-<th>Amount</th>
-</tr>
-###TROWS###</table><input type="submit" value="!APPLY ABOVE CHANGES TO MY SAVE!"></form>';
-        $trows = '';
-
-// later you can switch cargo on carts - maybe this can be done by editing the save via the mapper later?
-        $possibleCargos = array(
-            'flatcar_logs' => array('log'),
-            'flatcar_stakes' => array('rail', 'lumber', 'beam', 'rawiron'),
-            'flatcar_hopper' => array('ironore', 'coal'),
-            'flatcar_cordwood' => array('cordwood'),
-        );
-
-        $cargoNames = array(
-            "log" => "Logs",
-            "cordwood" => "Cordwood",
-            "beam" => "Beams",
-            "lumber" => "Lumber",
-            "ironore" => "Iron Ore",
-            "rail" => "Rails",
-            "rawiron" => "Raw Iron",
-            "coal" => "Coal",
-            "steelpipe" => "Steel Pipes",
-            "crate_tools" => "Tools",
-            "crudeoil" => "Crude Oil",
-            "oilbarrel" => "Oil Barrels",
-        );
-
-
-        foreach ($this->data['Frames'] as $cartIndex => $vehicle) {
-            $trow = '<tr>
-<td>###1###</td>
-<td>              <input size="5" maxlength="15" name="name_' . $cartIndex . '" value="###2###"></td>
-<td align="right"><input size="5" maxlength="15" name="number_' . $cartIndex . '" value="###3###"></td>
-<td>###4###</td>
-<td>###5###</td>
-<td>###6###</td>
-</tr>';
-
-            $selectTemplate = '<select name="freightType_###INDEX###">###OPTIONS###</select>';
-            $optionTemplate = '<option value="###OPTIONVALUE###" ###SELECTED###>###OPTIONNAME###</option>';
-
-            $optionsStringArray = array();
-            $selectString = $vehicle['Freight']['Type'];
-            if (isset($possibleCargos[$vehicle['Type']])) {
-                $options = '';
-                foreach ($possibleCargos[$vehicle['Type']] as $type) {
-                    if ($vehicle['Freight']['Type'] == $type) {
-                        $selected = ' selected';
-                    } else {
-                        $selected = '';
-                    }
-                    $optionValue = $type;
-                    $optionName = $type;
-                    $optionsStringArray[] = str_replace(
-                        array('###OPTIONVALUE###', '###SELECTED###', '###OPTIONNAME###'),
-                        array($optionValue, $selected, $cargoNames[$optionName]),
-                        $optionTemplate
-                    );
-                }
-                $selectString = str_replace(
-                    array('###OPTIONS###', '###INDEX###'),
-                    array(implode('', $optionsStringArray), $cartIndex),
-                    $selectTemplate
-                );
-            }
-
-            $exArr = array(
-                $vehicle['Type'],
-                strtoupper(strip_tags($vehicle['Name'])),
-                strip_tags(trim($vehicle['Number']))
-            );
-            if (
-                // trim out empty carts without number and without name
-                $empty ||
-                (strip_tags($vehicle['Name']) && trim($vehicle['Name']) != '.') ||
-                (trim($vehicle['Number']) != '.' && trim($vehicle['Number']))
-            ) {
-                $exArr[] = $arithmeticHelper->nearestIndustry($vehicle['Location'], $this->data['Industries']);
-                if ($vehicle['Tender']['Fuelamount']) {
-                    $exArr[] = 'firewood';
-                    $exArr[] = $vehicle['Tender']['Fuelamount'];
-                    $exArr[] = 'tenderamount_';
-                } else {
-                    if ($vehicle['Freight']['Type']) {
-                        $exArr[] = $selectString;
-                        $exArr[] = $vehicle['Freight']['Amount'];
-                        $exArr[] = 'freightamount_';
-                    } else {
-                        $exArr[] = '-';
-                        $exArr[] = '-';
-                        $exArr[] = false;
-
-                    }
-
-                }
-                if (isset($exArr[6])) {
-                    $template = '<input size="2" maxlength="4" name="' . $exArr[6] . $cartIndex . '" value="' . $exArr[5] . '">';
-                } else {
-                    $template = $exArr[5];
-                }
-                $exArr[5] = $template;
-
-                $trows .= str_replace(array('###1###', '###2###', '###3###', '###4###', '###5###', '###6###'), $exArr, $trow);
-
-            }
-
-            $x = ($this->imx - (int)(($vehicle['Location'][0] - $this->minX) / 100 * $this->scale));
-            $y = ($this->imy - (int)(($vehicle['Location'][1] - $this->minY) / 100 * $this->scale));
-            if ($doSvg) {
-                $svg .= '<ellipse cx="' . $x . '" cy="' . $y . '" rx="' . ($this->engineRadius / 2) . '" ry="' . ($this->engineRadius / 3) .
-                    '" style="fill:' . $cartColors[$vehicle['Type']][1] . ';stroke:black;stroke-width:1" transform="rotate(' . $vehicle['Rotation'][1] .
-                    ', ' . ($this->imx - (int)(($vehicle['Location'][0] - $this->minX) / 100 * $this->scale)) . ', ' . ($this->imy - (int)(($vehicle['Location'][1] - $this->minY) / 100 * $this->scale)) . ')"
-              />';
-
-                if ($vehicle['Location'][2] < 1000) {
-                    $svg .= '<ellipse cx="' . $x . '" cy="' . $y . '" rx="' . (($this->engineRadius / 2) * 10) .
-                        '" ry="' . (($this->engineRadius / 2) * 10) .
-                        '" style="fill:none;stroke:red;stroke-width:10" transform="rotate(' . $vehicle['Rotation'][1] .
-                        ', ' . ($this->imx - (int)(($vehicle['Location'][0] - $this->minX) / 100 * $this->scale)) . ', ' . ($this->imy - (int)(($vehicle['Location'][1] - $this->minY) / 100 * $this->scale)) . ')"
-              />';
-                    $svg .= '<text x="' . $x . '" y="' . $y . '" >' . '&nbsp;&nbsp;' . $vehicle['Location'][2] . '</text>' . "\n";
-
-                }
-            }
-
-            // add some names to the locomotives
-            if ($vehicle['Type'] == 'porter_040'
-                || $vehicle['Type'] == 'porter_042'
-                || $vehicle['Type'] == 'eureka'
-                || $vehicle['Type'] == 'climax'
-                || $vehicle['Type'] == 'heisler'
-                || $vehicle['Type'] == 'class70'
-                || $vehicle['Type'] == 'cooke260'
-            ) {
-                $totalLocos++;
-                $name = strtoupper(strip_tags($vehicle['Name']));
-                // fallback to engine type when no name was given
-                if (!$name) {
-                    $name = ucfirst($vehicle['Type']);
-                }
-                //$name.=' ('.$vehicle['Location']['Z'].')';
-                // label locomotives
-                if ($doSvg) {
-                    $svg .= '<text x="' . $x . '" y="' . $y . '" >' . '&nbsp;&nbsp;' . $name . '</text>' . "\n";
-
-                }
-            } else {
-                $totalCarts++;
-            }
-
-        }
-
-        $cartExtraStr = str_replace('###TROWS###', $trows, $cartExtraStr);
-        $htmlSvg = str_replace('###EXTRAS###', $cartExtraStr, $htmlSvg);
+        $svg .= $this->drawRollingStocks($htmlSvg);
 
 
         $types = array();
@@ -519,7 +200,14 @@ class Mapper
 
             // create a "database" and store some infos about this file for the websies index page
             @$db = unserialize(@file_get_contents('db.db'));
-            $db[$NEWUPLOADEDFILE] = array($this->totalTrackLength, $totalSwitches, $totalLocos, $totalCarts, $this->maxSlope, getUserIpAddr());
+            $db[$NEWUPLOADEDFILE] = array(
+                $this->totalTrackLength,
+                $this->totalSwitches,
+                $this->totalLocos,
+                $this->totalCarts,
+                $this->maxSlope,
+                getUserIpAddr()
+            );
             @file_put_contents('db.db', serialize($db));
 
             // label the industries
@@ -616,13 +304,7 @@ class Mapper
     }
 
     /**
-     * @param $maxSlope
-     * @param $totalTrackLength
-     * @param $imx
-     * @param $imy
-     * @param $minX
-     * @param $minY
-     * @param $scale
+     * @return string
      */
     function drawTracksAndBeds()
     {
@@ -679,13 +361,13 @@ class Mapper
                     );
 
                     if (in_array($type, array(4, 0))) {
-                        $totalTrackLength += $distance;
+                        $this->totalTrackLength += $distance;
 
                         $height = $segment['LocationEnd']['Z'] - $segment['LocationStart']['Z'];
                         $height = abs($height);
                         $length = sqrt(pow($segment['LocationEnd']['X'] - $segment['LocationStart']['X'], 2) +
                             pow($segment['LocationEnd']['Y'] - $segment['LocationStart']['Y'], 2));
-                        $maxSlope = max($maxSlope,
+                        $this->maxSlope = max($this->maxSlope,
                             ($height * 100 / $length));
                     }
 
@@ -701,6 +383,371 @@ class Mapper
         }
         return $svg;
 
+    }
+
+    /**
+     * @return string
+     */
+    public function drawSwitches()
+    {
+        $doSvg = true;
+        $svg = '';
+        /**
+         * Fill in the missing gaps AKA switches
+         */
+        $types = array();
+        foreach ($this->data['Switchs'] as $switch) {
+            $this->totalSwitches++;
+            $dir = false;
+            $type = trim($switch['Type']);
+
+            /**
+             * 0 = SwitchLeft           = lever left switch going left
+             * 1 = SwitchRight          = lever right switch going right
+             * 2 =                      = Y
+             * 3 =                      = Y mirror
+             * 4 = SwitchRightMirror    = lever left switch going right
+             * 5 = SwitchLeftMirror     = lever right switch going left
+             * 6 = SwitchCross90        = cross
+             */
+            $state = $switch['Side'];
+
+            switch ($type) {
+                case 0 :
+                    $dir = -7;
+                    $state = !$state;
+                    break;
+                case 1 :
+                case 3 :
+                case 4:
+                    $dir = 7;
+                    break;
+                case 2 :
+                    $dir = -7;
+                    break;
+                case 5 :
+                    $state = !$state;
+                    $dir = -7;
+                    break;
+                case 6 :
+                    $dir = '99';
+                    break;
+                default:
+                    $dir = 1;
+            }
+
+            if (!$dir) {
+                var_dump($type);
+                die('WHOOPS');
+            }
+            $segments = $switch['Location'];
+            // fix given angles and convert to radiant - subtract 90 - because ingame coordinates do not point NORTH (!?)
+            $rotation = deg2rad($switch['Rotation'][1] - 90);
+            $rotSide = deg2rad($switch['Rotation'][1] - 90 + $dir);
+            $rotCross = deg2rad($switch['Rotation'][1] + 180);
+
+            if ($doSvg) {
+                $x = ($this->imx - (int)(($switch['Location'][0] - $this->minX) / 100 * $this->scale));
+                $y = ($this->imy - (int)(($switch['Location'][1] - $this->minY) / 100 * $this->scale));
+                if ($dir == 99) { //CROSS
+                    $crosslength = $this->switchRadius / 10;
+
+                    $x2 = ($this->imx - (int)(($switch['Location'][0] - $this->minX) / 100 * $this->scale) + (cos($rotCross) * $crosslength));
+                    $y2 = ($this->imy - (int)(($switch['Location'][1] - $this->minY) / 100 * $this->scale) + (sin($rotCross) * $crosslength));
+
+                    $cx = $x + ($x2 - $x) / 2;
+                    $cy = $y + ($y2 - $y) / 2;
+
+
+                    $svg .= '<line x1="' . $x . '" y1="' . $y . '" x2="' . $x2 . '" y2="' . $y2 . '" stroke="black" stroke-width="3"/>' . "\n";
+                    $svg .= '<line x1="' .
+                        ($cx - (cos($rotation) * $crosslength)) .
+                        '" y1="' .
+                        ($cy - (sin($rotation) * $crosslength)) .
+                        '" x2="' . ($cx + (cos($rotation) * $crosslength)) .
+                        '" y2="' . ($cy + (sin($rotation) * $crosslength)) .
+                        '" stroke="black" stroke-width="3"/>' . "\n";
+
+                } else {
+                    $xStraight = ($this->imx - (int)(($switch['Location'][0] - $this->minX) / 100 * $this->scale) + (cos($rotation) * $this->switchRadius / 2));
+                    $yStraight = ($this->imy - (int)(($switch['Location'][1] - $this->minY) / 100 * $this->scale) + (sin($rotation) * $this->switchRadius / 2));
+                    $xSide = ($this->imx - (int)(($switch['Location'][0] - $this->minX) / 100 * $this->scale) + (cos($rotSide) * $this->switchRadius / 2));
+                    $ySide = ($this->imy - (int)(($switch['Location'][1] - $this->minY) / 100 * $this->scale) + (sin($rotSide) * $this->switchRadius / 2));
+
+                    if ($state) {
+//                    $svg .= '<text x="' . $x . '" y="' . $y . '">   ' . $type . '/' . $state . '</text>';
+                        $svg .= '<line x1="' . $x . '" y1="' . $y . '" x2="' . $xStraight . '" y2="' . $yStraight . '" stroke="red" stroke-width="3"/>' . "\n";
+                        $svg .= '<line x1="' . $x . '" y1="' . $y . '" x2="' . $xSide . '" y2="' . $ySide . '" stroke="black" stroke-width="3"/>' . "\n";
+                    } else {
+//                    $svg .= '<text x="' . $x . '" y="' . $y . '">   ' . $type . '/' . $state . '</text>';
+                        $svg .= '<line x1="' . $x . '" y1="' . $y . '" x2="' . $xSide . '" y2="' . $ySide . '" stroke="red" stroke-width="3"/>' . "\n";
+                        $svg .= '<line x1="' . $x . '" y1="' . $y . '" x2="' . $xStraight . '" y2="' . $yStraight . '" stroke="black" stroke-width="3"/>' . "\n";
+
+                    }
+                }
+            }
+
+
+// debugging
+//            imagettftext($img, 20, 0,
+//        $imx - (int)(($switch['Location']['X'] - $minX) /100* $scale), $imy - (int)(($switch['Location']['Y'] - $minY) /100* $scale),
+//    $colorTrack, $type);
+
+        }
+
+        return $svg;
+    }
+
+    /**
+     * @param $data
+     * @param $doSvg
+     * @param $svg
+     * @return array
+     */
+    public function drawTurntables()
+    {
+        $doSvg = true;
+        $svg='';
+        /**
+         * Fill in more missing gaps AKA turntables
+         */
+        if (!isset($this->data['Turntables'])) {
+            $this->data['Turntables'] = array();
+        }
+        foreach ($this->data['Turntables'] as $table) {
+            $type = trim($table['Type']);
+            /**
+             * 0 = regular
+             * 1 = light and nice
+             */
+
+            // fix given angles and convert to radiant - subtract 90 - because ingame coordinates do not point NORTH (!?)
+            $rotation = deg2rad($table['Rotator'][1] + 90);
+            $rotation2 = deg2rad($table['Rotator'][1] + 90 - $table['Deck'][1]);
+
+            if ($doSvg) {
+                $this->turnTableRadius = 25;
+
+                $x = ($this->imx - (int)(($table['Location'][0] - $this->minX) / 100 * $this->scale));
+                $y = ($this->imx - (int)(($table['Location'][1] - $this->minX) / 100 * $this->scale));
+                $x2 = ($this->imx - (int)(($table['Location'][0] - $this->minX) / 100 * $this->scale) + (cos($rotation) * $this->turnTableRadius));
+                $y2 = ($this->imy - (int)(($table['Location'][1] - $this->minY) / 100 * $this->scale) + (sin($rotation) * $this->turnTableRadius));
+
+                $cx = $x + ($x2 - $x) / 2;
+                $cy = $y + ($y2 - $y) / 2;
+
+                $svg .= '<circle cx="' . $cx . '" cy="' . $cy . '" r="' . ($this->turnTableRadius / 2) . '" stroke="black" stroke-width="1" fill="lightyellow" />' . "\n";
+
+                $svg .= '<line x1="' . ($cx - (cos($rotation2) * $this->turnTableRadius / 2)) .
+                    '" y1="' . ($cy - (sin($rotation2) * $this->turnTableRadius / 2))
+                    . '" x2="' . ($cx + (cos($rotation2) * $this->turnTableRadius / 2)) .
+                    '" y2="' . ($cy + (sin($rotation2) * $this->turnTableRadius / 2))
+                    . '" stroke="black" stroke-width="3"/>' . "\n";
+
+            }
+        }
+
+        return $svg;
+    }
+
+    /**
+     * @param $htmlSvg
+     * @return array
+     */
+    public function drawRollingStocks(&$htmlSvg)
+    {
+        $doSvg = true;
+        $svg = '';
+        /**
+         * draw some vehicles on top of that image
+         * define size and color of vehicle here
+         */
+
+        $cartColors = array(
+            'handcar' => array($this->engineRadius, 'black'),
+            'porter_040' => array($this->engineRadius, 'black'),
+            'porter_042' => array($this->engineRadius, 'black'),
+            'eureka' => array($this->engineRadius, 'black'),
+            'eureka_tender' => array($this->engineRadius, 'black'),
+            'climax' => array($this->engineRadius, 'black'),
+            'heisler' => array($this->engineRadius, 'black'),
+            'class70' => array($this->engineRadius, 'black'),
+            'class70_tender' => array($this->engineRadius, 'black'),
+            'cooke260' => array($this->engineRadius, 'black'),
+            'cooke260_tender' => array($this->engineRadius, 'black'),
+            'flatcar_logs' => array($this->engineRadius / 3, 'red'),
+            'flatcar_cordwood' => array($this->engineRadius / 3 * 2, 'orange'),
+            'flatcar_stakes' => array($this->engineRadius / 3 * 2, 'yellow'),
+            'flatcar_hopper' => array($this->engineRadius / 3 * 2, 'brown'),
+            'flatcar_tanker' => array($this->engineRadius / 3 * 2, 'grey'),
+        );
+
+// build some extra HTML for a form to edit cart data
+        $cartExtraStr = '<form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $this->NEWUPLOADEDFILE . '">
+<table class="myStuff">
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Number</th>
+<th>near</th>
+<th>Cargo</th>
+<th>Amount</th>
+</tr>
+###TROWS###</table><input type="submit" value="!APPLY ABOVE CHANGES TO MY SAVE!"></form>';
+        $trows = '';
+
+// later you can switch cargo on carts - maybe this can be done by editing the save via the mapper later?
+        $possibleCargos = array(
+            'flatcar_logs' => array('log'),
+            'flatcar_stakes' => array('rail', 'lumber', 'beam', 'rawiron'),
+            'flatcar_hopper' => array('ironore', 'coal'),
+            'flatcar_cordwood' => array('cordwood'),
+        );
+
+        $cargoNames = array(
+            "log" => "Logs",
+            "cordwood" => "Cordwood",
+            "beam" => "Beams",
+            "lumber" => "Lumber",
+            "ironore" => "Iron Ore",
+            "rail" => "Rails",
+            "rawiron" => "Raw Iron",
+            "coal" => "Coal",
+            "steelpipe" => "Steel Pipes",
+            "crate_tools" => "Tools",
+            "crudeoil" => "Crude Oil",
+            "oilbarrel" => "Oil Barrels",
+        );
+
+
+        foreach ($this->data['Frames'] as $cartIndex => $vehicle) {
+
+            $trow = '<tr>
+<td>###1###</td>
+<td>              <input size="5" maxlength="15" name="name_' . $cartIndex . '" value="###2###"></td>
+<td align="right"><input size="5" maxlength="15" name="number_' . $cartIndex . '" value="###3###"></td>
+<td>###4###</td>
+<td>###5###</td>
+<td>###6###</td>
+</tr>';
+
+            $selectTemplate = '<select name="freightType_###INDEX###">###OPTIONS###</select>';
+            $optionTemplate = '<option value="###OPTIONVALUE###" ###SELECTED###>###OPTIONNAME###</option>';
+
+            $optionsStringArray = array();
+            $selectString = $vehicle['Freight']['Type'];
+            if (isset($possibleCargos[$vehicle['Type']])) {
+                $options = '';
+                foreach ($possibleCargos[$vehicle['Type']] as $type) {
+                    if ($vehicle['Freight']['Type'] == $type) {
+                        $selected = ' selected';
+                    } else {
+                        $selected = '';
+                    }
+                    $optionValue = $type;
+                    $optionName = $type;
+                    $optionsStringArray[] = str_replace(
+                        array('###OPTIONVALUE###', '###SELECTED###', '###OPTIONNAME###'),
+                        array($optionValue, $selected, $cargoNames[$optionName]),
+                        $optionTemplate
+                    );
+                }
+                $selectString = str_replace(
+                    array('###OPTIONS###', '###INDEX###'),
+                    array(implode('', $optionsStringArray), $cartIndex),
+                    $selectTemplate
+                );
+            }
+
+            $exArr = array(
+                $vehicle['Type'],
+                strtoupper(strip_tags($vehicle['Name'])),
+                strip_tags(trim($vehicle['Number']))
+            );
+            if (
+                // trim out empty carts without number and without name
+                $this->empty ||
+                (strip_tags($vehicle['Name']) && trim($vehicle['Name']) != '.') ||
+                (trim($vehicle['Number']) != '.' && trim($vehicle['Number']))
+            ) {
+                $exArr[] = $this->arithmeticHelper->nearestIndustry($vehicle['Location'], $this->data['Industries']);
+                if ($vehicle['Tender']['Fuelamount']) {
+                    $exArr[] = 'firewood';
+                    $exArr[] = $vehicle['Tender']['Fuelamount'];
+                    $exArr[] = 'tenderamount_';
+                } else {
+                    if ($vehicle['Freight']['Type']) {
+                        $exArr[] = $selectString;
+                        $exArr[] = $vehicle['Freight']['Amount'];
+                        $exArr[] = 'freightamount_';
+                    } else {
+                        $exArr[] = '-';
+                        $exArr[] = '-';
+                        $exArr[] = false;
+
+                    }
+
+                }
+                if (isset($exArr[6])) {
+                    $template = '<input size="2" maxlength="4" name="' . $exArr[6] . $cartIndex . '" value="' . $exArr[5] . '">';
+                } else {
+                    $template = $exArr[5];
+                }
+                $exArr[5] = $template;
+
+                $trows .= str_replace(array('###1###', '###2###', '###3###', '###4###', '###5###', '###6###'), $exArr, $trow);
+
+            }
+
+            $x = ($this->imx - (int)(($vehicle['Location'][0] - $this->minX) / 100 * $this->scale));
+            $y = ($this->imy - (int)(($vehicle['Location'][1] - $this->minY) / 100 * $this->scale));
+            if ($doSvg) {
+                $svg .= '<ellipse cx="' . $x . '" cy="' . $y . '" rx="' . ($this->engineRadius / 2) . '" ry="' . ($this->engineRadius / 3) .
+                    '" style="fill:' . $cartColors[$vehicle['Type']][1] . ';stroke:black;stroke-width:1" transform="rotate(' . $vehicle['Rotation'][1] .
+                    ', ' . ($this->imx - (int)(($vehicle['Location'][0] - $this->minX) / 100 * $this->scale)) . ', ' . ($this->imy - (int)(($vehicle['Location'][1] - $this->minY) / 100 * $this->scale)) . ')"
+              />';
+
+                if ($vehicle['Location'][2] < 1000) {
+                    $svg .= '<ellipse cx="' . $x . '" cy="' . $y . '" rx="' . (($this->engineRadius / 2) * 10) .
+                        '" ry="' . (($this->engineRadius / 2) * 10) .
+                        '" style="fill:none;stroke:red;stroke-width:10" transform="rotate(' . $vehicle['Rotation'][1] .
+                        ', ' . ($this->imx - (int)(($vehicle['Location'][0] - $this->minX) / 100 * $this->scale)) . ', ' . ($this->imy - (int)(($vehicle['Location'][1] - $this->minY) / 100 * $this->scale)) . ')"
+              />';
+                    $svg .= '<text x="' . $x . '" y="' . $y . '" >' . '&nbsp;&nbsp;' . $vehicle['Location'][2] . '</text>' . "\n";
+
+                }
+            }
+
+            // add some names to the locomotives
+            if ($vehicle['Type'] == 'porter_040'
+                || $vehicle['Type'] == 'porter_042'
+                || $vehicle['Type'] == 'eureka'
+                || $vehicle['Type'] == 'climax'
+                || $vehicle['Type'] == 'heisler'
+                || $vehicle['Type'] == 'class70'
+                || $vehicle['Type'] == 'cooke260'
+            ) {
+                $this->totalLocos++;
+                $name = strtoupper(strip_tags($vehicle['Name']));
+                // fallback to engine type when no name was given
+                if (!$name) {
+                    $name = ucfirst($vehicle['Type']);
+                }
+                //$name.=' ('.$vehicle['Location']['Z'].')';
+                // label locomotives
+                if ($doSvg) {
+                    $svg .= '<text x="' . $x . '" y="' . $y . '" >' . '&nbsp;&nbsp;' . $name . '</text>' . "\n";
+
+                }
+            } else {
+                $this->totalCarts++;
+            }
+
+        }
+
+        $cartExtraStr = str_replace('###TROWS###', $trows, $cartExtraStr);
+        $htmlSvg = str_replace('###EXTRAS###', $cartExtraStr, $htmlSvg);
+        return array($x, $y, $svg, $totalLocos, $name, $totalCarts, $htmlSvg);
     }
 
 }
