@@ -43,4 +43,5 @@ A database used for hosting with filename, user, switches, trains, etc.
 
 ## Contributers
 
-[@JKD#0205](https://discordapp.com/users/905751614357372938)
+[@JKD#0205](https://discordapp.com/users/905751614357372938)  
+[@iScripters#9408](https://discordapp.com/users/330097359243575296)
