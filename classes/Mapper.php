@@ -364,25 +364,41 @@ class Mapper
 
                     if (in_array($type, array(4, 0))) {
                         $this->totalTrackLength += $distance;
+                        $x = ($this->imx - (int)(($segment['LocationStart']['X'] - $this->minX) / 100 * $this->scale));
+                        $y=($this->imy - (int)(($segment['LocationStart']['Y'] - $this->minY) / 100 * $this->scale));
 
                         $height = $segment['LocationEnd']['Z'] - $segment['LocationStart']['Z'];
                         $height = abs($height);
                         $length = sqrt(pow($segment['LocationEnd']['X'] - $segment['LocationStart']['X'], 2) +
                             pow($segment['LocationEnd']['Y'] - $segment['LocationStart']['Y'], 2));
 
-                        if(($height * 100 / $length)>$this->maxSlope){
-                            $slopecoords=array(($this->imx - (int)(($segment['LocationStart']['X'] - $this->minX) / 100 * $this->scale)),
-                                ($this->imy - (int)(($segment['LocationStart']['Y'] - $this->minY) / 100 * $this->scale)));
+                        $slope = ($height * 100 / $length);
+
+                        if($slope > $this->maxSlope){
+                            $slopecoords=array($x,$y);
                         }
-                        $this->maxSlope = max($this->maxSlope,
-                            ($height * 100 / $length));
+                        $this->maxSlope = max($this->maxSlope, $slope);
                     }
 
 // label some splines with their slope - not yet working
 // main problem: find a spot for the text that is near to track but do not override other stuff
-                    if (false && $distance > 0 && in_array($type, array(4, 0))) {
-                        $slope = asin(($segment['LocationEnd']['Y'] - $segment['LocationStart']['Y']) / $distance) / pi() * 180;
-                        if ($slope < -2 || $slope > 2) {
+                    if ($distance > 0 && in_array($type, array(4, 0))) {
+                        if (abs($slope) > $_POST['slopeTrigger']) {
+                            $tanA = (
+                                ($segment['LocationEnd']['Y']-$segment['LocationStart']['Y'])/
+                                ($segment['LocationEnd']['X']-$segment['LocationStart']['X'])
+                            );
+                            $a = rad2deg(atan($tanA));
+                            if($a>0) {
+                                $a-=90;
+                            } else {
+                                $a+=90;
+                            }
+
+                            if(!rand(0,4)){
+                                $svg .= '<text x="' . $x . '" y="' . $y . '" transform="rotate(' . $a .
+                                    ',' . $x . ', ' . $y . ')">' . '..' . round($slope,1) . '%</text>' . "\n";
+                            }
                         }
                     }
                 }

@@ -164,6 +164,11 @@ include_once('includes/head.php');
                 <label for="maxslope">draw 4 orange circles on worst slope</label>
             </div>
 
+            <div class="input-group">
+                <label for="slopeTrigger">label slopes greater than X%</label>
+                <input placeholder="1000" type="text" id="slopeTrigger" name="slopeTrigger" value="1000">
+            </div>
+
             <input class="button" type="submit" value="Upload" name="submit">
         </section>
     </form>
