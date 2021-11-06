@@ -200,7 +200,7 @@ class Mapper
 
 
             // create a "database" and store some infos about this file for the websies index page
-            @$db = unserialize(@file_get_contents('db.db'));
+            $db = unserialize(file_get_contents('db.db'));
             $db[$NEWUPLOADEDFILE] = array(
                 $this->totalTrackLength,
                 $this->totalSwitches,
@@ -210,7 +210,7 @@ class Mapper
                 getUserIpAddr(),
                 sizeof($this->data['Removed']['Vegetation'])
             );
-            @file_put_contents('db.db', serialize($db));
+            file_put_contents('db.db', serialize($db));
 
             // label the industries
             if ($doSvg) {

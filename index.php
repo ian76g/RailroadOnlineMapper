@@ -4,6 +4,19 @@
     $PageTitle="RailroadsOnlineMapper";
     include_once('includes/head.php');
 
+    // Create required folders if they don't exist
+    $folders = array("public", "saves", "uploads");
+    foreach ($folders as $folder) {
+        if (!file_exists($folder)) {
+            mkdir($folder);
+        }
+    }
+
+    // Create counter if it doesn't exist
+    if (!file_exists('counter')) {
+        file_put_contents('counter', 0);
+    }
+
     $tableHeader = '<thead>
                         <th>NAME</th><th>Track Length</th><th>#Y / #T</th><th>Locos</th><th>Carts</th><th>Slope</th>
                     </thead>';
@@ -45,46 +58,48 @@
                             $files[filemtime('done/' . $file)] = 'done/' . $file;
                         }
                     }
-                    @$db = unserialize(@file_get_contents('db.db'));
+                    $db = unserialize(file_get_contents('db.db'));
                     //array($totalTrackLength, $totalSwitches, $totalLocos, $totalCarts, $maxSlope);
-                    if(!isset($_GET['sortby']) || !isset($_GET['sortorder'])) {
-                        krsort($files);
-                    } else {
-                        usort($files, 'mysort');
-                    }
-
-                    $hard_limit = 400;
-                    $soft_limit = 90;
-                    for ($i = 0; $i < sizeof($files); $i++) {
-                        $file = array_shift($files);
-                        if (!$file) break;
-
-                        if ($i > $hard_limit) {
-                            unlink("done/".substr($file,5,-5).".html");
+                    if (isset($files) && $files != null) {
+                        if (!isset($_GET['sortby']) || !isset($_GET['sortorder'])) {
+                            krsort($files);
+                        } else {
+                            usort($files, 'mysort');
                         }
 
-                        if ($i >= $soft_limit) {
-                            continue;
-                        }
+                        $hard_limit = 400;
+                        $soft_limit = 90;
+                        for ($i = 0; $i < sizeof($files); $i++) {
+                            $file = array_shift($files);
+                            if (!$file) break;
 
-        $dl = '';
-        if(file_exists('public/'.substr($file, 5, -5).'.sav')){
-            $dl = ' (DL)';
-        }
+                            if ($i > $hard_limit) {
+                                unlink("done/" . substr($file, 5, -5) . ".html");
+                            }
 
-                        echo '<tr><td><a href="done/' . substr($file, 5, -5) . '.html?t=' . time() . '">' . substr($file, 5, -5) . $dl . '</a></td>
+                            if ($i >= $soft_limit) {
+                                continue;
+                            }
+
+                            $dl = '';
+                            if (file_exists('public/' . substr($file, 5, -5) . '.sav')) {
+                                $dl = ' (DL)';
+                            }
+
+                            echo '<tr><td><a href="done/' . substr($file, 5, -5) . '.html?t=' . time() . '">' . substr($file, 5, -5) . $dl . '</a></td>
                                 <td>' . round($db[substr($file, 5, -5) . '.sav'][0] / 100000, 2) . 'km</td>
-                                <td>' . $db[substr($file, 5, -5) . '.sav'][1] . ' / ' . $db[substr($file, 5, -5) . '.sav'][6] .'</td>
+                                <td>' . $db[substr($file, 5, -5) . '.sav'][1] . ' / ' . $db[substr($file, 5, -5) . '.sav'][6] . '</td>
                                 <td>' . $db[substr($file, 5, -5) . '.sav'][2] . '</td>
                                 <td>' . $db[substr($file, 5, -5) . '.sav'][3] . '</td>
                                 <td >' . round($db[substr($file, 5, -5) . '.sav'][4]) . '%</td>
                                 </tr>';
-                        if (!(($i + 1) % 15)) {
-                            if (($i + 1) < $soft_limit) {
-                                echo '</table><table>'.$tableHeader;
+                            if (!(($i + 1) % 15)) {
+                                if (($i + 1) < $soft_limit) {
+                                    echo '</table><table>' . $tableHeader;
+                                }
                             }
-                        }
 
+                        }
                     }
                     echo '</table>';
                     ?>
