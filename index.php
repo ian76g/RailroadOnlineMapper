@@ -60,7 +60,7 @@
                         if (!$file) break;
 
                         if ($i > $hard_limit) {
-                            unlink("done/'.substr($file,5,-5).'.html");
+                            unlink("done/".substr($file,5,-5).".html");
                         }
 
                         if ($i >= $soft_limit) {
