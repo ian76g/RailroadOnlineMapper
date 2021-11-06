@@ -58,9 +58,10 @@
                             $files[filemtime('done/' . $file)] = 'done/' . $file;
                         }
                     }
-                    $db = unserialize(file_get_contents('db.db'));
-                    //array($totalTrackLength, $totalSwitches, $totalLocos, $totalCarts, $maxSlope);
-                    if (isset($files) && $files != null) {
+                    if ((isset($files) && $files != null) && file_exists('db.db')) {
+                        $db = unserialize(file_get_contents('db.db'));
+                        //array($totalTrackLength, $totalSwitches, $totalLocos, $totalCarts, $maxSlope);
+
                         if (!isset($_GET['sortby']) || !isset($_GET['sortorder'])) {
                             krsort($files);
                         } else {
