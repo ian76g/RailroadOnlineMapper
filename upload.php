@@ -168,6 +168,14 @@ include_once('includes/head.php');
                 <label for="slopeTrigger">label slopes greater than X%</label>
                 <input placeholder="1000" type="text" id="slopeTrigger" name="slopeTrigger" value="1000">
             </div>
+            <div class="input-group">
+                <label for="slopeTriggerPrefix">prefix text with</label>
+                <input placeholder=".." type="text" id="slopeTriggerPrefix" name="slopeTriggerPrefix" value="..">
+            </div>
+            <div class="input-group">
+                <label for="slopeTriggerDecimals">round to X decimals</label>
+                <input placeholder="1" type="text" id="slopeTriggerDecimals" name="slopeTriggerDecimals" value="1">
+            </div>
 
             <input class="button" type="submit" value="Upload" name="submit">
         </section>

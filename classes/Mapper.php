@@ -397,7 +397,7 @@ class Mapper
 
                             if(!rand(0,4)){
                                 $svg .= '<text x="' . $x . '" y="' . $y . '" transform="rotate(' . $a .
-                                    ',' . $x . ', ' . $y . ')">' . '..' . round($slope,1) . '%</text>' . "\n";
+                                    ',' . $x . ', ' . $y . ')">' . $_POST['slopeTriggerPrefix'] . round($slope,$_POST['slopeTriggerDecimals']) . '%</text>' . "\n";
                             }
                         }
                     }
