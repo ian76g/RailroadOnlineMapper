@@ -375,11 +375,11 @@ class Mapper
                         
                         //check for zero length tracks
                         if(empty($length)){
-                            $zeroLenthSegments[] = $segment
+                            $zeroLenthSegments[] = $segment;
                             //@ToDo make function later. 
                             if($doSvg){
                                 // example <circle cx="50" cy="50" r="10" stroke="red" stroke-width="2" fill="red" />
-                                $svg .= sprintf('<circle cx="%d" cy="%d" r="10" stroke="red" stroke-width="2" fill="red" />',$x, $y)
+                                $svg .= sprintf('<circle cx="%d" cy="%d" r="10" stroke="red" stroke-width="2" fill="red" />',$x, $y);
                             }
                             continue; //This may cause issues down the road. We may need to stop at this point and return the errors segment.
                         }else{
