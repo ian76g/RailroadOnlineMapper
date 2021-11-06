@@ -333,7 +333,7 @@ class Mapper
         $totalSwitches = 0;
         $totalLocos = 0;
         $totalCarts = 0;
-        $zeroLenthSegments = [];// for error collections if desired.
+        $zeroLenthSegments = array();// for error collections if desired.
         /**
          * Loop the order array painting one type over the next
          */
@@ -373,12 +373,10 @@ class Mapper
                         $length = sqrt(pow($segment['LocationEnd']['X'] - $segment['LocationStart']['X'], 2) +
                             pow($segment['LocationEnd']['Y'] - $segment['LocationStart']['Y'], 2));
                         
-                        //check for zero length tracks
-                        if(empty($length)){
+                        
+                        if (empty($length)) {//check for zero length tracks
                             $zeroLenthSegments[] = $segment;
-                            //@ToDo make function later. 
-                            if($doSvg){
-                                // example <circle cx="50" cy="50" r="10" stroke="red" stroke-width="2" fill="red" />
+                            if ($doSvg) { //@ToDo make function later. 
                                 $svg .= sprintf('<circle cx="%d" cy="%d" r="10" stroke="red" stroke-width="2" fill="red" />',$x, $y);
                             }
                             continue; //This may cause issues down the road. We may need to stop at this point and return the errors segment.
