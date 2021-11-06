@@ -159,6 +159,11 @@ include_once('includes/head.php');
                 <label for="empty">include unnamed rolling stock to list</label>
             </div>
 
+            <div class="input-group input-group--row">
+                <input type="checkbox" id="maxslope" name="maxslope">
+                <label for="maxslope">draw 4 orange circles on worst slope</label>
+            </div>
+
             <input class="button" type="submit" value="Upload" name="submit">
         </section>
     </form>
