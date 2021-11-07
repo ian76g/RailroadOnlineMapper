@@ -224,7 +224,7 @@ label:hover {
   margin: 0 auto;
 }
 
-.uploads_tables table {
+.uploads__tables table {
   border-radius: 4px;
   background-color: rgba(255, 255, 255, 0.2);
   -webkit-backdrop-filter: blur(10px);
