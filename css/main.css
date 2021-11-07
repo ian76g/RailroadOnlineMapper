@@ -34,6 +34,7 @@ body {
   max-width: 100%;
   margin: 0;
   background: url("/images/indexbg.jpg") no-repeat center center fixed;
+  background-size: cover;
   font-family: "Open Sans", sans-serif;
   font-size: 1rem;
   background-size: cover;
