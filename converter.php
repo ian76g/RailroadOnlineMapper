@@ -144,7 +144,7 @@ foreach ($files as $file) {
     if ($data == 'AGAIN') {
         // hack - we read a small struct - and inject new structure elements (empty cart numbers)
         // therefore we need to parse the new struct again.
-        $data = $myParser->parseData(file_get_contents($path . '/uploads/' . $file), false);
+        $data = $myParser->parseData(file_get_contents($path . '/' . $file), false);
     }
     $data = json_decode($data, true);
 
