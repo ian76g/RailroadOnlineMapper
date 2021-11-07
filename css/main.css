@@ -224,14 +224,14 @@ label:hover {
   margin: 0 auto;
 }
 
-.uploads_tables {
+.uploads__tables table {
   border-radius: 4px;
   background-color: rgba(255, 255, 255, 0.2);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
 
-.table {
+table {
   width: auto;
   margin: 1rem 1rem 2rem 1rem;
   font-size: 0.9rem;

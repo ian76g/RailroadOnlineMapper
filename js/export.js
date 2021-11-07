@@ -1,5 +1,4 @@
-// Don't use window.onLoad like this in production, because it can only listen to one function.
-window.onload = function () {
+document.addEventListener("DOMContentLoaded", function () {
   // Expose to window namespase for testing purposes
   window.zoomTiger = svgPanZoom("#demo-tiger", {
     zoomEnabled: true,
@@ -12,16 +11,17 @@ window.onload = function () {
   document.getElementById("enable").addEventListener("click", function () {
     window.zoomTiger.enableControlIcons();
   });
+
   document.getElementById("disable").addEventListener("click", function () {
     window.zoomTiger.disableControlIcons();
   });
-};
 
-document.getElementById("menu-toggle").addEventListener("click", function () {
-  const menuClassList = document.querySelector(".export__menu").classList;
-  const openClass = "export__menu--open";
+  document.getElementById("menu-toggle").addEventListener("click", function () {
+    const menuClassList = document.querySelector(".export__menu").classList;
+    const openClass = "export__menu--open";
 
-  menuClassList.contains(openClass)
-    ? menuClassList.remove(openClass)
-    : menuClassList.add(openClass);
+    menuClassList.contains(openClass)
+      ? menuClassList.remove(openClass)
+      : menuClassList.add(openClass);
+  });
 });
