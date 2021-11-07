@@ -31,6 +31,7 @@ class Mapper
     private $NEWUPLOADEDFILE;
     private $empty;
     private $arithmeticHelper;
+    private $allLabels = array(array(0,0));
 
     /**
      * Mapper constructor.
@@ -306,6 +307,24 @@ class Mapper
     }
 
     /**
+     * @param $newLabel
+     * @return int|mixed
+     */
+    function getDistanceToNearestLabel($newLabel)
+    {
+        $minDistance = 8000;
+        foreach($this->allLabels as $oldLabel)
+        $minDistance = min(
+            $minDistance,
+            sqrt(
+            pow($newLabel[0]-$oldLabel[0], 2) +
+            pow($newLabel[1]-$oldLabel[1], 2)
+        ));
+
+        return $minDistance;
+    }
+
+    /**
      * @return string
      */
     function drawTracksAndBeds()
@@ -347,13 +366,17 @@ class Mapper
                 foreach ($segments as $segment) {
                     if ($segment['Visible'] != 1) continue; // skip invisible tracks
 
+                    $xStart = ($this->imx - (int)(($segment['LocationStart']['X'] - $this->minX) / 100 * $this->scale));
+                    $yStart = ($this->imy - (int)(($segment['LocationStart']['Y'] - $this->minY) / 100 * $this->scale));
+                    $xEnd = ($this->imx - (int)(($segment['LocationEnd']['X'] - $this->minX) / 100 * $this->scale));
+                    $yEnd = ($this->imy - (int)(($segment['LocationEnd']['Y'] - $this->minY) / 100 * $this->scale));
+                    $xCenter = ($this->imx - (int)(($segment['LocationCenter']['X'] - $this->minX) / 100 * $this->scale));
+                    $yCenter = ($this->imy - (int)(($segment['LocationCenter']['Y'] - $this->minY) / 100 * $this->scale));
+
                     if ($doSvg) {
-                        $svg .= '<line x1="' .
-                            ($this->imx - (int)(($segment['LocationStart']['X'] - $this->minX) / 100 * $this->scale)) . '" y1="' .
-                            ($this->imy - (int)(($segment['LocationStart']['Y'] - $this->minY) / 100 * $this->scale))
-                            . '" x2="' . ($this->imx - (int)(($segment['LocationEnd']['X'] - $this->minX) / 100 * $this->scale)) . '" y2="' .
-                            ($this->imy - (int)(($segment['LocationEnd']['Y'] - $this->minY) / 100 * $this->scale))
-                            . '" stroke="' . $optionsArr[1] . '" stroke-width="' . $optionsArr[0] . '"/>' . "\n";
+                        $svg .= '<line x1="' . ($xStart) . '" y1="' . ($yStart) .
+                            '" x2="' . ($xEnd) . '" y2="' . ($yEnd) .
+                            '" stroke="' . $optionsArr[1] . '" stroke-width="' . $optionsArr[0] . '"/>' . "\n";
                     }
 
 
@@ -365,8 +388,6 @@ class Mapper
 
                     if (in_array($type, array(4, 0))) {
                         $this->totalTrackLength += $distance;
-                        $x = ($this->imx - (int)(($segment['LocationStart']['X'] - $this->minX) / 100 * $this->scale));
-                        $y=($this->imy - (int)(($segment['LocationStart']['Y'] - $this->minY) / 100 * $this->scale));
 
                         $height = $segment['LocationEnd']['Z'] - $segment['LocationStart']['Z'];
                         $height = abs($height);
@@ -377,7 +398,7 @@ class Mapper
                         if (empty($length)) {//check for zero length tracks
                             $zeroLenthSegments[] = $segment;
                             if ($doSvg) { //@ToDo make function later. 
-                                $svg .= sprintf('<circle cx="%d" cy="%d" r="10" stroke="red" stroke-width="2" fill="red" />',$x, $y);
+                                $svg .= sprintf('<circle cx="%d" cy="%d" r="10" stroke="red" stroke-width="2" fill="red" />',$xCenter, $yCenter);
                             }
                             continue; //This may cause issues down the road. We may need to stop at this point and return the errors segment.
                         }else{
@@ -385,7 +406,7 @@ class Mapper
                         }
 
                         if($slope > $this->maxSlope){
-                            $slopecoords=array($x,$y);
+                            $slopecoords=array($xCenter,$yCenter);
                         }
                         $this->maxSlope = max($this->maxSlope, $slope);
                     }
@@ -405,9 +426,11 @@ class Mapper
                                 $a+=90;
                             }
 
-                            if(!rand(0,4)){
-                                $svg .= '<text x="' . $x . '" y="' . $y . '" transform="rotate(' . $a .
-                                    ',' . $x . ', ' . $y . ')">' . $_POST['slopeTriggerPrefix'] . round($slope,$_POST['slopeTriggerDecimals']) . '%</text>' . "\n";
+
+                            if($this->getDistanceToNearestLabel(array($xCenter, $yCenter))>60){
+                                $this->allLabels[] = array($xCenter, $yCenter);
+                                $svg .= '<text x="' . $xCenter . '" y="' . $yCenter . '" transform="rotate(' . $a .
+                                    ',' . $xCenter . ', ' . $yCenter . ')">' . $_POST['slopeTriggerPrefix'] . round($slope,$_POST['slopeTriggerDecimals']) . '%</text>' . "\n";
                             }
                         }
                     }
@@ -774,8 +797,17 @@ class Mapper
                 }
                 //$name.=' ('.$vehicle['Location']['Z'].')';
                 // label locomotives
+
+                $textRotation = $vehicle['Rotation'][1];
+                if($textRotation<0) {
+                    $textRotation+=90;
+                } else {
+                    $textRotation-=90;
+                }
+
                 if ($doSvg) {
-                    $svg .= '<text x="' . $x . '" y="' . $y . '" >' . '&nbsp;&nbsp;' . $name . '</text>' . "\n";
+                    $this->allLabels[] = array($x, $y);
+                    $svg .= '<text x="' . $x . '" y="' . $y . '" transform="rotate('.$textRotation.', '.$x.', '.$y.')">' . '..' . $name . '</text>' . "\n";
 
                 }
             } else {

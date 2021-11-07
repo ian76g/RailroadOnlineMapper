@@ -263,6 +263,11 @@ class GVASParser
                         'Y' => $endLocs[1],
                         'Z' => $endLocs[2]
                     ),
+                    'LocationCenter' => array(
+                        'X' => $startLocs[0] + ($endLocs[0]-$startLocs[0])/2,
+                        'Y' => $startLocs[1] + ($endLocs[1]-$startLocs[1])/2,
+                        'Z' => $startLocs[2] + ($endLocs[2]-$startLocs[2])/2
+                    ),
                     'Visible' => array_shift($this->goldenBucket['Spline']['Segments']['Visibility']),
 
                 );
