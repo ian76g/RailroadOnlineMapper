@@ -362,7 +362,7 @@ class Mapper
 
                 if ($type != $current) continue;            // if this spline is not the current type, skip it
                 $segments = $spline['Segments'];
-                
+
                 foreach ($segments as $segment) {
                     if ($segment['Visible'] != 1) continue; // skip invisible tracks
 
@@ -393,11 +393,11 @@ class Mapper
                         $height = abs($height);
                         $length = sqrt(pow($segment['LocationEnd']['X'] - $segment['LocationStart']['X'], 2) +
                             pow($segment['LocationEnd']['Y'] - $segment['LocationStart']['Y'], 2));
-                        
-                        
+
+
                         if (empty($length)) {//check for zero length tracks
                             $zeroLenthSegments[] = $segment;
-                            if ($doSvg) { //@ToDo make function later. 
+                            if ($doSvg) { //@ToDo make function later.
                                 $svg .= sprintf('<circle cx="%d" cy="%d" r="10" stroke="red" stroke-width="2" fill="red" />',$xCenter, $yCenter);
                             }
                             continue; //This may cause issues down the road. We may need to stop at this point and return the errors segment.
@@ -645,7 +645,7 @@ class Mapper
 
 // build some extra HTML for a form to edit cart data
         $cartExtraStr = '<form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $this->NEWUPLOADEDFILE . '">
-<table class="myStuff">
+<table class="export__mapper">
 <tr>
 <th>Type</th>
 <th>Name</th>
@@ -654,7 +654,7 @@ class Mapper
 <th>Cargo</th>
 <th>Amount</th>
 </tr>
-###TROWS###</table><input type="submit" value="!APPLY ABOVE CHANGES TO MY SAVE!"></form>';
+###TROWS###</table><br/><button class="button">!APPLY ABOVE CHANGES TO MY SAVE!</button></form>';
         $trows = '';
 
 // later you can switch cargo on carts - maybe this can be done by editing the save via the mapper later?

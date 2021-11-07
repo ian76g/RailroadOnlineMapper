@@ -1,0 +1,24 @@
+.export {
+  display: flex;
+  justify-content: space-between;
+}
+
+.export__map {
+  width: calc(60% - 1rem);
+  height: 100vh;
+  border: 1px solid black;
+}
+
+.export__map-viewer {
+  width: 100%;
+  height: 100%;
+}
+
+.export__extras {
+  width: 40%;
+}
+
+.export__mapper {
+  width: 100%;
+  margin: 0;
+}

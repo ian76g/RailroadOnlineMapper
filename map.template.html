@@ -1,52 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+  <head>
+    <meta charset="UTF8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Railroads Online Map</title>
-    <link rel="stylesheet" href="../css/reset.css">
-    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/reset.css" />
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/export.css" />
+  </head>
+  <body>
+    <header class="header">
+      <a class="button" href="/">Go Back</a>
+    </header>
+    <main class="export">
+      <div id="container" class="export__map">
+        <svg
+          id="demo-tiger"
+          class="export__map-viewer"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 8000 8000"
+        >
+          <defs>###PATTERN###</defs>
+          <rect
+            x="0"
+            y="0"
+            width="8000"
+            height="8000"
+            fill="url(#bild)"
+            stroke="black"
+          />
+          ###SVG###
+        </svg>
+        <button id="enable">enable</button>
+        <button id="disable">disable</button>
+      </div>
+      <div class="export__extras">###EXTRAS###</div>
+    </main>
+
+    <hr />
+    ###DOWNLOAD###
+
     <script type="text/javascript" src="svg-pan-zoom.js"></script>
-</head>
-<body>
-<header class="header">
-    <a class="button" href="/">Go Back</a>
-</header>
-<div id="container" style="margin: 0px 0px 50px 50px;width: 850px; height: 850px; border:1px solid black;">
-    <svg id="demo-tiger" xmlns="http://www.w3.org/2000/svg" style="display: inline; width: inherit; min-width: inherit; max-width: inherit; height: inherit; min-height: inherit; max-height: inherit; " viewBox="0 0 8000 8000">
-        <defs>
-            ###PATTERN###
-        </defs>
-        <rect x="0" y="0" width="8000" height="8000" fill="url(#bild)" stroke="black"/>
-        ###SVG###
-    </svg>
-    <button id="enable">enable</button>
-    <button id="disable">disable</button>
-</div>
-<div class="myStuff">###EXTRAS###</div>
-
-<script>
-    // Don't use window.onLoad like this in production, because it can only listen to one function.
-    window.onload = function() {
-        // Expose to window namespase for testing purposes
-        window.zoomTiger = svgPanZoom('#demo-tiger', {
-            zoomEnabled: true,
-            controlIconsEnabled: true,
-            fit: true,
-            center: true,
-            // viewportSelector: document.getElementById('demo-tiger').querySelector('#g4') // this option will make library to misbehave. Viewport should have no transform attribute
-        });
-
-        document.getElementById('enable').addEventListener('click', function() {
-            window.zoomTiger.enableControlIcons();
-        })
-        document.getElementById('disable').addEventListener('click', function() {
-            window.zoomTiger.disableControlIcons();
-        })
-    };
-</script>
-
-<hr>###DOWNLOAD###
-</body>
-
+    <script type="text/javascript" src="../js/export.js"></script>
+  </body>
 </html>
