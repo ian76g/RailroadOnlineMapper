@@ -29,7 +29,7 @@
 }
 
 .export__menu {
-  width: 500px;
+  width: 700px;
   max-width: 100%;
   height: 100vh;
   padding: 6rem 1rem 1rem;
@@ -38,7 +38,7 @@
   top: 0;
   right: 0;
   z-index: 1;
-  transform: translateX(500px);
+  transform: translateX(700px);
   overflow: scroll;
   background: white;
   transition: all 0.2s ease-out;
@@ -51,4 +51,18 @@
 .export__mapper {
   width: 100%;
   margin: 0;
+}
+
+.export__mapper td {
+  padding: 0rem 0.5rem;
+  vertical-align: middle;
+}
+
+.export__mapper input {
+  width: 100%;
+}
+
+.export__mapper td img {
+  max-width: none;
+  width: 4.5rem;
 }

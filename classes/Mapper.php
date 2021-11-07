@@ -654,7 +654,7 @@ class Mapper
 <th>Cargo</th>
 <th>Amount</th>
 </tr>
-###TROWS###</table><br/><button class="button">!APPLY ABOVE CHANGES TO MY SAVE!</button></form>';
+###TROWS###</table><br/><button class="button">APPLY ABOVE CHANGES TO MY SAVE!</button></form>';
         $trows = '';
 
 // later you can switch cargo on carts - maybe this can be done by editing the save via the mapper later?
@@ -817,23 +817,23 @@ class Mapper
         }
 
         $images = array(
-            '>porter_040'        => '><img style="margin:-25px 0px -25px 20px" height="60" src="/images/porter.png">',
-            '>porter_042'        => '><img style="margin:-25px 0px -25px 20px" height="60" src="/images/porter2.png">',
-            '>handcar'           => '><img style="margin:-25px 0px -25px 20px" height="60" src="/images/handcar.png">',
-            '>eureka_tender'     => '><img style="margin:-25px 0px -25px 20px" height="60" src="/images/eureka_tender.png">',
-            '>class70_tender'    => '><img style="margin:-25px 0px -25px 20px" height="60" src="/images/class70_tender.png">',
-            '>cooke260_tender'   => '><img style="margin:-25px 0px -25px 20px" height="60" src="/images/cooke_tender.png">',
-            '>eureka'            => '><img style="margin:-25px 0px -25px 20px" height="60" src="/images/eureka.png">',
-            '>climax'            => '><img style="margin:-25px 0px -25px 20px" height="60" src="/images/climax.png">',
-            '>heisler'           => '><img style="margin:-25px 0px -25px 20px" height="60" src="/images/heisler.png">',
-            '>class70'           => '><img style="margin:-25px 0px -25px 20px" height="60" src="/images/class70.png">',
-            '>cooke260'          => '><img style="margin:-25px 0px -25px 20px" height="60" src="/images/cooke.png">',
-            '>boxcar'            => '><img style="margin:-25px 0px -25px 20px" height="60" src="/images/boxcar.png">',
-            '>flatcar_cordwood'  => '><img style="margin:-25px 0px -25px 20px" height="60" src="/images/flatcar_cordwood.png">',
-            '>flatcar_logs'      => '><img style="margin:-25px 0px -25px 20px" height="60" src="/images/flatcar_logs.png">',
-            '>flatcar_stakes'    => '><img style="margin:-25px 0px -25px 20px" height="60" src="/images/flatcar_stakes.png">',
-            '>flatcar_tanker'    => '><img style="margin:-25px 0px -25px 20px" height="60" src="/images/flatcar_tanker.png">',
-            '>flatcar_hopper'    => '><img style="margin:-25px 0px -25px 20px" height="60" src="/images/flatcar_hopper.png">',
+            '>porter_040'        => '><img src="/images/porter.png">',
+            '>porter_042'        => '><img src="/images/porter2.png">',
+            '>handcar'           => '><img src="/images/handcar.png">',
+            '>eureka_tender'     => '><img src="/images/eureka_tender.png">',
+            '>class70_tender'    => '><img src="/images/class70_tender.png">',
+            '>cooke260_tender'   => '><img src="/images/cooke_tender.png">',
+            '>eureka'            => '><img src="/images/eureka.png">',
+            '>climax'            => '><img src="/images/climax.png">',
+            '>heisler'           => '><img src="/images/heisler.png">',
+            '>class70'           => '><img src="/images/class70.png">',
+            '>cooke260'          => '><img src="/images/cooke.png">',
+            '>boxcar'            => '><img src="/images/boxcar.png">',
+            '>flatcar_cordwood'  => '><img src="/images/flatcar_cordwood.png">',
+            '>flatcar_logs'      => '><img src="/images/flatcar_logs.png">',
+            '>flatcar_stakes'    => '><img src="/images/flatcar_stakes.png">',
+            '>flatcar_tanker'    => '><img src="/images/flatcar_tanker.png">',
+            '>flatcar_hopper'    => '><img src="/images/flatcar_hopper.png">',
         );
 
         $cartExtraStr = str_replace('###TROWS###', $trows, $cartExtraStr);
