@@ -145,14 +145,17 @@ class dtProperty
                 $this->CONTENTOBJECTS[] = substr($this->x, $this->position, 1);
                 $this->position++;
 
-                $arrayCount = unpack('I', substr($this->x, $this->position, 4))[1];
-                $this->CONTENTOBJECTS[] = pack('I', $arrayCount);
+                $arrayCounter = new dtDynamic();
+                $arrayCounter->NAME = 'Arraycounter';
+                $arrayCounter->value = unpack('I', substr($this->x, $this->position, 4))[1];
+                $arrayCounter->pack = 'I';
+                $this->CONTENTOBJECTS[] = $arrayCounter;
                 $this->position += 4;
 
 //                echo "ARRAYCOUNT:[$arrayCount] ";
                 switch ($itemType) {
                     case 'StrProperty':
-                        for ($i = 0; $i < $arrayCount; $i++) {
+                        for ($i = 0; $i < $arrayCounter->value; $i++) {
                             $myString = new dtString();
                             $myString->skipNullByteStrings = false;
                             $results = $myString->unserialize($this->x, $this->position);
@@ -197,18 +200,14 @@ class dtProperty
                         switch ($subType) {
                             case "Vector":
                             case "Rotator":
-                                for ($i = 0; $i < $arrayCount; $i++) {
-                                    $notX = unpack('g', substr($this->x, $this->position, 4))[1];
-                                    $this->CONTENTOBJECTS[] = pack('g', $notX);
-                                    $this->position += 4;
-                                    $y = unpack('g', substr($this->x, $this->position, 4))[1];
-                                    $this->CONTENTOBJECTS[] = pack('g', $y);
-                                    $this->position += 4;
-                                    $z = unpack('g', substr($this->x, $this->position, 4))[1];
-                                    $this->CONTENTOBJECTS[] = pack('g', $z);
-                                    $this->position += 4;
-                                    //$goldenBucket[$name][] = array($notX, $y, $z);
-                                    $elem[] = array($pieces, array($notX, $y, $z));
+                                for ($i = 0; $i < $arrayCounter->value ; $i++) {
+                                    $myVector = new dtVector();
+                                    $myVector->ARRCOUNTER = $i;
+                                    $tmp = $myVector->unserialize($this->x, $this->position);
+                                    $this->position=$tmp[0];
+                                    $elem[] = array($pieces, $tmp[1]);
+                                    $this->CONTENTOBJECTS[] = $myVector;
+
                                 }
                                 return $elem;
 
@@ -218,7 +217,7 @@ class dtProperty
                         }
 
                     case 'FloatProperty':
-                        for ($i = 0; $i < $arrayCount; $i++) {
+                        for ($i = 0; $i < $arrayCounter->value; $i++) {
                             $float = unpack('g', substr($this->x, $this->position, 4))[1];
                             $nD = new dtDynamic();
                             $nD->NAME = 'FloatProperty';
@@ -233,7 +232,7 @@ class dtProperty
                         return $elem;
 
                     case 'IntProperty':
-                        for ($i = 0; $i < $arrayCount; $i++) {
+                        for ($i = 0; $i < $arrayCounter->value; $i++) {
                             $int = unpack('V', substr($this->x, $this->position, 4))[1];
                             $nD = new dtDynamic();
                             $nD->NAME = 'IntProperty';
@@ -248,7 +247,7 @@ class dtProperty
                         return $elem;
 
                     case 'BoolProperty':
-                        for ($i = 0; $i < $arrayCount; $i++) {
+                        for ($i = 0; $i < $arrayCounter->value; $i++) {
                             $bool = unpack('C', substr($this->x, $this->position, 1))[1];
                             $this->CONTENTOBJECTS[] = substr($this->x, $this->position, 1);
                             $this->position += 1;
@@ -259,7 +258,7 @@ class dtProperty
 
                     case 'TextProperty':
                         //echo "Textproperty incoming at " . $this->position . " for Name $name\n";
-                        for ($i = 0; $i < $arrayCount; $i++) {
+                        for ($i = 0; $i < $arrayCounter->value; $i++) {
                             $createEmptyNumber = false;
                             $createEmptyName = false;
                             if (trim($this->NAME) == 'FrameNumberArray') {

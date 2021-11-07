@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Class GVASParser
  */
@@ -50,7 +51,6 @@ class GVASParser
                 }
 
                 $this->saveObject['objects'][] = $myProperty;
-
                 $this->position = $results[1];
                 $resultRows = $results[0];
                 foreach ($resultRows as $row) {
@@ -67,108 +67,13 @@ class GVASParser
             }
         }
 
-        $output = '';
-        foreach ($this->saveObject['objects'] as $object) {
-            if (is_object($object)) {
-//                echo 'ON: '.trim($object->NAME).", ";
-                if (trim($object->NAME) == 'FrameNumberArray') {
-                    foreach ($object->CONTENTOBJECTS as $co) {
-                        if (is_object($co) && trim($co->NAME) == 'STRING') {
-                            if (
-                                ($co->ARRCOUNTER !== '') &&
-                                isset($_POST['number_' . $co->ARRCOUNTER]) &&
-                                $_POST['number_' . $co->ARRCOUNTER] != trim($co->string)
-                            ) {
-                                $co->string = strip_tags(trim($_POST['number_' . $co->ARRCOUNTER])) . hex2bin('00');
-                            }
-                        }
-                    }
-                }
-                if (trim($object->NAME) == 'FrameNameArray') {
-                    foreach ($object->CONTENTOBJECTS as $co) {
-                        if (is_object($co) && trim($co->NAME) == 'STRING') {
-                            if ($co->ARRCOUNTER)
-                                //echo "(".$co->string.")";
-                                if (
-                                    ($co->ARRCOUNTER !== '') &&
-                                    isset($_POST['name_' . $co->ARRCOUNTER]) &&
-                                    $_POST['name_' . $co->ARRCOUNTER] != trim($co->string)
-                                ) {
-                                    $co->string = strip_tags(trim($_POST['name_' . $co->ARRCOUNTER])) . hex2bin('00');
-                                }
-                        }
-                    }
-                }
-                if (trim($object->NAME) == 'FreightAmountArray') {
-                    foreach ($object->CONTENTOBJECTS as $co) {
-                        if (is_object($co) && trim($co->NAME) == 'IntProperty') {
-                            if (
-                                ($co->ARRCOUNTER !== '') &&
-                                isset($_POST['freightamount_' . $co->ARRCOUNTER]) &&
-                                $_POST['freightamount_' . $co->ARRCOUNTER] != trim($co->value)
-                            ) {
-                                $co->value = strip_tags(trim($_POST['freightamount_' . $co->ARRCOUNTER]));
-                            }
-                        }
-                    }
-                }
-                if (trim($object->NAME) == 'TenderFuelAmountArray') {
-                    foreach ($object->CONTENTOBJECTS as $co) {
-                        if (is_object($co) && trim($co->NAME) == 'FloatProperty') {
-                            if (
-                                ($co->ARRCOUNTER !== '') &&
-                                isset($_POST['tenderamount_' . $co->ARRCOUNTER]) &&
-                                $_POST['tenderamount_' . $co->ARRCOUNTER] != trim($co->value)
-                            ) {
-                                $co->value = strip_tags(trim($_POST['tenderamount_' . $co->ARRCOUNTER]));
-                            }
-                        }
-                    }
-                }
-                if (trim($object->NAME) == 'FreightTypeArray') {
-                    foreach ($object->CONTENTOBJECTS as $co) {
-                        if (is_object($co) && $co->ARRCOUNTER) {
-                            if (
-                                ($co->ARRCOUNTER !== '') &&
-                                isset($_POST['freightType_' . $co->ARRCOUNTER]) &&
-                                $_POST['freightType_' . $co->ARRCOUNTER] != trim($co->string)
-                            ) {
-                                $co->string = strip_tags(trim($_POST['freightType_' . $co->ARRCOUNTER])) . hex2bin('00');
-                            }
-                        }
-                    }
-                }
-
-                $output .= $object->serialize();
-            } else {
-                die('WHOPSI');
-            }
-        }
-        $output .= hex2bin('050000004e6f6e650000000000');
-
-        if (isset($_POST['save'])) {
-            $db = unserialize(file_get_contents('db.db'));
-            if (getUserIpAddr() != $db[$this->NEWUPLOADEDFILE][5]) {
-                die("This does not seem to be your save file.");
-            }
-            echo "SAVING FILE " . $this->NEWUPLOADEDFILE . '.modified' . "<br>\n";
-            file_put_contents('saves/' . $this->NEWUPLOADEDFILE . '.modified', $output);
-            echo '<A href="saves/' . $this->NEWUPLOADEDFILE . '.modified' . '">Download your modified save here </A><br>';
-            echo 'Want to upload this map again?<A href="upload.php">Add your renumbered save again</A><br>';
-        } else {
-            if ($againAllowed) {
-                //echo "RESAVING FILE TO DISK - EMPTY NUMBERS BECAME A DOT " . $this->NEWUPLOADEDFILE . "<br>\n";
-                file_put_contents('uploads/' . $this->NEWUPLOADEDFILE, $output);
-                return 'AGAIN';
-            }
-        }
 
         $silverPlate = array();
 
         $keys = array('Player', 'Freight', 'Compressor', 'Tender', 'Coupler', 'Boiler', 'Headlight', 'Frame', 'Watertower', 'Switch');
         foreach ($keys as $key) {
             $silverPlate[$key . 's'] = array();
-            if(isset($this->goldenBucket[$key])) {
+            if (isset($this->goldenBucket[$key])) {
                 foreach ($this->goldenBucket[$key] as $index => $value) {
                     foreach ($value as $idx => $v) {
                         $silverPlate[$key . 's'][$idx][$index] = $v;
@@ -264,9 +169,9 @@ class GVASParser
                         'Z' => $endLocs[2]
                     ),
                     'LocationCenter' => array(
-                        'X' => $startLocs[0] + ($endLocs[0]-$startLocs[0])/2,
-                        'Y' => $startLocs[1] + ($endLocs[1]-$startLocs[1])/2,
-                        'Z' => $startLocs[2] + ($endLocs[2]-$startLocs[2])/2
+                        'X' => $startLocs[0] + ($endLocs[0] - $startLocs[0]) / 2,
+                        'Y' => $startLocs[1] + ($endLocs[1] - $startLocs[1]) / 2,
+                        'Z' => $startLocs[2] + ($endLocs[2] - $startLocs[2]) / 2
                     ),
                     'Visible' => array_shift($this->goldenBucket['Spline']['Segments']['Visibility']),
 
@@ -293,10 +198,169 @@ class GVASParser
         unset($this->goldenBucket['Save']);
         unset($this->goldenBucket['Industry']);
 
+        /**
+         * HANDLE DATA MANIPULATION AND SAVE FILE
+         */
+
+        $tmp = $this->handleEditAndSave($againAllowed);
+        if ($tmp == 'AGAIN') {
+            return $tmp;
+        }
 
         $json = json_encode($this->goldenBucket, JSON_PRETTY_PRINT);
         file_put_contents('xx.json', $json);
         return $json;
+
+    }
+
+    /**
+     * @param $a
+     * @param $b
+     * @return float
+     */
+    function distance($a, $b)
+    {
+
+        return sqrt(pow($a[0] - $b['X'], 2) + pow($a[1] - $b['Y'], 2));
+    }
+
+    /**
+     * @param $againAllowed
+     * @return string
+     */
+    function handleEditAndSave($againAllowed)
+    {
+        $output = '';
+        foreach ($this->saveObject['objects'] as $saveObjectIndex => $object) {
+            if (is_object($object)) {
+                if (trim($object->NAME) == 'RemovedVegetationAssetsArray' && $againAllowed) {
+//                    $v = 0;
+//                    foreach ($object->CONTENTOBJECTS as $index => $co) {
+//                        if (is_object($co) && trim($co->NAME) == 'Vector') {
+//                            $v++;
+//                            // found a new fallen tree
+//                            $minDistanceToSomething = 80000000;
+//                            foreach ($this->goldenBucket['Splines'] as $spline) {
+//                                foreach ($spline['Segments'] as $segment) {
+//                                    if ($segment['LocationCenter']['X'] < $co->content[0] - 2000) {
+//                                        continue;
+//                                    }
+//                                    if ($segment['LocationCenter']['X'] > $co->content[0] + 2000) {
+//                                        continue;
+//                                    }
+//                                    if ($segment['LocationCenter']['Y'] < $co->content[1] - 2000) {
+//                                        continue;
+//                                    }
+//                                    if ($segment['LocationCenter']['Y'] > $co->content[1] + 2000) {
+//                                        continue;
+//                                    }
+//                                    $minDistanceToSomething = min($minDistanceToSomething, $this->distance($co->content, $segment['LocationCenter']));
+//                                }
+//                            }
+//                            if ($minDistanceToSomething > 20000) {
+//                                $toRemove[] = $index;
+//                            }
+//                            //echo round($minDistanceToSomething)." ";
+//                        }
+//                    }
+//                    foreach ($toRemove as $tri) {
+//                        unset($object->CONTENTOBJECTS[$tri]);
+//
+//                    }
+//                    $object->CONTENTOBJECTS[5]->content = (sizeof($object->CONTENTOBJECTS) - 6);
+                }
+
+                if (trim($object->NAME) == 'FrameNumberArray') {
+                    foreach ($object->CONTENTOBJECTS as $co) {
+                        if (is_object($co) && trim($co->NAME) == 'STRING') {
+                            if (
+                                ($co->ARRCOUNTER !== '') &&
+                                isset($_POST['number_' . $co->ARRCOUNTER]) &&
+                                $_POST['number_' . $co->ARRCOUNTER] != trim($co->string)
+                            ) {
+                                $co->string = strip_tags(trim($_POST['number_' . $co->ARRCOUNTER])) . hex2bin('00');
+                            }
+                        }
+                    }
+                }
+                if (trim($object->NAME) == 'FrameNameArray') {
+                    foreach ($object->CONTENTOBJECTS as $co) {
+                        if (is_object($co) && trim($co->NAME) == 'STRING') {
+                            if ($co->ARRCOUNTER)
+                                //echo "(".$co->string.")";
+                                if (
+                                    ($co->ARRCOUNTER !== '') &&
+                                    isset($_POST['name_' . $co->ARRCOUNTER]) &&
+                                    $_POST['name_' . $co->ARRCOUNTER] != trim($co->string)
+                                ) {
+                                    $co->string = strip_tags(trim($_POST['name_' . $co->ARRCOUNTER])) . hex2bin('00');
+                                }
+                        }
+                    }
+                }
+                if (trim($object->NAME) == 'FreightAmountArray') {
+                    foreach ($object->CONTENTOBJECTS as $co) {
+                        if (is_object($co) && trim($co->NAME) == 'IntProperty') {
+                            if (
+                                ($co->ARRCOUNTER !== '') &&
+                                isset($_POST['freightamount_' . $co->ARRCOUNTER]) &&
+                                $_POST['freightamount_' . $co->ARRCOUNTER] != trim($co->value)
+                            ) {
+                                $co->value = strip_tags(trim($_POST['freightamount_' . $co->ARRCOUNTER]));
+                            }
+                        }
+                    }
+                }
+                if (trim($object->NAME) == 'TenderFuelAmountArray') {
+                    foreach ($object->CONTENTOBJECTS as $co) {
+                        if (is_object($co) && trim($co->NAME) == 'FloatProperty') {
+                            if (
+                                ($co->ARRCOUNTER !== '') &&
+                                isset($_POST['tenderamount_' . $co->ARRCOUNTER]) &&
+                                $_POST['tenderamount_' . $co->ARRCOUNTER] != trim($co->value)
+                            ) {
+                                $co->value = strip_tags(trim($_POST['tenderamount_' . $co->ARRCOUNTER]));
+                            }
+                        }
+                    }
+                }
+                if (trim($object->NAME) == 'FreightTypeArray') {
+                    foreach ($object->CONTENTOBJECTS as $co) {
+                        if (is_object($co) && $co->ARRCOUNTER) {
+                            if (
+                                ($co->ARRCOUNTER !== '') &&
+                                isset($_POST['freightType_' . $co->ARRCOUNTER]) &&
+                                $_POST['freightType_' . $co->ARRCOUNTER] != trim($co->string)
+                            ) {
+                                $co->string = strip_tags(trim($_POST['freightType_' . $co->ARRCOUNTER])) . hex2bin('00');
+                            }
+                        }
+                    }
+                }
+
+                $output .= $object->serialize();
+            } else {
+                die('WHOPSI');
+            }
+        }
+        $output .= hex2bin('050000004e6f6e650000000000');
+
+        if (isset($_POST['save'])) {
+            $db = unserialize(file_get_contents('db.db'));
+            if (getUserIpAddr() != $db[$this->NEWUPLOADEDFILE][5]) {
+                die("This does not seem to be your save file.");
+            }
+            echo "SAVING FILE " . $this->NEWUPLOADEDFILE . '.modified' . "<br>\n";
+            file_put_contents('saves/' . $this->NEWUPLOADEDFILE . '.modified', $output);
+            echo '<A href="saves/' . $this->NEWUPLOADEDFILE . '.modified' . '">Download your modified save here </A><br>';
+            echo 'Want to upload this map again?<A href="upload.php">Add your renumbered save again</A><br>';
+        } else {
+            if ($againAllowed) {
+                //echo "RESAVING FILE TO DISK - EMPTY NUMBERS BECAME A DOT " . $this->NEWUPLOADEDFILE . "<br>\n";
+                file_put_contents('uploads/' . $this->NEWUPLOADEDFILE, $output);
+                return 'AGAIN';
+            }
+        }
 
     }
 }

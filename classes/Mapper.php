@@ -413,6 +413,9 @@ class Mapper
 
 // label some splines with their slope - not yet working
 // main problem: find a spot for the text that is near to track but do not override other stuff
+                    if(!isset($_POST['slopeTrigger'])) $_POST['slopeTrigger']=2;
+                    if(!isset($_POST['slopeTriggerPrefix'])) $_POST['slopeTriggerPrefix']='..';
+                    if(!isset($_POST['slopeTriggerDecimals'])) $_POST['slopeTriggerDecimals']=1;
                     if ($distance > 0 && in_array($type, array(4, 0))) {
                         if (abs($slope) > $_POST['slopeTrigger']) {
                             $tanA = (

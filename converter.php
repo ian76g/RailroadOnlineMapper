@@ -1,6 +1,6 @@
 <?php
 ini_set('memory_limit', -1);  // just in case - previous versions had 8000x8000 px truecolor images JPEG
-set_time_limit(10);                // just in case something wents really bad -- kill script after 10 seconds
+set_time_limit(50);                // just in case something wents really bad -- kill script after 10 seconds
 $v = 46;                                  //version - totally not used except in next line
 //echo "\n" . 'running converter version 0.' . $v . "\n";
 
@@ -9,6 +9,7 @@ require_once 'classes/dtDynamic.php';
 require_once 'classes/dtHeader.php';
 require_once 'classes/dtProperty.php';
 require_once 'classes/dtString.php';
+require_once 'classes/dtVector.php';
 require_once 'classes/GVASParser.php';
 require_once 'classes/Mapper.php';
 
@@ -143,7 +144,7 @@ foreach ($files as $file) {
     if ($data == 'AGAIN') {
         // hack - we read a small struct - and inject new structure elements (empty cart numbers)
         // therefore we need to parse the new struct again.
-        $data = $myParser->parseData(file_get_contents($path . '/' . $file), false);
+        $data = $myParser->parseData(file_get_contents($path . '/uploads/' . $file), false);
     }
     $data = json_decode($data, true);
 
