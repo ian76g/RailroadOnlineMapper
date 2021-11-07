@@ -16,3 +16,12 @@ window.onload = function () {
     window.zoomTiger.disableControlIcons();
   });
 };
+
+document.getElementById("menu-toggle").addEventListener("click", function () {
+  const menuClassList = document.querySelector(".export__menu").classList;
+  const openClass = "export__menu--open";
+
+  menuClassList.contains(openClass)
+    ? menuClassList.remove(openClass)
+    : menuClassList.add(openClass);
+});

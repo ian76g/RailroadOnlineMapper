@@ -8,11 +8,17 @@
     <link rel="stylesheet" href="../css/main.css" />
     <link rel="stylesheet" href="../css/export.css" />
   </head>
-  <body>
-    <header class="header">
-      <a class="button" href="/">Go Back</a>
-    </header>
-    <main class="export">
+  <body class="export">
+    <main class="export__main">
+      <nav class="export__nav">
+        <div>
+          <a class="button" href="/">Go Back</a>
+          <button id="enable" class="button">Enable</button>
+          <button id="disable" class="button">Disable</button>
+        </div>
+        <button class="button" id="menu-toggle">Menu</button>
+      </nav>
+
       <div id="container" class="export__map">
         <svg
           id="demo-tiger"
@@ -31,14 +37,9 @@
           />
           ###SVG###
         </svg>
-        <button id="enable">enable</button>
-        <button id="disable">disable</button>
       </div>
-      <div class="export__extras">###EXTRAS###</div>
+      <div class="export__menu">###EXTRAS### ###DOWNLOAD###</div>
     </main>
-
-    <hr />
-    ###DOWNLOAD###
 
     <script type="text/javascript" src="svg-pan-zoom.js"></script>
     <script type="text/javascript" src="../js/export.js"></script>

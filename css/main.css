@@ -221,18 +221,20 @@ label:hover {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-
   margin: 0 auto;
 }
 
-table {
-  width: auto;
-  margin: 1rem 1rem 2rem 1rem;
-  font-size: 0.9rem;
+.uploads_tables {
   border-radius: 4px;
   background-color: rgba(255, 255, 255, 0.2);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
+}
+
+.table {
+  width: auto;
+  margin: 1rem 1rem 2rem 1rem;
+  font-size: 0.9rem;
   border-collapse: collapse;
 }
 
