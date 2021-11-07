@@ -2,7 +2,11 @@
 
 [@ian76g#6577](https://discordapp.com/users/306158630145753090)
 
-Currently hosted on https://minizwerg.online/
+## Environments
+
+DEV - https://zwackelmann.online/
+QA - https://ohnezahn.online/
+PROD - https://minizwerg.online/
 
 ## Getting Started
 
