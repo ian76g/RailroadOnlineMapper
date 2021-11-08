@@ -20,12 +20,12 @@
 
 .export__nav {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   position: fixed;
   top: 0;
-  left: 0;
+  right: 0;
   z-index: 2;
-  width: 100%;
+  width: auto;
 }
 
 .export__menu {
