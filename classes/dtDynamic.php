@@ -2,7 +2,7 @@
 /**
  * Class dtDynamic
  */
-class dtDynamic
+class dtDynamic extends dtAbstractData
 {
     var $value;
     var $NAME = 'dynamic';
