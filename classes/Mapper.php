@@ -13,10 +13,10 @@ class Mapper
      *
      * initially to scale the network - but was skipped after getting the high quality backgrounds
      */
-    private $minX=0;
-    private $maxX=0;
-    private $minY=0;
-    private $maxY=0;
+    private $minX = 0;
+    private $maxX = 0;
+    private $minY = 0;
+    private $maxY = 0;
     private $scale;
     private $switchRadius;
     private $engineRadius;
@@ -31,7 +31,7 @@ class Mapper
     private $NEWUPLOADEDFILE;
     private $empty;
     private $arithmeticHelper;
-    private $allLabels = array(array(0,0));
+    private $allLabels = array(array(0, 0));
 
     /**
      * Mapper constructor.
@@ -89,7 +89,7 @@ class Mapper
         $this->totalTrackLength = 0;
         $this->maxSlope = 0;
 
-        $svg = $this->drawTracksAndBeds( );
+        $svg = $this->drawTracksAndBeds();
 
         $svg .= $this->drawSwitches();
 
@@ -199,29 +199,29 @@ class Mapper
                     die('unknown industry');
             }
 
-
-            // create a "database" and store some infos about this file for the websies index page
-            $db = @unserialize(@file_get_contents('db.db'));
-            $db[$NEWUPLOADEDFILE] = array(
-                $this->totalTrackLength,
-                $this->totalSwitches,
-                $this->totalLocos,
-                $this->totalCarts,
-                $this->maxSlope,
-                getUserIpAddr(),
-                sizeof($this->data['Removed']['Vegetation'])
-            );
-            file_put_contents('db.db', serialize($db));
-
-            // label the industries
-            if ($doSvg) {
-                $svg .= '<text x="' . ($this->imx - (int)(($site['Location'][0] - $this->minX) / 100 * $this->scale) + $xoff) .
-                    '" y="' . ($this->imy - (int)(($site['Location'][1] - $this->minY) / 100 * $this->scale) + $yoff) . '" transform="rotate(' . $rotation .
-                    ',' . ($this->imx - (int)(($site['Location'][0] - $this->minX) / 100 * $this->scale) + $xoff) .
-                    ', ' . ($this->imy - (int)(($site['Location'][1] - $this->minY) / 100 * $this->scale) + $yoff) . ')" >' . $name . '</text>' . "\n";
-            }
-
         }
+        // create a "database" and store some infos about this file for the websies index page
+
+        $db = @unserialize(@file_get_contents('db.db'));
+        $db[$NEWUPLOADEDFILE] = array(
+            $this->totalTrackLength,
+            $this->totalSwitches,
+            $this->totalLocos,
+            $this->totalCarts,
+            $this->maxSlope,
+            getUserIpAddr(),
+            sizeof($this->data['Removed']['Vegetation'])
+        );
+        file_put_contents('db.db', serialize($db));
+
+        // label the industries
+        if ($doSvg) {
+            $svg .= '<text x="' . ($this->imx - (int)(($site['Location'][0] - $this->minX) / 100 * $this->scale) + $xoff) .
+                '" y="' . ($this->imy - (int)(($site['Location'][1] - $this->minY) / 100 * $this->scale) + $yoff) . '" transform="rotate(' . $rotation .
+                ',' . ($this->imx - (int)(($site['Location'][0] - $this->minX) / 100 * $this->scale) + $xoff) .
+                ', ' . ($this->imy - (int)(($site['Location'][1] - $this->minY) / 100 * $this->scale) + $yoff) . ')" >' . $name . '</text>' . "\n";
+        }
+
 
         /**
          * add Watertowers to the map
@@ -313,13 +313,13 @@ class Mapper
     function getDistanceToNearestLabel($newLabel)
     {
         $minDistance = 8000;
-        foreach($this->allLabels as $oldLabel)
-        $minDistance = min(
-            $minDistance,
-            sqrt(
-            pow($newLabel[0]-$oldLabel[0], 2) +
-            pow($newLabel[1]-$oldLabel[1], 2)
-        ));
+        foreach ($this->allLabels as $oldLabel)
+            $minDistance = min(
+                $minDistance,
+                sqrt(
+                    pow($newLabel[0] - $oldLabel[0], 2) +
+                    pow($newLabel[1] - $oldLabel[1], 2)
+                ));
 
         return $minDistance;
     }
@@ -398,42 +398,42 @@ class Mapper
                         if (empty($length)) {//check for zero length tracks
                             $zeroLenthSegments[] = $segment;
                             if ($doSvg) { //@ToDo make function later.
-                                $svg .= sprintf('<circle cx="%d" cy="%d" r="10" stroke="red" stroke-width="2" fill="red" />',$xCenter, $yCenter);
+                                $svg .= sprintf('<circle cx="%d" cy="%d" r="10" stroke="red" stroke-width="2" fill="red" />', $xCenter, $yCenter);
                             }
                             continue; //This may cause issues down the road. We may need to stop at this point and return the errors segment.
-                        }else{
+                        } else {
                             $slope = ($height * 100 / $length);
                         }
 
-                        if($slope > $this->maxSlope){
-                            $slopecoords=array($xCenter,$yCenter);
+                        if ($slope > $this->maxSlope) {
+                            $slopecoords = array($xCenter, $yCenter);
                         }
                         $this->maxSlope = max($this->maxSlope, $slope);
                     }
 
 // label some splines with their slope - not yet working
 // main problem: find a spot for the text that is near to track but do not override other stuff
-                    if(!isset($_POST['slopeTrigger'])) $_POST['slopeTrigger']=2;
-                    if(!isset($_POST['slopeTriggerPrefix'])) $_POST['slopeTriggerPrefix']='..';
-                    if(!isset($_POST['slopeTriggerDecimals'])) $_POST['slopeTriggerDecimals']=1;
+                    if (!isset($_POST['slopeTrigger'])) $_POST['slopeTrigger'] = 2;
+                    if (!isset($_POST['slopeTriggerPrefix'])) $_POST['slopeTriggerPrefix'] = '..';
+                    if (!isset($_POST['slopeTriggerDecimals'])) $_POST['slopeTriggerDecimals'] = 1;
                     if ($distance > 0 && in_array($type, array(4, 0))) {
                         if (abs($slope) > $_POST['slopeTrigger']) {
                             $tanA = (
-                                ($segment['LocationEnd']['Y']-$segment['LocationStart']['Y'])/
-                                ($segment['LocationEnd']['X']-$segment['LocationStart']['X'])
+                                ($segment['LocationEnd']['Y'] - $segment['LocationStart']['Y']) /
+                                ($segment['LocationEnd']['X'] - $segment['LocationStart']['X'])
                             );
                             $a = rad2deg(atan($tanA));
-                            if($a>0) {
-                                $a-=90;
+                            if ($a > 0) {
+                                $a -= 90;
                             } else {
-                                $a+=90;
+                                $a += 90;
                             }
 
 
-                            if($this->getDistanceToNearestLabel(array($xCenter, $yCenter))>60){
+                            if ($this->getDistanceToNearestLabel(array($xCenter, $yCenter)) > 60) {
                                 $this->allLabels[] = array($xCenter, $yCenter);
                                 $svg .= '<text x="' . $xCenter . '" y="' . $yCenter . '" transform="rotate(' . $a .
-                                    ',' . $xCenter . ', ' . $yCenter . ')">' . $_POST['slopeTriggerPrefix'] . round($slope,$_POST['slopeTriggerDecimals']) . '%</text>' . "\n";
+                                    ',' . $xCenter . ', ' . $yCenter . ')">' . $_POST['slopeTriggerPrefix'] . round($slope, $_POST['slopeTriggerDecimals']) . '%</text>' . "\n";
                             }
                         }
                     }
@@ -441,11 +441,11 @@ class Mapper
             }
         }
 //print_r($slopecoords);
-        if(isset($_POST['maxslope']) && $_POST['maxslope']) {
-            $svg .= '<circle cx="' . $slopecoords[0] . '" cy="' . $slopecoords[1] . '" r="' . ($this->turnTableRadius*5) . '" stroke="orange" stroke-width="5" fill="none"/>' . "\n";
-            $svg .= '<circle cx="' . $slopecoords[0] . '" cy="' . $slopecoords[1] . '" r="' . ($this->turnTableRadius*4) . '" stroke="orange" stroke-width="5" fill="none"/>' . "\n";
-            $svg .= '<circle cx="' . $slopecoords[0] . '" cy="' . $slopecoords[1] . '" r="' . ($this->turnTableRadius*3) . '" stroke="orange" stroke-width="5" fill="none"/>' . "\n";
-            $svg .= '<circle cx="' . $slopecoords[0] . '" cy="' . $slopecoords[1] . '" r="' . ($this->turnTableRadius*2) . '" stroke="orange" stroke-width="5" fill="none"/>' . "\n";
+        if (isset($_POST['maxslope']) && $_POST['maxslope']) {
+            $svg .= '<circle cx="' . $slopecoords[0] . '" cy="' . $slopecoords[1] . '" r="' . ($this->turnTableRadius * 5) . '" stroke="orange" stroke-width="5" fill="none"/>' . "\n";
+            $svg .= '<circle cx="' . $slopecoords[0] . '" cy="' . $slopecoords[1] . '" r="' . ($this->turnTableRadius * 4) . '" stroke="orange" stroke-width="5" fill="none"/>' . "\n";
+            $svg .= '<circle cx="' . $slopecoords[0] . '" cy="' . $slopecoords[1] . '" r="' . ($this->turnTableRadius * 3) . '" stroke="orange" stroke-width="5" fill="none"/>' . "\n";
+            $svg .= '<circle cx="' . $slopecoords[0] . '" cy="' . $slopecoords[1] . '" r="' . ($this->turnTableRadius * 2) . '" stroke="orange" stroke-width="5" fill="none"/>' . "\n";
         }
 
         return $svg;
@@ -571,7 +571,7 @@ class Mapper
     public function drawTurntables()
     {
         $doSvg = true;
-        $svg='';
+        $svg = '';
         /**
          * Fill in more missing gaps AKA turntables
          */
@@ -699,6 +699,19 @@ class Mapper
             $optionTemplate = '<option value="###OPTIONVALUE###" ###SELECTED###>###OPTIONNAME###</option>';
 
             $optionsStringArray = array();
+            if(!isset($vehicle['Freight'])){
+                $vehicle['Freight']['Type'] = '';
+            }
+            if(!isset($vehicle['Name'])){
+                $vehicle['Name'] = '';
+            }
+            if(!isset($vehicle['Number'])){
+                $vehicle['Number'] = '';
+            }
+            if(!isset($vehicle['Tender'])){
+                $vehicle['Tender']['Fuelamount'] = '';
+            }
+
             $selectString = $vehicle['Freight']['Type'];
             if (isset($possibleCargos[$vehicle['Type']])) {
                 $options = '';
@@ -782,7 +795,7 @@ class Mapper
 
             // add some names to the locomotives
             if (
-                   $vehicle['Type'] == 'porter_040'
+                $vehicle['Type'] == 'porter_040'
 
                 || $vehicle['Type'] == 'porter_042'
                 || $vehicle['Type'] == 'handcar'
@@ -802,15 +815,15 @@ class Mapper
                 // label locomotives
 
                 $textRotation = $vehicle['Rotation'][1];
-                if($textRotation<0) {
-                    $textRotation+=90;
+                if ($textRotation < 0) {
+                    $textRotation += 90;
                 } else {
-                    $textRotation-=90;
+                    $textRotation -= 90;
                 }
 
                 if ($doSvg) {
                     $this->allLabels[] = array($x, $y);
-                    $svg .= '<text x="' . $x . '" y="' . $y . '" transform="rotate('.$textRotation.', '.$x.', '.$y.')">' . '..' . $name . '</text>' . "\n";
+                    $svg .= '<text x="' . $x . '" y="' . $y . '" transform="rotate(' . $textRotation . ', ' . $x . ', ' . $y . ')">' . '..' . $name . '</text>' . "\n";
 
                 }
             } else {
@@ -820,23 +833,23 @@ class Mapper
         }
 
         $images = array(
-            '>porter_040'        => '><img src="/images/porter.png">',
-            '>porter_042'        => '><img src="/images/porter2.png">',
-            '>handcar'           => '><img src="/images/handcar.png">',
-            '>eureka_tender'     => '><img src="/images/eureka_tender.png">',
-            '>class70_tender'    => '><img src="/images/class70_tender.png">',
-            '>cooke260_tender'   => '><img src="/images/cooke_tender.png">',
-            '>eureka'            => '><img src="/images/eureka.png">',
-            '>climax'            => '><img src="/images/climax.png">',
-            '>heisler'           => '><img src="/images/heisler.png">',
-            '>class70'           => '><img src="/images/class70.png">',
-            '>cooke260'          => '><img src="/images/cooke.png">',
-            '>boxcar'            => '><img src="/images/boxcar.png">',
-            '>flatcar_cordwood'  => '><img src="/images/flatcar_cordwood.png">',
-            '>flatcar_logs'      => '><img src="/images/flatcar_logs.png">',
-            '>flatcar_stakes'    => '><img src="/images/flatcar_stakes.png">',
-            '>flatcar_tanker'    => '><img src="/images/flatcar_tanker.png">',
-            '>flatcar_hopper'    => '><img src="/images/flatcar_hopper.png">',
+            '>porter_040' => '><img src="/images/porter.png">',
+            '>porter_042' => '><img src="/images/porter2.png">',
+            '>handcar' => '><img src="/images/handcar.png">',
+            '>eureka_tender' => '><img src="/images/eureka_tender.png">',
+            '>class70_tender' => '><img src="/images/class70_tender.png">',
+            '>cooke260_tender' => '><img src="/images/cooke_tender.png">',
+            '>eureka' => '><img src="/images/eureka.png">',
+            '>climax' => '><img src="/images/climax.png">',
+            '>heisler' => '><img src="/images/heisler.png">',
+            '>class70' => '><img src="/images/class70.png">',
+            '>cooke260' => '><img src="/images/cooke.png">',
+            '>boxcar' => '><img src="/images/boxcar.png">',
+            '>flatcar_cordwood' => '><img src="/images/flatcar_cordwood.png">',
+            '>flatcar_logs' => '><img src="/images/flatcar_logs.png">',
+            '>flatcar_stakes' => '><img src="/images/flatcar_stakes.png">',
+            '>flatcar_tanker' => '><img src="/images/flatcar_tanker.png">',
+            '>flatcar_hopper' => '><img src="/images/flatcar_hopper.png">',
         );
 
         $cartExtraStr = str_replace('###TROWS###', $trows, $cartExtraStr);
