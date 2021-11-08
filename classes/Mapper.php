@@ -303,8 +303,31 @@ class Mapper
             $svg .= '</text>' . "\n";
         }
 
+        $svg .= $this->drawReplantableTrees();
+
         return $svg;
     }
+
+
+    function drawReplantableTrees()
+    {
+        $svg = '';
+        foreach($this->data['Removed']['Vegetation'] as $index => $tree){
+            if(isset($tree['replant'])) {
+                if($index<1825) {
+                    $color='orange';
+                } else {
+                    $color = 'green';
+                }
+                $x = ($this->imx - (int)(($tree[0] - $this->minX) / 100 * $this->scale));
+                $y = ($this->imy - (int)(($tree[1] - $this->minY) / 100 * $this->scale));
+                $svg .= sprintf('<circle cx="%d" cy="%d" r="6" stroke="darkgreen" stroke-width="2" fill="%s" />', $x, $y, $color);
+            }
+        }
+
+        return $svg;
+    }
+
 
     /**
      * @param $newLabel
@@ -643,6 +666,7 @@ class Mapper
             'flatcar_cordwood' => array($this->engineRadius / 3 * 2, 'orange'),
             'flatcar_stakes' => array($this->engineRadius / 3 * 2, 'yellow'),
             'flatcar_hopper' => array($this->engineRadius / 3 * 2, 'brown'),
+            'boxcar' => array($this->engineRadius / 3 * 2, 'purple'),
             'flatcar_tanker' => array($this->engineRadius / 3 * 2, 'grey'),
         );
 

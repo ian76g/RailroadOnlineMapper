@@ -43,6 +43,7 @@ class dtTextProperty extends dtAbstractData
         switch(unpack('C', $this->terminator)[1]){
             case '0' :
                 // empty text
+                $output = hex2bin('00000000ff00000000');
                 break;
 
             case '1' :

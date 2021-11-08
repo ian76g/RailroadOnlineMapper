@@ -84,50 +84,50 @@ class GVASParser
         }
 
         foreach ($this->goldenBucket['Frames'] as $i => $frame) {
-            if(isset($this->goldenBucket['Boilers'][$i]))
-            $this->goldenBucket['Frames'][$i]['Boiler'] = $this->goldenBucket['Boilers'][$i];
+            if (isset($this->goldenBucket['Boilers'][$i]))
+                $this->goldenBucket['Frames'][$i]['Boiler'] = $this->goldenBucket['Boilers'][$i];
 
-            if(isset($this->goldenBucket['Headlights'][$i]))
-            $this->goldenBucket['Frames'][$i]['Headlights'] = $this->goldenBucket['Headlights'][$i];
+            if (isset($this->goldenBucket['Headlights'][$i]))
+                $this->goldenBucket['Frames'][$i]['Headlights'] = $this->goldenBucket['Headlights'][$i];
 
-            if(isset($this->goldenBucket['Freights'][$i]))
-            $this->goldenBucket['Frames'][$i]['Freight'] = $this->goldenBucket['Freights'][$i];
+            if (isset($this->goldenBucket['Freights'][$i]))
+                $this->goldenBucket['Frames'][$i]['Freight'] = $this->goldenBucket['Freights'][$i];
 
-            if(isset($this->goldenBucket['Compressors'][$i]))
-            $this->goldenBucket['Frames'][$i]['Compressor'] = $this->goldenBucket['Compressors'][$i];
+            if (isset($this->goldenBucket['Compressors'][$i]))
+                $this->goldenBucket['Frames'][$i]['Compressor'] = $this->goldenBucket['Compressors'][$i];
 
-            if(isset($this->goldenBucket['Tenders'][$i]))
-            $this->goldenBucket['Frames'][$i]['Tender'] = $this->goldenBucket['Tenders'][$i];
+            if (isset($this->goldenBucket['Tenders'][$i]))
+                $this->goldenBucket['Frames'][$i]['Tender'] = $this->goldenBucket['Tenders'][$i];
 
-            if(isset($this->goldenBucket['Couplers'][$i]))
-            $this->goldenBucket['Frames'][$i]['Coupler'] = $this->goldenBucket['Couplers'][$i];
+            if (isset($this->goldenBucket['Couplers'][$i]))
+                $this->goldenBucket['Frames'][$i]['Coupler'] = $this->goldenBucket['Couplers'][$i];
 
-            if(isset($this->goldenBucket['Regulatorvalue'][$i]))
-            $this->goldenBucket['Frames'][$i]['Regulator'] = $this->goldenBucket['Regulatorvalue'][$i];
+            if (isset($this->goldenBucket['Regulatorvalue'][$i]))
+                $this->goldenBucket['Frames'][$i]['Regulator'] = $this->goldenBucket['Regulatorvalue'][$i];
 
-            if(isset($this->goldenBucket['Brakevalue'][$i]))
-            $this->goldenBucket['Frames'][$i]['Brake'] = $this->goldenBucket['Brakevalue'][$i];
+            if (isset($this->goldenBucket['Brakevalue'][$i]))
+                $this->goldenBucket['Frames'][$i]['Brake'] = $this->goldenBucket['Brakevalue'][$i];
 
-            if(isset($this->goldenBucket['Reverservalue'][$i]))
-            $this->goldenBucket['Frames'][$i]['Reverser'] = $this->goldenBucket['Reverservalue'][$i];
+            if (isset($this->goldenBucket['Reverservalue'][$i]))
+                $this->goldenBucket['Frames'][$i]['Reverser'] = $this->goldenBucket['Reverservalue'][$i];
 
-            if(isset($this->goldenBucket['Reverservalue'][$i]))
-            $this->goldenBucket['Frames'][$i]['Smokestack'] = $this->goldenBucket['Smokestacktype'][$i];
+            if (isset($this->goldenBucket['Reverservalue'][$i]))
+                $this->goldenBucket['Frames'][$i]['Smokestack'] = $this->goldenBucket['Smokestacktype'][$i];
 
-            if(isset($this->goldenBucket['Reverservalue'][$i]))
-            $this->goldenBucket['Frames'][$i]['Generatorvalvevalue'] = $this->goldenBucket['Generatorvalvevalue'][$i];
+            if (isset($this->goldenBucket['Reverservalue'][$i]))
+                $this->goldenBucket['Frames'][$i]['Generatorvalvevalue'] = $this->goldenBucket['Generatorvalvevalue'][$i];
 
-            if(isset($this->goldenBucket['Marker'][$i]))
-            $this->goldenBucket['Frames'][$i]['Marker']['Front']['Right'] = $this->goldenBucket['Marker']['Lights']['Front']['Right'][$i];
+            if (isset($this->goldenBucket['Marker'][$i]))
+                $this->goldenBucket['Frames'][$i]['Marker']['Front']['Right'] = $this->goldenBucket['Marker']['Lights']['Front']['Right'][$i];
 
-            if(isset($this->goldenBucket['Marker'][$i]))
-            $this->goldenBucket['Frames'][$i]['Marker']['Front']['Left'] = $this->goldenBucket['Marker']['Lights']['Front']['Left'][$i];
+            if (isset($this->goldenBucket['Marker'][$i]))
+                $this->goldenBucket['Frames'][$i]['Marker']['Front']['Left'] = $this->goldenBucket['Marker']['Lights']['Front']['Left'][$i];
 
-            if(isset($this->goldenBucket['Marker'][$i]))
-            $this->goldenBucket['Frames'][$i]['Marker']['Rear']['Right'] = $this->goldenBucket['Marker']['Lights']['Rear']['Right'][$i];
+            if (isset($this->goldenBucket['Marker'][$i]))
+                $this->goldenBucket['Frames'][$i]['Marker']['Rear']['Right'] = $this->goldenBucket['Marker']['Lights']['Rear']['Right'][$i];
 
-            if(isset($this->goldenBucket['Marker'][$i]))
-            $this->goldenBucket['Frames'][$i]['Marker']['Rear']['Left'] = $this->goldenBucket['Marker']['Lights']['Rear']['Left'][$i];
+            if (isset($this->goldenBucket['Marker'][$i]))
+                $this->goldenBucket['Frames'][$i]['Marker']['Rear']['Left'] = $this->goldenBucket['Marker']['Lights']['Rear']['Left'][$i];
         }
 
         unset($this->goldenBucket['Headlights']);
@@ -260,42 +260,45 @@ class GVASParser
         $output = '';
         foreach ($this->saveObject['objects'] as $saveObjectIndex => $object) {
             if (is_object($object)) {
-                if (false && trim($object->NAME) == 'RemovedVegetationAssetsArray' && $againAllowed) {
+                if (false && trim($object->NAME) == 'RemovedVegetationAssetsArray') {
                     $v = 0;
-                    foreach ($object->CONTENTOBJECTS as $index => $co) {
-                        if (is_object($co) && trim($co->NAME) == 'Vector') {
-                            $v++;
-                            // found a new fallen tree
-                            $minDistanceToSomething = 80000000;
-                            foreach ($this->goldenBucket['Splines'] as $spline) {
-                                foreach ($spline['Segments'] as $segment) {
-                                    if ($segment['LocationCenter']['X'] < $co->content[0] - 2000) {
-                                        continue;
-                                    }
-                                    if ($segment['LocationCenter']['X'] > $co->content[0] + 2000) {
-                                        continue;
-                                    }
-                                    if ($segment['LocationCenter']['Y'] < $co->content[1] - 2000) {
-                                        continue;
-                                    }
-                                    if ($segment['LocationCenter']['Y'] > $co->content[1] + 2000) {
-                                        continue;
-                                    }
-                                    $minDistanceToSomething = min($minDistanceToSomething, $this->distance($co->content, $segment['LocationCenter']));
+                    $toRemove = array();
+                    foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $vector) {
+                        $v++;
+                        // found a new fallen tree
+                        $minDistanceToSomething = 80000000;
+                        foreach ($this->goldenBucket['Splines'] as $spline) {
+                            foreach ($spline['Segments'] as $segment) {
+                                if ($segment['LocationCenter']['X'] < $vector->content[0] - 2000) {
+                                    continue;
                                 }
+                                if ($segment['LocationCenter']['X'] > $vector->content[0] + 2000) {
+                                    continue;
+                                }
+                                if ($segment['LocationCenter']['Y'] < $vector->content[1] - 2000) {
+                                    continue;
+                                }
+                                if ($segment['LocationCenter']['Y'] > $vector->content[1] + 2000) {
+                                    continue;
+                                }
+                                $minDistanceToSomething = min($minDistanceToSomething, $this->distance($vector->content, $segment['LocationCenter']));
                             }
-                            if ($minDistanceToSomething > 20000) {
-                                $toRemove[] = $index;
-                            }
-                            //echo round($minDistanceToSomething)." ";
                         }
+                        if ($minDistanceToSomething > 1000) {
+                            $toRemove[] = $index;
+                        }
+                        //echo round($minDistanceToSomething)." ";
                     }
                     foreach ($toRemove as $tri) {
-                        unset($object->CONTENTOBJECTS[$tri]);
+                        if(!isset($_POST['replantTrees'])){
+                            $this->goldenBucket['Removed']['Vegetation'][$tri]['replant'] = true;
+                        } else {
+                            unset($object->CONTENTOBJECTS[3]->contentElements[$tri]);
+                        }
 
                     }
-                    $object->CONTENTOBJECTS[5]->value = (sizeof($object->CONTENTOBJECTS) - 6);
-                    echo "NEW VALUE = ".(sizeof($object->CONTENTOBJECTS) - 6);
+                    $object->CONTENTOBJECTS[3]->COUNTER->value = (sizeof($object->CONTENTOBJECTS[3]->contentElements));
+//                    echo "NEW VALUE = " . (sizeof($object->CONTENTOBJECTS[3]->contentElements));
                 }
 
                 if (trim($object->NAME) == 'FrameNumberArray') {
@@ -383,11 +386,7 @@ class GVASParser
             echo '<A href="saves/' . $this->NEWUPLOADEDFILE . '.modified' . '">Download your modified save here </A><br>';
             echo 'Want to upload this map again?<A href="upload.php">Add your renumbered save again</A><br>';
         } else {
-            if ($againAllowed) {
-                //echo "RESAVING FILE TO DISK - EMPTY NUMBERS BECAME A DOT " . $this->NEWUPLOADEDFILE . "<br>\n";
-                file_put_contents('uploads/' . $this->NEWUPLOADEDFILE, $output);
-                return 'AGAIN';
-            }
+            file_put_contents('uploads/' . $this->NEWUPLOADEDFILE, $output);
         }
 
     }
