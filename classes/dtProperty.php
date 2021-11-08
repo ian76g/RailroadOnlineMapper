@@ -297,7 +297,18 @@ class dtProperty extends dtAbstractData
                             $textPropertyObject->x='';
 //var_dump($textPropertyObject);
                             $arrayObject->addElement($textPropertyObject);
-                            $elem[] = array($pieces, 'TBI');
+                            $str = '';
+                            foreach($textPropertyObject->lines as $lineObject){
+                                if(get_class($lineObject) == 'dtString'){
+                                    if($lineObject->NAME == 'HUMAN_TEXT'){
+                                        $str.=trim($lineObject->string).'<br>';
+                                    }
+                                } else {
+                                    //dtTextProperty
+                                    $str.=$lineObject->getText();
+                                }
+                            }
+                            $elem[] = array($pieces, $str);
                             //echo "...-[$cartText]-..."
                         }
                         $this->CONTENTOBJECTS[] = $arrayObject;
@@ -489,7 +500,7 @@ class dtProperty extends dtAbstractData
                 }
                 if ($secondFour == 1) {
                     $myString = new dtString();
-                    $myString->NAME = 'TEXT FOR TERMINATOR 2 AND SF = 1';
+                    $myString->NAME = 'HUMAN_TEXT';
                     $results = $myString->unserialize($this->x, $this->position);
                     $cartText = $results[0];
                     $this->position = $results[1];

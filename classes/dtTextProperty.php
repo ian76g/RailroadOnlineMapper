@@ -17,6 +17,22 @@ class dtTextProperty extends dtAbstractData
     var $tests = array();
     var $pack;
 
+    function getText()
+    {
+        $out = '';
+        foreach($this->lines as $lineOject){
+            if(get_class($lineOject)=='dtString'){
+                if(trim($lineOject->NAME) == 'HUMAN_TEXT') {
+                    $out.=trim($lineOject->string).'<br>';
+                }
+            } else {
+                $out.=$lineOject->getText().'<br>';
+            }
+        }
+        return $out;
+    }
+
+
     function serialize()
     {
         $output = '';
@@ -107,8 +123,6 @@ class dtTextProperty extends dtAbstractData
         $this->pack = $numberOfLines[0];
         $this->numberOfLines = unpack($this->pack, $numberOfLines[1])[1];
     }
-
-
 
     /**
      * @param mixed $terminator
