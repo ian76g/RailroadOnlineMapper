@@ -2,7 +2,7 @@
 /**
  * Class dtString
  */
-class dtString
+class dtString extends dtAbstractData
 {
     var $content;
     var $string;
