@@ -15,6 +15,7 @@ class dtTextProperty extends dtAbstractData
 
     var $lines = array();
     var $tests = array();
+    var $pack;
 
     function serialize()
     {
@@ -32,7 +33,7 @@ class dtTextProperty extends dtAbstractData
                 $output .= $this->unknown;
                 $output .= $this->typeOfNextThing->serialize();
                 $output .= $this->formatter->serialize();
-                $output .= $this->numberOfLines[1];
+                $output .= pack($this->pack, $this->numberOfLines);
 
                 while(sizeof($this->lines))
                 {
@@ -103,7 +104,8 @@ class dtTextProperty extends dtAbstractData
      */
     public function setNumberOfLines($numberOfLines)
     {
-        $this->numberOfLines = $numberOfLines;
+        $this->pack = $numberOfLines[0];
+        $this->numberOfLines = unpack($this->pack, $numberOfLines[1])[1];
     }
 
 

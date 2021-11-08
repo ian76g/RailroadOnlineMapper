@@ -25,6 +25,7 @@ class dtProperty extends dtAbstractData
 
         $resultRows = $this->readUEProperty();
         $this->RESULTROWS = $resultRows;
+        $this->x = '';
         return array($resultRows, $this->position);
     }
 
@@ -70,7 +71,7 @@ class dtProperty extends dtAbstractData
         $this->position = $results[1];
         $this->NAME = $name;
         $this->CONTENTOBJECTS[] = $myString;
-    //echo "[$name]";
+//    echo "[$name]";
         if ($name == "None") {
             echo "XXXxXXX";
             return new stdClass();
@@ -79,7 +80,7 @@ class dtProperty extends dtAbstractData
         $myString = new dtString();
         $results = $myString->unserialize($this->x, $this->position);
         $type = $results[0];
-//   echo "$type ";
+//   echo "($type) ";
         $this->position = $results[1];
         $this->TYPE = trim($type);
         $this->CONTENTOBJECTS[] = $myString;
@@ -142,6 +143,7 @@ class dtProperty extends dtAbstractData
                 $this->ITEMTYPE = $itemType;
                 $this->position = $results[1];
                 $arrayObject->setItemType($myString);
+//                echo "(ItemType is ".trim($myString->string).")";
 //                $this->CONTENTOBJECTS[] = $myString;
 
                 $arrayObject->setByte(substr($this->x, $this->position, 1));
@@ -152,7 +154,7 @@ class dtProperty extends dtAbstractData
                 $arrayCounter->value = unpack('I', substr($this->x, $this->position, 4))[1];
                 $arrayCounter->pack = 'I';
 //                $this->CONTENTOBJECTS[] = $arrayCounter;
-//            echo "ARRAY-COUNT = ".$arrayCounter->value." ";
+//            echo "(ARRAY-COUNT = ".$arrayCounter->value.") ";
                 $this->position += 4;
                 $arrayObject->setCounter($arrayCounter);
 
@@ -286,12 +288,14 @@ class dtProperty extends dtAbstractData
                             $createEmptyNumber = false;
                             $createEmptyName = false;
                             if (trim($this->NAME) == 'FrameNumberArray') {
-                                $createEmptyNumber = true;
+//                                $createEmptyNumber = true;
                             }
                             if (trim($this->NAME) == 'FrameNameArray') {
-                                $createEmptyName = true;
+//                                $createEmptyName = true;
                             }
                             $textPropertyObject = $this->readTextProperty($i, $createEmptyNumber, $createEmptyName)[0];
+                            $textPropertyObject->x='';
+//var_dump($textPropertyObject);
                             $arrayObject->addElement($textPropertyObject);
                             $elem[] = array($pieces, 'TBI');
                             //echo "...-[$cartText]-..."
@@ -438,6 +442,7 @@ class dtProperty extends dtAbstractData
                 $this->position += 5;
 
                 $myString = new dtString();
+                $myString->NAME = 'Type of Next Thing';
                 $results = $myString->unserialize($this->x, $this->position);
                 $typeOfNextThing = $results[0];
                 $this->position = $results[1];
@@ -445,21 +450,21 @@ class dtProperty extends dtAbstractData
                 $textPropertyObject->setTypeOfNextThing($myString);
 
                 $myString = new dtString();
+                $myString->NAME = 'Formatter';
                 $results = $myString->unserialize($this->x, $this->position);
                 $stringFormatter = trim($results[0]);
                 $this->position = $results[1];
                 //$this->CONTENTOBJECTS[] = $myString;
                 $textPropertyObject->setFormatter($myString);
 
-                $numberOfTextLines = unpack('i', substr($this->x, $this->position, 4))[1];
                 $textPropertyObject->setNumberOfLines(array('i', substr($this->x, $this->position, 4)));
                 $this->position += 4;
                 //$this->CONTENTOBJECTS[] = substr($this->x, $this->position, 4);
 
-                for ($lineNumber = 0; $lineNumber < $numberOfTextLines; $lineNumber++) {
+                for ($lineNumber = 0; $lineNumber < $textPropertyObject->numberOfLines; $lineNumber++) {
                     $myString = new dtString();
+                    $myString->NAME='Line Number';
                     $results = $myString->unserialize($this->x, $this->position);
-                    //$rowId = $results[0];
                     $this->position = $results[1];
                     //$this->CONTENTOBJECTS[] = $myString;  // string contains $lineNumber
                     $textPropertyObject->addLine($myString);
@@ -484,6 +489,7 @@ class dtProperty extends dtAbstractData
                 }
                 if ($secondFour == 1) {
                     $myString = new dtString();
+                    $myString->NAME = 'TEXT FOR TERMINATOR 2 AND SF = 1';
                     $results = $myString->unserialize($this->x, $this->position);
                     $cartText = $results[0];
                     $this->position = $results[1];

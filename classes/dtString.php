@@ -23,6 +23,7 @@ class dtString extends dtAbstractData
         $this->x = $fromX;
         $this->position = $position;
         $this->readUEString();
+        $this->x = '';
         return array($this->string, $this->position);
     }
 

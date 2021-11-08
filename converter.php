@@ -1,4 +1,5 @@
 <?php
+error_reporting(E_ALL);
 ini_set('memory_limit', -1);  // just in case - previous versions had 8000x8000 px truecolor images JPEG
 set_time_limit(50);                // just in case something wents really bad -- kill script after 10 seconds
 $v = 46;                                  //version - totally not used except in next line
@@ -127,7 +128,7 @@ $arithmeticHelper = new ArithmeticHelper();             // put some math stuff i
  */
 foreach ($files as $file) {
     if (!file_exists($path . '/' . $file)) {
-        header('Location: https://minizwerg.online/');
+        header('Location: /');
         die();
     }
     $htmlFileName = str_replace('.sav', '', basename($file)) . '.html';
@@ -144,7 +145,7 @@ foreach ($files as $file) {
     $myParser = new GVASParser();                       // grab a Parser
     $myParser->NEWUPLOADEDFILE = $NEWUPLOADEDFILE;      // give the parser a filename
 
-    $data = $myParser->parseData(file_get_contents($path . '/' . $file));
+    $data = $myParser->parseData(file_get_contents($path . '/' . $file), false);
     if ($data == 'AGAIN') {
         // hack - we read a small struct - and inject new structure elements (empty cart numbers)
         // therefore we need to parse the new struct again.
