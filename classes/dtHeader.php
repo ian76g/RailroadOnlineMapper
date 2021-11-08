@@ -2,7 +2,7 @@
 /**
  * Class dtHeader for the Fileheader
  */
-class dtHeader
+class dtHeader extends dtAbstractData
 {
     var $NAME = 'HEADER';
     var $a = array(

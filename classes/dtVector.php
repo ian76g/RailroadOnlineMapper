@@ -2,7 +2,7 @@
 /**
  * Class dtVector
  */
-class dtVector
+class dtVector extends dtAbstractData
 {
     var $content;
     var $NAME='Vector';
