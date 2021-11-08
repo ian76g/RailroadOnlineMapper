@@ -5,11 +5,15 @@ $v = 46;                                  //version - totally not used except in
 //echo "\n" . 'running converter version 0.' . $v . "\n";
 
 require_once 'classes/ArithmeticHelper.php';
+//require_once 'classes/dtAbstractData.php';
 require_once 'classes/dtDynamic.php';
 require_once 'classes/dtHeader.php';
 require_once 'classes/dtProperty.php';
 require_once 'classes/dtString.php';
 require_once 'classes/dtVector.php';
+//require_once 'classes/dtArray.php';
+//require_once 'classes/dtStruct.php';
+//require_once 'classes/dtTextProperty.php';
 require_once 'classes/GVASParser.php';
 require_once 'classes/Mapper.php';
 
@@ -46,28 +50,28 @@ if (isset($_POST['empty']) && $_POST['empty']) {
     $empty = true;                          // render table of rolling stock without names?
 }
 
-$bg = 'bg5';                                // choose a background image
+$bg = 'bg5.jpg';                                // choose a background image
 if (isset($_POST['background'])) {
     if ($_POST['background'] == 'bg') {
-        $bg = 'bg';
+        $bg = 'bg.png';
     }
     if ($_POST['background'] == 'bg3') {
-        $bg = 'bg3';
+        $bg = 'bg3.png';
     }
     if ($_POST['background'] == 'bg4') {
-        $bg = 'bg4';
+        $bg = 'bg4.png';
     }
     if ($_POST['background'] == 'bg5') {
-        $bg = 'bg5';
+        $bg = 'bg5.jpg';
     }
 }
 
 // each different background image needs different croping and stretching params
 $bgOffsets = array(
-    'bg5' => array(9400, 9600, -720, -770, 9400, 9600),
-    'bg4' => array(9400, 9600, -720, -770, 9400, 9600),
-    'bg3' => array(8000, 8000, 0, 50, 8000, 8000),
-    'bg' => array(8000, 8000, 0, 0, 8000, 8000),
+    'bg5.jpg' => array(8000, 8000, 0, 0, 8000, 8000),
+    'bg4.png' => array(9400, 9600, -720, -770, 9400, 9600),
+    'bg3.png' => array(8000, 8000, 0, 50, 8000, 8000),
+    'bg.png' => array(8000, 8000, 0, 0, 8000, 8000),
 );
 
 // devine the SVG structure of the output-map
@@ -78,7 +82,7 @@ $pattern = '
     ((isset($_POST['xoff']) && $_POST['xoff'] !== '') ? ($_POST['xoff']) : $bgOffsets[$bg][2]) . '" y="' .
     ((isset($_POST['yoff']) && $_POST['xoff'] !== '') ? ($_POST['yoff']) : $bgOffsets[$bg][3]) . '" width="' .
     ((isset($_POST['xsoff']) && $_POST['xoff'] !== '') ? ($_POST['xsoff']) : $bgOffsets[$bg][4]) . '" height="' .
-    ((isset($_POST['ysoff']) && $_POST['xoff'] !== '') ? ($_POST['ysoff']) : $bgOffsets[$bg][5]) . '" href="' . $bg . '.png" />
+    ((isset($_POST['ysoff']) && $_POST['xoff'] !== '') ? ($_POST['ysoff']) : $bgOffsets[$bg][5]) . '" href="' . $bg . '" />
             </pattern>
 ';
 $htmlSvg = str_replace('###PATTERN###', $pattern, $htmlSvg);
