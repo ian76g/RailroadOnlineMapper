@@ -14,7 +14,7 @@ class dtTextProperty extends dtAbstractData
     var $numberOfLines;
 
     var $lines = array();
-    var $test = array();
+    var $tests = array();
 
     function serialize()
     {
@@ -23,21 +23,25 @@ class dtTextProperty extends dtAbstractData
         $output .= $this->firstFour;
         $output .= $this->secondFour;
 
-        switch(unpack('C', $this->terminator)){
+        switch(unpack('C', $this->terminator)[1]){
+            case '0' :
+                // empty text
+                break;
+
             case '1' :
                 $output .= $this->unknown;
                 $output .= $this->typeOfNextThing->serialize();
                 $output .= $this->formatter->serialize();
-                $output .= pack($this->numberOfLines[0], $this->numberOfLines[1]);
+                $output .= $this->numberOfLines[1];
 
                 while(sizeof($this->lines))
                 {
                     $x = array_shift($this->lines);
                     $output .= $x->serialize();
-                    $output .= array_shift($this->test);
+                    $output .= array_shift($this->tests);
                     $x = array_shift($this->lines);
                     $output .= $x->serialize();
-                    array_shift($this->test); // dummy;
+                    array_shift($this->tests); // dummy;
 
                 }
 
@@ -45,10 +49,16 @@ class dtTextProperty extends dtAbstractData
 
             case '2' :
 
-                $x = array_shift($this->lines);
-                $output .= $x->serialize();
-                break;
-
+                if(unpack('i', $this->secondFour)[1]==1){
+                    if(sizeof($this->lines)){
+                        $x = array_shift($this->lines);
+                        $output .= $x->serialize();
+                    }
+                    break;
+                }
+                if(unpack('i', $this->secondFour)[1]==0){
+                    break;
+                }
         }
 
         return $output;

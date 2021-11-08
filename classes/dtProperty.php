@@ -1,8 +1,9 @@
 <?php
+
 /**
  * Class dtProperty
  */
-class dtProperty
+class dtProperty extends dtAbstractData
 {
     var $x;
     var $position;
@@ -56,8 +57,6 @@ class dtProperty
     function readUEProperty()
     {
 
-        //echo "Filepointer is now at $this->position\n";
-
         if (substr($this->x, $this->position, 1) < 0) {
             echo "YYYYyYYYY";
             $this->content = substr($this->x, $this->position, 1);
@@ -71,7 +70,7 @@ class dtProperty
         $this->position = $results[1];
         $this->NAME = $name;
         $this->CONTENTOBJECTS[] = $myString;
-//    echo "[$name]";
+    //echo "[$name]";
         if ($name == "None") {
             echo "XXXxXXX";
             return new stdClass();
@@ -84,6 +83,7 @@ class dtProperty
         $this->position = $results[1];
         $this->TYPE = trim($type);
         $this->CONTENTOBJECTS[] = $myString;
+
         $value = substr($this->x, $this->position, 8);
         $this->CONTENTOBJECTS[] = substr($this->x, $this->position, 8);
         $this->position += 8;
@@ -134,25 +134,29 @@ class dtProperty
                 return array(array($pieces, $string));
 
             case 'ArrayProperty':
+                $arrayObject = new dtArray();
                 $elem = array();
                 $myString = new dtString();
                 $results = $myString->unserialize($this->x, $this->position);
                 $itemType = trim($results[0]);
                 $this->ITEMTYPE = $itemType;
                 $this->position = $results[1];
-                $this->CONTENTOBJECTS[] = $myString;
+                $arrayObject->setItemType($myString);
+//                $this->CONTENTOBJECTS[] = $myString;
 
-                $this->CONTENTOBJECTS[] = substr($this->x, $this->position, 1);
+                $arrayObject->setByte(substr($this->x, $this->position, 1));
                 $this->position++;
 
                 $arrayCounter = new dtDynamic();
                 $arrayCounter->NAME = 'Arraycounter';
                 $arrayCounter->value = unpack('I', substr($this->x, $this->position, 4))[1];
                 $arrayCounter->pack = 'I';
-                $this->CONTENTOBJECTS[] = $arrayCounter;
+//                $this->CONTENTOBJECTS[] = $arrayCounter;
+//            echo "ARRAY-COUNT = ".$arrayCounter->value." ";
                 $this->position += 4;
+                $arrayObject->setCounter($arrayCounter);
 
-//                echo "ARRAYCOUNT:[$arrayCount] ";
+//                echo "ARRAYCOUNT:[$arrayCounter->value] ";
                 switch ($itemType) {
                     case 'StrProperty':
                         for ($i = 0; $i < $arrayCounter->value; $i++) {
@@ -162,28 +166,35 @@ class dtProperty
                             $str = trim($results[0]);
                             $this->position = $results[1];
                             $myString->ARRCOUNTER = $i;
-                            $this->CONTENTOBJECTS[] = $myString;
+                            $arrayObject->addElement($myString);
+//                            $this->CONTENTOBJECTS[] = $myString;
                             //@$goldenBucket[$name][]= $str;
                             $elem[] = array($pieces, $str);
                         }
+                        $this->CONTENTOBJECTS[] = $arrayObject;
                         return $elem;
 
                     case 'StructProperty' :
+                        $structObject = new dtStruct();
+
                         $myString = new dtString();
                         $results = $myString->unserialize($this->x, $this->position);
                         $name = trim($results[0]);
                         $this->position = $results[1];
-                        $this->CONTENTOBJECTS[] = $myString;
+                        //$this->CONTENTOBJECTS[] = $myString;
+                        $structObject->setName($myString);
 
                         $myString = new dtString();
                         $results = $myString->unserialize($this->x, $this->position);
                         $type = trim($results[0]);
                         $this->position = $results[1];
-                        $this->CONTENTOBJECTS[] = $myString;
+                        //$this->CONTENTOBJECTS[] = $myString;
+                        $structObject->setType($myString);
 
-                        $lenght = $val = unpack('P', substr($this->x, $this->position, 8))[1];
+                        $lenght = unpack('P', substr($this->x, $this->position, 8))[1];
                         $this->position += 8;
-                        $this->CONTENTOBJECTS[] = pack('P', $lenght);
+                        //$this->CONTENTOBJECTS[] = pack('P', $lenght);
+                        $structObject->setLength(array('P', $lenght));
 
 //                    echo "[[$type][$lenght]]";
                         $myString = new dtString();
@@ -191,24 +202,30 @@ class dtProperty
                         $subType = trim($results[0]);
                         $this->SUBTYPE = $subType;
                         $this->position = $results[1];
-                        $this->CONTENTOBJECTS[] = $myString;
+                        //$this->CONTENTOBJECTS[] = $myString;
+                        $structObject->setSubType($myString);
 
-                        $this->CONTENTOBJECTS[] = substr($this->x, $this->position, 17);
+                        //$this->CONTENTOBJECTS[] = substr($this->x, $this->position, 17);
+                        $structObject->setSeventeenBytes(substr($this->x, $this->position, 17));
                         $this->position++;
                         $this->position += 16;
+
+                        $arrayObject->setStructObject($structObject);
 
                         switch ($subType) {
                             case "Vector":
                             case "Rotator":
-                                for ($i = 0; $i < $arrayCounter->value ; $i++) {
+                                for ($i = 0; $i < $arrayCounter->value; $i++) {
                                     $myVector = new dtVector();
                                     $myVector->ARRCOUNTER = $i;
                                     $tmp = $myVector->unserialize($this->x, $this->position);
-                                    $this->position=$tmp[0];
+                                    $this->position = $tmp[0];
                                     $elem[] = array($pieces, $tmp[1]);
-                                    $this->CONTENTOBJECTS[] = $myVector;
+                                    //$this->CONTENTOBJECTS[] = $myVector;
+                                    $arrayObject->addElement($myVector);
 
                                 }
+                                $this->CONTENTOBJECTS[] = $arrayObject;
                                 return $elem;
 
                             default:
@@ -218,17 +235,18 @@ class dtProperty
 
                     case 'FloatProperty':
                         for ($i = 0; $i < $arrayCounter->value; $i++) {
-                            $float = unpack('g', substr($this->x, $this->position, 4))[1];
-                            $nD = new dtDynamic();
-                            $nD->NAME = 'FloatProperty';
-                            $nD->value = $float;
-                            $nD->ARRCOUNTER = $i;
-                            $nD->pack = 'g';
-                            $this->CONTENTOBJECTS[] = $nD;
+                            $floatObject = new dtDynamic();
+                            $floatObject->NAME = 'FloatProperty';
+                            $floatObject->pack = 'g';
+                            $floatObject->value = unpack('g', substr($this->x, $this->position, 4))[1];
                             $this->position += 4;
+                            $floatObject->ARRCOUNTER = $i;
+                            $arrayObject->addElement($floatObject);
+//                            $this->CONTENTOBJECTS[] = $floatObject;
                             //@$goldenBucket[$name][]= $float;
-                            $elem[] = array($pieces, $float);
+                            $elem[] = array($pieces, $floatObject->value);
                         }
+                        $this->CONTENTOBJECTS[] = $arrayObject;
                         return $elem;
 
                     case 'IntProperty':
@@ -239,21 +257,27 @@ class dtProperty
                             $nD->value = $int;
                             $nD->ARRCOUNTER = $i;
                             $nD->pack = 'V';
-                            $this->CONTENTOBJECTS[] = $nD;
+//                            $this->CONTENTOBJECTS[] = $nD;
+                            $arrayObject->addElement($nD);
                             $this->position += 4;
                             //@$goldenBucket[$name][]= $int;
                             $elem[] = array($pieces, $int);
                         }
+                        $this->CONTENTOBJECTS[] = $arrayObject;
                         return $elem;
 
                     case 'BoolProperty':
                         for ($i = 0; $i < $arrayCounter->value; $i++) {
-                            $bool = unpack('C', substr($this->x, $this->position, 1))[1];
-                            $this->CONTENTOBJECTS[] = substr($this->x, $this->position, 1);
+                            $boolObject = new dtDynamic();
+                            $boolObject->pack='C';
+                            $boolObject->value = unpack('C', substr($this->x, $this->position, 1))[1];
+//                            $this->CONTENTOBJECTS[] = substr($this->x, $this->position, 1);
                             $this->position += 1;
+                            $arrayObject->addElement($boolObject);
                             //@$goldenBucket[$name][]= $int;
-                            $elem[] = array($pieces, $bool);
+                            $elem[] = array($pieces, $boolObject->value);
                         }
+                        $this->CONTENTOBJECTS[] = $arrayObject;
                         return $elem;
 
                     case 'TextProperty':
@@ -267,10 +291,12 @@ class dtProperty
                             if (trim($this->NAME) == 'FrameNameArray') {
                                 $createEmptyName = true;
                             }
-                            $cartText = $this->readTextProperty($i, $createEmptyNumber, $createEmptyName);
-                            $elem[] = array($pieces, $cartText);
+                            $textPropertyObject = $this->readTextProperty($i, $createEmptyNumber, $createEmptyName)[0];
+                            $arrayObject->addElement($textPropertyObject);
+                            $elem[] = array($pieces, 'TBI');
                             //echo "...-[$cartText]-..."
                         }
+                        $this->CONTENTOBJECTS[] = $arrayObject;
                         //$index+=$propertyLength-4;
 //                    echo "... done\n";
                         return $elem;
@@ -329,72 +355,76 @@ class dtProperty
      */
     function readTextProperty($cartIndex, $createEmptyNumber = false, $createEmptyName = false)
     {
+        $textPropertyObject = new dtTextProperty();
         $terminator = unpack('C', substr($this->x, $this->position, 1))[1];
-        $this->CONTENTOBJECTS[] = substr($this->x, $this->position, 1);
+        $textPropertyObject->setTerminator(substr($this->x, $this->position, 1));
+//        $this->CONTENTOBJECTS[] = ;
         $this->position++;
         $firstFour = unpack('i', substr($this->x, $this->position, 4))[1];
-        $this->CONTENTOBJECTS[] = substr($this->x, $this->position, 4); //000000FF
+        $textPropertyObject->setFirstFour(substr($this->x, $this->position, 4));
+        //$this->CONTENTOBJECTS[] = substr($this->x, $this->position, 4); //000000FF
         $this->position += 4;
         $secondFour = unpack('i', substr($this->x, $this->position, 4))[1];
-        $this->CONTENTOBJECTS[] = substr($this->x, $this->position, 4); //00000000 in case of terminator 0
+        $textPropertyObject->setSecondFour(substr($this->x, $this->position, 4));
+        //$this->CONTENTOBJECTS[] = substr($this->x, $this->position, 4); //00000000 in case of terminator 0
         $this->position += 4;
 
-        if ($terminator == 0 && $createEmptyNumber) {
-            // HERE WE HAVE TO IMPLEMENT A NEW CART NUMBER (eg. a dot)
-            // TERMINATOR must be 02
-            // firstFour have to be 000000FF
-            // secondFour have to be 01000000
-            // and then comes the text as length 2 bytes 02000000
-            // and the text itself .0x00
-            //
-            $this->CONTENTOBJECTS[sizeof($this->CONTENTOBJECTS) - 3] = pack('C', 2);
-            $this->CONTENTOBJECTS[sizeof($this->CONTENTOBJECTS) - 1] = pack('i', 1);
-            $newText = new dtString();
-            $newText->nullBytes = 1;
-            $newText->string = '.' . hex2bin('00');
-            $this->CONTENTOBJECTS[] = $newText;
-        }
-
-        if ($terminator == 0 && $createEmptyName) {
-            //* However if you get 01 00 00 00 as first value, then it’s formatted,
-            $this->CONTENTOBJECTS[sizeof($this->CONTENTOBJECTS) - 3] = pack('C', 1);
-            //* the separator is 03,
-            $this->CONTENTOBJECTS[sizeof($this->CONTENTOBJECTS) - 2] = hex2bin(str_replace(' ', '', '00 00 00 03'));
-            // then int64 08 00 00 00 00 00 00 00 and empty byte 00
-            $this->CONTENTOBJECTS[sizeof($this->CONTENTOBJECTS) - 1] =
-                hex2bin(str_replace(' ', '', '08 00 00 00 00 00 00 00 00'));
-            //* Then the format specifiers :
-            //* UEString (the magic string I don’t know what it does but is always the same),
-            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '', '21 00 00 00')); // length of formatter
-            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '',
-                '35 36 46 38 44 32 37 31 34 39 ' .
-                '43 43 35 45 32 44 31 32 31 30 ' .
-                '33 42 42 45 42 46 43 41 39 30 ' .
-                '39 37 00 '));
-            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '',
-                '0b 00 00 00 ' .
-                '7b 30 7d 3c 62 72 3e 7b 31 7d 00')  // {0} <br> {1}
-            ); // formatter
-            //* 02 00 00 00 (probably the number of field in the formatter)
-            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '', '02 00 00 00')); // 2 texts coming
-
-            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '', '02 00 00 00 30 00')); // text rowid with line number 0
-            //* Then a special separator 04
-            $this->CONTENTOBJECTS[] = hex2bin('04');
-            $this->CONTENTOBJECTS[] = hex2bin('02'); // terminator 2
-            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '', '00 00 00 ff 01 00 00 00')); // first 4 and second 4
-            // first Text
-            $newText = new dtString();
-            $newText->nullBytes = 1;
-            $newText->string = '.' . hex2bin('00');
-            $this->CONTENTOBJECTS[] = $newText;
-
-            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '', '02 00 00 00 31 00')); // text rowid with line number 1
-            //* Then a special separator 04
-            $this->CONTENTOBJECTS[] = hex2bin('04');
-            // second Text
-            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '', '02 00 00 00 ff 00 00 00 00'));
-        }
+//        if ($terminator == 0 && $createEmptyNumber) {
+//            // HERE WE HAVE TO IMPLEMENT A NEW CART NUMBER (eg. a dot)
+//            // TERMINATOR must be 02
+//            // firstFour have to be 000000FF
+//            // secondFour have to be 01000000
+//            // and then comes the text as length 2 bytes 02000000
+//            // and the text itself .0x00
+//            //
+//            $this->CONTENTOBJECTS[sizeof($this->CONTENTOBJECTS) - 3] = pack('C', 2);
+//            $this->CONTENTOBJECTS[sizeof($this->CONTENTOBJECTS) - 1] = pack('i', 1);
+//            $newText = new dtString();
+//            $newText->nullBytes = 1;
+//            $newText->string = '.' . hex2bin('00');
+//            $this->CONTENTOBJECTS[] = $newText;
+//        }
+//
+//        if ($terminator == 0 && $createEmptyName) {
+//            //* However if you get 01 00 00 00 as first value, then it’s formatted,
+//            $this->CONTENTOBJECTS[sizeof($this->CONTENTOBJECTS) - 3] = pack('C', 1);
+//            //* the separator is 03,
+//            $this->CONTENTOBJECTS[sizeof($this->CONTENTOBJECTS) - 2] = hex2bin(str_replace(' ', '', '00 00 00 03'));
+//            // then int64 08 00 00 00 00 00 00 00 and empty byte 00
+//            $this->CONTENTOBJECTS[sizeof($this->CONTENTOBJECTS) - 1] =
+//                hex2bin(str_replace(' ', '', '08 00 00 00 00 00 00 00 00'));
+//            //* Then the format specifiers :
+//            //* UEString (the magic string I don’t know what it does but is always the same),
+//            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '', '21 00 00 00')); // length of formatter
+//            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '',
+//                '35 36 46 38 44 32 37 31 34 39 ' .
+//                '43 43 35 45 32 44 31 32 31 30 ' .
+//                '33 42 42 45 42 46 43 41 39 30 ' .
+//                '39 37 00 '));
+//            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '',
+//                '0b 00 00 00 ' .
+//                '7b 30 7d 3c 62 72 3e 7b 31 7d 00')  // {0} <br> {1}
+//            ); // formatter
+//            //* 02 00 00 00 (probably the number of field in the formatter)
+//            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '', '02 00 00 00')); // 2 texts coming
+//
+//            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '', '02 00 00 00 30 00')); // text rowid with line number 0
+//            //* Then a special separator 04
+//            $this->CONTENTOBJECTS[] = hex2bin('04');
+//            $this->CONTENTOBJECTS[] = hex2bin('02'); // terminator 2
+//            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '', '00 00 00 ff 01 00 00 00')); // first 4 and second 4
+//            // first Text
+//            $newText = new dtString();
+//            $newText->nullBytes = 1;
+//            $newText->string = '.' . hex2bin('00');
+//            $this->CONTENTOBJECTS[] = $newText;
+//
+//            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '', '02 00 00 00 31 00')); // text rowid with line number 1
+//            //* Then a special separator 04
+//            $this->CONTENTOBJECTS[] = hex2bin('04');
+//            // second Text
+//            $this->CONTENTOBJECTS[] = hex2bin(str_replace(' ', '', '02 00 00 00 ff 00 00 00 00'));
+//        }
 
 
         switch ($terminator) {
@@ -403,44 +433,48 @@ class dtProperty
                 break;
 
             case 1:
-                $this->CONTENTOBJECTS[] = substr($this->x, $this->position, 5);  // UNKONWN 0000000308
+                $textPropertyObject->setUnknown(substr($this->x, $this->position, 5));
+                //$this->CONTENTOBJECTS[] = substr($this->x, $this->position, 5);  // UNKONWN 0000000308
                 $this->position += 5;
+
                 $myString = new dtString();
                 $results = $myString->unserialize($this->x, $this->position);
                 $typeOfNextThing = $results[0];
                 $this->position = $results[1];
-                $this->CONTENTOBJECTS[] = $myString;
+                //$this->CONTENTOBJECTS[] = $myString;
+                $textPropertyObject->setTypeOfNextThing($myString);
 
                 $myString = new dtString();
                 $results = $myString->unserialize($this->x, $this->position);
                 $stringFormatter = trim($results[0]);
                 $this->position = $results[1];
-                $this->CONTENTOBJECTS[] = $myString;
+                //$this->CONTENTOBJECTS[] = $myString;
+                $textPropertyObject->setFormatter($myString);
 
                 $numberOfTextLines = unpack('i', substr($this->x, $this->position, 4))[1];
+                $textPropertyObject->setNumberOfLines(array('i', substr($this->x, $this->position, 4)));
                 $this->position += 4;
-                $this->CONTENTOBJECTS[] = substr($this->x, $this->position, 4);
+                //$this->CONTENTOBJECTS[] = substr($this->x, $this->position, 4);
 
-                $cartTexts = array();
                 for ($lineNumber = 0; $lineNumber < $numberOfTextLines; $lineNumber++) {
                     $myString = new dtString();
                     $results = $myString->unserialize($this->x, $this->position);
                     //$rowId = $results[0];
                     $this->position = $results[1];
-                    $this->CONTENTOBJECTS[] = $myString;  // string contains $lineNumber
+                    //$this->CONTENTOBJECTS[] = $myString;  // string contains $lineNumber
+                    $textPropertyObject->addLine($myString);
 
                     $test = unpack('C', substr($this->x, $this->position, 1))[1];
-                    $this->CONTENTOBJECTS[] = substr($this->x, $this->position, 1);
+                    $textPropertyObject->addTest(substr($this->x, $this->position, 1));
+                    //$this->CONTENTOBJECTS[] = substr($this->x, $this->position, 1);
                     $this->position++;
                     if ($test != 4) {
                         die('horribly');
                     } else {
-                        $cartTexts[] = $this->readTextProperty($cartIndex)[0];
+                        $textPropertyObject->addLine($this->readTextProperty($cartIndex)[0]);
+                        $textPropertyObject->addTest('dummy');
                     }
                 }
-                $cartText = implode('', $cartTexts);
-//                echo "($cartText)";
-
                 break;
 
             case 2:
@@ -454,7 +488,8 @@ class dtProperty
                     $cartText = $results[0];
                     $this->position = $results[1];
                     $myString->ARRCOUNTER = $cartIndex;
-                    $this->CONTENTOBJECTS[] = $myString;
+                    //$this->CONTENTOBJECTS[] = $myString;
+                    $textPropertyObject->addLine($myString);
 
                     break;
                 }
@@ -464,6 +499,6 @@ class dtProperty
                 die('oooops' . $terminator);
         }
 
-        return array($cartText, $this->position);
+        return array($textPropertyObject, $this->position);
     }
 }

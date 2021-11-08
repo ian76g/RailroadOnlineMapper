@@ -47,7 +47,6 @@ class GVASParser
                 if ($original != $test) {
                     file_put_contents('tmp_' . trim($myProperty->NAME), $original);
                     file_put_contents('tmp_' . trim($myProperty->NAME) . '.test', $test);
-
                 }
 
                 $this->saveObject['objects'][] = $myProperty;
@@ -85,20 +84,49 @@ class GVASParser
         }
 
         foreach ($this->goldenBucket['Frames'] as $i => $frame) {
+            if(isset($this->goldenBucket['Boilers'][$i]))
             $this->goldenBucket['Frames'][$i]['Boiler'] = $this->goldenBucket['Boilers'][$i];
+
+            if(isset($this->goldenBucket['Headlights'][$i]))
             $this->goldenBucket['Frames'][$i]['Headlights'] = $this->goldenBucket['Headlights'][$i];
+
+            if(isset($this->goldenBucket['Freights'][$i]))
             $this->goldenBucket['Frames'][$i]['Freight'] = $this->goldenBucket['Freights'][$i];
+
+            if(isset($this->goldenBucket['Compressors'][$i]))
             $this->goldenBucket['Frames'][$i]['Compressor'] = $this->goldenBucket['Compressors'][$i];
+
+            if(isset($this->goldenBucket['Tenders'][$i]))
             $this->goldenBucket['Frames'][$i]['Tender'] = $this->goldenBucket['Tenders'][$i];
+
+            if(isset($this->goldenBucket['Couplers'][$i]))
             $this->goldenBucket['Frames'][$i]['Coupler'] = $this->goldenBucket['Couplers'][$i];
+
+            if(isset($this->goldenBucket['Regulatorvalue'][$i]))
             $this->goldenBucket['Frames'][$i]['Regulator'] = $this->goldenBucket['Regulatorvalue'][$i];
+
+            if(isset($this->goldenBucket['Brakevalue'][$i]))
             $this->goldenBucket['Frames'][$i]['Brake'] = $this->goldenBucket['Brakevalue'][$i];
+
+            if(isset($this->goldenBucket['Reverservalue'][$i]))
             $this->goldenBucket['Frames'][$i]['Reverser'] = $this->goldenBucket['Reverservalue'][$i];
+
+            if(isset($this->goldenBucket['Reverservalue'][$i]))
             $this->goldenBucket['Frames'][$i]['Smokestack'] = $this->goldenBucket['Smokestacktype'][$i];
+
+            if(isset($this->goldenBucket['Reverservalue'][$i]))
             $this->goldenBucket['Frames'][$i]['Generatorvalvevalue'] = $this->goldenBucket['Generatorvalvevalue'][$i];
+
+            if(isset($this->goldenBucket['Marker'][$i]))
             $this->goldenBucket['Frames'][$i]['Marker']['Front']['Right'] = $this->goldenBucket['Marker']['Lights']['Front']['Right'][$i];
+
+            if(isset($this->goldenBucket['Marker'][$i]))
             $this->goldenBucket['Frames'][$i]['Marker']['Front']['Left'] = $this->goldenBucket['Marker']['Lights']['Front']['Left'][$i];
+
+            if(isset($this->goldenBucket['Marker'][$i]))
             $this->goldenBucket['Frames'][$i]['Marker']['Rear']['Right'] = $this->goldenBucket['Marker']['Lights']['Rear']['Right'][$i];
+
+            if(isset($this->goldenBucket['Marker'][$i]))
             $this->goldenBucket['Frames'][$i]['Marker']['Rear']['Left'] = $this->goldenBucket['Marker']['Lights']['Rear']['Left'][$i];
         }
 
@@ -148,7 +176,6 @@ class GVASParser
             );
 
             $segmentArray = array();
-            if (!isset($this->goldenBucket['Spline']['Points']['Index']['Start'][$i])) die('xcxvxcv');
             $startPos = $this->goldenBucket['Spline']['Points']['Index']['Start'][$i];
             $endPos = $this->goldenBucket['Spline']['Points']['Index']['End'][$i];
 
@@ -233,41 +260,42 @@ class GVASParser
         $output = '';
         foreach ($this->saveObject['objects'] as $saveObjectIndex => $object) {
             if (is_object($object)) {
-                if (trim($object->NAME) == 'RemovedVegetationAssetsArray' && $againAllowed) {
-//                    $v = 0;
-//                    foreach ($object->CONTENTOBJECTS as $index => $co) {
-//                        if (is_object($co) && trim($co->NAME) == 'Vector') {
-//                            $v++;
-//                            // found a new fallen tree
-//                            $minDistanceToSomething = 80000000;
-//                            foreach ($this->goldenBucket['Splines'] as $spline) {
-//                                foreach ($spline['Segments'] as $segment) {
-//                                    if ($segment['LocationCenter']['X'] < $co->content[0] - 2000) {
-//                                        continue;
-//                                    }
-//                                    if ($segment['LocationCenter']['X'] > $co->content[0] + 2000) {
-//                                        continue;
-//                                    }
-//                                    if ($segment['LocationCenter']['Y'] < $co->content[1] - 2000) {
-//                                        continue;
-//                                    }
-//                                    if ($segment['LocationCenter']['Y'] > $co->content[1] + 2000) {
-//                                        continue;
-//                                    }
-//                                    $minDistanceToSomething = min($minDistanceToSomething, $this->distance($co->content, $segment['LocationCenter']));
-//                                }
-//                            }
-//                            if ($minDistanceToSomething > 20000) {
-//                                $toRemove[] = $index;
-//                            }
-//                            //echo round($minDistanceToSomething)." ";
-//                        }
-//                    }
-//                    foreach ($toRemove as $tri) {
-//                        unset($object->CONTENTOBJECTS[$tri]);
-//
-//                    }
-//                    $object->CONTENTOBJECTS[5]->content = (sizeof($object->CONTENTOBJECTS) - 6);
+                if (false && trim($object->NAME) == 'RemovedVegetationAssetsArray' && $againAllowed) {
+                    $v = 0;
+                    foreach ($object->CONTENTOBJECTS as $index => $co) {
+                        if (is_object($co) && trim($co->NAME) == 'Vector') {
+                            $v++;
+                            // found a new fallen tree
+                            $minDistanceToSomething = 80000000;
+                            foreach ($this->goldenBucket['Splines'] as $spline) {
+                                foreach ($spline['Segments'] as $segment) {
+                                    if ($segment['LocationCenter']['X'] < $co->content[0] - 2000) {
+                                        continue;
+                                    }
+                                    if ($segment['LocationCenter']['X'] > $co->content[0] + 2000) {
+                                        continue;
+                                    }
+                                    if ($segment['LocationCenter']['Y'] < $co->content[1] - 2000) {
+                                        continue;
+                                    }
+                                    if ($segment['LocationCenter']['Y'] > $co->content[1] + 2000) {
+                                        continue;
+                                    }
+                                    $minDistanceToSomething = min($minDistanceToSomething, $this->distance($co->content, $segment['LocationCenter']));
+                                }
+                            }
+                            if ($minDistanceToSomething > 20000) {
+                                $toRemove[] = $index;
+                            }
+                            //echo round($minDistanceToSomething)." ";
+                        }
+                    }
+                    foreach ($toRemove as $tri) {
+                        unset($object->CONTENTOBJECTS[$tri]);
+
+                    }
+                    $object->CONTENTOBJECTS[5]->value = (sizeof($object->CONTENTOBJECTS) - 6);
+                    echo "NEW VALUE = ".(sizeof($object->CONTENTOBJECTS) - 6);
                 }
 
                 if (trim($object->NAME) == 'FrameNumberArray') {
