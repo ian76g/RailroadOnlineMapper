@@ -203,6 +203,22 @@ class GVASParser
 
                 );
                 $startPos++;
+
+                $cX = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['X']) / 100000);
+                $cY = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['Y']) / 100000);
+                $this->goldenBucket['Segments'][$cX][$cY][] = $segmentArray[sizeof($segmentArray) - 1];
+
+                $sX = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['X']) / 100000);
+                $sY = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['Y']) / 100000);
+                if ($sX != $cX || $sY != $cY) {
+                    $this->goldenBucket['Segments'][$sX][$sY][] = $segmentArray[sizeof($segmentArray) - 1];
+                }
+
+                $eX = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['X']) / 100000);
+                $eY = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['Y']) / 100000);
+                if ($eX != $cX || $eY != $cY) {
+                    $this->goldenBucket['Segments'][$eX][$eY][] = $segmentArray[sizeof($segmentArray) - 1];
+                }
             }
 
             $spline['Segments'] = $segmentArray;
@@ -243,20 +259,18 @@ class GVASParser
     }
 
 
-
-
     /**
      * Encode array from latin1 to utf8 recursively
      * @param $dat
      * @return array|string
      */
-    public  function convert_from_latin1_to_utf8_recursively($dat)
+    public function convert_from_latin1_to_utf8_recursively($dat)
     {
         if (is_string($dat)) {
             return utf8_encode($dat);
         } elseif (is_array($dat)) {
             $ret = [];
-            foreach ($dat as $i => $d) $ret[ $i ] = self::convert_from_latin1_to_utf8_recursively($d);
+            foreach ($dat as $i => $d) $ret[$i] = self::convert_from_latin1_to_utf8_recursively($d);
 
             return $ret;
         } elseif (is_object($dat)) {
@@ -289,37 +303,43 @@ class GVASParser
         $output = '';
         foreach ($this->saveObject['objects'] as $saveObjectIndex => $object) {
             if (is_object($object)) {
-                if (false && trim($object->NAME) == 'RemovedVegetationAssetsArray') {
+                if (isset($_POST['replant']) && $_POST['replant'] == 'YES' && trim($object->NAME) == 'RemovedVegetationAssetsArray') {
                     $v = 0;
                     $toRemove = array();
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $vector) {
                         $v++;
                         // found a new fallen tree
+                        if ($v < 1825) continue;
+                        $treeX = floor((200000 + $vector->content[0]) / 100000);
+                        $treeY = floor((200000 + $vector->content[1]) / 100000);
+
                         $minDistanceToSomething = 80000000;
-                        foreach ($this->goldenBucket['Splines'] as $spline) {
-                            foreach ($spline['Segments'] as $segment) {
-                                if ($segment['LocationCenter']['X'] < $vector->content[0] - 2000) {
+//                        foreach ($this->goldenBucket['Splines'] as $spline) {
+                        if (isset($this->goldenBucket['Segments'][$treeX][$treeY])) {
+//                            foreach ($spline['Segments'] as $segment) {
+                            foreach ($this->goldenBucket['Segments'][$treeX][$treeY] as $segment) {
+                                if ($segment['LocationCenter']['X'] < $vector->content[0] - 6000) {
                                     continue;
                                 }
-                                if ($segment['LocationCenter']['X'] > $vector->content[0] + 2000) {
+                                if ($segment['LocationCenter']['X'] > $vector->content[0] + 6000) {
                                     continue;
                                 }
-                                if ($segment['LocationCenter']['Y'] < $vector->content[1] - 2000) {
+                                if ($segment['LocationCenter']['Y'] < $vector->content[1] - 6000) {
                                     continue;
                                 }
-                                if ($segment['LocationCenter']['Y'] > $vector->content[1] + 2000) {
+                                if ($segment['LocationCenter']['Y'] > $vector->content[1] + 6000) {
                                     continue;
                                 }
                                 $minDistanceToSomething = min($minDistanceToSomething, $this->distance($vector->content, $segment['LocationCenter']));
                             }
                         }
-                        if ($minDistanceToSomething > 1000) {
+                        if ($minDistanceToSomething > 2000) {
                             $toRemove[] = $index;
                         }
                         //echo round($minDistanceToSomething)." ";
                     }
                     foreach ($toRemove as $tri) {
-                        if(isset($_POST['replant']) && $_POST['replant']=='YES'){
+                        if (isset($_POST['replant']) && $_POST['replant'] == 'YES') {
                             unset($object->CONTENTOBJECTS[3]->contentElements[$tri]);
                         } else {
                             $this->goldenBucket['Removed']['Vegetation'][$tri]['replant'] = true;

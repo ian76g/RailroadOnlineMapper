@@ -131,7 +131,19 @@ include_once('includes/head.php');
         </section>
 
         <section>
-            <h3>5. Expert settings</h3>
+            <h3>5. Trees</h3>
+            <div class="input-group input-group--row">
+                <input type="checkbox" id="firstTree" name="firstTree">
+                <label for="firstTree">draw orange circles on initially fallen trees</label>
+            </div>
+            <div class="input-group input-group--row">
+                <input type="checkbox" id="userTree" name="userTree">
+                <label for="userTree">draw green circles on fallen trees that could be replanted</label>
+            </div>
+        </section>
+
+        <section>
+            <h3>6. Expert settings</h3>
             <p><b>expert settings: DON'T TOUCH when you are no expert!</b></p>
 
             <div class="input-group">

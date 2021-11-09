@@ -309,11 +309,38 @@ class Mapper
     }
 
 
+    /**
+     * @return string
+     */
     function drawReplantableTrees()
     {
         $svg = '';
         foreach($this->data['Removed']['Vegetation'] as $index => $tree){
-            if(isset($tree['replant'])) {
+
+            if(!isset($_POST['firstTree']) && $index<1825) continue;
+            if(!isset($_POST['userTree'])) continue;
+
+            $treeX = floor((200000 + $tree[0]) / 100000);
+            $treeY = floor((200000 + $tree[1]) / 100000);
+            $minDistanceToSomething = 80000000;
+            if (isset($this->data['Segments'][$treeX][$treeY])) {
+                foreach ($this->data['Segments'][$treeX][$treeY] as $segment) {
+                    if ($segment['LocationCenter']['X'] < $tree[0] - 6000) {
+                        continue;
+                    }
+                    if ($segment['LocationCenter']['X'] > $tree[0] + 6000) {
+                        continue;
+                    }
+                    if ($segment['LocationCenter']['Y'] < $tree[1] - 6000) {
+                        continue;
+                    }
+                    if ($segment['LocationCenter']['Y'] > $tree[1] + 6000) {
+                        continue;
+                    }
+                    $minDistanceToSomething = min($minDistanceToSomething, $this->distance($tree, $segment['LocationCenter']));
+                }
+            }
+            if ($minDistanceToSomething > 2000) {
                 if($index<1825) {
                     $color='orange';
                 } else {
@@ -327,6 +354,18 @@ class Mapper
 
         return $svg;
     }
+
+    /**
+     * @param $a
+     * @param $b
+     * @return float
+     */
+    function distance($a, $b)
+    {
+
+        return sqrt(pow($a[0] - $b['X'], 2) + pow($a[1] - $b['Y'], 2));
+    }
+
 
 
     /**
