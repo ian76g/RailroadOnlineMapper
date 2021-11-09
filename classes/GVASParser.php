@@ -303,7 +303,7 @@ class GVASParser
         $output = '';
         foreach ($this->saveObject['objects'] as $saveObjectIndex => $object) {
             if (is_object($object)) {
-                if (isset($_POST['replant']) && $_POST['replant'] == 'YES' && trim($object->NAME) == 'RemovedVegetationAssetsArray') {
+                if (trim($object->NAME) == 'RemovedVegetationAssetsArray' && isset($_POST['replant']) && $_POST['replant'] == 'YES') {
                     $v = 0;
                     $toRemove = array();
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $vector) {
@@ -350,6 +350,23 @@ class GVASParser
 //                    echo "NEW VALUE = " . (sizeof($object->CONTENTOBJECTS[3]->contentElements));
                 }
 
+                if( false && trim($object->NAME) == 'FrameNumberArray'){
+                    foreach($object->CONTENTOBJECTS[3]->contentElements as $index=>$textProp){
+                        if(isset($_POST['number_'.$index]) && trim($_POST['number_'.$index])){
+                            $x=2;
+                            if(!isset($object->CONTENTOBJECTS[3]->contentElements[$index]->lines[0])){
+                                $string = new dtString();
+                                $string->nullBytes = 1;
+                                $object->CONTENTOBJECTS[3]->contentElements[$index]->addLine($string);
+                            }
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->lines[0]->string = trim($_POST['number_'.$index]);
+                            // terminator = 2
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->terminator = pack('C', 2);
+                            // second 4 = 1
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->secondFour = pack('i', 1);
+                        }
+                    }
+                }
 
                 $output .= $object->serialize();
             } else {
