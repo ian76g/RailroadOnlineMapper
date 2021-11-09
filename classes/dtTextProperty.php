@@ -67,10 +67,8 @@ class dtTextProperty extends dtAbstractData
             case '2' :
 
                 if(unpack('i', $this->secondFour)[1]==1){
-                    if(sizeof($this->lines)){
-                        $x = array_shift($this->lines);
-                        $output .= $x->serialize();
-                    }
+                    $x = $this->lines[0];
+                    $output .= $x->serialize();
                     break;
                 }
                 if(unpack('i', $this->secondFour)[1]==0){

@@ -36,8 +36,8 @@ function getUserIpAddr()
 }
 
 
-//$_POST['save'] = 'slot1.sav';
-//$_POST['replant'] = 'YES';
+$_POST['save'] = 'slot1.sav';
+$_POST['replant'] = 'NO';
 
 /**
  * define some stuff we need later

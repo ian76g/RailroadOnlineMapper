@@ -364,7 +364,7 @@ class GVASParser
                 die("This does not seem to be your save file.");
             }
             echo "SAVING FILE " . $this->NEWUPLOADEDFILE . '.modified' . "<br>\n";
-            file_put_contents('saves/' . $this->NEWUPLOADEDFILE . '.modified', $output);
+            file_put_contents('saves/' . $this->NEWUPLOADEDFILE . '.modified', $output, FILE_BINARY);
             echo '<A href="saves/' . $this->NEWUPLOADEDFILE . '.modified' . '">Download your modified save here </A><br>';
             echo 'Want to upload this map again?<A href="upload.php">Add your renumbered save again</A><br>';
         } else {
