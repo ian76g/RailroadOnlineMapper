@@ -198,6 +198,13 @@ class Mapper
                 default:
                     die('unknown industry');
             }
+            // label the industries
+            if ($doSvg) {
+                $svg .= '<text x="' . ($this->imx - (int)(($site['Location'][0] - $this->minX) / 100 * $this->scale) + $xoff) .
+                    '" y="' . ($this->imy - (int)(($site['Location'][1] - $this->minY) / 100 * $this->scale) + $yoff) . '" transform="rotate(' . $rotation .
+                    ',' . ($this->imx - (int)(($site['Location'][0] - $this->minX) / 100 * $this->scale) + $xoff) .
+                    ', ' . ($this->imy - (int)(($site['Location'][1] - $this->minY) / 100 * $this->scale) + $yoff) . ')" >' . $name . '</text>' . "\n";
+            }
 
         }
         // create a "database" and store some infos about this file for the websies index page
@@ -214,13 +221,6 @@ class Mapper
         );
         file_put_contents('db.db', serialize($db));
 
-        // label the industries
-        if ($doSvg) {
-            $svg .= '<text x="' . ($this->imx - (int)(($site['Location'][0] - $this->minX) / 100 * $this->scale) + $xoff) .
-                '" y="' . ($this->imy - (int)(($site['Location'][1] - $this->minY) / 100 * $this->scale) + $yoff) . '" transform="rotate(' . $rotation .
-                ',' . ($this->imx - (int)(($site['Location'][0] - $this->minX) / 100 * $this->scale) + $xoff) .
-                ', ' . ($this->imy - (int)(($site['Location'][1] - $this->minY) / 100 * $this->scale) + $yoff) . ')" >' . $name . '</text>' . "\n";
-        }
 
 
         /**
@@ -681,7 +681,9 @@ class Mapper
 <th>Cargo</th>
 <th>Amount</th>
 </tr>
-###TROWS###</table><br/><button class="button">APPLY ABOVE CHANGES TO MY SAVE!</button></form>';
+###TROWS###</table><br/>
+Replant trees: NO<input type="radio" name="replant" value="NO" checked="checked" /> &nbsp; &nbsp; <input type="radio" name="replant" value="YES" />YES<br>
+<button class="button">!DO NOT CLICK!</button></form>';
         $trows = '';
 
 // later you can switch cargo on carts - maybe this can be done by editing the save via the mapper later?

@@ -35,6 +35,10 @@ function getUserIpAddr()
     return $ip;
 }
 
+
+//$_POST['save'] = 'slot1.sav';
+//$_POST['replant'] = 'YES';
+
 /**
  * define some stuff we need later
  */
@@ -145,15 +149,9 @@ foreach ($files as $file) {
     $myParser = new GVASParser();                       // grab a Parser
     $myParser->NEWUPLOADEDFILE = $NEWUPLOADEDFILE;      // give the parser a filename
 
-    $data = $myParser->parseData(file_get_contents($path . '/' . $file), false);
-    if ($data == 'AGAIN') {
-        // hack - we read a small struct - and inject new structure elements (empty cart numbers)
-        // therefore we need to parse the new struct again.
-        $data = $myParser->parseData(file_get_contents($path . '/' . $file), false);
-    }
-    $data = json_decode($data, true);
+    $myParser->parseData(file_get_contents($path . '/' . $file), false);
 
-    $myMapper = new Mapper($data);
+    $myMapper = new Mapper($myParser->goldenBucket);
     $svg = $myMapper->gethtmlSVG($htmlSvg, $NEWUPLOADEDFILE, $empty, $arithmeticHelper);
 
     //@print_r($distances);

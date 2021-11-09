@@ -20,7 +20,6 @@ class GVASParser
     public function parseData($x, $againAllowed = true)
     {
         $this->x = $x;
-        $this->position = 0;
         $this->goldenBucket = array();
         $this->position = 0;
 
@@ -33,7 +32,7 @@ class GVASParser
 
         $myString = new dtString();
         $results = $myString->unserialize($x, $this->position);
-        $string = $results[0];
+//        $string = $results[0];
         $this->position = $results[1];
         $this->saveObject['objects'][] = $myString;
 
@@ -234,11 +233,41 @@ class GVASParser
             return $tmp;
         }
 
-        $json = json_encode($this->goldenBucket, JSON_PRETTY_PRINT);
+        $this->goldenBucket = $this->convert_from_latin1_to_utf8_recursively($this->goldenBucket);
+
+        $json = json_encode($this->goldenBucket, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+//echo json_last_error_msg();
         file_put_contents('xx.json', $json);
         return $json;
 
     }
+
+
+
+
+    /**
+     * Encode array from latin1 to utf8 recursively
+     * @param $dat
+     * @return array|string
+     */
+    public  function convert_from_latin1_to_utf8_recursively($dat)
+    {
+        if (is_string($dat)) {
+            return utf8_encode($dat);
+        } elseif (is_array($dat)) {
+            $ret = [];
+            foreach ($dat as $i => $d) $ret[ $i ] = self::convert_from_latin1_to_utf8_recursively($d);
+
+            return $ret;
+        } elseif (is_object($dat)) {
+            foreach ($dat as $i => $d) $dat->$i = self::convert_from_latin1_to_utf8_recursively($d);
+
+            return $dat;
+        } else {
+            return $dat;
+        }
+    }
+
 
     /**
      * @param $a
@@ -290,10 +319,10 @@ class GVASParser
                         //echo round($minDistanceToSomething)." ";
                     }
                     foreach ($toRemove as $tri) {
-                        if(!isset($_POST['replantTrees'])){
-                            $this->goldenBucket['Removed']['Vegetation'][$tri]['replant'] = true;
-                        } else {
+                        if(isset($_POST['replant']) && $_POST['replant']=='YES'){
                             unset($object->CONTENTOBJECTS[3]->contentElements[$tri]);
+                        } else {
+                            $this->goldenBucket['Removed']['Vegetation'][$tri]['replant'] = true;
                         }
 
                     }
@@ -301,73 +330,6 @@ class GVASParser
 //                    echo "NEW VALUE = " . (sizeof($object->CONTENTOBJECTS[3]->contentElements));
                 }
 
-                if (trim($object->NAME) == 'FrameNumberArray') {
-                    foreach ($object->CONTENTOBJECTS as $co) {
-                        if (is_object($co) && trim($co->NAME) == 'STRING') {
-                            if (
-                                ($co->ARRCOUNTER !== '') &&
-                                isset($_POST['number_' . $co->ARRCOUNTER]) &&
-                                $_POST['number_' . $co->ARRCOUNTER] != trim($co->string)
-                            ) {
-                                $co->string = strip_tags(trim($_POST['number_' . $co->ARRCOUNTER])) . hex2bin('00');
-                            }
-                        }
-                    }
-                }
-                if (trim($object->NAME) == 'FrameNameArray') {
-                    foreach ($object->CONTENTOBJECTS as $co) {
-                        if (is_object($co) && trim($co->NAME) == 'STRING') {
-                            if ($co->ARRCOUNTER)
-                                //echo "(".$co->string.")";
-                                if (
-                                    ($co->ARRCOUNTER !== '') &&
-                                    isset($_POST['name_' . $co->ARRCOUNTER]) &&
-                                    $_POST['name_' . $co->ARRCOUNTER] != trim($co->string)
-                                ) {
-                                    $co->string = strip_tags(trim($_POST['name_' . $co->ARRCOUNTER])) . hex2bin('00');
-                                }
-                        }
-                    }
-                }
-                if (trim($object->NAME) == 'FreightAmountArray') {
-                    foreach ($object->CONTENTOBJECTS as $co) {
-                        if (is_object($co) && trim($co->NAME) == 'IntProperty') {
-                            if (
-                                ($co->ARRCOUNTER !== '') &&
-                                isset($_POST['freightamount_' . $co->ARRCOUNTER]) &&
-                                $_POST['freightamount_' . $co->ARRCOUNTER] != trim($co->value)
-                            ) {
-                                $co->value = strip_tags(trim($_POST['freightamount_' . $co->ARRCOUNTER]));
-                            }
-                        }
-                    }
-                }
-                if (trim($object->NAME) == 'TenderFuelAmountArray') {
-                    foreach ($object->CONTENTOBJECTS as $co) {
-                        if (is_object($co) && trim($co->NAME) == 'FloatProperty') {
-                            if (
-                                ($co->ARRCOUNTER !== '') &&
-                                isset($_POST['tenderamount_' . $co->ARRCOUNTER]) &&
-                                $_POST['tenderamount_' . $co->ARRCOUNTER] != trim($co->value)
-                            ) {
-                                $co->value = strip_tags(trim($_POST['tenderamount_' . $co->ARRCOUNTER]));
-                            }
-                        }
-                    }
-                }
-                if (trim($object->NAME) == 'FreightTypeArray') {
-                    foreach ($object->CONTENTOBJECTS as $co) {
-                        if (is_object($co) && $co->ARRCOUNTER) {
-                            if (
-                                ($co->ARRCOUNTER !== '') &&
-                                isset($_POST['freightType_' . $co->ARRCOUNTER]) &&
-                                $_POST['freightType_' . $co->ARRCOUNTER] != trim($co->string)
-                            ) {
-                                $co->string = strip_tags(trim($_POST['freightType_' . $co->ARRCOUNTER])) . hex2bin('00');
-                            }
-                        }
-                    }
-                }
 
                 $output .= $object->serialize();
             } else {
@@ -386,7 +348,7 @@ class GVASParser
             echo '<A href="saves/' . $this->NEWUPLOADEDFILE . '.modified' . '">Download your modified save here </A><br>';
             echo 'Want to upload this map again?<A href="upload.php">Add your renumbered save again</A><br>';
         } else {
-            file_put_contents('uploads/' . $this->NEWUPLOADEDFILE, $output);
+            file_put_contents('uploads/' . $this->NEWUPLOADEDFILE, $output, FILE_BINARY);
         }
 
     }
