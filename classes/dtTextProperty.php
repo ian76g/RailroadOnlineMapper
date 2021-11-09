@@ -51,15 +51,14 @@ class dtTextProperty extends dtAbstractData
                 $output .= $this->formatter->serialize();
                 $output .= pack($this->pack, $this->numberOfLines);
 
-                while(sizeof($this->lines))
+                for($i=0; $i<sizeof($this->lines); $i++)
                 {
-                    $x = array_shift($this->lines);
+                    $x = $this->lines[$i];
                     $output .= $x->serialize();
-                    $output .= array_shift($this->tests);
-                    $x = array_shift($this->lines);
+                    $output .= $this->tests[$i];
+                    $x = $this->lines[$i+1];
                     $output .= $x->serialize();
-                    array_shift($this->tests); // dummy;
-
+                    $i++;
                 }
 
                 break;
