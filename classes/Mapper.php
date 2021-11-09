@@ -97,6 +97,7 @@ class Mapper
 
         $svg .= $this->drawRollingStocks($htmlSvg);
 
+        $svg .= $this->populateInfo($htmlSvg);
 
         $types = array();
         /**
@@ -237,37 +238,6 @@ class Mapper
         }
 
         /**
-         * add player info to the map
-         */
-
-        $text = '===== PLAYERS ON THIS SERVER =====' . "\n\n\n";
-        $text2 = '.' . "\n\n\n";
-        if ($this->data['Players'][0]['Name'] == 'ian76g') {
-            $this->data['Players'][0]['Money'] -= 30000;
-        }
-        foreach ($this->data['Players'] as $player) {
-            $text .= str_pad($player['Name'], 20, ' ', STR_PAD_BOTH) . "\n\n";
-            $text2 .= ' (XP ' . str_pad($player['Xp'], 7, ' ', STR_PAD_RIGHT) . '  ' .
-                str_pad($player['Money'], 8, ' ', STR_PAD_LEFT) . '$)' . "\n\n";
-        }
-        if ($doSvg) {
-            $svg .= '<text x="50" y="50" font-size="20" dy="0">';
-            $textlines = explode("\n", $text);
-            foreach ($textlines as $textline) {
-                $svg .= '<tspan x="50" dy="1.2em">' . $textline . '&nbsp;</tspan>';
-            }
-            $svg .= '</text>' . "\n";
-
-            $svg .= '<text x="350" y="50" font-size="20" dy="0">';
-            $textlines = explode("\n", $text2);
-            foreach ($textlines as $textline) {
-                $svg .= '<tspan x="350" dy="1.2em">' . $textline . '&nbsp;</tspan>';
-            }
-            $svg .= '</text>' . "\n";
-        }
-
-
-        /**
          * chart (Legende) of carts
          */
         $carts = array(
@@ -327,7 +297,6 @@ class Mapper
 
         return $svg;
     }
-
 
     /**
      * @param $newLabel
@@ -876,10 +845,49 @@ class Mapper
             '>flatcar_hopper' => '><img src="/images/flatcar_hopper.png">',
         );
 
+
         $cartExtraStr = str_replace('###TROWS###', $trows, $cartExtraStr);
         $cartExtraStr = str_replace(array_keys($images), $images, $cartExtraStr);
         $htmlSvg = str_replace('###EXTRAS###', $cartExtraStr, $htmlSvg);
 
+        return $svg;
+    }
+
+    public function populateInfo(&$htmlSvg)
+    {
+        $doSvg = true;
+        $svg = '';
+         /**
+            * add player info
+         */
+
+        $text = "";
+        $text2 = "";
+        $playerInfo = "";
+        if ($this->data['Players'][0]['Name'] == 'ian76g') {
+            $this->data['Players'][0]['Money'] -= 30000;
+        }
+
+        foreach ($this->data['Players'] as $player) {
+            $text .= str_pad($player['Name'], 20, ' ', STR_PAD_BOTH) . "\n";
+            $text2 .= ' (XP ' . str_pad($player['Xp'], 7, ' ', STR_PAD_RIGHT) . '  ' .
+                str_pad($player['Money'], 8, ' ', STR_PAD_LEFT) . '$)' . "\n\n";
+        }
+
+        $textlines = explode("\n", $text);
+        $playerInfo .= '<div>';
+        foreach ($textlines as $textline) {
+            $playerInfo .= '<p>' . $textline . '</p>';
+        }
+        $playerInfo .= '</div><div>';
+
+        $textlines = explode("\n", $text2);
+        foreach ($textlines as $textline) {
+            $playerInfo .= '<p>' . $textline . '</p>';
+        }
+        $playerInfo .= '</div>';
+
+        $htmlSvg = str_replace('###PLAYERINFO###', $playerInfo, $htmlSvg);
         return $svg;
     }
 

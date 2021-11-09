@@ -6,12 +6,26 @@ document.addEventListener("DOMContentLoaded", function () {
     center: true,
   });
 
-  document.getElementById("menu-toggle").addEventListener("click", function () {
-    const menuClassList = document.querySelector(".export__menu").classList;
-    const openClass = "export__menu--open";
-
-    menuClassList.contains(openClass)
-      ? menuClassList.remove(openClass)
-      : menuClassList.add(openClass);
+  document.getElementById("info-panel-toggle").addEventListener("click", function () {
+    togglePanel('info-panel')
   });
+
+  document.getElementById("edit-panel-toggle").addEventListener("click", function () {
+    togglePanel('edit-panel')
+  });
+
+  const togglePanel = panelClass => {
+    const openClass = `export__panel--open`;
+    let openPanels = document.querySelector(`.${openClass}`);
+    let panelClassList = document.querySelector(`.${panelClass}`).classList;
+
+    // Close any open panels
+    if (openPanels !== null && !openPanels.classList.contains(panelClass)) {
+      openPanels.classList.remove(openClass)
+    }
+
+    panelClassList.contains(openClass)
+      ? panelClassList.remove(openClass)
+      : panelClassList.add(openClass);
+  }
 });
