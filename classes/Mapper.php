@@ -222,7 +222,6 @@ class Mapper
         file_put_contents('db.db', serialize($db));
 
 
-
         /**
          * add Watertowers to the map
          */
@@ -315,10 +314,22 @@ class Mapper
     function drawReplantableTrees()
     {
         $svg = '';
-        foreach($this->data['Removed']['Vegetation'] as $index => $tree){
+        foreach ($this->data['Removed']['Vegetation'] as $index => $tree) {
 
-            if(!isset($_POST['firstTree']) && $index<1825) continue;
-            if(!isset($_POST['userTree'])) continue;
+            if (isset($_POST['firstTree']) && isset($_POST['userTree'])) {
+                // all trees
+            }
+            if (!isset($_POST['firstTree']) && isset($_POST['userTree'])) {
+                // >1825
+                if ($index < 1825) continue;
+            }
+            if (isset($_POST['firstTree']) && !isset($_POST['userTree'])) {
+                // <1825
+                if ($index > 1825) continue;
+            }
+            if (!isset($_POST['firstTree']) && !isset($_POST['userTree'])) {
+                continue;
+            }
 
             $treeX = floor((200000 + $tree[0]) / 100000);
             $treeY = floor((200000 + $tree[1]) / 100000);
@@ -341,8 +352,8 @@ class Mapper
                 }
             }
             if ($minDistanceToSomething > 2000) {
-                if($index<1825) {
-                    $color='orange';
+                if ($index < 1825) {
+                    $color = 'orange';
                 } else {
                     $color = 'green';
                 }
@@ -365,7 +376,6 @@ class Mapper
 
         return sqrt(pow($a[0] - $b['X'], 2) + pow($a[1] - $b['Y'], 2));
     }
-
 
 
     /**
@@ -764,16 +774,16 @@ Replant trees: NO<input type="radio" name="replant" value="NO" checked="checked"
             $optionTemplate = '<option value="###OPTIONVALUE###" ###SELECTED###>###OPTIONNAME###</option>';
 
             $optionsStringArray = array();
-            if(!isset($vehicle['Freight'])){
+            if (!isset($vehicle['Freight'])) {
                 $vehicle['Freight']['Type'] = '';
             }
-            if(!isset($vehicle['Name'])){
+            if (!isset($vehicle['Name'])) {
                 $vehicle['Name'] = '';
             }
-            if(!isset($vehicle['Number'])){
+            if (!isset($vehicle['Number'])) {
                 $vehicle['Number'] = '';
             }
-            if(!isset($vehicle['Tender'])){
+            if (!isset($vehicle['Tender'])) {
                 $vehicle['Tender']['Fuelamount'] = '';
             }
 
