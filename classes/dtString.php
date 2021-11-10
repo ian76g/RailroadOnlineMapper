@@ -14,6 +14,25 @@ class dtString extends dtAbstractData
     var $ARRCOUNTER = '';
 
     /**
+     * dtString constructor.
+     * @param $string
+     */
+    public function __construct($string=null)
+    {
+        if($string!==null) {
+            $string = rtrim($string);
+            $encoding = mb_detect_encoding($string);
+            if($encoding == 'UTF-8'){
+                $this->nullBytes = 2;
+            } else {
+                $this->nullBytes = 1;
+            }
+            $this->string = $string;
+            $this->NAME = 'HUMAN_TEXT';
+        }
+    }
+
+    /**
      * @param $fromX
      * @param $position
      * @return array
@@ -94,7 +113,7 @@ class dtString extends dtAbstractData
             $strLength = -(strlen($data) / 2);
             $data = pack('i', $strLength) . rtrim($data, "\0");
         } else {
-            $data = pack('i', strlen($this->string)) . rtrim($this->string);
+            $data = pack('i', strlen(rtrim($this->string))+$this->nullBytes) . rtrim($this->string);
         }
 
         for ($i = 0; $i < $this->nullBytes; $i++) {

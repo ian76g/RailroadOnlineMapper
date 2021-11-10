@@ -11,6 +11,7 @@ class GVASParser
     var $goldenBucket = array();
     var $NEWUPLOADEDFILE;
     var $saveObject = array();
+    var $initialTreesDown = 1750;
 
     /**
      * @param $x
@@ -162,67 +163,70 @@ class GVASParser
         }
 
 
-        for ($i = 0; $i < sizeof($this->goldenBucket['Spline']['Points']['Index']['Start']); $i++) {
-            $locArr = $this->goldenBucket['Spline']['Location'][$i];
+        if (isset($this->goldenBucket['Spline'])) {
 
-            $spline = array(
-                'Location' => array(
-                    'X' => $locArr[0],
-                    'Y' => $locArr[1],
-                    'Z' => $locArr[2]
-                ),
-                'Type' => $this->goldenBucket['Spline']['Type'][$i]
-            );
+            for ($i = 0; $i < sizeof($this->goldenBucket['Spline']['Points']['Index']['Start']); $i++) {
+                $locArr = $this->goldenBucket['Spline']['Location'][$i];
 
-            $segmentArray = array();
-            $startPos = $this->goldenBucket['Spline']['Points']['Index']['Start'][$i];
-            $endPos = $this->goldenBucket['Spline']['Points']['Index']['End'][$i];
-
-            while ($startPos < $endPos) {
-
-                $startLocs = $this->goldenBucket['Spline']['Points']['Arr'][$startPos];
-                $endLocs = $this->goldenBucket['Spline']['Points']['Arr'][$startPos + 1];
-
-                $segmentArray[] = array(
-                    'LocationStart' => array(
-                        'X' => $startLocs[0],
-                        'Y' => $startLocs[1],
-                        'Z' => $startLocs[2]
+                $spline = array(
+                    'Location' => array(
+                        'X' => $locArr[0],
+                        'Y' => $locArr[1],
+                        'Z' => $locArr[2]
                     ),
-                    'LocationEnd' => array(
-                        'X' => $endLocs[0],
-                        'Y' => $endLocs[1],
-                        'Z' => $endLocs[2]
-                    ),
-                    'LocationCenter' => array(
-                        'X' => $startLocs[0] + ($endLocs[0] - $startLocs[0]) / 2,
-                        'Y' => $startLocs[1] + ($endLocs[1] - $startLocs[1]) / 2,
-                        'Z' => $startLocs[2] + ($endLocs[2] - $startLocs[2]) / 2
-                    ),
-                    'Visible' => array_shift($this->goldenBucket['Spline']['Segments']['Visibility']),
-
+                    'Type' => $this->goldenBucket['Spline']['Type'][$i]
                 );
-                $startPos++;
 
-                $cX = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['X']) / 100000);
-                $cY = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['Y']) / 100000);
-                $this->goldenBucket['Segments'][$cX][$cY][] = $segmentArray[sizeof($segmentArray) - 1];
+                $segmentArray = array();
+                $startPos = $this->goldenBucket['Spline']['Points']['Index']['Start'][$i];
+                $endPos = $this->goldenBucket['Spline']['Points']['Index']['End'][$i];
 
-                $sX = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['X']) / 100000);
-                $sY = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['Y']) / 100000);
-                if ($sX != $cX || $sY != $cY) {
-                    $this->goldenBucket['Segments'][$sX][$sY][] = $segmentArray[sizeof($segmentArray) - 1];
+                while ($startPos < $endPos) {
+
+                    $startLocs = $this->goldenBucket['Spline']['Points']['Arr'][$startPos];
+                    $endLocs = $this->goldenBucket['Spline']['Points']['Arr'][$startPos + 1];
+
+                    $segmentArray[] = array(
+                        'LocationStart' => array(
+                            'X' => $startLocs[0],
+                            'Y' => $startLocs[1],
+                            'Z' => $startLocs[2]
+                        ),
+                        'LocationEnd' => array(
+                            'X' => $endLocs[0],
+                            'Y' => $endLocs[1],
+                            'Z' => $endLocs[2]
+                        ),
+                        'LocationCenter' => array(
+                            'X' => $startLocs[0] + ($endLocs[0] - $startLocs[0]) / 2,
+                            'Y' => $startLocs[1] + ($endLocs[1] - $startLocs[1]) / 2,
+                            'Z' => $startLocs[2] + ($endLocs[2] - $startLocs[2]) / 2
+                        ),
+                        'Visible' => array_shift($this->goldenBucket['Spline']['Segments']['Visibility']),
+
+                    );
+                    $startPos++;
+
+                    $cX = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['X']) / 100000);
+                    $cY = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['Y']) / 100000);
+                    $this->goldenBucket['Segments'][$cX][$cY][] = $segmentArray[sizeof($segmentArray) - 1];
+
+                    $sX = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['X']) / 100000);
+                    $sY = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['Y']) / 100000);
+                    if ($sX != $cX || $sY != $cY) {
+                        $this->goldenBucket['Segments'][$sX][$sY][] = $segmentArray[sizeof($segmentArray) - 1];
+                    }
+
+                    $eX = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['X']) / 100000);
+                    $eY = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['Y']) / 100000);
+                    if ($eX != $cX || $eY != $cY) {
+                        $this->goldenBucket['Segments'][$eX][$eY][] = $segmentArray[sizeof($segmentArray) - 1];
+                    }
                 }
 
-                $eX = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['X']) / 100000);
-                $eY = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['Y']) / 100000);
-                if ($eX != $cX || $eY != $cY) {
-                    $this->goldenBucket['Segments'][$eX][$eY][] = $segmentArray[sizeof($segmentArray) - 1];
-                }
+                $spline['Segments'] = $segmentArray;
+                $this->goldenBucket['Splines'][] = $spline;
             }
-
-            $spline['Segments'] = $segmentArray;
-            $this->goldenBucket['Splines'][] = $spline;
         }
 
         if (isset($this->goldenBucket['Turntable'])) {
@@ -309,7 +313,7 @@ class GVASParser
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $vector) {
                         $v++;
                         // found a new fallen tree
-                        if ($v < 1825) continue;
+                        if ($v < $this->initialTreesDown) continue;
                         $treeX = floor((200000 + $vector->content[0]) / 100000);
                         $treeY = floor((200000 + $vector->content[1]) / 100000);
 
@@ -350,16 +354,16 @@ class GVASParser
 //                    echo "NEW VALUE = " . (sizeof($object->CONTENTOBJECTS[3]->contentElements));
                 }
 
-                if( false && trim($object->NAME) == 'FrameNumberArray'){
-                    foreach($object->CONTENTOBJECTS[3]->contentElements as $index=>$textProp){
-                        if(isset($_POST['number_'.$index]) && trim($_POST['number_'.$index])){
-                            $x=2;
-                            if(!isset($object->CONTENTOBJECTS[3]->contentElements[$index]->lines[0])){
+                if (trim($object->NAME) == 'FrameNumberArray') {
+                    foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
+                        if (isset($_POST['number_' . $index]) && trim($_POST['number_' . $index])) {
+                            $x = 2;
+                            if (!isset($object->CONTENTOBJECTS[3]->contentElements[$index]->lines[0])) {
                                 $string = new dtString();
                                 $string->nullBytes = 1;
                                 $object->CONTENTOBJECTS[3]->contentElements[$index]->addLine($string);
                             }
-                            $object->CONTENTOBJECTS[3]->contentElements[$index]->lines[0]->string = trim($_POST['number_'.$index]);
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->lines[0]->string = trim($_POST['number_' . $index]);
                             // terminator = 2
                             $object->CONTENTOBJECTS[3]->contentElements[$index]->terminator = pack('C', 2);
                             // second 4 = 1
@@ -367,6 +371,111 @@ class GVASParser
                         }
                     }
                 }
+                if (trim($object->NAME) == 'FrameNameArray') {
+                    foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
+                        if (isset($_POST['name_' . $index]) && trim($_POST['name_' . $index])) {
+                            $x = 2;
+                            $object->CONTENTOBJECTS[3]->contentElements[$index] = new dtTextProperty(trim($_POST['name_' . $index]));
+                        }
+                    }
+                }
+
+                if (trim($object->NAME) == 'FreightAmountArray') {
+                    foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $dtDynamic) {
+                        if (isset($_POST['freightamount_' . $index]) && trim($_POST['freightamount_' . $index])) {
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['freightamount_' . $index]);
+                        }
+                    }
+                }
+
+                if (trim($object->NAME) == 'TenderFuelAmountArray') {
+                    foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
+                        if (isset($_POST['tenderfuelamount_' . $index]) && trim($_POST['tenderfuelamount_' . $index])) {
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['tenderfuelamount_' . $index]);
+                        }
+                    }
+                }
+
+                if (trim($object->NAME) == 'PlayerXPArray') {
+                    foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
+                        if (isset($_POST['xp_' . $index]) && trim($_POST['xp_' . $index])) {
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['xp_' . $index]);
+                        }
+                    }
+                }
+                if (trim($object->NAME) == 'PlayerMoneyArray') {
+                    foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
+                        if (isset($_POST['money_' . $index]) && trim($_POST['money_' . $index])) {
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['money_' . $index]);
+                        }
+                    }
+                }
+
+                //IndustryStorageEduct1Array
+                if (trim($object->NAME) == 'IndustryStorageEduct1Array') {
+                    foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
+                        if (isset($_POST['educt0_' . $index]) && trim($_POST['educt0_' . $index])) {
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['educt0_' . $index]);
+                        }
+                    }
+                }
+                //IndustryStorageEduct2Array
+                if (trim($object->NAME) == 'IndustryStorageEduct2Array') {
+                    foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
+                        if (isset($_POST['educt1_' . $index]) && trim($_POST['educt1_' . $index])) {
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['educt1_' . $index]);
+                        }
+                    }
+                }
+                //IndustryStorageEduct3Array
+                if (trim($object->NAME) == 'IndustryStorageEduc3Array') {
+                    foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
+                        if (isset($_POST['educt2_' . $index]) && trim($_POST['educt2_' . $index])) {
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['educt2_' . $index]);
+                        }
+                    }
+                }
+                //IndustryStorageEduct4Array
+                if (trim($object->NAME) == 'IndustryStorageEduct4Array') {
+                    foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
+                        if (isset($_POST['educt3_' . $index]) && trim($_POST['educt3_' . $index])) {
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['educt3_' . $index]);
+                        }
+                    }
+                }
+                //IndustryStorageProduct1Array
+                if (trim($object->NAME) == 'IndustryStorageProduct1Array') {
+                    foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
+                        if (isset($_POST['product0_' . $index]) && trim($_POST['product0_' . $index])) {
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['product0_' . $index]);
+                        }
+                    }
+                }
+                //IndustryStorageProduct2Array
+                if (trim($object->NAME) == 'IndustryStorageProduct2Array') {
+                    foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
+                        if (isset($_POST['product1_' . $index]) && trim($_POST['product1_' . $index])) {
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['product1_' . $index]);
+                        }
+                    }
+                }
+                //IndustryStorageProduct3Array
+                if (trim($object->NAME) == 'IndustryStorageProduct3Array') {
+                    foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
+                        if (isset($_POST['product2_' . $index]) && trim($_POST['product2_' . $index])) {
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['product2_' . $index]);
+                        }
+                    }
+                }
+                //IndustryStorageProduct4Array
+                if (trim($object->NAME) == 'IndustryStorageProduct4Array') {
+                    foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
+                        if (isset($_POST['product3_' . $index]) && trim($_POST['product3_' . $index])) {
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['product3_' . $index]);
+                        }
+                    }
+                }
+
 
                 $output .= $object->serialize();
             } else {

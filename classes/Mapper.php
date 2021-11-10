@@ -33,6 +33,10 @@ class Mapper
     private $arithmeticHelper;
     private $allLabels = array(array(0, 0));
 
+    var $initialsTreeDown = 1750;
+    var $prows = '';
+    var $irows = '';
+
     /**
      * Mapper constructor.
      * @param $data
@@ -95,118 +99,14 @@ class Mapper
 
         $svg .= $this->drawTurntables();
 
+        $svg .= $this->drawPlayers();
+
+        $svg .= $this->drawIndustries();
+
         $svg .= $this->drawRollingStocks($htmlSvg);
 
 
         $types = array();
-        /**
-         * add the industries to the map
-         */
-        foreach ($this->data['Industries'] as $site) {
-            /**
-             * again - fix some issues with wrong INPUT from json
-             */
-            $xoff = $yoff = 0;
-            switch ($site['Type']) {
-                case '1':
-                    $name = 'Logging Camp';
-                    $rotation = 0;
-                    $xoff = -70;
-                    $yoff = -30;
-                    break;
-                case '2':
-                    $name = 'Sawmill';
-                    array_pop($site['EductsStored']);
-                    array_pop($site['EductsStored']);
-                    array_pop($site['EductsStored']);
-                    array_pop($site['ProductsStored']);
-                    array_pop($site['ProductsStored']);
-                    $name .= "\nI:" . implode(',', $site['EductsStored']) . "\nO:" . implode(',', $site['ProductsStored']);
-                    $xoff = -35;
-                    $yoff = -15;
-                    $rotation = 45;
-                    break;
-                case '3':
-                    $name = 'Smelter';
-                    array_pop($site['EductsStored']);
-                    array_pop($site['EductsStored']);
-                    array_pop($site['ProductsStored']);
-                    array_pop($site['ProductsStored']);
-                    $name .= "\nI:" . implode(',', $site['EductsStored']) . "\nO:" . implode(',', $site['ProductsStored']);
-                    $rotation = 90;
-                    break;
-                case '4':
-                    $name = 'Ironworks';
-                    array_pop($site['EductsStored']);
-                    array_pop($site['EductsStored']);
-                    array_pop($site['ProductsStored']);
-                    array_pop($site['ProductsStored']);
-                    $name .= "\nI:" . implode(',', $site['EductsStored']) . "\nO:" . implode(',', $site['ProductsStored']);
-                    $rotation = 90;
-                    break;
-                case '5':
-                    $name = 'Oilfield';
-                    array_pop($site['EductsStored']);
-                    array_pop($site['ProductsStored']);
-                    array_pop($site['ProductsStored']);
-                    array_pop($site['ProductsStored']);
-                    $name .= "\nI:" . implode(',', $site['EductsStored']) . "\nO:" . implode(',', $site['ProductsStored']);
-                    $rotation = 0;
-                    break;
-                case '6':
-                    $name = 'Refinery';
-                    array_pop($site['EductsStored']);
-                    array_pop($site['ProductsStored']);
-                    array_pop($site['ProductsStored']);
-                    array_pop($site['ProductsStored']);
-                    $name .= "\nI:" . implode(',', $site['EductsStored']) . "\nO:" . implode(',', $site['ProductsStored']);
-                    $rotation = 0;
-                    break;
-                case '7':
-                    $name = 'Coal Mine';
-                    array_pop($site['EductsStored']);
-                    array_pop($site['EductsStored']);
-                    array_pop($site['ProductsStored']);
-                    array_pop($site['ProductsStored']);
-                    array_pop($site['ProductsStored']);
-                    $name .= "\nI:" . implode(',', $site['EductsStored']) . "\nO:" . implode(',', $site['ProductsStored']);
-                    $rotation = -20;
-                    $xoff = -20;
-                    $yoff = 20;
-                    break;
-                case '8':
-                    $name = 'Iron Mine';
-                    array_pop($site['EductsStored']);
-                    array_pop($site['EductsStored']);
-                    array_pop($site['ProductsStored']);
-                    array_pop($site['ProductsStored']);
-                    array_pop($site['ProductsStored']);
-                    $name .= "\nI:" . implode(',', $site['EductsStored']) . "\nO:" . implode(',', $site['ProductsStored']);
-                    $rotation = 45;
-                    $yoff = +50;
-                    $xoff = -20;
-                    break;
-                case '9':
-                    $name = 'Freight Depot';
-                    $rotation = 90;
-                    break;
-                case '10':
-                    $name = 'F';
-                    $name .= "(" . array_sum($site['ProductsStored']) . ")";
-                    $rotation = 0;
-                    break;
-                default:
-                    die('unknown industry');
-            }
-            // label the industries
-            if ($doSvg) {
-                $svg .= '<text x="' . ($this->imx - (int)(($site['Location'][0] - $this->minX) / 100 * $this->scale) + $xoff) .
-                    '" y="' . ($this->imy - (int)(($site['Location'][1] - $this->minY) / 100 * $this->scale) + $yoff) . '" transform="rotate(' . $rotation .
-                    ',' . ($this->imx - (int)(($site['Location'][0] - $this->minX) / 100 * $this->scale) + $xoff) .
-                    ', ' . ($this->imy - (int)(($site['Location'][1] - $this->minY) / 100 * $this->scale) + $yoff) . ')" >' . $name . '</text>' . "\n";
-            }
-
-        }
         // create a "database" and store some infos about this file for the websies index page
 
         $db = @unserialize(@file_get_contents('db.db'));
@@ -233,36 +133,6 @@ class Mapper
                     $svg .= '<text x="' . ($x) . '" y="' . ($y) . '" >W</text>' . "\n";
                 }
             }
-        }
-
-        /**
-         * add player info to the map
-         */
-
-        $text = '===== PLAYERS ON THIS SERVER =====' . "\n\n\n";
-        $text2 = '.' . "\n\n\n";
-        if ($this->data['Players'][0]['Name'] == 'ian76g') {
-            $this->data['Players'][0]['Money'] -= 30000;
-        }
-        foreach ($this->data['Players'] as $player) {
-            $text .= str_pad($player['Name'], 20, ' ', STR_PAD_BOTH) . "\n\n";
-            $text2 .= ' (XP ' . str_pad($player['Xp'], 7, ' ', STR_PAD_RIGHT) . '  ' .
-                str_pad($player['Money'], 8, ' ', STR_PAD_LEFT) . '$)' . "\n\n";
-        }
-        if ($doSvg) {
-            $svg .= '<text x="50" y="50" font-size="20" dy="0">';
-            $textlines = explode("\n", $text);
-            foreach ($textlines as $textline) {
-                $svg .= '<tspan x="50" dy="1.2em">' . $textline . '&nbsp;</tspan>';
-            }
-            $svg .= '</text>' . "\n";
-
-            $svg .= '<text x="350" y="50" font-size="20" dy="0">';
-            $textlines = explode("\n", $text2);
-            foreach ($textlines as $textline) {
-                $svg .= '<tspan x="350" dy="1.2em">' . $textline . '&nbsp;</tspan>';
-            }
-            $svg .= '</text>' . "\n";
         }
 
 
@@ -320,12 +190,12 @@ class Mapper
                 // all trees
             }
             if (!isset($_POST['firstTree']) && isset($_POST['userTree'])) {
-                // >1825
-                if ($index < 1825) continue;
+                // >1767
+                if ($index < $this->initialsTreeDown) continue;
             }
             if (isset($_POST['firstTree']) && !isset($_POST['userTree'])) {
-                // <1825
-                if ($index > 1825) continue;
+                // <1767
+                if ($index > $this->initialsTreeDown) continue;
             }
             if (!isset($_POST['firstTree']) && !isset($_POST['userTree'])) {
                 continue;
@@ -352,7 +222,7 @@ class Mapper
                 }
             }
             if ($minDistanceToSomething > 2000) {
-                if ($index < 1825) {
+                if ($index < $this->initialsTreeDown) {
                     $color = 'orange';
                 } else {
                     $color = 'green';
@@ -429,83 +299,85 @@ class Mapper
          * Loop the order array painting one type over the next
          */
         foreach ($order as $current => $optionsArr) {
-            foreach ($this->data['Splines'] as $spline) {
-                $type = $spline['Type'];
+            if (isset($this->data['Splines'])) {
+                foreach ($this->data['Splines'] as $spline) {
+                    $type = $spline['Type'];
 
-                if ($type != $current) continue;            // if this spline is not the current type, skip it
-                $segments = $spline['Segments'];
+                    if ($type != $current) continue;            // if this spline is not the current type, skip it
+                    $segments = $spline['Segments'];
 
-                foreach ($segments as $segment) {
-                    if ($segment['Visible'] != 1) continue; // skip invisible tracks
+                    foreach ($segments as $segment) {
+                        if ($segment['Visible'] != 1) continue; // skip invisible tracks
 
-                    $xStart = ($this->imx - (int)(($segment['LocationStart']['X'] - $this->minX) / 100 * $this->scale));
-                    $yStart = ($this->imy - (int)(($segment['LocationStart']['Y'] - $this->minY) / 100 * $this->scale));
-                    $xEnd = ($this->imx - (int)(($segment['LocationEnd']['X'] - $this->minX) / 100 * $this->scale));
-                    $yEnd = ($this->imy - (int)(($segment['LocationEnd']['Y'] - $this->minY) / 100 * $this->scale));
-                    $xCenter = ($this->imx - (int)(($segment['LocationCenter']['X'] - $this->minX) / 100 * $this->scale));
-                    $yCenter = ($this->imy - (int)(($segment['LocationCenter']['Y'] - $this->minY) / 100 * $this->scale));
+                        $xStart = ($this->imx - (int)(($segment['LocationStart']['X'] - $this->minX) / 100 * $this->scale));
+                        $yStart = ($this->imy - (int)(($segment['LocationStart']['Y'] - $this->minY) / 100 * $this->scale));
+                        $xEnd = ($this->imx - (int)(($segment['LocationEnd']['X'] - $this->minX) / 100 * $this->scale));
+                        $yEnd = ($this->imy - (int)(($segment['LocationEnd']['Y'] - $this->minY) / 100 * $this->scale));
+                        $xCenter = ($this->imx - (int)(($segment['LocationCenter']['X'] - $this->minX) / 100 * $this->scale));
+                        $yCenter = ($this->imy - (int)(($segment['LocationCenter']['Y'] - $this->minY) / 100 * $this->scale));
 
-                    if ($doSvg) {
-                        $svg .= '<line x1="' . ($xStart) . '" y1="' . ($yStart) .
-                            '" x2="' . ($xEnd) . '" y2="' . ($yEnd) .
-                            '" stroke="' . $optionsArr[1] . '" stroke-width="' . $optionsArr[0] . '"/>' . "\n";
-                    }
-
-
-                    $distance = sqrt(
-                        pow($segment['LocationEnd']['X'] - $segment['LocationStart']['X'], 2) +
-                        pow($segment['LocationEnd']['Y'] - $segment['LocationStart']['Y'], 2) +
-                        pow($segment['LocationEnd']['Z'] - $segment['LocationStart']['Z'], 2)
-                    );
-
-                    if (in_array($type, array(4, 0))) {
-                        $this->totalTrackLength += $distance;
-
-                        $height = $segment['LocationEnd']['Z'] - $segment['LocationStart']['Z'];
-                        $height = abs($height);
-                        $length = sqrt(pow($segment['LocationEnd']['X'] - $segment['LocationStart']['X'], 2) +
-                            pow($segment['LocationEnd']['Y'] - $segment['LocationStart']['Y'], 2));
+                        if ($doSvg) {
+                            $svg .= '<line x1="' . ($xStart) . '" y1="' . ($yStart) .
+                                '" x2="' . ($xEnd) . '" y2="' . ($yEnd) .
+                                '" stroke="' . $optionsArr[1] . '" stroke-width="' . $optionsArr[0] . '"/>' . "\n";
+                        }
 
 
-                        if (empty($length)) {//check for zero length tracks
-                            $zeroLenthSegments[] = $segment;
-                            if ($doSvg) { //@ToDo make function later.
-                                $svg .= sprintf('<circle cx="%d" cy="%d" r="10" stroke="red" stroke-width="2" fill="red" />', $xCenter, $yCenter);
+                        $distance = sqrt(
+                            pow($segment['LocationEnd']['X'] - $segment['LocationStart']['X'], 2) +
+                            pow($segment['LocationEnd']['Y'] - $segment['LocationStart']['Y'], 2) +
+                            pow($segment['LocationEnd']['Z'] - $segment['LocationStart']['Z'], 2)
+                        );
+
+                        if (in_array($type, array(4, 0))) {
+                            $this->totalTrackLength += $distance;
+
+                            $height = $segment['LocationEnd']['Z'] - $segment['LocationStart']['Z'];
+                            $height = abs($height);
+                            $length = sqrt(pow($segment['LocationEnd']['X'] - $segment['LocationStart']['X'], 2) +
+                                pow($segment['LocationEnd']['Y'] - $segment['LocationStart']['Y'], 2));
+
+
+                            if (empty($length)) {//check for zero length tracks
+                                $zeroLenthSegments[] = $segment;
+                                if ($doSvg) { //@ToDo make function later.
+                                    $svg .= sprintf('<circle cx="%d" cy="%d" r="10" stroke="red" stroke-width="2" fill="red" />', $xCenter, $yCenter);
+                                }
+                                continue; //This may cause issues down the road. We may need to stop at this point and return the errors segment.
+                            } else {
+                                $slope = ($height * 100 / $length);
                             }
-                            continue; //This may cause issues down the road. We may need to stop at this point and return the errors segment.
-                        } else {
-                            $slope = ($height * 100 / $length);
-                        }
 
-                        if ($slope > $this->maxSlope) {
-                            $slopecoords = array($xCenter, $yCenter);
+                            if ($slope > $this->maxSlope) {
+                                $slopecoords = array($xCenter, $yCenter);
+                            }
+                            $this->maxSlope = max($this->maxSlope, $slope);
                         }
-                        $this->maxSlope = max($this->maxSlope, $slope);
-                    }
 
 // label some splines with their slope - not yet working
 // main problem: find a spot for the text that is near to track but do not override other stuff
-                    if (!isset($_POST['slopeTrigger'])) $_POST['slopeTrigger'] = 2;
-                    if (!isset($_POST['slopeTriggerPrefix'])) $_POST['slopeTriggerPrefix'] = '..';
-                    if (!isset($_POST['slopeTriggerDecimals'])) $_POST['slopeTriggerDecimals'] = 1;
-                    if ($distance > 0 && in_array($type, array(4, 0))) {
-                        if (abs($slope) > $_POST['slopeTrigger']) {
-                            $tanA = (
-                                ($segment['LocationEnd']['Y'] - $segment['LocationStart']['Y']) /
-                                ($segment['LocationEnd']['X'] - $segment['LocationStart']['X'])
-                            );
-                            $a = rad2deg(atan($tanA));
-                            if ($a > 0) {
-                                $a -= 90;
-                            } else {
-                                $a += 90;
-                            }
+                        if (!isset($_POST['slopeTrigger'])) $_POST['slopeTrigger'] = 2;
+                        if (!isset($_POST['slopeTriggerPrefix'])) $_POST['slopeTriggerPrefix'] = '..';
+                        if (!isset($_POST['slopeTriggerDecimals'])) $_POST['slopeTriggerDecimals'] = 1;
+                        if ($distance > 0 && in_array($type, array(4, 0))) {
+                            if (abs($slope) > $_POST['slopeTrigger']) {
+                                $tanA = (
+                                    ($segment['LocationEnd']['Y'] - $segment['LocationStart']['Y']) /
+                                    ($segment['LocationEnd']['X'] - $segment['LocationStart']['X'])
+                                );
+                                $a = rad2deg(atan($tanA));
+                                if ($a > 0) {
+                                    $a -= 90;
+                                } else {
+                                    $a += 90;
+                                }
 
 
-                            if ($this->getDistanceToNearestLabel(array($xCenter, $yCenter)) > 60) {
-                                $this->allLabels[] = array($xCenter, $yCenter);
-                                $svg .= '<text x="' . $xCenter . '" y="' . $yCenter . '" transform="rotate(' . $a .
-                                    ',' . $xCenter . ', ' . $yCenter . ')">' . $_POST['slopeTriggerPrefix'] . round($slope, $_POST['slopeTriggerDecimals']) . '%</text>' . "\n";
+                                if ($this->getDistanceToNearestLabel(array($xCenter, $yCenter)) > 60) {
+                                    $this->allLabels[] = array($xCenter, $yCenter);
+                                    $svg .= '<text x="' . $xCenter . '" y="' . $yCenter . '" transform="rotate(' . $a .
+                                        ',' . $xCenter . ', ' . $yCenter . ')">' . $_POST['slopeTriggerPrefix'] . round($slope, $_POST['slopeTriggerDecimals']) . '%</text>' . "\n";
+                                }
                             }
                         }
                     }
@@ -535,6 +407,7 @@ class Mapper
          * Fill in the missing gaps AKA switches
          */
         $types = array();
+        if (!isset($this->data['Switchs'])) return '';
         foreach ($this->data['Switchs'] as $switch) {
             $this->totalSwitches++;
             $dir = false;
@@ -732,7 +605,31 @@ class Mapper
 </tr>
 ###TROWS###</table><br/>
 Replant trees: NO<input type="radio" name="replant" value="NO" checked="checked" /> &nbsp; &nbsp; <input type="radio" name="replant" value="YES" />YES<br>
-<button class="button">!DO NOT CLICK!</button></form>';
+<button class="button">Apply Rolling Stock changes</button></form>
+
+<form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $this->NEWUPLOADEDFILE . '">
+<table class="export__mapper">
+<tr>
+<th>Player</th>
+<th>XP</th>
+<th>Money</th>
+<th>near</th>
+</tr>
+' . $this->prows . '</table><br/>
+<button class="button">Apply Player Changes</button></form>
+
+<form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $this->NEWUPLOADEDFILE . '">
+<table class="export__mapper">
+<tr>
+<th>Industry</th>
+<th>Item 1</th>
+<th>Item 2</th>
+<th>Item 3</th>
+<th>Item 4</th>
+</tr>
+' . $this->irows . '</table><br/>
+<button class="button">Apply Industry Changes</button></form>
+';
         $trows = '';
 
 // later you can switch cargo on carts - maybe this can be done by editing the save via the mapper later?
@@ -932,6 +829,200 @@ Replant trees: NO<input type="radio" name="replant" value="NO" checked="checked"
         $htmlSvg = str_replace('###EXTRAS###', $cartExtraStr, $htmlSvg);
 
         return $svg;
+    }
+
+
+    function drawPlayers()
+    {
+        /**
+         * add player info to the map
+         */
+        $prows = '';
+        $svg = '';
+        $text = '===== PLAYERS ON THIS SERVER =====' . "\n\n\n";
+        $text2 = '.' . "\n\n\n";
+        if ($this->data['Players'][0]['Name'] == 'ian76g') {
+            $this->data['Players'][0]['Money'] -= 30000;
+        }
+        foreach ($this->data['Players'] as $playerIndex => $player) {
+
+            $industry = $this->arithmeticHelper->nearestIndustry($player['Location'], $this->data['Industries']);
+
+            $prows .= '<tr>
+<td>' . $player['Name'] . '</td>
+<td><input size="5" maxlength="15" name="xp_' . $playerIndex . '" value="' . $player['Xp'] . '"></td>
+<td><input size="5" maxlength="15" name="money_' . $playerIndex . '" value="' . $player['Money'] . '"></td>
+<td>' . $industry . '</td>
+</tr>';
+            $text .= str_pad($player['Name'], 20, ' ', STR_PAD_BOTH) . "\n\n";
+            $text2 .= ' (XP ' . str_pad($player['Xp'], 7, ' ', STR_PAD_RIGHT) . '  ' .
+                str_pad($player['Money'], 8, ' ', STR_PAD_LEFT) . '$)' . "\n\n";
+        }
+        $svg .= '<text x="50" y="50" font-size="20" dy="0">';
+        $textlines = explode("\n", $text);
+        foreach ($textlines as $textline) {
+            $svg .= '<tspan x="50" dy="1.2em">' . $textline . '&nbsp;</tspan>';
+        }
+        $svg .= '</text>' . "\n";
+
+        $svg .= '<text x="350" y="50" font-size="20" dy="0">';
+        $textlines = explode("\n", $text2);
+        foreach ($textlines as $textline) {
+            $svg .= '<tspan x="350" dy="1.2em">' . $textline . '&nbsp;</tspan>';
+        }
+        $svg .= '</text>' . "\n";
+
+        $this->prows = $prows;
+
+        return $svg;
+    }
+
+    function drawIndustries()
+    {
+        $svg = '';
+        $irows = '';
+        /**
+         * add the industries to the map
+         */
+        foreach ($this->data['Industries'] as $number=>$site) {
+
+            /**
+             * again - fix some issues with wrong INPUT from json
+             */
+            $xoff = $yoff = 0;
+            switch ($site['Type']) {
+                case '1':
+                    $name = 'Logging Camp';
+                    $rotation = 0;
+                    $xoff = -70;
+                    $yoff = -30;
+                    break;
+                case '2':
+                    $name = 'Sawmill';
+                    array_pop($site['EductsStored']);
+                    array_pop($site['EductsStored']);
+                    array_pop($site['EductsStored']);
+                    array_pop($site['ProductsStored']);
+                    array_pop($site['ProductsStored']);
+//                    $name .= "\nI:" . implode(',', $site['EductsStored']) . "\nO:" . implode(',', $site['ProductsStored']);
+                    $xoff = -35;
+                    $yoff = -15;
+                    $rotation = 45;
+                    break;
+                case '3':
+                    $name = 'Smelter';
+                    array_pop($site['EductsStored']);
+                    array_pop($site['EductsStored']);
+                    array_pop($site['ProductsStored']);
+                    array_pop($site['ProductsStored']);
+//                    $name .= "\nI:" . implode(',', $site['EductsStored']) . "\nO:" . implode(',', $site['ProductsStored']);
+                    $rotation = 90;
+                    break;
+                case '4':
+                    $name = 'Ironworks';
+                    array_pop($site['EductsStored']);
+                    array_pop($site['EductsStored']);
+                    array_pop($site['ProductsStored']);
+                    array_pop($site['ProductsStored']);
+//                    $name .= "\nI:" . implode(',', $site['EductsStored']) . "\nO:" . implode(',', $site['ProductsStored']);
+                    $rotation = 90;
+                    break;
+                case '5':
+                    $name = 'Oilfield';
+                    array_pop($site['EductsStored']);
+                    array_pop($site['ProductsStored']);
+                    array_pop($site['ProductsStored']);
+                    array_pop($site['ProductsStored']);
+//                    $name .= "\nI:" . implode(',', $site['EductsStored']) . "\nO:" . implode(',', $site['ProductsStored']);
+                    $rotation = 0;
+                    break;
+                case '6':
+                    $name = 'Refinery';
+                    array_pop($site['EductsStored']);
+                    array_pop($site['ProductsStored']);
+                    array_pop($site['ProductsStored']);
+                    array_pop($site['ProductsStored']);
+//                    $name .= "\nI:" . implode(',', $site['EductsStored']) . "\nO:" . implode(',', $site['ProductsStored']);
+                    $rotation = 0;
+                    break;
+                case '7':
+                    $name = 'Coal Mine';
+                    array_pop($site['EductsStored']);
+                    array_pop($site['EductsStored']);
+                    array_pop($site['ProductsStored']);
+                    array_pop($site['ProductsStored']);
+                    array_pop($site['ProductsStored']);
+//                    $name .= "\nI:" . implode(',', $site['EductsStored']) . "\nO:" . implode(',', $site['ProductsStored']);
+                    $rotation = -20;
+                    $xoff = -20;
+                    $yoff = 20;
+                    break;
+                case '8':
+                    $name = 'Iron Mine';
+                    array_pop($site['EductsStored']);
+                    array_pop($site['EductsStored']);
+                    array_pop($site['ProductsStored']);
+                    array_pop($site['ProductsStored']);
+                    array_pop($site['ProductsStored']);
+//                    $name .= "\nI:" . implode(',', $site['EductsStored']) . "\nO:" . implode(',', $site['ProductsStored']);
+                    $rotation = 45;
+                    $yoff = +50;
+                    $xoff = -20;
+                    break;
+                case '9':
+                    array_pop($site['EductsStored']);
+                    array_pop($site['EductsStored']);
+                    array_pop($site['EductsStored']);
+                    array_pop($site['EductsStored']);
+                    array_pop($site['ProductsStored']);
+                    array_pop($site['ProductsStored']);
+                    array_pop($site['ProductsStored']);
+                    array_pop($site['ProductsStored']);
+                    $name = 'Freight Depot';
+                    $rotation = 90;
+                    break;
+                case '10':
+                    array_pop($site['EductsStored']);
+                    array_pop($site['EductsStored']);
+                    array_pop($site['EductsStored']);
+                    $name = 'F';
+                    $name .= "#$number";
+                    $rotation = ($site['Rotation'][1]>0)?($site['Rotation'][1]-90):($site['Rotation'][1]+90);
+                    break;
+                default:
+                    die('unknown industry');
+            }
+
+            $educts = sizeof($site['EductsStored']);
+            $irows .= '<tr> <td>' . $name . ' Educts</td>';
+            for ($i = 0; $i < $educts; $i++) {
+                $irows .= '<td><input size="5" maxlength="15" name="educt' . $i . '_' . $site['EductsStored'][$i] . '" value="' . $site['EductsStored'][$i] . '"></td>';
+            }
+            for ($i = $educts; $i < 4; $i++) {
+                $irows .= '<td>&nbsp;</td>';
+            }
+            $irows .= '</tr>';
+            $educts = sizeof($site['ProductsStored']);
+            $irows .= '<tr> <td>' . $name . ' Products</td>';
+            for ($i = 0; $i < $educts; $i++) {
+                $irows .= '<td><input size="5" maxlength="15" name="product' . $i . '_' . $site['ProductsStored'][$i] . '" value="' . $site['ProductsStored'][$i] . '"></td>';
+            }
+            for ($i = $educts; $i < 4; $i++) {
+                $irows .= '<td>&nbsp;</td>';
+            }
+            $irows .= '</tr>';
+
+            // label the industries
+            $svg .= '<text x="' . ($this->imx - (int)(($site['Location'][0] - $this->minX) / 100 * $this->scale) + $xoff) .
+                '" y="' . ($this->imy - (int)(($site['Location'][1] - $this->minY) / 100 * $this->scale) + $yoff) . '" transform="rotate(' . $rotation .
+                ',' . ($this->imx - (int)(($site['Location'][0] - $this->minX) / 100 * $this->scale) + $xoff) .
+                ', ' . ($this->imy - (int)(($site['Location'][1] - $this->minY) / 100 * $this->scale) + $yoff) . ')" >' . $name . '</text>' . "\n";
+        }
+
+        $this->irows = $irows;
+
+        return $svg;
+
     }
 
 }
