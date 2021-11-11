@@ -43,6 +43,7 @@ function getUserIpAddr()
 //$_POST['name_0'] = '2605';
 //$_POST['xp_0'] = 10;
 //$_POST['money_0'] = 10;
+//$_POST['underground_0'] = 10;
 
 /**
  * define some stuff we need later
@@ -79,8 +80,8 @@ if (isset($_POST['background'])) {
 // each different background image needs different croping and stretching params
 $bgOffsets = array(
     'bg5.jpg' => array(8000, 8000, 0, 0, 8000, 8000),
-    'bg4.png' => array(9400, 9600, -720, -770, 9400, 9600),
-    'bg3.png' => array(8000, 8000, 0, 50, 8000, 8000),
+    'bg4.png' => array(8000, 8000, 0, 0, 8000, 8000),
+    'bg3.png' => array(8000, 8000, 0, 0, 8000, 8000),
     'bg.png' => array(8000, 8000, 0, 0, 8000, 8000),
 );
 

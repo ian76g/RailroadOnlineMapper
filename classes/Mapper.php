@@ -629,8 +629,14 @@ Replant trees: NO<input type="radio" name="replant" value="NO" checked="checked"
 </tr>
 ' . $this->irows . '</table><br/>
 <button class="button">Apply Industry Changes</button></form>
+
+
+<form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $this->NEWUPLOADEDFILE . '">
+<table class="export__mapper">
+###UMROWS###<br/>
+<button class="button">Get Carts from Underground</button></form>
 ';
-        $trows = '';
+        $trows = $umrows = '';
 
 // later you can switch cargo on carts - maybe this can be done by editing the save via the mapper later?
         $possibleCargos = array(
@@ -762,6 +768,7 @@ Replant trees: NO<input type="radio" name="replant" value="NO" checked="checked"
               />';
                     $svg .= '<text x="' . $x . '" y="' . $y . '" >' . '&nbsp;&nbsp;' . $vehicle['Location'][2] . '</text>' . "\n";
 
+                    $umrows.='<input name="underground_'.$cartIndex.'" value="1" type="hidden">';
                 }
             }
 
@@ -824,6 +831,7 @@ Replant trees: NO<input type="radio" name="replant" value="NO" checked="checked"
             '>flatcar_hopper' => '><img src="/images/flatcar_hopper.png">',
         );
 
+        $cartExtraStr = str_replace('###UMROWS###', $umrows, $cartExtraStr);
         $cartExtraStr = str_replace('###TROWS###', $trows, $cartExtraStr);
         $cartExtraStr = str_replace(array_keys($images), $images, $cartExtraStr);
         $htmlSvg = str_replace('###EXTRAS###', $cartExtraStr, $htmlSvg);

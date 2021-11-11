@@ -143,34 +143,7 @@ include_once('includes/head.php');
         </section>
 
         <section>
-            <h3>6. Expert settings</h3>
-            <p><b>expert settings: DON'T TOUCH when you are no expert!</b></p>
-
-            <div class="input-group">
-                <label for="xoff">background image offset X:</label>
-                <input placeholder="0px" type="text" id="xoff" name="xoff" value="">
-            </div>
-
-            <div class="input-group">
-                <label for="yoff">background image offset Y:</label>
-                <input placeholder="0px" type="text" id="yoff" name="yoff" value="">
-            </div>
-
-            <div class="input-group">
-                <label for="xsoff">background image width:</label>
-                <input placeholder="0px" type="text" id="xsoff" name="xsoff" value="">
-            </div>
-
-            <div class="input-group">
-                <label for="ysoff">background image height:</label>
-                <input placeholder="0px" type="text" id="ysoff" name="ysoff" value="">
-            </div>
-
-            <div class="input-group input-group--row">
-                <input type="checkbox" id="empty" name="empty">
-                <label for="empty">include unnamed rolling stock to list</label>
-            </div>
-
+            <h3>6. Slope settings</h3>
             <div class="input-group input-group--row">
                 <input type="checkbox" id="maxslope" name="maxslope">
                 <label for="maxslope">draw 4 orange circles on worst slope</label>
@@ -178,8 +151,9 @@ include_once('includes/head.php');
 
             <div class="input-group">
                 <label for="slopeTrigger">label slopes greater than X%</label>
-                <input placeholder="1000" type="text" id="slopeTrigger" name="slopeTrigger" value="1000">
+                <input placeholder="1000" type="text" id="slopeTrigger" name="slopeTrigger" value="2">
             </div>
+
             <div class="input-group">
                 <label for="slopeTriggerPrefix">prefix text with</label>
                 <input placeholder=".." type="text" id="slopeTriggerPrefix" name="slopeTriggerPrefix" value="..">
@@ -188,6 +162,15 @@ include_once('includes/head.php');
                 <label for="slopeTriggerDecimals">round to X decimals</label>
                 <input placeholder="1" type="text" id="slopeTriggerDecimals" name="slopeTriggerDecimals" value="1">
             </div>
+        </section>
+
+        <section>
+            <h3>7. Rolling Stock</h3>
+            <div class="input-group input-group--row">
+                <input type="checkbox" id="empty" name="empty">
+                <label for="empty">include unnamed rolling stock to list</label>
+            </div>
+
 
             <input class="button" type="submit" value="Upload" name="submit">
         </section>

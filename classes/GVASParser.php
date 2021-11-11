@@ -374,8 +374,15 @@ class GVASParser
                 if (trim($object->NAME) == 'FrameNameArray') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['name_' . $index]) && trim($_POST['name_' . $index])) {
-                            $x = 2;
                             $object->CONTENTOBJECTS[3]->contentElements[$index] = new dtTextProperty(trim($_POST['name_' . $index]));
+                        }
+                    }
+                }
+
+                if (trim($object->NAME) == 'FrameLocationArray') {
+                    foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
+                        if (isset($_POST['underground_' . $index]) && trim($_POST['underground_' . $index])) {
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->content[2] = 2000;
                         }
                     }
                 }
