@@ -593,7 +593,7 @@ class Mapper
         );
 
 // build some extra HTML for a form to edit cart data
-        $cartExtraStr = '<form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $this->NEWUPLOADEDFILE . '">
+$cartExtraStr = '<form method="POST" action="/converter.php"><input type="hidden" name="save" value="' . $this->NEWUPLOADEDFILE . '">
 <table class="export__mapper">
 <tr>
 <th>Type</th>
