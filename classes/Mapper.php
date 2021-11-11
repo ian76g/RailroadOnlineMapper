@@ -97,14 +97,15 @@ class Mapper
 
         $svg .= $this->drawSwitches();
 
-        $svg .= $this->drawTurntables();
-
         $svg .= $this->drawPlayers();
 
         $svg .= $this->drawIndustries();
 
+        $svg .= $this->drawTurntables();
+
         $svg .= $this->drawRollingStocks($htmlSvg);
 
+        $svg .= $this->populateInfo($htmlSvg);
 
         $types = array();
         // create a "database" and store some infos about this file for the websies index page
@@ -221,7 +222,7 @@ class Mapper
                     $minDistanceToSomething = min($minDistanceToSomething, $this->distance($tree, $segment['LocationCenter']));
                 }
             }
-            if ($minDistanceToSomething > 2000) {
+            if ($minDistanceToSomething > 700) {
                 if ($index < $this->initialsTreeDown) {
                     $color = 'orange';
                 } else {
@@ -291,9 +292,6 @@ class Mapper
         );
 
         // statistics for the webpage index
-        $totalSwitches = 0;
-        $totalLocos = 0;
-        $totalCarts = 0;
         $zeroLenthSegments = array();// for error collections if desired.
         /**
          * Loop the order array painting one type over the next
@@ -839,7 +837,50 @@ Replant trees: NO<input type="radio" name="replant" value="NO" checked="checked"
         return $svg;
     }
 
+    /**
+     * @param $htmlSvg
+     * @return string
+     */
+    public function populateInfo(&$htmlSvg)
+    {
+        $svg = '';
+         /**
+            * add player info
+         */
 
+        $text = "";
+        $text2 = "";
+        $playerInfo = "";
+        if ($this->data['Players'][0]['Name'] == 'ian76g') {
+            $this->data['Players'][0]['Money'] -= 30000;
+        }
+
+        foreach ($this->data['Players'] as $player) {
+            $text .= str_pad($player['Name'], 20, ' ', STR_PAD_BOTH) . "\n";
+            $text2 .= ' (XP ' . str_pad($player['Xp'], 7, ' ', STR_PAD_RIGHT) . '  ' .
+                str_pad($player['Money'], 8, ' ', STR_PAD_LEFT) . '$)' . "\n\n";
+        }
+
+        $textlines = explode("\n", $text);
+        $playerInfo .= '<div>';
+        foreach ($textlines as $textline) {
+            $playerInfo .= '<p>' . $textline . '</p>';
+        }
+        $playerInfo .= '</div><div>';
+
+        $textlines = explode("\n", $text2);
+        foreach ($textlines as $textline) {
+            $playerInfo .= '<p>' . $textline . '</p>';
+        }
+        $playerInfo .= '</div>';
+
+        $htmlSvg = str_replace('###PLAYERINFO###', $playerInfo, $htmlSvg);
+        return $svg;
+    }
+
+    /**
+     * @return string
+     */
     function drawPlayers()
     {
         /**
@@ -853,38 +894,41 @@ Replant trees: NO<input type="radio" name="replant" value="NO" checked="checked"
             $this->data['Players'][0]['Money'] -= 30000;
         }
         foreach ($this->data['Players'] as $playerIndex => $player) {
-
             $industry = $this->arithmeticHelper->nearestIndustry($player['Location'], $this->data['Industries']);
-
             $prows .= '<tr>
-<td>' . $player['Name'] . '</td>
-<td><input size="5" maxlength="15" name="xp_' . $playerIndex . '" value="' . $player['Xp'] . '"></td>
-<td><input size="5" maxlength="15" name="money_' . $playerIndex . '" value="' . $player['Money'] . '"></td>
-<td>' . $industry . '</td>
-</tr>';
-            $text .= str_pad($player['Name'], 20, ' ', STR_PAD_BOTH) . "\n\n";
-            $text2 .= ' (XP ' . str_pad($player['Xp'], 7, ' ', STR_PAD_RIGHT) . '  ' .
-                str_pad($player['Money'], 8, ' ', STR_PAD_LEFT) . '$)' . "\n\n";
+                <td>' . $player['Name'] . '</td>
+                <td><input size="5" maxlength="15" name="xp_' . $playerIndex . '" value="' . $player['Xp'] . '"></td>
+                <td><input size="5" maxlength="15" name="money_' . $playerIndex . '" value="' . $player['Money'] . '"></td>
+                <td>' . $industry . '</td>
+                </tr>';
         }
-        $svg .= '<text x="50" y="50" font-size="20" dy="0">';
-        $textlines = explode("\n", $text);
-        foreach ($textlines as $textline) {
-            $svg .= '<tspan x="50" dy="1.2em">' . $textline . '&nbsp;</tspan>';
-        }
-        $svg .= '</text>' . "\n";
 
-        $svg .= '<text x="350" y="50" font-size="20" dy="0">';
-        $textlines = explode("\n", $text2);
-        foreach ($textlines as $textline) {
-            $svg .= '<tspan x="350" dy="1.2em">' . $textline . '&nbsp;</tspan>';
-        }
-        $svg .= '</text>' . "\n";
+        //     $text .= str_pad($player['Name'], 20, ' ', STR_PAD_BOTH) . "\n\n";
+        //     $text2 .= ' (XP ' . str_pad($player['Xp'], 7, ' ', STR_PAD_RIGHT) . '  ' .
+        //         str_pad($player['Money'], 8, ' ', STR_PAD_LEFT) . '$)' . "\n\n";
+        // }
+        // $svg .= '<text x="50" y="50" font-size="20" dy="0">';
+        // $textlines = explode("\n", $text);
+        // foreach ($textlines as $textline) {
+        //     $svg .= '<tspan x="50" dy="1.2em">' . $textline . '&nbsp;</tspan>';
+        // }
+        // $svg .= '</text>' . "\n";
+
+        // $svg .= '<text x="350" y="50" font-size="20" dy="0">';
+        // $textlines = explode("\n", $text2);
+        // foreach ($textlines as $textline) {
+        //     $svg .= '<tspan x="350" dy="1.2em">' . $textline . '&nbsp;</tspan>';
+        // }
+        // $svg .= '</text>' . "\n";
 
         $this->prows = $prows;
 
         return $svg;
     }
 
+    /**
+     * @return string
+     */
     function drawIndustries()
     {
         $svg = '';
