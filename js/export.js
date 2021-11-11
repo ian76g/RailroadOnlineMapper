@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
-  svgPanZoom("#demo-tiger", {
+  const panZoom = svgPanZoom("#demo-tiger", {
     zoomEnabled: true,
-    controlIconsEnabled: true,
+    controlIconsEnabled: false,
     fit: true,
     center: true,
   });
@@ -12,6 +12,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document.getElementById("edit-panel-toggle").addEventListener("click", function () {
     togglePanel('edit-panel')
+  });
+
+  document.getElementById('zoom-in').addEventListener('click', function(e){
+    e.preventDefault()
+    panZoom.zoomIn()
+  });
+
+  document.getElementById('zoom-out').addEventListener('click', function(e){
+    e.preventDefault()
+    panZoom.zoomOut()
+  });
+
+  document.getElementById('reset').addEventListener('click', function(e){
+    e.preventDefault()
+    panZoom.resetZoom()
   });
 
   const togglePanel = panelClass => {

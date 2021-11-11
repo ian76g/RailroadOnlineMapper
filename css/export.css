@@ -31,7 +31,6 @@
 .export__panel{
   max-width: 100%;
   height: 100vh;
-  border-left: 2px solid var(--secondary-color);
   position: fixed;
   top: 0;
   z-index: 1;
@@ -45,41 +44,32 @@
 }
 
 .export__panel-scroll-content{
+  max-width: 100%;
   height: 100vh;
-  padding: 1rem;
+  padding: 6rem 1rem 1rem;
   overflow: scroll;
 }
 
 .info-panel{
   left: 0;
   transform: translateX(-400px);
+  border-right: 2px solid var(--secondary-color);
 }
 .info-panel .export__panel-scroll-content{
   width: 400px;
-}
-.info-panel > .button--toggle{
-  right: 0;
-  transform: translateX(100%)
 }
 
 .edit-panel{
   right: 0;
   transform: translateX(700px);
+  border-left: 2px solid var(--secondary-color);
 }
 .edit-panel .export__panel-scroll-content{
   width: 700px;
 }
-.edit-panel > .button--toggle{
-  left: 0;
-  transform: translateX(-100%);
-}
 
 .export__panel--open {
   transform: translateX(0);
-}
-.export__panel--open .button--toggle{
-  border: 2px solid var(--secondary-color);
-  color: var(--secondary-color);
 }
 
 .info-panel__player-info{
@@ -105,4 +95,10 @@
 .export__mapper td img {
   max-width: none;
   width: 4.5rem;
+}
+
+.export__controls{
+  position: fixed;
+  bottom: 0;
+  left: 0;
 }

@@ -10,8 +10,13 @@
   </head>
   <body class="export">
     <main class="export__main">
-      <div class="export__panel info-panel">
+
+      <div class="export__nav">
         <button class="button button--toggle" id="info-panel-toggle">Info</button>
+        <button class="button button--toggle" id="edit-panel-toggle">Edit</button>
+      </div>
+
+      <div class="export__panel info-panel">
         <div class="export__panel-scroll-content">
           <h3>Player Info</h3><br/>
           <div class="info-panel__player-info">
@@ -40,7 +45,6 @@
         </svg>
       </div>
       <div class="export__panel edit-panel">
-        <button class="button button--toggle" id="edit-panel-toggle">Edit</button>
         <div class="export__panel-scroll-content">
           <h3>Edit</h3><br/>
           <div class="edit-panel__extras">
@@ -48,6 +52,12 @@
             ###DOWNLOAD###
           </div>
         </div>
+      </div>
+
+      <div class="export__controls">
+        <button class="button" id="zoom-out">-</button>
+        <button class="button"id="zoom-in">+</button>
+        <button class="button" id="reset">Reset</button>
       </div>
     </main>
 
