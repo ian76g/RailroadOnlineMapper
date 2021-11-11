@@ -81,7 +81,6 @@ if (isset($_POST['background'])) {
 
 $bgOffsets = array(
     'bg5.jpg' => array(8000, 8000, 0, 0, 8000, 8000),
-    // 'bg4.png' => array(9400, 9600, -720, -770, 9400, 9600),
     'bg4.png' => array(8000, 8000, 0, 0, 8000, 8000),
     'bg3.png' => array(8000, 8000, 0, 50, 8000, 8000),
     'bg.png' => array(8000, 8000, 0, 0, 8000, 8000),
