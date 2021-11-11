@@ -374,8 +374,58 @@ class GVASParser
                 if (trim($object->NAME) == 'FrameNameArray') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['name_' . $index]) && trim($_POST['name_' . $index])) {
-                            $x = 2;
                             $object->CONTENTOBJECTS[3]->contentElements[$index] = new dtTextProperty(trim($_POST['name_' . $index]));
+                        }
+                    }
+                }
+
+                if (trim($object->NAME) == 'FrameRotationArray') {
+                    foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
+                        if (isset($_POST['underground_' . $index]) && trim($_POST['underground_' . $index])) {
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->content = array(0,90,0);
+                        }
+                    }
+                }
+
+                if (trim($object->NAME) == 'FrameLocationArray') {
+                    $spawnPositions = array(
+                        [720, -2503, 10160],
+                        [720, -461, 10160],
+                        [1260, -2503, 10160],
+                        [1260, -461, 10160],
+                        [1800, -2503, 10160],
+                        [1800, -461, 10160],
+                    );
+                    $used=0;
+                    foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
+                        if (isset($_POST['underground_' . $index]) && trim($_POST['underground_' . $index])) {
+//spawnZOffset = {
+//    "heisler": 10233.,
+//    "cooke260": 10239.,
+//    "class70": 10194.,
+//    "eureka": 10194.
+//}
+//
+//def nextAvailableSpawn(gvas, pos):
+//    framelocs = gvas.data.find("FrameLocationArray").data
+//    for i, spawnPos in enumerate(spawnPositions):
+//        for frameloc in framelocs:
+//            checks = []
+//            checks.append(
+//                frameloc[0] > spawnPos[0]-270 and
+//                frameloc[0] < spawnPos[0]+270)
+//            checks.append(
+//                frameloc[1] > spawnPos[1]-1021 and
+//                frameloc[1] < spawnPos[1]+1021
+//            )
+//            if all(checks):
+//                break
+//        if all(checks):
+//            continue
+//        else:
+//            return i
+//    return None
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->content = $spawnPositions[max($used++,5)];
                         }
                     }
                 }
