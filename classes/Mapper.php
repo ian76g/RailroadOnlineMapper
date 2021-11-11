@@ -591,52 +591,63 @@ class Mapper
         );
 
 // build some extra HTML for a form to edit cart data
-        $cartExtraStr = '<form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $this->NEWUPLOADEDFILE . '">
-<table class="export__mapper">
-<tr>
-<th>Type</th>
-<th>Name</th>
-<th>Number</th>
-<th>near</th>
-<th>Cargo</th>
-<th>Amount</th>
-</tr>
-###TROWS###</table><br/>
-Replant trees: NO<input type="radio" name="replant" value="NO" checked="checked" /> &nbsp; &nbsp; <input type="radio" name="replant" value="YES" />YES<br>
-<button class="button">Apply Rolling Stock changes</button></form>
 
-<form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $this->NEWUPLOADEDFILE . '">
-<table class="export__mapper">
-<tr>
-<th>Player</th>
-<th>XP</th>
-<th>Money</th>
-<th>near</th>
-</tr>
-' . $this->prows . '</table><br/>
-<button class="button">Apply Player Changes</button></form>
+        $cartExtraStr = '
+        <br/>
+        <h4>Rolling Stock</h4>
+        <form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $this->NEWUPLOADEDFILE . '">
+        <table class="export__mapper">
+        <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Number</th>
+        <th>near</th>
+        <th>Cargo</th>
+        <th>Amount</th>
+        </tr>
+        ###TROWS###</table><br/>
+        Replant trees: NO<input type="radio" name="replant" value="NO" checked="checked" /> &nbsp; &nbsp; <input type="radio" name="replant" value="YES" />YES<br>
+        <button class="button">Apply Rolling Stock changes</button></form>
 
-<form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $this->NEWUPLOADEDFILE . '">
-<table class="export__mapper">
-<tr>
-<th>Industry</th>
-<th>Item 1</th>
-<th>Item 2</th>
-<th>Item 3</th>
-<th>Item 4</th>
-</tr>
-' . $this->irows . '</table><br/>
-<button class="button">Apply Industry Changes</button></form>
+        <br/><br/>
+        <h4>Players</h4>
+        <form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $this->NEWUPLOADEDFILE . '">
+        <table class="export__mapper">
+        <tr>
+        <th>Player</th>
+        <th>XP</th>
+        <th>Money</th>
+        <th>near</th>
+        </tr>
+        ' . $this->prows . '</table><br/>
+        <button class="button">Apply Player Changes</button></form>
 
+        <br/><br/>
+        <h4>Industries</h4>
+        <form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $this->NEWUPLOADEDFILE . '">
+        <table class="export__mapper">
+        <tr>
+        <th>Industry</th>
+        <th>Item 1</th>
+        <th>Item 2</th>
+        <th>Item 3</th>
+        <th>Item 4</th>
+        </tr>
+        ' . $this->irows . '</table><br/>
+        <button class="button">Apply Industry Changes</button></form>
 
-<form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $this->NEWUPLOADEDFILE . '">
-<table class="export__mapper">
-###UMROWS###<br/>
-<button class="button">Get Carts from Underground</button></form>
-';
+        <br/><br/>
+        <h4>Carts</h4>
+        <form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $this->NEWUPLOADEDFILE . '">
+        <table class="export__mapper">
+        ###UMROWS###
+        </table>
+        <br/>
+        <button class="button">Get Carts from Underground</button></form>
+        ';
         $trows = $umrows = '';
 
-// later you can switch cargo on carts - maybe this can be done by editing the save via the mapper later?
+        // later you can switch cargo on carts - maybe this can be done by editing the save via the mapper later?
         $possibleCargos = array(
             'flatcar_logs' => array('log'),
             'flatcar_stakes' => array('rail', 'lumber', 'beam', 'rawiron'),
@@ -661,15 +672,14 @@ Replant trees: NO<input type="radio" name="replant" value="NO" checked="checked"
 
 
         foreach ($this->data['Frames'] as $cartIndex => $vehicle) {
-
             $trow = '<tr>
-<td>###1###</td>
-<td>              <input size="5" maxlength="15" name="name_' . $cartIndex . '" value="###2###"></td>
-<td align="right"><input size="5" maxlength="15" name="number_' . $cartIndex . '" value="###3###"></td>
-<td>###4###</td>
-<td>###5###</td>
-<td>###6###</td>
-</tr>';
+            <td>###1###</td>
+            <td>              <input size="5" maxlength="15" name="name_' . $cartIndex . '" value="###2###"></td>
+            <td align="right"><input size="5" maxlength="15" name="number_' . $cartIndex . '" value="###3###"></td>
+            <td>###4###</td>
+            <td>###5###</td>
+            <td>###6###</td>
+            </tr>';
 
             $selectTemplate = '<select name="freightType_###INDEX###">###OPTIONS###</select>';
             $optionTemplate = '<option value="###OPTIONVALUE###" ###SELECTED###>###OPTIONNAME###</option>';
