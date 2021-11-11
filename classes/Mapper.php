@@ -105,6 +105,7 @@ class Mapper
 
         $svg .= $this->drawRollingStocks($htmlSvg);
 
+        $svg .= $this->populateInfo($htmlSvg);
 
         $types = array();
         // create a "database" and store some infos about this file for the websies index page
@@ -877,7 +878,6 @@ Replant trees: NO<input type="radio" name="replant" value="NO" checked="checked"
         return $svg;
     }
 
-
     /**
      * @return string
      */
@@ -894,32 +894,32 @@ Replant trees: NO<input type="radio" name="replant" value="NO" checked="checked"
             $this->data['Players'][0]['Money'] -= 30000;
         }
         foreach ($this->data['Players'] as $playerIndex => $player) {
-
             $industry = $this->arithmeticHelper->nearestIndustry($player['Location'], $this->data['Industries']);
-
             $prows .= '<tr>
-<td>' . $player['Name'] . '</td>
-<td><input size="5" maxlength="15" name="xp_' . $playerIndex . '" value="' . $player['Xp'] . '"></td>
-<td><input size="5" maxlength="15" name="money_' . $playerIndex . '" value="' . $player['Money'] . '"></td>
-<td>' . $industry . '</td>
-</tr>';
-            $text .= str_pad($player['Name'], 20, ' ', STR_PAD_BOTH) . "\n\n";
-            $text2 .= ' (XP ' . str_pad($player['Xp'], 7, ' ', STR_PAD_RIGHT) . '  ' .
-                str_pad($player['Money'], 8, ' ', STR_PAD_LEFT) . '$)' . "\n\n";
+                <td>' . $player['Name'] . '</td>
+                <td><input size="5" maxlength="15" name="xp_' . $playerIndex . '" value="' . $player['Xp'] . '"></td>
+                <td><input size="5" maxlength="15" name="money_' . $playerIndex . '" value="' . $player['Money'] . '"></td>
+                <td>' . $industry . '</td>
+                </tr>';
         }
-        $svg .= '<text x="50" y="50" font-size="20" dy="0">';
-        $textlines = explode("\n", $text);
-        foreach ($textlines as $textline) {
-            $svg .= '<tspan x="50" dy="1.2em">' . $textline . '&nbsp;</tspan>';
-        }
-        $svg .= '</text>' . "\n";
 
-        $svg .= '<text x="350" y="50" font-size="20" dy="0">';
-        $textlines = explode("\n", $text2);
-        foreach ($textlines as $textline) {
-            $svg .= '<tspan x="350" dy="1.2em">' . $textline . '&nbsp;</tspan>';
-        }
-        $svg .= '</text>' . "\n";
+        //     $text .= str_pad($player['Name'], 20, ' ', STR_PAD_BOTH) . "\n\n";
+        //     $text2 .= ' (XP ' . str_pad($player['Xp'], 7, ' ', STR_PAD_RIGHT) . '  ' .
+        //         str_pad($player['Money'], 8, ' ', STR_PAD_LEFT) . '$)' . "\n\n";
+        // }
+        // $svg .= '<text x="50" y="50" font-size="20" dy="0">';
+        // $textlines = explode("\n", $text);
+        // foreach ($textlines as $textline) {
+        //     $svg .= '<tspan x="50" dy="1.2em">' . $textline . '&nbsp;</tspan>';
+        // }
+        // $svg .= '</text>' . "\n";
+
+        // $svg .= '<text x="350" y="50" font-size="20" dy="0">';
+        // $textlines = explode("\n", $text2);
+        // foreach ($textlines as $textline) {
+        //     $svg .= '<tspan x="350" dy="1.2em">' . $textline . '&nbsp;</tspan>';
+        // }
+        // $svg .= '</text>' . "\n";
 
         $this->prows = $prows;
 
