@@ -33,10 +33,6 @@ class Mapper
     private $arithmeticHelper;
     private $allLabels = array(array(0, 0));
 
-    var $initialsTreeDown = 1750;
-    var $prows = '';
-    var $irows = '';
-
     /**
      * Mapper constructor.
      * @param $data
@@ -98,10 +94,6 @@ class Mapper
         $svg .= $this->drawSwitches();
 
         $svg .= $this->drawTurntables();
-
-        $svg .= $this->drawPlayers();
-
-        $svg .= $this->drawIndustries();
 
         $svg .= $this->drawRollingStocks($htmlSvg);
 
@@ -836,6 +828,44 @@ Replant trees: NO<input type="radio" name="replant" value="NO" checked="checked"
         $cartExtraStr = str_replace(array_keys($images), $images, $cartExtraStr);
         $htmlSvg = str_replace('###EXTRAS###', $cartExtraStr, $htmlSvg);
 
+        return $svg;
+    }
+
+    public function populateInfo(&$htmlSvg)
+    {
+        $doSvg = true;
+        $svg = '';
+         /**
+            * add player info
+         */
+
+        $text = "";
+        $text2 = "";
+        $playerInfo = "";
+        if ($this->data['Players'][0]['Name'] == 'ian76g') {
+            $this->data['Players'][0]['Money'] -= 30000;
+        }
+
+        foreach ($this->data['Players'] as $player) {
+            $text .= str_pad($player['Name'], 20, ' ', STR_PAD_BOTH) . "\n";
+            $text2 .= ' (XP ' . str_pad($player['Xp'], 7, ' ', STR_PAD_RIGHT) . '  ' .
+                str_pad($player['Money'], 8, ' ', STR_PAD_LEFT) . '$)' . "\n\n";
+        }
+
+        $textlines = explode("\n", $text);
+        $playerInfo .= '<div>';
+        foreach ($textlines as $textline) {
+            $playerInfo .= '<p>' . $textline . '</p>';
+        }
+        $playerInfo .= '</div><div>';
+
+        $textlines = explode("\n", $text2);
+        foreach ($textlines as $textline) {
+            $playerInfo .= '<p>' . $textline . '</p>';
+        }
+        $playerInfo .= '</div>';
+
+        $htmlSvg = str_replace('###PLAYERINFO###', $playerInfo, $htmlSvg);
         return $svg;
     }
 
