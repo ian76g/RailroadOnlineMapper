@@ -1,13 +1,12 @@
 <?php
 if (isset($_POST) && !empty($_POST)) {
-
-    $target_dir = "uploads/";
+    $target_dir = "saves/";
     $myNewName = str_replace(array('#', '&', ' ', "'", '`', '�'), '_', substr($_POST['discordName'], 0, 8));
     $target_file = $target_dir . $myNewName . '.sav';
     $uploadOk = 1;
     $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
-// Check if file already exists
+    // Check if file already exists
     if (!$_POST['discordName']) {
         echo "You MUST enter your Name.<br>";
         $uploadOk = 0;
@@ -25,33 +24,30 @@ if (isset($_POST) && !empty($_POST)) {
         $uploadOk = 0;
     }
 
-// Check file size
+    // Check file size
     if ($_FILES["fileToUpload"]["size"] > 1500000) {
         echo "Sorry, your file is too large.";
         $uploadOk = 0;
     }
 
-// Allow certain file formats
+    // Allow certain file formats
     if ($imageFileType != "sav") {
         echo "Sorry, only .sav files are allowed.";
         $uploadOk = 0;
     }
 
-// Check if $uploadOk is set to 0 by an error
+    // Check if $uploadOk is set to 0 by an error
     if ($uploadOk == 0) {
         echo "Sorry, your file was not uploaded.";
-// if everything is ok, try to upload file
+        // if everything is ok, try to upload file
     } else {
         if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
-            //echo "The file " . htmlspecialchars(basename($_FILES["fileToUpload"]["name"])) . " has been uploaded.<br>";
-//            die('YOUR FILE WAS PLACED IN QUEUE UNTIL I TURN THE COMPUTER ON AGAIN AFTER MY NIGHT!');
             if (isset($_POST['public'])) {
-                copy($target_file, 'public/' . $myNewName . '.sav');
+                copy($target_file, 'saves/' . $myNewName . '.sav');
             }
 
             $NEWUPLOADEDFILE = $myNewName . '.sav';
-            include('converter.php');
-            header('Location: /done/' . $myNewName . '.html?t=' . time());
+            header('Location: /map.php?name=' . $myNewName);
             die();
         } else {
             echo "Sorry, there was an error uploading your file.";
@@ -68,10 +64,6 @@ $PageTitle = "Upload";
 include_once('includes/head.php');
 ?>
 <body>
-<!--H1>I AM IN BED NOW. GAMING COMPUTER SHUT DOWN! YOUR UPLOADS WILL BE QUEUED UNTIL I WAKE UP TOMORROW.</H1>
-<H2>Due to some technical limitations this mapping can yet not be done plainely on Webservers (yet!)</H2>
-<H3>hence we miss some cruicial bits needed to display a map.</H3-->
-
 <header class="header">
     <a class="button" href="/">Go Back</a>
 </header>
@@ -79,14 +71,14 @@ include_once('includes/head.php');
 <main>
     <form class="upload-form" method="post" enctype="multipart/form-data">
         <h1>Upload your savefile</h1>
-        <p>Open explorer at %localappdata%\arr\saved\savegames\</p>
+        <p>Open explorer at <code>%localappdata%\arr\saved\savegames\</code></p>
         <br>
 
         <section>
             <h3>1. Select savefile</h3>
             <input type="file" name="fileToUpload" id="fileToUpload">
         </section>
-        <!--img src="hint.png" width="700"-->
+
         <section>
             <h3>2. Enter your name</h3>
             <div class="input-group">
@@ -111,20 +103,24 @@ include_once('includes/head.php');
             <fieldset>
                 <div>
                     <input type="radio" id="bg" name="background" value="bg">
-                    <label for="bg"> <img border="2" src="done/bg.png" width="90" height="90"> Old background </label>
+                    <label for="bg"> <img border="2" src="assets/images/bg.png" width="90" height="90"> Old background
+                    </label>
                 </div>
                 <div>
                     <input type="radio" id="bg3" name="background" value="bg3">
-                    <label for="bg3"> <img border="2" src="done/bg3.png" width="90" height="90"> New background </label>
+                    <label for="bg3"> <img border="2" src="assets/images/bg3.png" width="90" height="90"> New background
+                    </label>
                 </div>
                 <div>
                     <input type="radio" id="bg4" name="background" value="bg4">
-                    <label for="bg4"> <img border="2" src="done/bg4.png" width="90" height="90"> Psawhns background
+                    <label for="bg4"> <img border="2" src="assets/images/bg4.png" width="90" height="90"> Psawhns
+                        background
                     </label>
                 </div>
                 <div>
                     <input checked type="radio" id="bg5" name="background" value="bg5">
-                    <label for="bg5"> <img border="2" src="done/bg4.png" width="90" height="90"> Psawhns background with
+                    <label for="bg5"> <img border="2" src="assets/images/bg4.png" width="90" height="90"> Psawhns
+                        background with
                         Kanados overlay</label>
                 </div>
             </fieldset>
