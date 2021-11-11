@@ -33,6 +33,10 @@ class Mapper
     private $arithmeticHelper;
     private $allLabels = array(array(0, 0));
 
+    var $initialsTreeDown = 1750;
+    var $prows = '';
+    var $irows = '';
+
     /**
      * Mapper constructor.
      * @param $data
@@ -92,6 +96,10 @@ class Mapper
         $svg = $this->drawTracksAndBeds();
 
         $svg .= $this->drawSwitches();
+
+        $svg .= $this->drawPlayers();
+
+        $svg .= $this->drawIndustries();
 
         $svg .= $this->drawTurntables();
 
@@ -283,9 +291,6 @@ class Mapper
         );
 
         // statistics for the webpage index
-        $totalSwitches = 0;
-        $totalLocos = 0;
-        $totalCarts = 0;
         $zeroLenthSegments = array();// for error collections if desired.
         /**
          * Loop the order array painting one type over the next
@@ -831,9 +836,12 @@ Replant trees: NO<input type="radio" name="replant" value="NO" checked="checked"
         return $svg;
     }
 
+    /**
+     * @param $htmlSvg
+     * @return string
+     */
     public function populateInfo(&$htmlSvg)
     {
-        $doSvg = true;
         $svg = '';
          /**
             * add player info
@@ -870,6 +878,9 @@ Replant trees: NO<input type="radio" name="replant" value="NO" checked="checked"
     }
 
 
+    /**
+     * @return string
+     */
     function drawPlayers()
     {
         /**
@@ -915,6 +926,9 @@ Replant trees: NO<input type="radio" name="replant" value="NO" checked="checked"
         return $svg;
     }
 
+    /**
+     * @return string
+     */
     function drawIndustries()
     {
         $svg = '';
