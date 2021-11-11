@@ -631,7 +631,9 @@ Replant trees: NO<input type="radio" name="replant" value="NO" checked="checked"
 
 <form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $this->NEWUPLOADEDFILE . '">
 <table class="export__mapper">
-###UMROWS###<br/>
+###UMROWS###
+</table>
+<br/>
 <button class="button">Get Carts from Underground</button></form>
 ';
         $trows = $umrows = '';
