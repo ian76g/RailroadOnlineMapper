@@ -18,6 +18,7 @@
     }
 
     $tableHeader = '<thead>
+<<<<<<< HEAD
                         <th>Player</th>
                         <th>Track Length</th>
                         <th>Switch Count</th>
@@ -26,6 +27,14 @@
                         <th>Rolling Stock</th>
                         <th>Slope</th>
                         <th>Shared (2 Days)</th>
+=======
+                        <th>NAME</th>
+                        <th><A href="?sortby=0&sortorder=desc" style="color: white">Track Length</A></th>
+                        <th><A href="?sortby=1&sortorder=desc" style="color: white">#Y</A> / <A href="?sortby=6&sortorder=desc" style="color: white">#T</A></th>
+                        <th><A href="?sortby=2&sortorder=desc" style="color: white">Locos</A></th>
+                        <th><A href="?sortby=3&sortorder=desc" style="color: white">Carts</A></th>
+                        <th><A href="?sortby=4&sortorder=desc" style="color: white">Slope</A></th>
+>>>>>>> 3a151899b48d50c01198da83a8d43a2824a48f6e
                     </thead>';
 
 // Removed sort function for different variation
@@ -78,8 +87,8 @@
                             usort($files, 'mysort');
                         }
 
-                        $hard_limit = 400;
-                        $soft_limit = 90;
+                        $hard_limit = 1600;
+                        $soft_limit = 800;
                         for ($i = 0; $i < sizeof($files); $i++) {
                             $file = array_shift($files);
                             if (!$file) break;

@@ -38,7 +38,17 @@ function getUserIpAddr()
 }
 
 //$_POST['save'] = 'slot1.sav';
+<<<<<<< HEAD
 //$_POST['replant'] = 'NO';
+=======
+//$_POST['firstTree'] = 'A';
+//$_POST['userTree'] = 'A';
+//$_POST['name_2'] = '2605';
+//$_POST['name_0'] = '2605';
+//$_POST['xp_0'] = 10;
+//$_POST['money_0'] = 10;
+//$_POST['underground_0'] = 10;
+>>>>>>> 3a151899b48d50c01198da83a8d43a2824a48f6e
 
 // Define some stuff we need later
 
@@ -82,7 +92,11 @@ if (isset($_POST['background'])) {
 $bgOffsets = array(
     'bg5.jpg' => array(8000, 8000, 0, 0, 8000, 8000),
     'bg4.png' => array(8000, 8000, 0, 0, 8000, 8000),
+<<<<<<< HEAD
     'bg3.png' => array(8000, 8000, 0, 50, 8000, 8000),
+=======
+    'bg3.png' => array(8000, 8000, 0, 0, 8000, 8000),
+>>>>>>> 3a151899b48d50c01198da83a8d43a2824a48f6e
     'bg.png' => array(8000, 8000, 0, 0, 8000, 8000),
 );
 
