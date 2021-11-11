@@ -337,7 +337,7 @@ class GVASParser
                                 $minDistanceToSomething = min($minDistanceToSomething, $this->distance($vector->content, $segment['LocationCenter']));
                             }
                         }
-                        if ($minDistanceToSomething > 2000) {
+                        if ($minDistanceToSomething > 700) {
                             $toRemove[] = $index;
                         }
                         //echo round($minDistanceToSomething)." ";

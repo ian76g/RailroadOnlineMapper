@@ -222,7 +222,7 @@ class Mapper
                     $minDistanceToSomething = min($minDistanceToSomething, $this->distance($tree, $segment['LocationCenter']));
                 }
             }
-            if ($minDistanceToSomething > 2000) {
+            if ($minDistanceToSomething > 700) {
                 if ($index < $this->initialsTreeDown) {
                     $color = 'orange';
                 } else {
