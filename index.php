@@ -18,32 +18,42 @@
     }
 
     $tableHeader = '<thead>
-                        <th>NAME</th><th>Track Length</th><th>#Y / #T</th><th>Locos</th><th>Carts</th><th>Slope</th>
+                        <th>Player</th>
+                        <th>Track Length</th>
+                        <th>Switch Count</th>
+                        <th>Trees Removed</th>
+                        <th>Locos</th>
+                        <th>Rolling Stock</th>
+                        <th>Slope</th>
+                        <th>Shared (2 Days)</th>
                     </thead>';
 
-    function mysort($a, $b){
-        global $db;
-        $x=1;
-        if(strtolower($db[substr($a, 5, -5) . '.sav'][$_GET['sortby']]) == strtolower($db[substr($b, 5, -5) . '.sav'][$_GET['sortby']])){
-            return 0;
-        }
-        if(strtolower($db[substr($a, 5, -5) . '.sav'][$_GET['sortby']]) > strtolower($db[substr($b, 5, -5) . '.sav'][$_GET['sortby']])){
-            $x=-1;
-        } else {
-            $x=1;
-        }
-        if($_GET['sortorder']=='desc'){
-            return $x;
-        } else {
-            return -$x;
-        }
-    }
+// Removed sort function for different variation
+//
+//    function mysort($a, $b){
+//        global $db;
+//        $x=1;
+//        if(strtolower($db[substr($a, 5, -5) . '.sav'][$_GET['sortby']]) == strtolower($db[substr($b, 5, -5) . '.sav'][$_GET['sortby']])){
+//            return 0;
+//        }
+//        if(strtolower($db[substr($a, 5, -5) . '.sav'][$_GET['sortby']]) > strtolower($db[substr($b, 5, -5) . '.sav'][$_GET['sortby']])){
+//            $x=-1;
+//        } else {
+//            $x=1;
+//        }
+//        if($_GET['sortorder']=='desc'){
+//            return $x;
+//        } else {
+//            return -$x;
+//        }
+//    }
+//
 
 ?>
 <body>
     <header class="header">
         <h1 class="logo">RailroadsOnlineMapper</h1>
-        <a class="button" href="upload.php">Upload Savegame</a>
+        <a class="button" href="upload.php">Upload Save Game</a>
     </header>
     <main>
         <section class="uploads">
@@ -52,10 +62,10 @@
                 <table>
                     <?php
                     echo $tableHeader;
-                    $dh = opendir('done/');
+                    $dh = opendir('maps/');
                     while ($file = readdir($dh)) {
                         if (substr($file, -5) == '.html') {
-                            $files[filemtime('done/' . $file)] = 'done/' . $file;
+                            $files[filemtime('maps/' . $file)] = 'maps/' . $file;
                         }
                     }
                     if ((isset($files) && $files != null) && file_exists('db.db')) {
@@ -75,7 +85,7 @@
                             if (!$file) break;
 
                             if ($i > $hard_limit) {
-                                unlink("done/" . substr($file, 5, -5) . ".html");
+                                unlink("maps/" . substr($file, 5, -5) . ".html");
                             }
 
                             if ($i >= $soft_limit) {
@@ -83,17 +93,56 @@
                             }
 
                             $dl = '';
-                            if (file_exists('public/' . substr($file, 5, -5) . '.sav')) {
+                            if (file_exists('maps/' . substr($file, 5, -5) . '.sav')) {
                                 $dl = ' (DL)';
                             }
 
-                            echo '<tr><td><a href="done/' . substr($file, 5, -5) . '.html?t=' . time() . '">' . substr($file, 5, -5) . $dl . '</a></td>
+                            echo
+                            '<tr>
+                                <!-- Owner of Map -->
+                                <td><a href=" maps/' . substr($file, 5, -5) . '.html">' .substr($file, 5, -5) .'</a></td>
+
+                                <!-- Track Length -->
                                 <td>' . round($db[substr($file, 5, -5) . '.sav'][0] / 100000, 2) . 'km</td>
-                                <td>' . $db[substr($file, 5, -5) . '.sav'][1] . ' / ' . $db[substr($file, 5, -5) . '.sav'][6] . '</td>
+
+                                <!-- Switch Count -->
+                                <td>' . $db[substr($file, 5, -5) . '.sav'][1] . '</td>
+
+                                <!-- Tree Death Count -->
+                                <td>' . $db[substr($file, 5, -5) . '.sav'][6] . '</td>
+
+                                <!-- Locomotives Owned -->
                                 <td>' . $db[substr($file, 5, -5) . '.sav'][2] . '</td>
+
+                                <!-- Rolling Stock Owned -->
                                 <td>' . $db[substr($file, 5, -5) . '.sav'][3] . '</td>
-                                <td >' . round($db[substr($file, 5, -5) . '.sav'][4]) . '%</td>
-                                </tr>';
+
+                                <!-- Max Slope -->
+                                <td>' . round($db[substr($file, 5, -5) . '.sav'][4]) . '%</td>
+                                <!-- Shared Link -->';
+                                ?>
+                                <?php
+
+                                // Checks public save folder to see if we can provide a link
+                                $saveCheck = 'saves/public/' . substr($file,5, -5) . '.sav';
+
+                                $upTime = filemtime($saveCheck);
+                                $timeCheck = time() - $upTime;
+
+                                if(file_exists($saveCheck)) {
+                                  if($timeCheck < 172800) {
+                                    echo '<td><a href="saves/public/'. substr($file, 5, -5) . '.sav">Link</a></td>';
+                                  } else {
+                                    echo '<td>Expired</td>';
+                                  }
+                                } else {
+                                  echo '<td></a></td>';
+                                }
+
+                                ?>
+
+                                <?php
+                            echo '</tr>';
                             if (!(($i + 1) % 15)) {
                                 if (($i + 1) < $soft_limit) {
                                     echo '</table><table>' . $tableHeader;

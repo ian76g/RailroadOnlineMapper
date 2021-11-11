@@ -26,7 +26,7 @@ if (isset($_POST) && !empty($_POST)) {
     }
 
 // Check file size
-    if ($_FILES["fileToUpload"]["size"] > 1500000) {
+    if ($_FILES["fileToUpload"]["size"] > 500000) {
         echo "Sorry, your file is too large.";
         $uploadOk = 0;
     }
@@ -37,27 +37,38 @@ if (isset($_POST) && !empty($_POST)) {
         $uploadOk = 0;
     }
 
-// Check if $uploadOk is set to 0 by an error
-    if ($uploadOk == 0) {
-        echo "Sorry, your file was not uploaded.";
-// if everything is ok, try to upload file
-    } else {
-        if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
-            //echo "The file " . htmlspecialchars(basename($_FILES["fileToUpload"]["name"])) . " has been uploaded.<br>";
-//            die('YOUR FILE WAS PLACED IN QUEUE UNTIL I TURN THE COMPUTER ON AGAIN AFTER MY NIGHT!');
-            if (isset($_POST['public'])) {
-                copy($target_file, 'public/' . $myNewName . '.sav');
-            }
-
-            $NEWUPLOADEDFILE = $myNewName . '.sav';
-            include('converter.php');
-            header('Location: /done/' . $myNewName . '.html?t=' . time());
-            die();
+    // Check if $uploadOk is set to 0 by an error
+        if ($uploadOk == 0) {
+            echo "Sorry, your file was not uploaded.";
+    // if everything is ok, try to upload file
         } else {
-            echo "Sorry, there was an error uploading your file.";
+            if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
+                //echo "The file " . htmlspecialchars(basename($_FILES["fileToUpload"]["name"])) . " has been uploaded.<br>";
+                //die('YOUR FILE WAS PLACED IN QUEUE UNTIL I TURN THE COMPUTER ON AGAIN AFTER MY NIGHT!');
+
+                if (isset($_POST['public'])) {
+
+                  // Copy save for public use
+                  copy($target_file, 'saves/public/' . $myNewName . '.sav');
+
+                  $NEWUPLOADEDFILE = $myNewName . '.sav';
+
+                  include('converter.php');
+                  header('Location: maps/' . $myNewName . '.html');
+
+                } else {
+
+                  $NEWUPLOADEDFILE = $myNewName . '.sav';
+
+                  include('converter.php');
+                  header('Location: maps/' . $myNewName . '.html');
+                }
+
+            } else {
+                echo "Sorry, there was an error uploading your file.";
+            }
         }
-    }
-    die();
+        die();
 }
 
 ?>
@@ -111,20 +122,20 @@ include_once('includes/head.php');
             <fieldset>
                 <div>
                     <input type="radio" id="bg" name="background" value="bg">
-                    <label for="bg"> <img border="2" src="done/bg.png" width="90" height="90"> Old background </label>
+                    <label for="bg"> <img border="2" src="topo/bg.png" width="90" height="90"> Old background </label>
                 </div>
                 <div>
                     <input type="radio" id="bg3" name="background" value="bg3">
-                    <label for="bg3"> <img border="2" src="done/bg3.png" width="90" height="90"> New background </label>
+                    <label for="bg3"> <img border="2" src="topo/bg3.png" width="90" height="90"> New background </label>
                 </div>
                 <div>
                     <input type="radio" id="bg4" name="background" value="bg4">
-                    <label for="bg4"> <img border="2" src="done/bg4.png" width="90" height="90"> Psawhns background
+                    <label for="bg4"> <img border="2" src="topo/bg4.png" width="90" height="90"> Psawhns background
                     </label>
                 </div>
                 <div>
                     <input checked type="radio" id="bg5" name="background" value="bg5">
-                    <label for="bg5"> <img border="2" src="done/bg4.png" width="90" height="90"> Psawhns background with
+                    <label for="bg5"> <img border="2" src="topo/bg4.png" width="90" height="90"> Psawhns background with
                         Kanados overlay</label>
                 </div>
             </fieldset>
