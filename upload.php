@@ -161,18 +161,7 @@ include_once('includes/head.php');
         </section>
 
         <section>
-            <h3>6. Rolling Stock Options</h3>
-            <div class="input-group input-group--row">
-                <input type="checkbox" id="empty" name="empty">
-                <label for="empty">Include Unnamed Rolling Stock to List</label>
-            </div>
-          </section>
-
-          <section>
-            <h3>7. Map Options</h3>
-            <div>
             <h3>6. Slope settings</h3>
-
             <div class="input-group input-group--row">
                 <input type="checkbox" id="maxslope" name="maxslope">
                 <label for="maxslope">Draw 4 orange circles on worst slope</label>
