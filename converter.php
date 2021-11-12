@@ -5,8 +5,6 @@ ini_set('memory_limit', -1);  // just in case - previous versions had 8000x8000 
 set_time_limit(90);                // just in case something wents really bad -- kill script after 10 seconds
 $v = 46;                                  //version - totally not used except in next line
 
-echo "\r\n" . 'Running converter version 0.' . $v . "<br>";
-
 require_once 'classes/ArithmeticHelper.php';
 require_once 'classes/dtAbstractData.php';
 require_once 'classes/dtDynamic.php';
