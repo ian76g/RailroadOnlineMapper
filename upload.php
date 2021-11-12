@@ -161,33 +161,17 @@ include_once('includes/head.php');
         </section>
 
         <section>
-<<<<<<< HEAD
-            <h3>6. Rolling Stock Options</h3>
-            <div class="input-group input-group--row">
-                <input type="checkbox" id="empty" name="empty">
-                <label for="empty">Include Unnamed Rolling Stock to List</label>
-            </div>
-          </section>
-
-          <section>
-            <h3>7. Map Options</h3>
-            <div>
-=======
             <h3>6. Slope settings</h3>
->>>>>>> 3a151899b48d50c01198da83a8d43a2824a48f6e
             <div class="input-group input-group--row">
                 <input type="checkbox" id="maxslope" name="maxslope">
                 <label for="maxslope">Draw 4 orange circles on worst slope</label>
             </div>
 
             <div class="input-group">
-<<<<<<< HEAD
                 <label for="slopeTrigger">Label slopes greater than x%</label>
                 <input placeholder="20" type="text" id="slopeTrigger" name="slopeTrigger" value="20" class="iBox">
-=======
                 <label for="slopeTrigger">label slopes greater than X%</label>
                 <input placeholder="1000" type="text" id="slopeTrigger" name="slopeTrigger" value="2">
->>>>>>> 3a151899b48d50c01198da83a8d43a2824a48f6e
             </div>
 
             <div class="input-group">
@@ -198,10 +182,8 @@ include_once('includes/head.php');
                 <label for="slopeTriggerDecimals">Round to X decimals</label>
                 <input placeholder="1" type="text" id="slopeTriggerDecimals" name="slopeTriggerDecimals" value="1">
             </div>
-<<<<<<< HEAD
           </div>
           </section>
-=======
         </section>
 
         <section>
@@ -211,8 +193,6 @@ include_once('includes/head.php');
                 <label for="empty">include unnamed rolling stock to list</label>
             </div>
 
-
->>>>>>> 3a151899b48d50c01198da83a8d43a2824a48f6e
             <input class="button" type="submit" value="Upload" name="submit">
         </section>
     </form>
