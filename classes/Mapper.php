@@ -606,8 +606,13 @@ class Mapper
         <th>Amount</th>
         </tr>
         ###TROWS###</table><br/>
-        Replant trees: NO<input type="radio" name="replant" value="NO" checked="checked" /> &nbsp; &nbsp; <input type="radio" name="replant" value="YES" />YES<br>
         <button class="button">Apply Rolling Stock changes</button></form>
+
+        <br/><br/>
+        <h4>Trees</h4>
+        <form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $this->NEWUPLOADEDFILE . '">
+        <input name="replant" value="YES" type="hidden" />
+        <button class="button">Replant Trees</button></form>
 
         <br/><br/>
         <h4>Players</h4>
