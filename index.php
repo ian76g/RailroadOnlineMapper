@@ -50,7 +50,7 @@
 <body>
     <header class="header">
         <h1 class="logo">RailroadsOnlineMapper</h1>
-        <a class="button" href="upload.php">Upload Save Game</a>
+        <a class="button" href="upload.php">Upload Savegame</a>
     </header>
     <main>
         <section class="uploads">
