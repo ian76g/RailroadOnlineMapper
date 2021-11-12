@@ -28,26 +28,23 @@
                         <th><A href="?sortby=4&sortorder=desc" style="color: white">Shared (2 Days)</th>
                     </thead>';
 
-// Removed sort function for different variation
-//
-//    function mysort($a, $b){
-//        global $db;
-//        $x=1;
-//        if(strtolower($db[substr($a, 5, -5) . '.sav'][$_GET['sortby']]) == strtolower($db[substr($b, 5, -5) . '.sav'][$_GET['sortby']])){
-//            return 0;
-//        }
-//        if(strtolower($db[substr($a, 5, -5) . '.sav'][$_GET['sortby']]) > strtolower($db[substr($b, 5, -5) . '.sav'][$_GET['sortby']])){
-//            $x=-1;
-//        } else {
-//            $x=1;
-//        }
-//        if($_GET['sortorder']=='desc'){
-//            return $x;
-//        } else {
-//            return -$x;
-//        }
-//    }
-//
+    function mysort($a, $b){
+        global $db;
+        $x=1;
+        if(strtolower($db[substr($a, 5, -5) . '.sav'][$_GET['sortby']]) == strtolower($db[substr($b, 5, -5) . '.sav'][$_GET['sortby']])){
+            return 0;
+        }
+        if(strtolower($db[substr($a, 5, -5) . '.sav'][$_GET['sortby']]) > strtolower($db[substr($b, 5, -5) . '.sav'][$_GET['sortby']])){
+            $x=-1;
+        } else {
+            $x=1;
+        }
+        if($_GET['sortorder']=='desc'){
+            return $x;
+        } else {
+            return -$x;
+        }
+    }
 
 ?>
 <body>
