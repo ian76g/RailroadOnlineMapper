@@ -104,8 +104,9 @@ input[type="text"] {
   width: 100%;
   padding: 1rem 0.75rem;
   background: white;
-  border: 1px solid #AAAAAA;
+  border: 0;
   border-radius: var(--border-radius);
+  outline: 2px solid transparent;
   transition: all 0.1s ease-out;
 }
 
@@ -299,7 +300,6 @@ tbody td {
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  border: 1px;
 }
 
 .upload-form__background fieldset div {
