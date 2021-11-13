@@ -50,7 +50,7 @@ if (isset($_POST) && !empty($_POST)) {
                 if (isset($_POST['public'])) {
 
                   // Copy save for public use
-                  copy($target_file, SHELL_ROOT.'saves/public/' . $myNewName . '.sav');
+                  copy($target_file, SHELL_ROOT.'public/' . $myNewName . '.sav');
 
                   $NEWUPLOADEDFILE = $myNewName . '.sav';
 
