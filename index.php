@@ -8,7 +8,7 @@ require_once 'config.php';
     include_once(SHELL_ROOT . 'includes/head.php');
 
     // Create required folders if they don't exist
-    $folders = array("saves/", "saves/public/", "uploads");
+    $folders = array("saves", "saves/public", "uploads");
     foreach ($folders as $folder) {
         if (!file_exists($folder)) {
             mkdir($folder);
