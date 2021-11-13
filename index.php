@@ -22,7 +22,7 @@ require_once 'config.php';
 
     $tableHeader = '<thead>
                         <th>Player</th>
-                        <th><A href="?sortby=0&sortorder=desc" style="color: white">Track Length</A></th>
+                        <th><A href="?sortby=0&sortorder=desc" style="color: white">Length</A></th>
                         <th><A href="?sortby=1&sortorder=desc" style="color: white">Switches</A></th>
                         <th><A href="?sortby=6&sortorder=desc" style="color: white">Trees</A></th>
                         <th><A href="?sortby=2&sortorder=desc" style="color: white">Locos</A></th>
