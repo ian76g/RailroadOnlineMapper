@@ -560,20 +560,5 @@ class GVASParser
                 die('WHOPSI');
             }
         }
-        $output .= hex2bin('050000004e6f6e650000000000');
-
-        if (isset($_POST['save'])) {
-            $db = unserialize(file_get_contents('db.db'));
-            if (getUserIpAddr() != $db[$this->NEWUPLOADEDFILE][5]) {
-                die("This does not seem to be your save file.");
-            }
-            echo "SAVING FILE " . $this->NEWUPLOADEDFILE . '.modified' . "<br>\n";
-            file_put_contents('saves/' . $this->NEWUPLOADEDFILE . '.modified', $output, FILE_BINARY);
-            echo '<A href="saves/' . $this->NEWUPLOADEDFILE . '.modified' . '">Download your modified save here </A><br>';
-            echo 'Want to upload this map again?<A href="upload.php">Add your renumbered save again</A><br>';
-        } else {
-            file_put_contents('uploads/' . $this->NEWUPLOADEDFILE, $output, FILE_BINARY);
-        }
-
     }
 }

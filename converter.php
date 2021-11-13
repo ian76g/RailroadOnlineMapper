@@ -5,18 +5,18 @@ set_time_limit(90);                // just in case something wents really bad --
 $v = 46;                                  //version - totally not used except in next line
 //echo "\n" . 'running converter version 0.' . $v . "\n";
 
-require_once 'classes/ArithmeticHelper.php';
-require_once 'classes/dtAbstractData.php';
-require_once 'classes/dtDynamic.php';
-require_once 'classes/dtHeader.php';
-require_once 'classes/dtProperty.php';
-require_once 'classes/dtString.php';
-require_once 'classes/dtVector.php';
-require_once 'classes/dtArray.php';
-require_once 'classes/dtStruct.php';
-require_once 'classes/dtTextProperty.php';
-require_once 'classes/GVASParser.php';
-require_once 'classes/Mapper.php';
+require_once 'utils/ArithmeticHelper.php';
+require_once 'utils/dtAbstractData.php';
+require_once 'utils/dtDynamic.php';
+require_once 'utils/dtHeader.php';
+require_once 'utils/dtProperty.php';
+require_once 'utils/dtString.php';
+require_once 'utils/dtVector.php';
+require_once 'utils/dtArray.php';
+require_once 'utils/dtStruct.php';
+require_once 'utils/dtTextProperty.php';
+require_once 'utils/GVASParser.php';
+require_once 'utils/Mapper.php';
 
 function getUserIpAddr()
 {

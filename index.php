@@ -3,6 +3,7 @@
 <?php
 $PageTitle = "RailroadsOnlineMapper";
 include_once('includes/head.php');
+include_once('utils/tools.php');
 
 // Create required folder if it don't exist
 if (!file_exists('./saves/')) {
@@ -22,26 +23,6 @@ $tableHeader = '<thead>
                         <th><A href="?sortby=3&sortorder=desc" style="color: white">Carts</A></th>
                         <th><A href="?sortby=4&sortorder=desc" style="color: white">Slope</A></th>
                     </thead>';
-
-function mysort($a, $b)
-{
-    global $db;
-    $x = 1;
-    if (strtolower($db[substr($a, 5, -5) . '.sav'][$_GET['sortby']]) == strtolower($db[substr($b, 5, -5) . '.sav'][$_GET['sortby']])) {
-        return 0;
-    }
-    if (strtolower($db[substr($a, 5, -5) . '.sav'][$_GET['sortby']]) > strtolower($db[substr($b, 5, -5) . '.sav'][$_GET['sortby']])) {
-        $x = -1;
-    } else {
-        $x = 1;
-    }
-    if ($_GET['sortorder'] == 'desc') {
-        return $x;
-    } else {
-        return -$x;
-    }
-}
-
 ?>
 <body>
 <header class="header">
@@ -55,55 +36,25 @@ function mysort($a, $b)
             <table>
                 <?php
                 echo $tableHeader;
-                $dh = opendir('done/');
-                while ($file = readdir($dh)) {
-                    if (substr($file, -5) == '.html') {
-                        $files[filemtime('done/' . $file)] = 'done/' . $file;
+                $soft_limit = 800;
+
+                $i = 0;
+                foreach (map_entries() as $entry) {
+                    print('<tr>' . PHP_EOL);
+                    print('<td><a href="map.php?name=' . $entry['name'] . '">' . $entry['name'] . '</a></td>' . PHP_EOL);
+                    print('<td>' . $entry['trackLength'] . 'km</td>' . PHP_EOL);
+                    print('<td>' . $entry['numY'] . ' / ' . $entry['numT'] . '</td>' . PHP_EOL);
+                    print('<td>' . $entry['numLocs'] . '</td>' . PHP_EOL);
+                    print('<td>' . $entry['numCarts'] . '</td>' . PHP_EOL);
+                    print('<td>' . $entry['slope'] . '%</td>' . PHP_EOL);
+                    print('</tr>' . PHP_EOL);
+
+                    if (!(($i + 1) % 15)) {
+                        if (($i + 1) < $soft_limit) {
+                            echo '</table><table>' . $tableHeader;
+                        }
                     }
-                }
-                if ((isset($files) && $files != null) && file_exists('db.db')) {
-                    $db = unserialize(file_get_contents('db.db'));
-                    //array($totalTrackLength, $totalSwitches, $totalLocos, $totalCarts, $maxSlope);
-
-                    if (!isset($_GET['sortby']) || !isset($_GET['sortorder'])) {
-                        krsort($files);
-                    } else {
-                        usort($files, 'mysort');
-                    }
-
-                    $hard_limit = 1600;
-                    $soft_limit = 800;
-                    for ($i = 0; $i < sizeof($files); $i++) {
-                        $file = array_shift($files);
-                        if (!$file) break;
-
-                        if ($i > $hard_limit) {
-                            unlink("done/" . substr($file, 5, -5) . ".html");
-                        }
-
-                        if ($i >= $soft_limit) {
-                            continue;
-                        }
-
-                        $dl = '';
-                        if (file_exists('public/' . substr($file, 5, -5) . '.sav')) {
-                            $dl = ' (DL)';
-                        }
-
-                        echo '<tr><td><a href="done/' . substr($file, 5, -5) . '.html?t=' . time() . '">' . substr($file, 5, -5) . $dl . '</a></td>
-                                <td>' . round($db[substr($file, 5, -5) . '.sav'][0] / 100000, 2) . 'km</td>
-                                <td>' . $db[substr($file, 5, -5) . '.sav'][1] . ' / ' . $db[substr($file, 5, -5) . '.sav'][6] . '</td>
-                                <td>' . $db[substr($file, 5, -5) . '.sav'][2] . '</td>
-                                <td>' . $db[substr($file, 5, -5) . '.sav'][3] . '</td>
-                                <td >' . round($db[substr($file, 5, -5) . '.sav'][4]) . '%</td>
-                                </tr>';
-                        if (!(($i + 1) % 15)) {
-                            if (($i + 1) < $soft_limit) {
-                                echo '</table><table>' . $tableHeader;
-                            }
-                        }
-
-                    }
+                    $i++;
                 }
                 echo '</table>';
                 ?>
@@ -114,14 +65,3 @@ function mysort($a, $b)
 <?php include_once('includes/footer.php') ?>
 </body>
 </html>
-<?php
-$dir = 'saves';
-$dh = opendir($dir);
-
-while ($file = readdir($dh)) {
-    if ($file && (substr($file, -4) == '.sav' || substr($file, -13) == '.sav.modified')) {
-        if (filemtime($dir . '/' . $file) < time() - 600) {
-            unlink($dir . '/' . $file);
-        }
-    }
-}

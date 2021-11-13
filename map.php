@@ -1,15 +1,15 @@
 <?php
-require_once 'classes/ArithmeticHelper.php';
-require_once 'classes/dtAbstractData.php';
-require_once 'classes/dtDynamic.php';
-require_once 'classes/dtHeader.php';
-require_once 'classes/dtProperty.php';
-require_once 'classes/dtString.php';
-require_once 'classes/dtVector.php';
-require_once 'classes/dtArray.php';
-require_once 'classes/dtStruct.php';
-require_once 'classes/dtTextProperty.php';
-require_once 'classes/GVASParser.php';
+require_once 'utils/ArithmeticHelper.php';
+require_once 'utils/dtAbstractData.php';
+require_once 'utils/dtDynamic.php';
+require_once 'utils/dtHeader.php';
+require_once 'utils/dtProperty.php';
+require_once 'utils/dtString.php';
+require_once 'utils/dtVector.php';
+require_once 'utils/dtArray.php';
+require_once 'utils/dtStruct.php';
+require_once 'utils/dtTextProperty.php';
+require_once 'utils/GVASParser.php';
 
 $saveFile = null;
 $json = null;

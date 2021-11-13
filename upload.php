@@ -1,8 +1,8 @@
 <?php
 if (isset($_POST) && !empty($_POST)) {
     $target_dir = "saves/";
-    $myNewName = str_replace(array('#', '&', ' ', "'", '`', '�'), '_', substr($_POST['discordName'], 0, 8));
-    $target_file = $target_dir . $myNewName . '.sav';
+    $newFilename = str_replace(array('#', '&', ' ', "'", '`', '�'), '_', substr($_POST['discordName'], 0, 8));
+    $target_file = $target_dir . $newFilename . '.sav';
     $uploadOk = 1;
     $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
@@ -42,12 +42,27 @@ if (isset($_POST) && !empty($_POST)) {
         // if everything is ok, try to upload file
     } else {
         if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
-            if (isset($_POST['public'])) {
-                copy($target_file, 'saves/' . $myNewName . '.sav');
-            }
+            require_once 'utils/ArithmeticHelper.php';
+            require_once 'utils/dtAbstractData.php';
+            require_once 'utils/dtDynamic.php';
+            require_once 'utils/dtHeader.php';
+            require_once 'utils/dtProperty.php';
+            require_once 'utils/dtString.php';
+            require_once 'utils/dtVector.php';
+            require_once 'utils/dtArray.php';
+            require_once 'utils/dtStruct.php';
+            require_once 'utils/dtTextProperty.php';
+            require_once 'utils/GVASParser.php';
+            require_once 'utils/Mapper.php';
 
-            $NEWUPLOADEDFILE = $myNewName . '.sav';
-            header('Location: /map.php?name=' . $myNewName);
+            $arithmeticHelper = new ArithmeticHelper();
+            $myParser = new GVASParser();
+            $myParser->NEWUPLOADEDFILE = $target_file;
+            $myParser->parseData(file_get_contents($target_file), false);
+            $myMapper = new Mapper($myParser->goldenBucket, false);
+            $myMapper->gethtmlSVG($htmlSvg, $target_file, true, $arithmeticHelper);
+
+            header('Location: /map.php?name=' . $newFilename);
             die();
         } else {
             echo "Sorry, there was an error uploading your file.";

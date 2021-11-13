@@ -32,7 +32,7 @@ class Mapper
     private $empty;
     private $arithmeticHelper;
     private $allLabels = array(array(0, 0));
-
+    private bool $doSvg;
     var $initialsTreeDown = 1750;
     var $prows = '';
     var $irows = '';
@@ -40,10 +40,29 @@ class Mapper
     /**
      * Mapper constructor.
      * @param $data
+     * @param bool $doSvg
      */
-    public function __construct($data)
+    public function __construct($data, bool $doSvg = true)
     {
         $this->data = $data;
+        $this->doSvg = $doSvg;
+    }
+
+    private function getUserIpAddr()
+    {
+        global $argv;
+
+        if(isset($argv) && $argv){
+            return 'local';
+        }
+        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+            $ip = $_SERVER['HTTP_CLIENT_IP'];
+        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else {
+            $ip = $_SERVER['REMOTE_ADDR'];
+        }
+        return $ip;
     }
 
     /**
@@ -53,9 +72,8 @@ class Mapper
      * @param $arithmeticHelper
      * @return string
      */
-    function gethtmlSVG(&$htmlSvg, $NEWUPLOADEDFILE, $empty, $arithmeticHelper)
+    function gethtmlSVG(&$htmlSvg, $NEWUPLOADEDFILE, $empty, $arithmeticHelper): string
     {
-        $doSvg = true;
         $this->empty = $empty;
         $this->arithmeticHelper = $arithmeticHelper;
         $this->NEWUPLOADEDFILE = $NEWUPLOADEDFILE;
@@ -117,7 +135,7 @@ class Mapper
             $this->totalLocos,
             $this->totalCarts,
             $this->maxSlope,
-            getUserIpAddr(),
+            $this->getUserIpAddr(),
             sizeof($this->data['Removed']['Vegetation'])
         );
         file_put_contents('db.db', serialize($db));
@@ -130,7 +148,7 @@ class Mapper
             foreach ($this->data['Watertowers'] as $site) {
                 $x = $this->imx - (int)(($site['Location'][0] - $this->minX) / 100 * $this->scale);
                 $y = $this->imy - (int)(($site['Location'][1] - $this->minY) / 100 * $this->scale);
-                if ($doSvg) {
+                if ($this->doSvg) {
                     $svg .= '<text x="' . ($x) . '" y="' . ($y) . '" >W</text>' . "\n";
                 }
             }
@@ -154,7 +172,7 @@ class Mapper
             $y = 100 + $cartsDrawn * 5 * ($this->engineRadius * 1.1) / 2;
             $rx = $this->engineRadius * 1.1 * 2;
             $ry = ($this->engineRadius * 1.1);
-            if ($doSvg) {
+            if ($this->doSvg) {
                 $svg .= '<ellipse cx="' . $x .
                     '" cy="' . $y .
                     '" rx="' . $rx .
@@ -165,7 +183,7 @@ class Mapper
 
 
         }
-        if ($doSvg) {
+        if ($this->doSvg) {
             $svg .= '<text x="' . ($x + $rx) . '" y="' . (100 - 2 * $ry) . '" font-size="30" dy="0">';
             foreach ($carts as $cartType => $cart) {
                 $svg .= '<tspan x="' . ($x + $rx) . '" dy="1.2em">' . $cartType . '&nbsp;</tspan>';
@@ -272,7 +290,6 @@ class Mapper
      */
     function drawTracksAndBeds()
     {
-        $doSvg = true;
         $svg = '';
         /**
          * set some basic order on what to draw first, rails of course should be painted last
@@ -314,7 +331,7 @@ class Mapper
                         $xCenter = ($this->imx - (int)(($segment['LocationCenter']['X'] - $this->minX) / 100 * $this->scale));
                         $yCenter = ($this->imy - (int)(($segment['LocationCenter']['Y'] - $this->minY) / 100 * $this->scale));
 
-                        if ($doSvg) {
+                        if ($this->doSvg) {
                             $svg .= '<line x1="' . ($xStart) . '" y1="' . ($yStart) .
                                 '" x2="' . ($xEnd) . '" y2="' . ($yEnd) .
                                 '" stroke="' . $optionsArr[1] . '" stroke-width="' . $optionsArr[0] . '"/>' . "\n";
@@ -338,7 +355,7 @@ class Mapper
 
                             if (empty($length)) {//check for zero length tracks
                                 $zeroLenthSegments[] = $segment;
-                                if ($doSvg) { //@ToDo make function later.
+                                if ($this->doSvg) { //@ToDo make function later.
                                     $svg .= sprintf('<circle cx="%d" cy="%d" r="10" stroke="red" stroke-width="2" fill="red" />', $xCenter, $yCenter);
                                 }
                                 continue; //This may cause issues down the road. We may need to stop at this point and return the errors segment.
@@ -399,7 +416,6 @@ class Mapper
      */
     public function drawSwitches()
     {
-        $doSvg = true;
         $svg = '';
         /**
          * Fill in the missing gaps AKA switches
@@ -456,7 +472,7 @@ class Mapper
             $rotSide = deg2rad($switch['Rotation'][1] - 90 + $dir);
             $rotCross = deg2rad($switch['Rotation'][1] + 180);
 
-            if ($doSvg) {
+            if ($this->doSvg) {
                 $x = ($this->imx - (int)(($switch['Location'][0] - $this->minX) / 100 * $this->scale));
                 $y = ($this->imy - (int)(($switch['Location'][1] - $this->minY) / 100 * $this->scale));
                 if ($dir == 99) { //CROSS
@@ -513,7 +529,6 @@ class Mapper
      */
     public function drawTurntables()
     {
-        $doSvg = true;
         $svg = '';
         /**
          * Fill in more missing gaps AKA turntables
@@ -532,7 +547,7 @@ class Mapper
             $rotation = deg2rad($table['Rotator'][1] + 90);
             $rotation2 = deg2rad($table['Rotator'][1] + 90 - $table['Deck'][1]);
 
-            if ($doSvg) {
+            if ($this->doSvg) {
                 $this->turnTableRadius = 25;
 
                 $x = ($this->imx - (int)(($table['Location'][0] - $this->minX) / 100 * $this->scale));
@@ -563,7 +578,6 @@ class Mapper
      */
     public function drawRollingStocks(&$htmlSvg)
     {
-        $doSvg = true;
         $svg = '';
         /**
          * draw some vehicles on top of that image
@@ -767,7 +781,7 @@ class Mapper
 
             $x = ($this->imx - (int)(($vehicle['Location'][0] - $this->minX) / 100 * $this->scale));
             $y = ($this->imy - (int)(($vehicle['Location'][1] - $this->minY) / 100 * $this->scale));
-            if ($doSvg) {
+            if ($this->doSvg) {
                 $svg .= '<ellipse cx="' . $x . '" cy="' . $y . '" rx="' . ($this->engineRadius / 2) . '" ry="' . ($this->engineRadius / 3) .
                     '" style="fill:' . $cartColors[$vehicle['Type']][1] . ';stroke:black;stroke-width:1" transform="rotate(' . $vehicle['Rotation'][1] .
                     ', ' . ($this->imx - (int)(($vehicle['Location'][0] - $this->minX) / 100 * $this->scale)) . ', ' . ($this->imy - (int)(($vehicle['Location'][1] - $this->minY) / 100 * $this->scale)) . ')"
@@ -781,7 +795,7 @@ class Mapper
               />';
                     $svg .= '<text x="' . $x . '" y="' . $y . '" >' . '&nbsp;&nbsp;' . $vehicle['Location'][2] . '</text>' . "\n";
 
-                    $umrows.='<input name="underground_'.$cartIndex.'" value="1" type="hidden">';
+                    $umrows .= '<input name="underground_' . $cartIndex . '" value="1" type="hidden">';
                 }
             }
 
@@ -813,7 +827,7 @@ class Mapper
                     $textRotation -= 90;
                 }
 
-                if ($doSvg) {
+                if ($this->doSvg) {
                     $this->allLabels[] = array($x, $y);
                     $svg .= '<text x="' . $x . '" y="' . $y . '" transform="rotate(' . $textRotation . ', ' . $x . ', ' . $y . ')">' . '..' . $name . '</text>' . "\n";
 
@@ -859,8 +873,8 @@ class Mapper
     public function populateInfo(&$htmlSvg)
     {
         $svg = '';
-         /**
-            * add player info
+        /**
+         * add player info
          */
 
         $text = "";
@@ -951,7 +965,7 @@ class Mapper
         /**
          * add the industries to the map
          */
-        foreach ($this->data['Industries'] as $number=>$site) {
+        foreach ($this->data['Industries'] as $number => $site) {
 
             /**
              * again - fix some issues with wrong INPUT from json
@@ -1054,7 +1068,7 @@ class Mapper
                     array_pop($site['EductsStored']);
                     $name = 'F';
                     $name .= "#$number";
-                    $rotation = ($site['Rotation'][1]>0)?($site['Rotation'][1]-90):($site['Rotation'][1]+90);
+                    $rotation = ($site['Rotation'][1] > 0) ? ($site['Rotation'][1] - 90) : ($site['Rotation'][1] + 90);
                     break;
                 default:
                     die('unknown industry');
