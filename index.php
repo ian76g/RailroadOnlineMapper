@@ -18,12 +18,14 @@
     }
 
     $tableHeader = '<thead>
-                        <th>NAME</th>
+                        <th>Player</th>
                         <th><A href="?sortby=0&sortorder=desc" style="color: white">Track Length</A></th>
-                        <th><A href="?sortby=1&sortorder=desc" style="color: white">#Y</A> / <A href="?sortby=6&sortorder=desc" style="color: white">#T</A></th>
+                        <th><A href="?sortby=1&sortorder=desc" style="color: white">Switches</A></th>
+                        <th><A href="?sortby=6&sortorder=desc" style="color: white">Trees Removed</A></th>
                         <th><A href="?sortby=2&sortorder=desc" style="color: white">Locos</A></th>
                         <th><A href="?sortby=3&sortorder=desc" style="color: white">Carts</A></th>
                         <th><A href="?sortby=4&sortorder=desc" style="color: white">Slope</A></th>
+                        <th><A href="?sortby=4&sortorder=desc" style="color: white">Shared (2 Days)</th>
                     </thead>';
 
     function mysort($a, $b){
@@ -44,6 +46,7 @@
         }
     }
 
+
 ?>
 <body>
     <header class="header">
@@ -57,10 +60,10 @@
                 <table>
                     <?php
                     echo $tableHeader;
-                    $dh = opendir('done/');
+                    $dh = opendir('maps/');
                     while ($file = readdir($dh)) {
                         if (substr($file, -5) == '.html') {
-                            $files[filemtime('done/' . $file)] = 'done/' . $file;
+                            $files[filemtime('maps/' . $file)] = 'maps/' . $file;
                         }
                     }
                     if ((isset($files) && $files != null) && file_exists('db.db')) {
@@ -80,7 +83,7 @@
                             if (!$file) break;
 
                             if ($i > $hard_limit) {
-                                unlink("done/" . substr($file, 5, -5) . ".html");
+                                unlink("maps/" . substr($file, 5, -5) . ".html");
                             }
 
                             if ($i >= $soft_limit) {
@@ -88,17 +91,56 @@
                             }
 
                             $dl = '';
-                            if (file_exists('public/' . substr($file, 5, -5) . '.sav')) {
+                            if (file_exists('maps/' . substr($file, 5, -5) . '.sav')) {
                                 $dl = ' (DL)';
                             }
 
-                            echo '<tr><td><a href="done/' . substr($file, 5, -5) . '.html?t=' . time() . '">' . substr($file, 5, -5) . $dl . '</a></td>
+                            echo
+                            '<tr>
+                                <!-- Owner of Map -->
+                                <td><a href=" maps/' . substr($file, 5, -5) . '.html">' .substr($file, 5, -5) .'</a></td>
+
+                                <!-- Track Length -->
                                 <td>' . round($db[substr($file, 5, -5) . '.sav'][0] / 100000, 2) . 'km</td>
-                                <td>' . $db[substr($file, 5, -5) . '.sav'][1] . ' / ' . $db[substr($file, 5, -5) . '.sav'][6] . '</td>
+
+                                <!-- Switch Count -->
+                                <td>' . $db[substr($file, 5, -5) . '.sav'][1] . '</td>
+
+                                <!-- Tree Death Count -->
+                                <td>' . $db[substr($file, 5, -5) . '.sav'][6] . '</td>
+
+                                <!-- Locomotives Owned -->
                                 <td>' . $db[substr($file, 5, -5) . '.sav'][2] . '</td>
+
+                                <!-- Rolling Stock Owned -->
                                 <td>' . $db[substr($file, 5, -5) . '.sav'][3] . '</td>
-                                <td >' . round($db[substr($file, 5, -5) . '.sav'][4]) . '%</td>
-                                </tr>';
+
+                                <!-- Max Slope -->
+                                <td>' . round($db[substr($file, 5, -5) . '.sav'][4]) . '%</td>
+                                <!-- Shared Link -->';
+                                ?>
+                                <?php
+
+                                // Checks public save folder to see if we can provide a link
+                                $saveCheck = 'saves/public/' . substr($file,5, -5) . '.sav';
+
+                                $upTime = filemtime($saveCheck);
+                                $timeCheck = time() - $upTime;
+
+                                if(file_exists($saveCheck)) {
+                                  if($timeCheck < 172800) {
+                                    echo '<td><a href="saves/public/'. substr($file, 5, -5) . '.sav">Link</a></td>';
+                                  } else {
+                                    echo '<td>Expired</td>';
+                                  }
+                                } else {
+                                  echo '<td></a></td>';
+                                }
+
+                                ?>
+
+                                <?php
+                            echo '</tr>';
                             if (!(($i + 1) % 15)) {
                                 if (($i + 1) < $soft_limit) {
                                     echo '</table><table>' . $tableHeader;
