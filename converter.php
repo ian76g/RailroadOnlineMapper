@@ -70,13 +70,13 @@ if (isset($_POST['empty']) && $_POST['empty']) {
 $bg = 'bg5.jpg';
 if (isset($_POST['background'])) {
     if ($_POST['background'] == 'bg') {
-        $bg = 'bg.png';
+        $bg = 'bg.jpg';
     }
     if ($_POST['background'] == 'bg3') {
-        $bg = 'bg3.png';
+        $bg = 'bg3.jpg';
     }
     if ($_POST['background'] == 'bg4') {
-        $bg = 'bg4.png';
+        $bg = 'bg4.jpg';
     }
     if ($_POST['background'] == 'bg5') {
         $bg = 'bg5.jpg';
@@ -86,11 +86,10 @@ if (isset($_POST['background'])) {
 // each different background image needs different croping and stretching params
 
 $bgOffsets = array(
+    'bg.jpg' => array(8000, 8000, 0, 0, 8000, 8000),
+    'bg3.jpg' => array(8000, 8000, 0, 50, 8000, 8000),
+    'bg4.jpg' => array(8000, 8000, 0, 0, 8000, 8000),
     'bg5.jpg' => array(8000, 8000, 0, 0, 8000, 8000),
-    'bg4.png' => array(8000, 8000, 0, 0, 8000, 8000),
-    'bg3.png' => array(8000, 8000, 0, 50, 8000, 8000),
-    'bg3.png' => array(8000, 8000, 0, 0, 8000, 8000),
-    'bg.png' => array(8000, 8000, 0, 0, 8000, 8000),
 );
 
 // devine the SVG structure of the output-map
