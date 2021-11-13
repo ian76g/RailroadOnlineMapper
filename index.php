@@ -25,8 +25,7 @@ require_once 'config.php';
                         <th><A href="?sortby=0&sortorder=desc" style="color: white">Length</A></th>
                         <th><A href="?sortby=1&sortorder=desc" style="color: white">Switches</A></th>
                         <th><A href="?sortby=6&sortorder=desc" style="color: white">Trees</A></th>
-                        <th><A href="?sortby=2&sortorder=desc" style="color: white">Locos</A></th>
-                        <th><A href="?sortby=3&sortorder=desc" style="color: white">Carts</A></th>
+                        <th><A href="?sortby=6&sortorder=desc" style="color: white">Rolling Stock</th>
                         <th><A href="?sortby=4&sortorder=desc" style="color: white">Slope</A></th>
                         <th><A href="?sortby=4&sortorder=desc" style="color: white">(DL)</th>
                     </thead>';
@@ -102,8 +101,9 @@ require_once 'config.php';
                                 continue;
                             }
 
+                            // Variable to create a link for downloading save
                             $dl = '';
-                            if (file_exists(SHELL_ROOT . 'maps/' . substr($file, 5, -5) . '.sav')) {
+                            if (file_exists(SHELL_ROOT . 'maps/public/' . substr($file, 5, -5) . '.sav')) {
                                 $dl = ' (DL)';
                             }
 
@@ -121,14 +121,12 @@ require_once 'config.php';
                                 <!-- Tree Death Count -->
                                 <td>' . $db[substr($file, 0, -5) . '.sav'][6] . '</td>
 
-                                <!-- Locomotives Owned -->
-                                <td>' . $db[substr($file, 0, -5) . '.sav'][2] . '</td>
-
                                 <!-- Rolling Stock Owned -->
-                                <td>' . $db[substr($file, 0, -5) . '.sav'][3] . '</td>
+                                <td>' . $db[substr($file, 0, -5) . '.sav'][2] . '/' . $db[substr($file, 0, -5) . '.sav'][3] . '</td>
 
                                 <!-- Max Slope -->
                                 <td>' . round($db[substr($file, 0, -5) . '.sav'][4]) . '%</td>
+
                                 <!-- Shared Link -->';
 
                             // Create savefile name from map file
@@ -136,7 +134,7 @@ require_once 'config.php';
 
                             // Check to see if savefile exists in public folder and create download link
                             if (file_exists(SHELL_ROOT.'saves/public/' . $saveFile)) {
-                              $upTime = filemtime($saveCheck);
+                              $upTime = filemtime(SHELL_ROOT.'saves/public/' . $saveFile);
                               $timeCheck = time() - $upTime;
 
                               // Timecheck to remove public link for download
