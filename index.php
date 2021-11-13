@@ -67,11 +67,11 @@ require_once 'config.php';
                     $dh = opendir(SHELL_ROOT . 'maps/');
                     while ($file = readdir($dh)) {
                         if (substr($file, -5) == '.html') {
-                            $files[filemtime(SHELL_ROOT . 'maps/' . $file)] = SHELL_ROOT . 'maps/' . $file;
+                            $files[filemtime(SHELL_ROOT . 'maps/' . $file)] = $file;
                         }
                     }
-                    if ((isset($files) && $files != null) && file_exists('db.db')) {
-                        $db = unserialize(file_get_contents('db.db'));
+                    if ((isset($files) && $files != null) && file_exists(SHELL_ROOT.'db.db')) {
+                        $db = unserialize(file_get_contents(SHELL_ROOT.'db.db'));
                         //array($totalTrackLength, $totalSwitches, $totalLocos, $totalCarts, $maxSlope);
 
                         if (!isset($_GET['sortby']) || !isset($_GET['sortorder'])) {
@@ -95,32 +95,32 @@ require_once 'config.php';
                             }
 
                             $dl = '';
-                            if (file_exists(SHELL_ROOT . 'maps/' . substr($file, 5, -5) . '.sav')) {
+                            if (file_exists(SHELL_ROOT . 'public/' . substr($file, 5, -5) . '.sav')) {
                                 $dl = ' (DL)';
                             }
 
                             echo
                                 '<tr>
                                 <!-- Owner of Map -->
-                                <td><a href=" maps/' . substr($file, 5, -5) . '.html">' . substr($file, 5, -5) . '</a></td>
+                                <td><a href="'.WWW_ROOT.'maps/' . substr($file, 5, -5) . '.html">' . substr($file, 0, -5) . '</a></td>
 
                                 <!-- Track Length -->
-                                <td>' . round($db[substr($file, 5, -5) . '.sav'][0] / 100000, 2) . 'km</td>
+                                <td>' . round($db[substr($file, 0, -5) . '.sav'][0] / 100000, 2) . 'km</td>
 
                                 <!-- Switch Count -->
-                                <td>' . $db[substr($file, 5, -5) . '.sav'][1] . '</td>
+                                <td>' . $db[substr($file, 0, -5) . '.sav'][1] . '</td>
 
                                 <!-- Tree Death Count -->
-                                <td>' . $db[substr($file, 5, -5) . '.sav'][6] . '</td>
+                                <td>' . $db[substr($file, 0, -5) . '.sav'][6] . '</td>
 
                                 <!-- Locomotives Owned -->
-                                <td>' . $db[substr($file, 5, -5) . '.sav'][2] . '</td>
+                                <td>' . $db[substr($file, 0, -5) . '.sav'][2] . '</td>
 
                                 <!-- Rolling Stock Owned -->
-                                <td>' . $db[substr($file, 5, -5) . '.sav'][3] . '</td>
+                                <td>' . $db[substr($file, 0, -5) . '.sav'][3] . '</td>
 
                                 <!-- Max Slope -->
-                                <td>' . round($db[substr($file, 5, -5) . '.sav'][4]) . '%</td>
+                                <td>' . round($db[substr($file, 0, -5) . '.sav'][4]) . '%</td>
                                 <!-- Shared Link -->';
                             ?>
                             <?php
