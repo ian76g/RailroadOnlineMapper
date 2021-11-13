@@ -189,8 +189,24 @@ include_once(SHELL_ROOT.'includes/head.php');
                 <input type="checkbox" id="empty" name="empty">
                 <label for="empty">include unnamed rolling stock to list</label>
             </div>
+        </section>
+
+        <section>
+            <h3>8. In Order of Appereance</h3>
+            <div class="input-group input-group--row">
+                <input type="radio" id="metalOverWood" name="metalOverWood" value="NO" checked>
+                <label for="metalOverWood">Wooden bridges over Iron bridges</label>
+            </div>
+
+            <div class="input-group input-group--row">
+                <input type="radio" id="metalOverWood" name="metalOverWood" value="YES">
+                <label for="metalOverWood">Iron bridges over wooden bridges</label>
+            </div>
+
             <input class="button" type="submit" value="Upload" name="submit">
         </section>
+
+
     </form>
 </main>
 

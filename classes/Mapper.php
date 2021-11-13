@@ -291,6 +291,20 @@ class Mapper
             '0' => array(3, 'black'),                          // track  darkkhaki, darkgrey,orange,blue,black
         );
 
+        if($_POST['metalOverWood'] && $_POST['metalOverWood']=='YES'){
+            $order = array(
+                '1' => array(15, 'darkkhaki'),                      // variable bank
+                '2' => array(15, 'darkkhaki'),                      //  constant bank
+                '5' => array(15, 'darkgrey'),                       // variable wall
+                '6' => array(15, 'darkgrey'),                       // constant wall
+                '3' => array(15, 'orange'),                         //  wooden bridge
+                '7' => array(15, 'lightblue'),                      //  iron bridge
+                '4' => array(3, 'black'),                          // trendle track
+                '0' => array(3, 'black'),                          // track  darkkhaki, darkgrey,orange,blue,black
+            );
+        }
+
+
         // statistics for the webpage index
         $zeroLenthSegments = array();// for error collections if desired.
         /**
@@ -300,81 +314,108 @@ class Mapper
             if (isset($this->data['Splines'])) {
                 foreach ($this->data['Splines'] as $spline) {
                     $type = $spline['Type'];
+                    if ($type != $current) continue;
 
-                    if ($type != $current) continue;            // if this spline is not the current type, skip it
-                    $segments = $spline['Segments'];
-
-                    foreach ($segments as $segment) {
-                        if ($segment['Visible'] != 1) continue; // skip invisible tracks
-
-                        $xStart = ($this->imx - (int)(($segment['LocationStart']['X'] - $this->minX) / 100 * $this->scale));
-                        $yStart = ($this->imy - (int)(($segment['LocationStart']['Y'] - $this->minY) / 100 * $this->scale));
-                        $xEnd = ($this->imx - (int)(($segment['LocationEnd']['X'] - $this->minX) / 100 * $this->scale));
-                        $yEnd = ($this->imy - (int)(($segment['LocationEnd']['Y'] - $this->minY) / 100 * $this->scale));
-                        $xCenter = ($this->imx - (int)(($segment['LocationCenter']['X'] - $this->minX) / 100 * $this->scale));
-                        $yCenter = ($this->imy - (int)(($segment['LocationCenter']['Y'] - $this->minY) / 100 * $this->scale));
-
-                        if ($doSvg) {
-                            $svg .= '<line x1="' . ($xStart) . '" y1="' . ($yStart) .
-                                '" x2="' . ($xEnd) . '" y2="' . ($yEnd) .
-                                '" stroke="' . $optionsArr[1] . '" stroke-width="' . $optionsArr[0] . '"/>' . "\n";
-                        }
-
-
-                        $distance = sqrt(
-                            pow($segment['LocationEnd']['X'] - $segment['LocationStart']['X'], 2) +
-                            pow($segment['LocationEnd']['Y'] - $segment['LocationStart']['Y'], 2) +
-                            pow($segment['LocationEnd']['Z'] - $segment['LocationStart']['Z'], 2)
-                        );
-
-                        if (in_array($type, array(4, 0))) {
-                            $this->totalTrackLength += $distance;
-
-                            $height = $segment['LocationEnd']['Z'] - $segment['LocationStart']['Z'];
-                            $height = abs($height);
-                            $length = sqrt(pow($segment['LocationEnd']['X'] - $segment['LocationStart']['X'], 2) +
-                                pow($segment['LocationEnd']['Y'] - $segment['LocationStart']['Y'], 2));
-
-
-                            if (empty($length)) {//check for zero length tracks
-                                $zeroLenthSegments[] = $segment;
-                                if ($doSvg) { //@ToDo make function later.
-                                    $svg .= sprintf('<circle cx="%d" cy="%d" r="10" stroke="red" stroke-width="2" fill="red" />', $xCenter, $yCenter);
-                                }
-                                continue; //This may cause issues down the road. We may need to stop at this point and return the errors segment.
+                    if (in_array($type, array(1, 2, 5, 6, 3, 7))) {
+                        $segments = $spline['Segments'];
+                        //'<path d="M 100 100 L 300 100 L 200 300 z" fill="red" stroke="blue" stroke-width="3" />'
+                        $path = '';
+                        foreach ($segments as $segment) {
+                            if ($segment['Visible'] != 1) {
+                                $tool = 'M';
                             } else {
-                                $slope = ($height * 100 / $length);
+                                $tool = 'L';
+                            }
+                            $xStart = ($this->imx - (int)(($segment['LocationStart']['X'] - $this->minX) / 100 * $this->scale));
+                            $yStart = ($this->imy - (int)(($segment['LocationStart']['Y'] - $this->minY) / 100 * $this->scale));
+                            $xEnd = ($this->imx - (int)(($segment['LocationEnd']['X'] - $this->minX) / 100 * $this->scale));
+                            $yEnd = ($this->imy - (int)(($segment['LocationEnd']['Y'] - $this->minY) / 100 * $this->scale));
+                            if (!$path) {
+                                $path = '<path d="M ' . $xStart . ',' . $yStart . ' ';
+                            } else {
+                                $path .= $tool. ' ' . $xEnd . ',' . $yEnd . ' ';
+                            }
+                        }
+                        $path .= $tool. ' ' . $xEnd . ',' . $yEnd . ' ';
+                        $path .= '" stroke="' . $optionsArr[1] . '" stroke-width="' . $optionsArr[0] . '" fill="none"/>' . "\n";
+                        $svg .= $path;
+                    } else {
+
+                        if ($type != $current) continue;            // if this spline is not the current type, skip it
+                        $segments = $spline['Segments'];
+
+                        foreach ($segments as $segment) {
+                            if ($segment['Visible'] != 1) continue; // skip invisible tracks
+
+                            $xStart = ($this->imx - (int)(($segment['LocationStart']['X'] - $this->minX) / 100 * $this->scale));
+                            $yStart = ($this->imy - (int)(($segment['LocationStart']['Y'] - $this->minY) / 100 * $this->scale));
+                            $xEnd = ($this->imx - (int)(($segment['LocationEnd']['X'] - $this->minX) / 100 * $this->scale));
+                            $yEnd = ($this->imy - (int)(($segment['LocationEnd']['Y'] - $this->minY) / 100 * $this->scale));
+                            $xCenter = ($this->imx - (int)(($segment['LocationCenter']['X'] - $this->minX) / 100 * $this->scale));
+                            $yCenter = ($this->imy - (int)(($segment['LocationCenter']['Y'] - $this->minY) / 100 * $this->scale));
+
+                            if ($doSvg) {
+                                $svg .= '<line x1="' . ($xStart) . '" y1="' . ($yStart) .
+                                    '" x2="' . ($xEnd) . '" y2="' . ($yEnd) .
+                                    '" stroke="' . $optionsArr[1] . '" stroke-width="' . $optionsArr[0] . '"/>' . "\n";
                             }
 
-                            if ($slope > $this->maxSlope) {
-                                $slopecoords = array($xCenter, $yCenter);
+
+                            $distance = sqrt(
+                                pow($segment['LocationEnd']['X'] - $segment['LocationStart']['X'], 2) +
+                                pow($segment['LocationEnd']['Y'] - $segment['LocationStart']['Y'], 2) +
+                                pow($segment['LocationEnd']['Z'] - $segment['LocationStart']['Z'], 2)
+                            );
+
+                            if (in_array($type, array(4, 0))) {
+                                $this->totalTrackLength += $distance;
+
+                                $height = $segment['LocationEnd']['Z'] - $segment['LocationStart']['Z'];
+                                $height = abs($height);
+                                $length = sqrt(pow($segment['LocationEnd']['X'] - $segment['LocationStart']['X'], 2) +
+                                    pow($segment['LocationEnd']['Y'] - $segment['LocationStart']['Y'], 2));
+
+
+                                if (empty($length)) {//check for zero length tracks
+                                    $zeroLenthSegments[] = $segment;
+                                    if ($doSvg) { //@ToDo make function later.
+                                        $svg .= sprintf('<circle cx="%d" cy="%d" r="10" stroke="red" stroke-width="2" fill="red" />', $xCenter, $yCenter);
+                                    }
+                                    continue; //This may cause issues down the road. We may need to stop at this point and return the errors segment.
+                                } else {
+                                    $slope = ($height * 100 / $length);
+                                }
+
+                                if ($slope > $this->maxSlope) {
+                                    $slopecoords = array($xCenter, $yCenter);
+                                }
+                                $this->maxSlope = max($this->maxSlope, $slope);
                             }
-                            $this->maxSlope = max($this->maxSlope, $slope);
-                        }
 
 // label some splines with their slope - not yet working
 // main problem: find a spot for the text that is near to track but do not override other stuff
-                        if (!isset($_POST['slopeTrigger'])) $_POST['slopeTrigger'] = 2;
-                        if (!isset($_POST['slopeTriggerPrefix'])) $_POST['slopeTriggerPrefix'] = '..';
-                        if (!isset($_POST['slopeTriggerDecimals'])) $_POST['slopeTriggerDecimals'] = 1;
-                        if ($distance > 0 && in_array($type, array(4, 0))) {
-                            if (abs($slope) > $_POST['slopeTrigger']) {
-                                $tanA = (
-                                    ($segment['LocationEnd']['Y'] - $segment['LocationStart']['Y']) /
-                                    ($segment['LocationEnd']['X'] - $segment['LocationStart']['X'])
-                                );
-                                $a = rad2deg(atan($tanA));
-                                if ($a > 0) {
-                                    $a -= 90;
-                                } else {
-                                    $a += 90;
-                                }
+                            if (!isset($_POST['slopeTrigger'])) $_POST['slopeTrigger'] = 2;
+                            if (!isset($_POST['slopeTriggerPrefix'])) $_POST['slopeTriggerPrefix'] = '..';
+                            if (!isset($_POST['slopeTriggerDecimals'])) $_POST['slopeTriggerDecimals'] = 1;
+                            if ($distance > 0 && in_array($type, array(4, 0))) {
+                                if (abs($slope) > $_POST['slopeTrigger']) {
+                                    $tanA = (
+                                        ($segment['LocationEnd']['Y'] - $segment['LocationStart']['Y']) /
+                                        ($segment['LocationEnd']['X'] - $segment['LocationStart']['X'])
+                                    );
+                                    $a = rad2deg(atan($tanA));
+                                    if ($a > 0) {
+                                        $a -= 90;
+                                    } else {
+                                        $a += 90;
+                                    }
 
 
-                                if ($this->getDistanceToNearestLabel(array($xCenter, $yCenter)) > 60) {
-                                    $this->allLabels[] = array($xCenter, $yCenter);
-                                    $svg .= '<text x="' . $xCenter . '" y="' . $yCenter . '" transform="rotate(' . $a .
-                                        ',' . $xCenter . ', ' . $yCenter . ')">' . $_POST['slopeTriggerPrefix'] . round($slope, $_POST['slopeTriggerDecimals']) . '%</text>' . "\n";
+                                    if ($this->getDistanceToNearestLabel(array($xCenter, $yCenter)) > 60) {
+                                        $this->allLabels[] = array($xCenter, $yCenter);
+                                        $svg .= '<text x="' . $xCenter . '" y="' . $yCenter . '" transform="rotate(' . $a .
+                                            ',' . $xCenter . ', ' . $yCenter . ')">' . $_POST['slopeTriggerPrefix'] . round($slope, $_POST['slopeTriggerDecimals']) . '%</text>' . "\n";
+                                    }
                                 }
                             }
                         }
@@ -782,7 +823,7 @@ class Mapper
               />';
                     $svg .= '<text x="' . $x . '" y="' . $y . '" >' . '&nbsp;&nbsp;' . $vehicle['Location'][2] . '</text>' . "\n";
 
-                    $umrows.='<input name="underground_'.$cartIndex.'" value="1" type="hidden">';
+                    $umrows .= '<input name="underground_' . $cartIndex . '" value="1" type="hidden">';
                 }
             }
 
@@ -860,8 +901,8 @@ class Mapper
     public function populateInfo(&$htmlSvg)
     {
         $svg = '';
-         /**
-            * add player info
+        /**
+         * add player info
          */
 
         $text = "";
@@ -916,7 +957,7 @@ class Mapper
                 <td><input size="5" maxlength="15" name="xp_' . $playerIndex . '" value="' . $player['Xp'] . '"></td>
                 <td><input size="5" maxlength="15" name="money_' . $playerIndex . '" value="' . $player['Money'] . '"></td>
                 <td>' . $industry . '</td>
-                <td><input name="deletePlayer_'.$playerIndex.'" type="checkbox"></td>
+                <td><input name="deletePlayer_' . $playerIndex . '" type="checkbox"></td>
                 </tr>';
         }
 
@@ -953,7 +994,7 @@ class Mapper
         /**
          * add the industries to the map
          */
-        foreach ($this->data['Industries'] as $number=>$site) {
+        foreach ($this->data['Industries'] as $number => $site) {
 
             /**
              * again - fix some issues with wrong INPUT from json
@@ -975,8 +1016,8 @@ class Mapper
                     array_pop($site['ProductsStored']);
 //                    $name .= "\nI:" . implode(',', $site['EductsStored']) . "\nO:" . implode(',', $site['ProductsStored']);
                     $xoff = -35;
-                    $yoff = -15;
-                    $rotation = 45;
+                    $yoff = 15;
+                    $rotation = 0;
                     break;
                 case '3':
                     $name = 'Smelter';
@@ -1056,7 +1097,7 @@ class Mapper
                     array_pop($site['EductsStored']);
                     $name = 'F';
                     $name .= "#$number";
-                    $rotation = ($site['Rotation'][1]>0)?($site['Rotation'][1]-90):($site['Rotation'][1]+90);
+                    $rotation = ($site['Rotation'][1] > 0) ? ($site['Rotation'][1] - 90) : ($site['Rotation'][1] + 90);
                     break;
                 default:
                     die('unknown industry');
