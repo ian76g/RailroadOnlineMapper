@@ -53,14 +53,14 @@ if (isset($_POST) && !empty($_POST)) {
             require_once 'utils/dtStruct.php';
             require_once 'utils/dtTextProperty.php';
             require_once 'utils/GVASParser.php';
-            require_once 'utils/Mapper.php';
+            require_once 'utils/SaveReader.php';
 
             $arithmeticHelper = new ArithmeticHelper();
             $myParser = new GVASParser();
             $myParser->NEWUPLOADEDFILE = $target_file;
             $myParser->parseData(file_get_contents($target_file), false);
-            $myMapper = new Mapper($myParser->goldenBucket, false);
-            $myMapper->gethtmlSVG($htmlSvg, $target_file, true, $arithmeticHelper);
+            $saveReadr = new SaveReader($myParser->goldenBucket);
+            $saveReadr->addDatabaseEntry($target_file);
 
             header('Location: /map.php?name=' . $newFilename);
             die();

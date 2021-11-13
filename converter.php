@@ -16,7 +16,7 @@ require_once 'utils/dtArray.php';
 require_once 'utils/dtStruct.php';
 require_once 'utils/dtTextProperty.php';
 require_once 'utils/GVASParser.php';
-require_once 'utils/Mapper.php';
+require_once 'utils/SaveReader.php';
 
 function getUserIpAddr()
 {
@@ -157,8 +157,8 @@ foreach ($files as $file) {
 
     $myParser->parseData(file_get_contents($path . '/' . $file), false);
 
-    $myMapper = new Mapper($myParser->goldenBucket);
-    $svg = $myMapper->gethtmlSVG($htmlSvg, $NEWUPLOADEDFILE, $empty, $arithmeticHelper);
+    $myMapper = new SaveReader($myParser->goldenBucket);
+    $svg = $myMapper->gethtmlSVG($NEWUPLOADEDFILE, $empty, $arithmeticHelper);
 
     //@print_r($distances);
     file_put_contents('done/' . $htmlFileName, str_replace('&nbsp;', ' ', str_replace('###SVG###', $svg, $htmlSvg)));
@@ -174,7 +174,5 @@ foreach ($files as $file) {
     if (!isset($_POST['save'])) {
         rename('uploads/' . $NEWUPLOADEDFILE, 'saves/' . $NEWUPLOADEDFILE);
     }
-
-
 
 }
