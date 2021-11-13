@@ -24,21 +24,21 @@ require_once 'config.php';
                         <th>Player</th>
                         <th><A href="?sortby=0&sortorder=desc" style="color: white">Track Length</A></th>
                         <th><A href="?sortby=1&sortorder=desc" style="color: white">Switches</A></th>
-                        <th><A href="?sortby=6&sortorder=desc" style="color: white">Trees Removed</A></th>
+                        <th><A href="?sortby=6&sortorder=desc" style="color: white">Trees</A></th>
                         <th><A href="?sortby=2&sortorder=desc" style="color: white">Locos</A></th>
                         <th><A href="?sortby=3&sortorder=desc" style="color: white">Carts</A></th>
                         <th><A href="?sortby=4&sortorder=desc" style="color: white">Slope</A></th>
-                        <th><A href="?sortby=4&sortorder=desc" style="color: white">Shared (2 Days)</th>
+                        <th><A href="?sortby=4&sortorder=desc" style="color: white">(DL)</th>
                     </thead>';
 
     function mysort($a, $b)
     {
         global $db;
         $x = 1;
-        if (strtolower($db[substr($a, 5, -5) . '.sav'][$_GET['sortby']]) == strtolower($db[substr($b, 5, -5) . '.sav'][$_GET['sortby']])) {
+        if (strtolower($db[substr($a, 0, -5) . '.sav'][$_GET['sortby']]) == strtolower($db[substr($b, 0, -5) . '.sav'][$_GET['sortby']])) {
             return 0;
         }
-        if (strtolower($db[substr($a, 5, -5) . '.sav'][$_GET['sortby']]) > strtolower($db[substr($b, 5, -5) . '.sav'][$_GET['sortby']])) {
+        if (strtolower($db[substr($a, 0, -5) . '.sav'][$_GET['sortby']]) > strtolower($db[substr($b, 0, -5) . '.sav'][$_GET['sortby']])) {
             $x = -1;
         } else {
             $x = 1;
@@ -83,9 +83,11 @@ require_once 'config.php';
 
                         $hard_limit = 1600;
                         $soft_limit = 800;
+                        $dbkeys = array_keys($db);
                         for ($i = 0; $i < sizeof($files); $i++) {
 
                             $file = $files[array_keys($files)[$i]];
+
                             if (!$file) {
                                 echo 'BRESK';
                                 break;
@@ -107,7 +109,7 @@ require_once 'config.php';
                             echo
                                 '<tr>
                                 <!-- Owner of Map -->
-                                <td><a href="'.WWW_ROOT.'maps/' . substr($file, 0, -5) . '.html">' . substr($file, 0, -5) . '</a></td>
+                                <td><a href="'.WWW_ROOT.'maps/' . $file. '">' . substr($file, 0, -5) . '</a></td>
 
                                 <!-- Track Length -->
                                 <td>' . round($db[substr($file, 0, -5) . '.sav'][0] / 100000, 2) . 'km</td>
