@@ -8,7 +8,7 @@ require_once 'config.php';
     include_once(SHELL_ROOT . 'includes/head.php');
 
     // Create required folders if they don't exist
-    $folders = array("public", "saves", "uploads");
+    $folders = array("saves/", "saves/public/", "uploads");
     foreach ($folders as $folder) {
         if (!file_exists($folder)) {
             mkdir($folder);
@@ -84,6 +84,7 @@ require_once 'config.php';
                         $hard_limit = 1600;
                         $soft_limit = 800;
                         $dbkeys = array_keys($db);
+
                         for ($i = 0; $i < sizeof($files); $i++) {
 
                             $file = $files[array_keys($files)[$i]];
@@ -102,7 +103,7 @@ require_once 'config.php';
                             }
 
                             $dl = '';
-                            if (file_exists(SHELL_ROOT . 'public/' . substr($file, 5, -5) . '.sav')) {
+                            if (file_exists(SHELL_ROOT . 'maps/' . substr($file, 5, -5) . '.sav')) {
                                 $dl = ' (DL)';
                             }
 
@@ -130,19 +131,25 @@ require_once 'config.php';
                                 <td>' . round($db[substr($file, 0, -5) . '.sav'][4]) . '%</td>
                                 <!-- Shared Link -->';
 
-                            // Checks public save folder to see if we can provide a link
-                            $saveCheck = SHELL_ROOT . 'saves/public/' . substr($file, 5, -5) . '.sav';
-                            if (file_exists($saveCheck)) {
-                                $upTime = filemtime($saveCheck);
-                                $timeCheck = time() - $upTime;
-                                if ($timeCheck < 172800) {
-                                    echo '<td><a href="' . WWW_ROOT . 'saves/public/' . substr($file, 5, -5) . '.sav">Link</a></td>';
+                            // Create savefile name from map file
+                            $saveFile = substr($file, 0, -5) .'.sav';
+
+                            // Check to see if savefile exists in public folder and create download link
+                            if (file_exists(SHELL_ROOT.'saves/public/' . $saveFile)) {
+                              $upTime = filemtime($saveCheck);
+                              $timeCheck = time() - $upTime;
+
+                              // Timecheck to remove public link for download
+                                if ($saveFile < $timeCheck) {
+                                    echo '<td><a href="'.WWW_ROOT.'saves/public/'.$saveFile.'">Link</a></td>';
                                 } else {
                                     echo '<td>Expired</td>';
                                 }
+
                             } else {
                                 echo '<td> </td>';
                             }
+
                             echo '</tr>';
                             if (!(($i + 1) % 15)) {
                                 if (($i + 1) < $soft_limit) {
