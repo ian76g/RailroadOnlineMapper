@@ -70,6 +70,7 @@ require_once 'config.php';
                             $files[filemtime(SHELL_ROOT . 'maps/' . $file)] = $file;
                         }
                     }
+
                     if ((isset($files) && $files != null) && file_exists(SHELL_ROOT.'db.db')) {
                         $db = unserialize(file_get_contents(SHELL_ROOT.'db.db'));
                         //array($totalTrackLength, $totalSwitches, $totalLocos, $totalCarts, $maxSlope);
@@ -83,8 +84,12 @@ require_once 'config.php';
                         $hard_limit = 1600;
                         $soft_limit = 800;
                         for ($i = 0; $i < sizeof($files); $i++) {
-                            $file = array_shift($files);
-                            if (!$file) break;
+
+                            $file = $files[array_keys($files)[$i]];
+                            if (!$file) {
+                                echo 'BRESK';
+                                break;
+                            }
 
                             if ($i > $hard_limit) {
                                 unlink(SHELL_ROOT . "maps/" . substr($file, 5, -5) . ".html");
@@ -122,8 +127,6 @@ require_once 'config.php';
                                 <!-- Max Slope -->
                                 <td>' . round($db[substr($file, 0, -5) . '.sav'][4]) . '%</td>
                                 <!-- Shared Link -->';
-                            ?>
-                            <?php
 
                             // Checks public save folder to see if we can provide a link
                             $saveCheck = SHELL_ROOT . 'saves/public/' . substr($file, 5, -5) . '.sav';
@@ -136,19 +139,14 @@ require_once 'config.php';
                                     echo '<td>Expired</td>';
                                 }
                             } else {
-                                echo '<td></a></td>';
+                                echo '<td> </td>';
                             }
-
-                            ?>
-
-                            <?php
                             echo '</tr>';
                             if (!(($i + 1) % 15)) {
                                 if (($i + 1) < $soft_limit) {
                                     echo '</table><table>' . $tableHeader;
                                 }
                             }
-
                         }
                     }
                     echo '</table>';
