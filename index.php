@@ -1,12 +1,9 @@
+<!DOCTYPE html>
+<html lang="en">
 <?php
-require_once 'config.php';
-?>
-    <!DOCTYPE html>
-    <html lang="en">
-    <?php
-    $PageTitle = "RailroadsOnlineMapper";
-    include_once(SHELL_ROOT . 'includes/head.php');
-    include_once('utils/tools.php');
+$PageTitle = "RailroadsOnlineMapper";
+include_once('includes/head.php');
+include_once('utils/tools.php');
 
 // Create required folder if it don't exist
 if (!file_exists('./saves/')) {
@@ -18,7 +15,7 @@ if (!file_exists('counter')) {
     file_put_contents('counter', 0);
 }
 
-    $tableHeader = '<thead>
+$tableHeader = '<thead>
                         <th>Player</th>
                         <th><A href="?sortby=0&sortorder=desc" style="color: white">Length</A></th>
                         <th><A href="?sortby=1&sortorder=desc" style="color: white">Switches</A></th>
@@ -26,7 +23,6 @@ if (!file_exists('counter')) {
                         <th><A href="?sortby=2&sortorder=desc" style="color: white">Locos</A></th>
                         <th><A href="?sortby=3&sortorder=desc" style="color: white">Carts</A></th>
                         <th><A href="?sortby=4&sortorder=desc" style="color: white">Slope</A></th>
-                        <th><A href="?sortby=4&sortorder=desc" style="color: white">(DL)</th>
                     </thead>';
 ?>
 <body>
@@ -48,7 +44,8 @@ if (!file_exists('counter')) {
                     print('<tr>' . PHP_EOL);
                     print('<td><a href="map.php?name=' . $entry['name'] . '">' . $entry['name'] . '</a></td>' . PHP_EOL);
                     print('<td>' . $entry['trackLength'] . 'km</td>' . PHP_EOL);
-                    print('<td>' . $entry['numY'] . ' / ' . $entry['numT'] . '</td>' . PHP_EOL);
+                    print('<td>' . $entry['numY'] . '</td>' . PHP_EOL);
+                    print('<td>' . $entry['numT'] . '</td>' . PHP_EOL);
                     print('<td>' . $entry['numLocs'] . '</td>' . PHP_EOL);
                     print('<td>' . $entry['numCarts'] . '</td>' . PHP_EOL);
                     print('<td>' . $entry['slope'] . '%</td>' . PHP_EOL);

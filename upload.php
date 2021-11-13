@@ -1,7 +1,6 @@
 <?php
-require_once ('config.php');
 if (isset($_POST) && !empty($_POST)) {
-    $target_dir = SHELL_ROOT."saves/";
+    $target_dir = "saves/";
     $newFilename = str_replace(array('#', '&', ' ', "'", '`', '�'), '_', substr($_POST['discordName'], 0, 8));
     $target_file = $target_dir . $newFilename . '.sav';
     $uploadOk = 1;

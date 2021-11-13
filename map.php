@@ -41,7 +41,7 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
         <button class="button button--toggle" id="edit-panel-toggle">Edit</button>
     </div>
 
-    <div class="export__panel info-panel export__panel--open">
+    <div class="export__panel info-panel">
         <div class="export__panel-scroll-content">
             <h3>Player Info</h3>
             <table id="playerTable">

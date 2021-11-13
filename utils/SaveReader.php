@@ -103,10 +103,9 @@ class SaveReader
      */
     private function getSwitchesCount()
     {
-        if (!isset($this->data['Switchs'])) {
-            $this->totalSwitches = 0;
+        if (array_key_exists('Switchs', $this->data)) {
+            $this->totalSwitches = count($this->data['Switchs']);
         }
-        $this->totalSwitches = count($this->data['Switchs']);
     }
 
     /**
