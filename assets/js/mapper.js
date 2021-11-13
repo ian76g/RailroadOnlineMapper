@@ -42,6 +42,33 @@ class Mapper {
         }
     }
 
+    populatePlayerTable() {
+        if (!('Players' in this.json)) {
+            return null
+        }
+        const playerInfoTable = document.getElementById("playerTable");
+        for (const player of this.json.Players) {
+            const playerInfoRow = document.createElement("tr");
+
+            const nameValue = document.createElement("td");
+            const nameTextNode = document.createTextNode(player['Name']);
+            nameValue.appendChild(nameTextNode);
+            playerInfoRow.appendChild(nameValue);
+
+            const xpValue = document.createElement("td");
+            const xpTextNode = document.createTextNode(player['Xp']);
+            xpValue.appendChild(xpTextNode);
+            playerInfoRow.appendChild(xpValue);
+
+            const moneyValue = document.createElement("td");
+            const moneyTextNode = document.createTextNode(player['Money']);
+            moneyValue.appendChild(moneyTextNode);
+            playerInfoRow.appendChild(moneyValue);
+
+            playerInfoTable.appendChild(playerInfoRow);
+        }
+    }
+
     getTracksAndBeds() {
         const drawOrder = [
             // [type, stroke-width, stroke]

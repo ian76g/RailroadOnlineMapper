@@ -20,31 +20,55 @@
 
 .export__nav {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   position: fixed;
   top: 0;
   right: 0;
   z-index: 2;
-  width: auto;
+  width: 100%;
 }
 
-.export__menu {
-  width: 700px;
+.export__panel{
   max-width: 100%;
   height: 100vh;
-  padding: 6rem 1rem 1rem;
-  border-left: 2px solid var(--secondary-color);
   position: fixed;
   top: 0;
-  right: 0;
   z-index: 1;
-  transform: translateX(700px);
-  overflow: scroll;
   background: white;
   transition: all 0.2s ease-out;
 }
 
-.export__menu--open {
+.export__panel .button--toggle{
+  position: absolute;
+  top: 0;
+}
+
+.export__panel-scroll-content{
+  max-width: 100%;
+  height: 100vh;
+  padding: 6rem 1rem 1rem;
+  overflow: scroll;
+}
+
+.info-panel{
+  left: 0;
+  transform: translateX(-400px);
+  border-right: 2px solid var(--secondary-color);
+}
+.info-panel .export__panel-scroll-content{
+  width: 400px;
+}
+
+.edit-panel{
+  right: 0;
+  transform: translateX(700px);
+  border-left: 2px solid var(--secondary-color);
+}
+.edit-panel .export__panel-scroll-content{
+  width: 700px;
+}
+
+.export__panel--open {
   transform: translateX(0);
 }
 
@@ -54,7 +78,7 @@
 }
 
 .export__mapper td {
-  padding: 0rem 0.5rem;
+  padding: 0 0.5rem;
   vertical-align: middle;
 }
 
@@ -65,4 +89,14 @@
 .export__mapper td img {
   max-width: none;
   width: 4.5rem;
+}
+
+.export__controls{
+  position: fixed;
+  bottom: 0;
+  left: 0;
+}
+
+#playerTable {
+  width: 90%;
 }

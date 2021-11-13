@@ -165,7 +165,6 @@ label:hover {
   align-items: flex-start;
   margin-bottom: 2rem;
 }
-
 @media only screen and (min-width: 960px) {
   .header {
     flex-direction: row;
@@ -180,7 +179,6 @@ label:hover {
   max-width: 100%;
   word-break: break-all;
 }
-
 @media only screen and (min-width: 960px) {
   .logo {
     margin-bottom: 0;
@@ -256,7 +254,6 @@ thead th {
   color: white;
   border-bottom: 1px solid var(--secondary-color);
 }
-
 @media only screen and (min-width: 1250px) {
   thead th {
     padding: 1rem;
