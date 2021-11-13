@@ -62,7 +62,7 @@ if (isset($_POST) && !empty($_POST)) {
                   $NEWUPLOADEDFILE = $myNewName . '.sav';
 
                   include(SHELL_ROOT.'converter.php');
-                  header('Location: '.WWW_ROOT.'maps/' . $myNewName . '.html');
+                  header('Location: '.WWW_ROOT.'maps/' . $myNewName . '.html?='.time());
                 }
 
             } else {
