@@ -1,8 +1,11 @@
+<?php
+require_once 'config.php';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <?php
     $PageTitle="RailroadsOnlineMapper";
-    include_once('includes/head.php');
+    include_once(SHELL_ROOT.'includes/head.php');
 
     // Create required folders if they don't exist
     $folders = array("public", "saves", "uploads");
@@ -60,10 +63,10 @@
                 <table>
                     <?php
                     echo $tableHeader;
-                    $dh = opendir('maps/');
+                    $dh = opendir(SHELL_ROOT.'maps/');
                     while ($file = readdir($dh)) {
                         if (substr($file, -5) == '.html') {
-                            $files[filemtime('maps/' . $file)] = 'maps/' . $file;
+                            $files[filemtime(SHELL_ROOT.'maps/' . $file)] = SHELL_ROOT.'maps/' . $file;
                         }
                     }
                     if ((isset($files) && $files != null) && file_exists('db.db')) {
@@ -83,7 +86,7 @@
                             if (!$file) break;
 
                             if ($i > $hard_limit) {
-                                unlink("maps/" . substr($file, 5, -5) . ".html");
+                                unlink(SHELL_ROOT."maps/" . substr($file, 5, -5) . ".html");
                             }
 
                             if ($i >= $soft_limit) {
@@ -91,7 +94,7 @@
                             }
 
                             $dl = '';
-                            if (file_exists('maps/' . substr($file, 5, -5) . '.sav')) {
+                            if (file_exists(SHELL_ROOT.'maps/' . substr($file, 5, -5) . '.sav')) {
                                 $dl = ' (DL)';
                             }
 
@@ -122,14 +125,14 @@
                                 <?php
 
                                 // Checks public save folder to see if we can provide a link
-                                $saveCheck = 'saves/public/' . substr($file,5, -5) . '.sav';
+                                $saveCheck = SHELL_ROOT.'saves/public/' . substr($file,5, -5) . '.sav';
 
                                 $upTime = filemtime($saveCheck);
                                 $timeCheck = time() - $upTime;
 
                                 if(file_exists($saveCheck)) {
                                   if($timeCheck < 172800) {
-                                    echo '<td><a href="saves/public/'. substr($file, 5, -5) . '.sav">Link</a></td>';
+                                    echo '<td><a href="'.WWW_ROOT.'saves/public/'. substr($file, 5, -5) . '.sav">Link</a></td>';
                                   } else {
                                     echo '<td>Expired</td>';
                                   }
@@ -155,15 +158,15 @@
             </div>
         </section>
     </main>
-    <?php include_once('includes/footer.php') ?>
+    <?php include_once(SHELL_ROOT.'includes/footer.php') ?>
 </body>
 </html>
 <?php
-$dir = 'saves';
+$dir = SHELL_ROOT.'saves';
 $dh = opendir($dir);
 
 while($file=readdir($dh)){
-    if($file && (substr($file,-4) == '.sav' || substr($file,-13) == '.sav.modified')){
+    if($file && (substr($file,-4) == '.sav' || substr($file,-13) == '.sav')){
         if(filemtime($dir.'/'.$file)<time()-600){
             unlink($dir.'/'.$file);
         }

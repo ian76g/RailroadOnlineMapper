@@ -1,7 +1,8 @@
 <?php
+require_once ('config.php');
 if (isset($_POST) && !empty($_POST)) {
 
-    $target_dir = "uploads/";
+    $target_dir = SHELL_ROOT."uploads/";
     $myNewName = str_replace(array('#', '&', ' ', "'", '`', '�'), '_', substr($_POST['discordName'], 0, 8));
     $target_file = $target_dir . $myNewName . '.sav';
     $uploadOk = 1;
@@ -49,19 +50,19 @@ if (isset($_POST) && !empty($_POST)) {
                 if (isset($_POST['public'])) {
 
                   // Copy save for public use
-                  copy($target_file, 'saves/public/' . $myNewName . '.sav');
+                  copy($target_file, SHELL_ROOT.'saves/public/' . $myNewName . '.sav');
 
                   $NEWUPLOADEDFILE = $myNewName . '.sav';
 
                   include('converter.php');
-                  header('Location: maps/' . $myNewName . '.html');
+                  header('Location: '.WWW_ROOT.'maps/' . $myNewName . '.html');
 
                 } else {
 
                   $NEWUPLOADEDFILE = $myNewName . '.sav';
 
-                  include('converter.php');
-                  header('Location: maps/' . $myNewName . '.html');
+                  include(SHELL_ROOT.'converter.php');
+                  header('Location: '.WWW_ROOT.'maps/' . $myNewName . '.html');
                 }
 
             } else {
@@ -76,16 +77,15 @@ if (isset($_POST) && !empty($_POST)) {
 <html lang="en">
 <?php
 $PageTitle = "Upload";
-include_once('includes/head.php');
+include_once(SHELL_ROOT.'includes/head.php');
 ?>
-<head><link rel="stylesheet" href="css/extra.css"></head>
 <body>
 <!--H1>I AM IN BED NOW. GAMING COMPUTER SHUT DOWN! YOUR UPLOADS WILL BE QUEUED UNTIL I WAKE UP TOMORROW.</H1>
 <H2>Due to some technical limitations this mapping can yet not be done plainely on Webservers (yet!)</H2>
 <H3>hence we miss some cruicial bits needed to display a map.</H3-->
 
 <header class="header">
-    <a class="button" href="/">Go Back</a>
+    <a class="button" href="<?php echo WWW_ROOT;?>">Go Back</a>
 </header>
 
 <main>
@@ -170,8 +170,6 @@ include_once('includes/head.php');
             <div class="input-group">
 
                 <label for="slopeTrigger">Label slopes greater than x%</label>
-                <input placeholder="20" type="text" id="slopeTrigger" name="slopeTrigger" value="20" class="iBox">
-                <label for="slopeTrigger">label slopes greater than X%</label>
                 <input placeholder="1000" type="text" id="slopeTrigger" name="slopeTrigger" value="2">
             </div>
 
@@ -183,9 +181,7 @@ include_once('includes/head.php');
                 <label for="slopeTriggerDecimals">Round to X decimals</label>
                 <input placeholder="1" type="text" id="slopeTriggerDecimals" name="slopeTriggerDecimals" value="1">
             </div>
-          </div>
           </section>
-        </section>
 
         <section>
             <h3>7. Rolling Stock</h3>
@@ -198,7 +194,7 @@ include_once('includes/head.php');
     </form>
 </main>
 
-<?php include_once('includes/footer.php') ?>
+<?php include_once(SHELL_ROOT.'includes/footer.php') ?>
 
 </body>
 </html>

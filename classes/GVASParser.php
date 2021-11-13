@@ -539,12 +539,12 @@ class GVASParser
             if (getUserIpAddr() != $db[$this->NEWUPLOADEDFILE][5]) {
                 die("This does not seem to be your save file.");
             }
-            echo "SAVING FILE " . $this->NEWUPLOADEDFILE . '.modified' . "<br>\n";
-            file_put_contents('saves/' . $this->NEWUPLOADEDFILE . '.modified', $output, FILE_BINARY);
-            echo '<A href="saves/' . $this->NEWUPLOADEDFILE . '.modified' . '">Download your modified save here </A><br>';
-            echo 'Want to upload this map again?<A href="upload.php">Add your renumbered save again</A><br>';
+            echo "SAVING FILE " . $this->NEWUPLOADEDFILE . "<br>\n";
+            file_put_contents(SHELL_ROOT.'saves/' . $this->NEWUPLOADEDFILE , $output, FILE_BINARY);
+            echo '<A href="'.WWW_ROOT.'saves/' . $this->NEWUPLOADEDFILE  . '">Download your modified save here </A><br>';
+            echo 'Want to upload this map again?<A href="'.WWW_ROOT.'upload.php">Add your save again</A><br>';
         } else {
-            file_put_contents('uploads/' . $this->NEWUPLOADEDFILE, $output, FILE_BINARY);
+            file_put_contents(SHELL_ROOT.'uploads/' . $this->NEWUPLOADEDFILE, $output, FILE_BINARY);
         }
 
     }

@@ -1,6 +1,7 @@
 <footer class="footer">
   <p class="footer__visitors">
-    <?php file_put_contents('counter', $counter = file_get_contents('counter') + 1); echo $counter ?> visitors
+    <?php file_put_contents(SHELL_ROOT.'counter',
+        $counter = file_get_contents(SHELL_ROOT.'counter') + 1); echo $counter; ?> visitors
   </p>
 
   <div class="footer__small">
