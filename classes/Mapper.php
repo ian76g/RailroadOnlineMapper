@@ -1,6 +1,5 @@
 <?php
 
-
 class Mapper
 {
 
@@ -291,7 +290,7 @@ class Mapper
             '0' => array(3, 'black'),                          // track  darkkhaki, darkgrey,orange,blue,black
         );
 
-        if($_POST['metalOverWood'] && $_POST['metalOverWood']=='YES'){
+        if(isset($_POST['metalOverWood']) && $_POST['metalOverWood']=='YES'){
             $order = array(
                 '1' => array(15, 'darkkhaki'),                      // variable bank
                 '2' => array(15, 'darkkhaki'),                      //  constant bank
@@ -1106,7 +1105,7 @@ class Mapper
             $educts = sizeof($site['EductsStored']);
             $irows .= '<tr> <td>' . $name . ' Educts</td>';
             for ($i = 0; $i < $educts; $i++) {
-                $irows .= '<td><input size="5" maxlength="15" name="educt' . $i . '_' . $site['EductsStored'][$i] . '" value="' . $site['EductsStored'][$i] . '"></td>';
+                $irows .= '<td><input size="5" maxlength="15" name="educt' . $i . '_' . $number . '" value="' . $site['EductsStored'][$i] . '"></td>';
             }
             for ($i = $educts; $i < 4; $i++) {
                 $irows .= '<td>&nbsp;</td>';
@@ -1115,7 +1114,7 @@ class Mapper
             $educts = sizeof($site['ProductsStored']);
             $irows .= '<tr> <td>' . $name . ' Products</td>';
             for ($i = 0; $i < $educts; $i++) {
-                $irows .= '<td><input size="5" maxlength="15" name="product' . $i . '_' . $site['ProductsStored'][$i] . '" value="' . $site['ProductsStored'][$i] . '"></td>';
+                $irows .= '<td><input size="5" maxlength="15" name="product' . $i . '_' . $number . '" value="' . $site['ProductsStored'][$i] . '"></td>';
             }
             for ($i = $educts; $i < 4; $i++) {
                 $irows .= '<td>&nbsp;</td>';

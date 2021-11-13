@@ -516,7 +516,7 @@ class GVASParser
                     }
                 }
                 //IndustryStorageEduct3Array
-                if (trim($object->NAME) == 'IndustryStorageEduc3Array') {
+                if (trim($object->NAME) == 'IndustryStorageEduct3Array') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['educt2_' . $index]) && trim($_POST['educt2_' . $index])) {
                             $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['educt2_' . $index]);

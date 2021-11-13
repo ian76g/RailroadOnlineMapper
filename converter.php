@@ -18,6 +18,10 @@ require_once 'classes/dtTextProperty.php';
 require_once 'classes/GVASParser.php';
 require_once 'classes/Mapper.php';
 
+if(!isset($_POST['metalOverWood'])){
+    $_POST['metalOverWood'] = 'NO';
+}
+
 function getUserIpAddr()
 {
     global $argv;
@@ -45,6 +49,7 @@ function getUserIpAddr()
 //$_POST['money_0'] = 10;
 //$_POST['underground_0'] = 10;
 //$_POST['deletePlayer_0'] = '1';
+//$_POST['product0_0'] = '1';
 
 // Define some stuff we need later
 
