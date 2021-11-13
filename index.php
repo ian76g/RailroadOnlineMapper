@@ -1,11 +1,11 @@
 <?php
 require_once 'config.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<?php
-    $PageTitle="RailroadsOnlineMapper";
-    include_once(SHELL_ROOT.'includes/head.php');
+    <!DOCTYPE html>
+    <html lang="en">
+    <?php
+    $PageTitle = "RailroadsOnlineMapper";
+    include_once(SHELL_ROOT . 'includes/head.php');
 
     // Create required folders if they don't exist
     $folders = array("public", "saves", "uploads");
@@ -31,18 +31,19 @@ require_once 'config.php';
                         <th><A href="?sortby=4&sortorder=desc" style="color: white">Shared (2 Days)</th>
                     </thead>';
 
-    function mysort($a, $b){
+    function mysort($a, $b)
+    {
         global $db;
-        $x=1;
-        if(strtolower($db[substr($a, 5, -5) . '.sav'][$_GET['sortby']]) == strtolower($db[substr($b, 5, -5) . '.sav'][$_GET['sortby']])){
+        $x = 1;
+        if (strtolower($db[substr($a, 5, -5) . '.sav'][$_GET['sortby']]) == strtolower($db[substr($b, 5, -5) . '.sav'][$_GET['sortby']])) {
             return 0;
         }
-        if(strtolower($db[substr($a, 5, -5) . '.sav'][$_GET['sortby']]) > strtolower($db[substr($b, 5, -5) . '.sav'][$_GET['sortby']])){
-            $x=-1;
+        if (strtolower($db[substr($a, 5, -5) . '.sav'][$_GET['sortby']]) > strtolower($db[substr($b, 5, -5) . '.sav'][$_GET['sortby']])) {
+            $x = -1;
         } else {
-            $x=1;
+            $x = 1;
         }
-        if($_GET['sortorder']=='desc'){
+        if ($_GET['sortorder'] == 'desc') {
             return $x;
         } else {
             return -$x;
@@ -50,8 +51,8 @@ require_once 'config.php';
     }
 
 
-?>
-<body>
+    ?>
+    <body>
     <header class="header">
         <h1 class="logo">RailroadsOnlineMapper</h1>
         <a class="button" href="upload.php">Upload Savegame</a>
@@ -63,10 +64,10 @@ require_once 'config.php';
                 <table>
                     <?php
                     echo $tableHeader;
-                    $dh = opendir(SHELL_ROOT.'maps/');
+                    $dh = opendir(SHELL_ROOT . 'maps/');
                     while ($file = readdir($dh)) {
                         if (substr($file, -5) == '.html') {
-                            $files[filemtime(SHELL_ROOT.'maps/' . $file)] = SHELL_ROOT.'maps/' . $file;
+                            $files[filemtime(SHELL_ROOT . 'maps/' . $file)] = SHELL_ROOT . 'maps/' . $file;
                         }
                     }
                     if ((isset($files) && $files != null) && file_exists('db.db')) {
@@ -86,7 +87,7 @@ require_once 'config.php';
                             if (!$file) break;
 
                             if ($i > $hard_limit) {
-                                unlink(SHELL_ROOT."maps/" . substr($file, 5, -5) . ".html");
+                                unlink(SHELL_ROOT . "maps/" . substr($file, 5, -5) . ".html");
                             }
 
                             if ($i >= $soft_limit) {
@@ -94,14 +95,14 @@ require_once 'config.php';
                             }
 
                             $dl = '';
-                            if (file_exists(SHELL_ROOT.'maps/' . substr($file, 5, -5) . '.sav')) {
+                            if (file_exists(SHELL_ROOT . 'maps/' . substr($file, 5, -5) . '.sav')) {
                                 $dl = ' (DL)';
                             }
 
                             echo
-                            '<tr>
+                                '<tr>
                                 <!-- Owner of Map -->
-                                <td><a href=" maps/' . substr($file, 5, -5) . '.html">' .substr($file, 5, -5) .'</a></td>
+                                <td><a href=" maps/' . substr($file, 5, -5) . '.html">' . substr($file, 5, -5) . '</a></td>
 
                                 <!-- Track Length -->
                                 <td>' . round($db[substr($file, 5, -5) . '.sav'][0] / 100000, 2) . 'km</td>
@@ -121,28 +122,26 @@ require_once 'config.php';
                                 <!-- Max Slope -->
                                 <td>' . round($db[substr($file, 5, -5) . '.sav'][4]) . '%</td>
                                 <!-- Shared Link -->';
-                                ?>
-                                <?php
+                            ?>
+                            <?php
 
-                                // Checks public save folder to see if we can provide a link
-                                $saveCheck = SHELL_ROOT.'saves/public/' . substr($file,5, -5) . '.sav';
-
+                            // Checks public save folder to see if we can provide a link
+                            $saveCheck = SHELL_ROOT . 'saves/public/' . substr($file, 5, -5) . '.sav';
+                            if (file_exists($saveCheck)) {
                                 $upTime = filemtime($saveCheck);
                                 $timeCheck = time() - $upTime;
-
-                                if(file_exists($saveCheck)) {
-                                  if($timeCheck < 172800) {
-                                    echo '<td><a href="'.WWW_ROOT.'saves/public/'. substr($file, 5, -5) . '.sav">Link</a></td>';
-                                  } else {
-                                    echo '<td>Expired</td>';
-                                  }
+                                if ($timeCheck < 172800) {
+                                    echo '<td><a href="' . WWW_ROOT . 'saves/public/' . substr($file, 5, -5) . '.sav">Link</a></td>';
                                 } else {
-                                  echo '<td></a></td>';
+                                    echo '<td>Expired</td>';
                                 }
+                            } else {
+                                echo '<td></a></td>';
+                            }
 
-                                ?>
+                            ?>
 
-                                <?php
+                            <?php
                             echo '</tr>';
                             if (!(($i + 1) % 15)) {
                                 if (($i + 1) < $soft_limit) {
@@ -158,17 +157,17 @@ require_once 'config.php';
             </div>
         </section>
     </main>
-    <?php include_once(SHELL_ROOT.'includes/footer.php') ?>
-</body>
-</html>
+    <?php include_once(SHELL_ROOT . 'includes/footer.php') ?>
+    </body>
+    </html>
 <?php
-$dir = SHELL_ROOT.'saves';
+$dir = SHELL_ROOT . 'saves';
 $dh = opendir($dir);
 
-while($file=readdir($dh)){
-    if($file && (substr($file,-4) == '.sav' || substr($file,-13) == '.sav')){
-        if(filemtime($dir.'/'.$file)<time()-600){
-            unlink($dir.'/'.$file);
+while ($file = readdir($dh)) {
+    if ($file && (substr($file, -4) == '.sav' || substr($file, -13) == '.sav')) {
+        if (filemtime($dir . '/' . $file) < time() - 600) {
+            unlink($dir . '/' . $file);
         }
     }
 }

@@ -1,5 +1,5 @@
 <?php
-
+require_once 'config.php';
 error_reporting(E_ALL);
 ini_set('memory_limit', -1);  // just in case - previous versions had 8000x8000 px truecolor images JPEG
 set_time_limit(90);                // just in case something wents really bad -- kill script after 10 seconds
@@ -200,9 +200,9 @@ foreach ($files as $file) {
 
     // Moves saves to appropriate folders for use
     if(isset($_POST['public'])) {
-      rename('uploads/' . $NEWUPLOADEDFILE, 'saves/public/' . $NEWUPLOADEDFILE);
+      @rename(SHELL_ROOT.'uploads/' . $NEWUPLOADEDFILE, SHELL_ROOT.'saves/public/' . $NEWUPLOADEDFILE);
     } else {
-      rename('uploads/' . $NEWUPLOADEDFILE, 'saves/' . $NEWUPLOADEDFILE);
+      @rename(SHELL_ROOT.'uploads/' . $NEWUPLOADEDFILE, SHELL_ROOT.'saves/' . $NEWUPLOADEDFILE);
     }
 
 
