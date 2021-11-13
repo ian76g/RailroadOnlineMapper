@@ -446,10 +446,20 @@ class GVASParser
                     }
                 }
 
+                //PlayerXPArray
+                //PlayerMoneyArray
+                //PlayerNameArray
+                //PlayerLocationArray
+                //PlayerRotationArray
+
                 if (trim($object->NAME) == 'PlayerXPArray') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['xp_' . $index]) && trim($_POST['xp_' . $index])) {
                             $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['xp_' . $index]);
+                        }
+                        if(isset($_POST['deletePlayer_' . $index])) {
+                            unset($object->CONTENTOBJECTS[3]->contentElements[$index]);
+                            $object->CONTENTOBJECTS[3]->COUNTER->value--;
                         }
                     }
                 }
@@ -457,6 +467,34 @@ class GVASParser
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['money_' . $index]) && trim($_POST['money_' . $index])) {
                             $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['money_' . $index]);
+                        }
+                        if(isset($_POST['deletePlayer_' . $index])) {
+                            unset($object->CONTENTOBJECTS[3]->contentElements[$index]);
+                            $object->CONTENTOBJECTS[3]->COUNTER->value--;
+                        }
+                    }
+                }
+                if (trim($object->NAME) == 'PlayerNameArray') {
+                    foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
+                        if(isset($_POST['deletePlayer_' . $index])) {
+                            unset($object->CONTENTOBJECTS[3]->contentElements[$index]);
+                            $object->CONTENTOBJECTS[3]->COUNTER->value--;
+                        }
+                    }
+                }
+                if (trim($object->NAME) == 'PlayerRotationArray') {
+                    foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
+                        if(isset($_POST['deletePlayer_' . $index])) {
+                            unset($object->CONTENTOBJECTS[3]->contentElements[$index]);
+                            $object->CONTENTOBJECTS[3]->COUNTER->value--;
+                        }
+                    }
+                }
+                if (trim($object->NAME) == 'PlayerLocationArray') {
+                    foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
+                        if(isset($_POST['deletePlayer_' . $index])) {
+                            unset($object->CONTENTOBJECTS[3]->contentElements[$index]);
+                            $object->CONTENTOBJECTS[3]->COUNTER->value--;
                         }
                     }
                 }

@@ -623,6 +623,7 @@ class Mapper
         <th>XP</th>
         <th>Money</th>
         <th>near</th>
+        <th>Delete</th>
         </tr>
         ' . $this->prows . '</table><br/>
         <button class="button">Apply Player Changes</button></form>
@@ -915,6 +916,7 @@ class Mapper
                 <td><input size="5" maxlength="15" name="xp_' . $playerIndex . '" value="' . $player['Xp'] . '"></td>
                 <td><input size="5" maxlength="15" name="money_' . $playerIndex . '" value="' . $player['Money'] . '"></td>
                 <td>' . $industry . '</td>
+                <td><input name="deletePlayer_'.$playerIndex.'" type="checkbox"></td>
                 </tr>';
         }
 

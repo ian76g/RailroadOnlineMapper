@@ -124,25 +124,25 @@ include_once(SHELL_ROOT.'includes/head.php');
                 <div>
                     <input type="radio" id="bg" name="background" value="bg">
                     <label for="bg">
-                      <img border="2" src="topo/bg.png" width="90" height="90">Old background
+                      <img border="2" src="topo/bg_90x90.png" width="90" height="90">Old background
                     </label>
                 </div>
                 <div>
                     <input type="radio" id="bg3" name="background" value="bg3">
                     <label for="bg3">
-                      <img border="2" src="topo/bg3.png" width="90" height="90">New background
+                      <img border="2" src="topo/bg3_90x90.png" width="90" height="90">New background
                     </label>
                 </div>
                 <div>
                     <input type="radio" id="bg4" name="background" value="bg4">
                     <label for="bg4">
-                      <img border="2" src="topo/bg4.png" width="90" height="90">Psawhns background
+                      <img border="2" src="topo/bg4_90x90.png" width="90" height="90">Psawhns background
                     </label>
                 </div>
                 <div>
                     <input checked type="radio" id="bg5" name="background" value="bg5">
                     <label for="bg5">
-                      <img border="2" src="topo/bg4.png" width="90" height="90"> Psawhns background with kanados overlay
+                      <img border="2" src="topo/bg5_90x90.png" width="90" height="90"> Psawhns background with kanados overlay
                     </label>
                 </div>
             </fieldset>

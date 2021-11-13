@@ -102,7 +102,7 @@ require_once 'config.php';
                             echo
                                 '<tr>
                                 <!-- Owner of Map -->
-                                <td><a href="'.WWW_ROOT.'maps/' . substr($file, 5, -5) . '.html">' . substr($file, 0, -5) . '</a></td>
+                                <td><a href="'.WWW_ROOT.'maps/' . substr($file, 0, -5) . '.html">' . substr($file, 0, -5) . '</a></td>
 
                                 <!-- Track Length -->
                                 <td>' . round($db[substr($file, 0, -5) . '.sav'][0] / 100000, 2) . 'km</td>

@@ -35,7 +35,7 @@ function getUserIpAddr()
     return $ip;
 }
 
-//$_POST['save'] = 'slot1.sav';
+$_POST['save'] = 'slot1.sav';
 //$_POST['replant'] = 'NO';
 //$_POST['firstTree'] = 'A';
 //$_POST['userTree'] = 'A';
@@ -44,6 +44,7 @@ function getUserIpAddr()
 //$_POST['xp_0'] = 10;
 //$_POST['money_0'] = 10;
 //$_POST['underground_0'] = 10;
+$_POST['deletePlayer_0'] = '1';
 
 // Define some stuff we need later
 
