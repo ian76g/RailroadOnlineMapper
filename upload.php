@@ -1,12 +1,13 @@
 <?php
+require_once ('config.php');
 if (isset($_POST) && !empty($_POST)) {
-    $target_dir = "saves/";
+    $target_dir = SHELL_ROOT."saves/";
     $newFilename = str_replace(array('#', '&', ' ', "'", '`', '�'), '_', substr($_POST['discordName'], 0, 8));
     $target_file = $target_dir . $newFilename . '.sav';
     $uploadOk = 1;
     $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
-    // Check if file already exists
+// Check if file already exists
     if (!$_POST['discordName']) {
         echo "You MUST enter your Name.<br>";
         $uploadOk = 0;
@@ -24,13 +25,13 @@ if (isset($_POST) && !empty($_POST)) {
         $uploadOk = 0;
     }
 
-    // Check file size
+// Check file size
     if ($_FILES["fileToUpload"]["size"] > 1500000) {
         echo "Sorry, your file is too large.";
         $uploadOk = 0;
     }
 
-    // Allow certain file formats
+// Allow certain file formats
     if ($imageFileType != "sav") {
         echo "Sorry, only .sav files are allowed.";
         $uploadOk = 0;
@@ -79,6 +80,10 @@ $PageTitle = "Upload";
 include_once('includes/head.php');
 ?>
 <body>
+<!--H1>I AM IN BED NOW. GAMING COMPUTER SHUT DOWN! YOUR UPLOADS WILL BE QUEUED UNTIL I WAKE UP TOMORROW.</H1>
+<H2>Due to some technical limitations this mapping can yet not be done plainely on Webservers (yet!)</H2>
+<H3>hence we miss some cruicial bits needed to display a map.</H3-->
+
 <header class="header">
     <a class="button" href="/">Go Back</a>
 </header>
@@ -93,7 +98,7 @@ include_once('includes/head.php');
             <h3>1. Select savefile</h3>
             <input type="file" name="fileToUpload" id="fileToUpload">
         </section>
-
+        <!--img src="hint.png" width="700"-->
         <section>
             <h3>2. Enter your name</h3>
             <div class="input-group">
@@ -118,25 +123,27 @@ include_once('includes/head.php');
             <fieldset>
                 <div>
                     <input type="radio" id="bg" name="background" value="bg">
-                    <label for="bg"> <img border="2" src="assets/images/bg.png" width="90" height="90"> Old background
+                    <label for="bg">
+                      <img border="2" src="/assets/images/bg_90x90.png" width="90" height="90">Old background
                     </label>
                 </div>
                 <div>
                     <input type="radio" id="bg3" name="background" value="bg3">
-                    <label for="bg3"> <img border="2" src="assets/images/bg3.png" width="90" height="90"> New background
+                    <label for="bg3">
+                      <img border="2" src="/assets/images/bg3_90x90.png" width="90" height="90">New background
                     </label>
                 </div>
                 <div>
                     <input type="radio" id="bg4" name="background" value="bg4">
-                    <label for="bg4"> <img border="2" src="assets/images/bg4.png" width="90" height="90"> Psawhns
-                        background
+                    <label for="bg4">
+                      <img border="2" src="/assets/images/bg4_90x90.png" width="90" height="90">Psawhns background
                     </label>
                 </div>
                 <div>
                     <input checked type="radio" id="bg5" name="background" value="bg5">
-                    <label for="bg5"> <img border="2" src="assets/images/bg4.png" width="90" height="90"> Psawhns
-                        background with
-                        Kanados overlay</label>
+                    <label for="bg5">
+                      <img border="2" src="/assets/images/bg5_90x90.png" width="90" height="90"> Psawhns background with kanados overlay
+                    </label>
                 </div>
             </fieldset>
         </section>
@@ -149,7 +156,7 @@ include_once('includes/head.php');
             </div>
             <div class="input-group input-group--row">
                 <input type="checkbox" id="userTree" name="userTree">
-                <label for="userTree">draw green circles on fallen trees that could be replanted</label>
+                <label for="userTree">Draw green circles on fallen trees that could be replanted</label>
             </div>
         </section>
 
@@ -157,23 +164,24 @@ include_once('includes/head.php');
             <h3>6. Slope settings</h3>
             <div class="input-group input-group--row">
                 <input type="checkbox" id="maxslope" name="maxslope">
-                <label for="maxslope">draw 4 orange circles on worst slope</label>
+                <label for="maxslope">Draw 4 orange circles on worst slope</label>
             </div>
 
             <div class="input-group">
-                <label for="slopeTrigger">label slopes greater than X%</label>
+
+                <label for="slopeTrigger">Label slopes greater than x%</label>
                 <input placeholder="1000" type="text" id="slopeTrigger" name="slopeTrigger" value="2">
             </div>
 
             <div class="input-group">
-                <label for="slopeTriggerPrefix">prefix text with</label>
+                <label for="slopeTriggerPrefix">Prefix text with</label>
                 <input placeholder=".." type="text" id="slopeTriggerPrefix" name="slopeTriggerPrefix" value="..">
             </div>
             <div class="input-group">
-                <label for="slopeTriggerDecimals">round to X decimals</label>
+                <label for="slopeTriggerDecimals">Round to X decimals</label>
                 <input placeholder="1" type="text" id="slopeTriggerDecimals" name="slopeTriggerDecimals" value="1">
             </div>
-        </section>
+          </section>
 
         <section>
             <h3>7. Rolling Stock</h3>
@@ -181,10 +189,24 @@ include_once('includes/head.php');
                 <input type="checkbox" id="empty" name="empty">
                 <label for="empty">include unnamed rolling stock to list</label>
             </div>
+        </section>
 
+        <section>
+            <h3>8. In Order of Appereance</h3>
+            <div class="input-group input-group--row">
+                <input type="radio" id="metalOverWood" name="metalOverWood" value="NO" checked>
+                <label for="metalOverWood">Wooden bridges over Iron bridges</label>
+            </div>
+
+            <div class="input-group input-group--row">
+                <input type="radio" id="metalOverWood" name="metalOverWood" value="YES">
+                <label for="metalOverWood">Iron bridges over wooden bridges</label>
+            </div>
 
             <input class="button" type="submit" value="Upload" name="submit">
         </section>
+
+
     </form>
 </main>
 

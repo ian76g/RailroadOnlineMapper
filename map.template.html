@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Railroads Online Map</title>
+    <link rel="stylesheet" href="/css/reset.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="/css/export.css" />
+  </head>
+  <body class="export">
+    <main class="export__main">
+
+      <div class="export__nav">
+        <button class="button button--toggle" id="info-panel-toggle">Info</button>
+        <button class="button button--toggle" id="edit-panel-toggle">Edit</button>
+      </div>
+
+      <div class="export__panel info-panel">
+        <div class="export__panel-scroll-content">
+          <h3>Player Info</h3><br/>
+          <div class="info-panel__player-info">
+            ###PLAYERINFO###
+          </div>
+        </div>
+      </div>
+
+      <div id="container" class="export__map">
+        <svg
+          id="demo-tiger"
+          class="export__map-viewer"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 8000 8000"
+        >
+          <defs>###PATTERN###</defs>
+          <rect
+            x="0"
+            y="0"
+            width="8000"
+            height="8000"
+            fill="url(#bild)"
+            stroke="black"
+          />
+          ###SVG###
+        </svg>
+      </div>
+
+      <div class="export__panel edit-panel">
+        <div class="export__panel-scroll-content">
+          <h3>Edit</h3><br/>
+          <div class="edit-panel__extras">
+            ###EXTRAS###
+            ###DOWNLOAD###
+          </div>
+        </div>
+      </div>
+
+      <div class="export__controls">
+        <button class="button" id="zoom-out">-</button>
+        <button class="button"id="zoom-in">+</button>
+        <button class="button" id="reset">Reset</button>
+      </div>
+    </main>
+
+    <script type="text/javascript" src="/assets/js/svg-pan-zoom.js"></script>
+    <script type="text/javascript" src="/js/export.js"></script>
+  </body>
+</html>

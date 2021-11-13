@@ -255,41 +255,13 @@ class GVASParser
 
         $this->goldenBucket = $this->convert_from_latin1_to_utf8_recursively($this->goldenBucket);
 
-//        // We are going to strip some things from the array, since we don't need this at all.
-//        //
-//        // Remove the first 1825 deleted trees
-//        array_splice($this->goldenBucket['Removed']['Vegetation'], 0, 1825);
-//
-//        // Remove the 'Rotation' for Watertowers
-//        for ($i = 0; $i < count($this->goldenBucket['Watertowers']); $i++) {
-//            unset($this->goldenBucket['Watertowers'][$i]['Rotation']);
-//        }
-//
-//        // Remove the 'Rotation' and 'Location' for Industires
-//        // TODO: Exclude industry type 10, it's the Fuel Depot
-//        for ($i = 0; $i < count($this->goldenBucket['Industries']); $i++) {
-//            unset($this->goldenBucket['Industries'][$i]['Location']);
-//            unset($this->goldenBucket['Industries'][$i]['Rotation']);
-//        }
-//
-//        // Remove loc-related properties from non-loc frames
-//        $locs = array('porter_040', 'porter_042', 'handcar', 'eureka', 'climax', 'heisler', 'class70', 'cooke260');
-//        for ($i = 0; $i < count($this->goldenBucket['Frames']); $i++) {
-//            if (!in_array($this->goldenBucket['Frames'][$i]['Type'], $locs)) {
-//                // Not a loc, remove stuff...
-//                unset($this->goldenBucket['Frames'][$i]['Boiler']);
-//                unset($this->goldenBucket['Frames'][$i]['Headlights']);
-//                unset($this->goldenBucket['Frames'][$i]['Compressor']);
-//                unset($this->goldenBucket['Frames'][$i]['Tender']);
-//                unset($this->goldenBucket['Frames'][$i]['Regulator']);
-//                unset($this->goldenBucket['Frames'][$i]['Reverser']);
-//                unset($this->goldenBucket['Frames'][$i]['Smokestack']);
-//                unset($this->goldenBucket['Frames'][$i]['Generatorvalvevalue']);
-//            }
-//        }
+        $json = json_encode($this->goldenBucket, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+//echo json_last_error_msg();
+        file_put_contents('xx.json', $json);
+        return $json;
 
-        return json_encode($this->goldenBucket, JSON_UNESCAPED_UNICODE);
     }
+
 
     /**
      * Encode array from latin1 to utf8 recursively
@@ -474,10 +446,20 @@ class GVASParser
                     }
                 }
 
+                //PlayerXPArray
+                //PlayerMoneyArray
+                //PlayerNameArray
+                //PlayerLocationArray
+                //PlayerRotationArray
+
                 if (trim($object->NAME) == 'PlayerXPArray') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['xp_' . $index]) && trim($_POST['xp_' . $index])) {
                             $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['xp_' . $index]);
+                        }
+                        if(isset($_POST['deletePlayer_' . $index])) {
+                            unset($object->CONTENTOBJECTS[3]->contentElements[$index]);
+                            $object->CONTENTOBJECTS[3]->COUNTER->value--;
                         }
                     }
                 }
@@ -485,6 +467,34 @@ class GVASParser
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['money_' . $index]) && trim($_POST['money_' . $index])) {
                             $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['money_' . $index]);
+                        }
+                        if(isset($_POST['deletePlayer_' . $index])) {
+                            unset($object->CONTENTOBJECTS[3]->contentElements[$index]);
+                            $object->CONTENTOBJECTS[3]->COUNTER->value--;
+                        }
+                    }
+                }
+                if (trim($object->NAME) == 'PlayerNameArray') {
+                    foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
+                        if(isset($_POST['deletePlayer_' . $index])) {
+                            unset($object->CONTENTOBJECTS[3]->contentElements[$index]);
+                            $object->CONTENTOBJECTS[3]->COUNTER->value--;
+                        }
+                    }
+                }
+                if (trim($object->NAME) == 'PlayerRotationArray') {
+                    foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
+                        if(isset($_POST['deletePlayer_' . $index])) {
+                            unset($object->CONTENTOBJECTS[3]->contentElements[$index]);
+                            $object->CONTENTOBJECTS[3]->COUNTER->value--;
+                        }
+                    }
+                }
+                if (trim($object->NAME) == 'PlayerLocationArray') {
+                    foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
+                        if(isset($_POST['deletePlayer_' . $index])) {
+                            unset($object->CONTENTOBJECTS[3]->contentElements[$index]);
+                            $object->CONTENTOBJECTS[3]->COUNTER->value--;
                         }
                     }
                 }
@@ -506,7 +516,7 @@ class GVASParser
                     }
                 }
                 //IndustryStorageEduct3Array
-                if (trim($object->NAME) == 'IndustryStorageEduc3Array') {
+                if (trim($object->NAME) == 'IndustryStorageEduct3Array') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['educt2_' . $index]) && trim($_POST['educt2_' . $index])) {
                             $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['educt2_' . $index]);
@@ -560,5 +570,20 @@ class GVASParser
                 die('WHOPSI');
             }
         }
+        $output .= hex2bin('050000004e6f6e650000000000');
+
+        if (isset($_POST['save'])) {
+            $db = unserialize(file_get_contents('db.db'));
+            if (getUserIpAddr() != $db[$this->NEWUPLOADEDFILE][5]) {
+                die("This does not seem to be your save file.");
+            }
+            echo "SAVING FILE " . $this->NEWUPLOADEDFILE . "<br>\n";
+            file_put_contents(SHELL_ROOT.'saves/' . $this->NEWUPLOADEDFILE , $output, FILE_BINARY);
+            echo '<A href="'.WWW_ROOT.'saves/' . $this->NEWUPLOADEDFILE  . '">Download your modified save here </A><br>';
+            echo 'Want to upload this map again?<A href="'.WWW_ROOT.'upload.php">Add your save again</A><br>';
+        } else {
+            file_put_contents(SHELL_ROOT.'uploads/' . $this->NEWUPLOADEDFILE, $output, FILE_BINARY);
+        }
+
     }
 }
