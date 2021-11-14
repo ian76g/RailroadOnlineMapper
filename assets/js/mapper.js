@@ -20,10 +20,6 @@ class Mapper {
         this.turnTableRadius = (10 / 2.2107077) * this.scale;
         this.imx = this.x / 100 * this.scale;
         this.imy = this.y / 100 * this.scale;
-        this.totalTrackLength = 0;
-        this.totalSwitches = 0;
-        this.totalLocos = 0;
-        this.totalCarts = 0;
         this.maxSlope = 0;
         this.allLabels = [[0, 0]];
     }
@@ -174,8 +170,6 @@ class Mapper {
 
                         let slope = 0;
                         if (type in [4, 0]) {
-                            this.totalTrackLength += distance;
-
                             const height = Math.abs(segment['LocationEnd']['Z'] - segment['LocationStart']['Z']);
                             const length = Math.sqrt(
                                 Math.pow(segment['LocationEnd']['X'] - segment['LocationStart']['X'], 2) +
@@ -254,7 +248,6 @@ class Mapper {
         }
 
         for (const swtch of this.json.Switchs) { // can't use 'switch' as variable name
-            this.totalSwitches += 1;
             let dir = false;
             const type = swtch['Type'];
 
@@ -384,8 +377,6 @@ class Mapper {
              * 0 = regular
              * 1 = light and nice
              */
-            const type = turntable['Type'];
-
             const rotation = this._deg2rad(turntable['Rotator'][1] + 90);
             const rotation2 = this._deg2rad(turntable['Rotator'][1] + 90 - turntable['Deck'][1]);
             this.turnTableRadius = 25;
@@ -504,7 +495,6 @@ class Mapper {
             }
 
             if (['porter_040', 'porter_042', 'handcar', 'eureka', 'climax', 'heisler', 'class70', 'cooke260'].indexOf(vehicle['Type']) >= 0) {
-                this.totalLocos += 1;
                 let name = vehicle['Name'].replace(/(<([^>]+)>)/gi, "").toUpperCase();
                 if (!name) {
                     name = this._capitalize(vehicle['Type']);
@@ -525,8 +515,6 @@ class Mapper {
                 vehicleLabel.setAttribute("transform", "rotate(" + textRotation + ", " + x + ", " + y + ")")
                 vehicleLabel.appendChild(textNode);
                 this.shapes.push(vehicleLabel);
-            } else {
-                this.totalCarts += 1;
             }
 
             let cargo = "firewood";
@@ -779,7 +767,7 @@ class Mapper {
     _getDistanceToNearestLabel(newLabel) {
         const minDistance = 8000;
         for (const oldLabel of this.allLabels) {
-            const minDistance = Math.min(
+            Math.min(
                 minDistance,
                 Math.sqrt(
                     Math.pow(newLabel[0] - oldLabel[0], 2) +
