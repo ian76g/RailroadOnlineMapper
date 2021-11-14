@@ -15,14 +15,14 @@ if (!file_exists('counter')) {
     file_put_contents('counter', 0);
 }
 
-$tableHeader = '<thead>
-                        <th>Player</th>
-                        <th><A href="?sortby=0&sortorder=desc" style="color: white">Length</A></th>
-                        <th><A href="?sortby=1&sortorder=desc" style="color: white">Switches</A></th>
-                        <th><A href="?sortby=6&sortorder=desc" style="color: white">Trees</A></th>
-                        <th><A href="?sortby=2&sortorder=desc" style="color: white">Locos</A></th>
-                        <th><A href="?sortby=3&sortorder=desc" style="color: white">Carts</A></th>
-                        <th><A href="?sortby=4&sortorder=desc" style="color: white">Slope</A></th>
+    $tableHeader = '<thead>
+                                                                                <th style="background-color: beige"><img height="28" width="40" src="/assets/images/player.svg"></th>
+                        <th style="background-color: beige"><A href="?sortby=0&sortorder=desc" style="color: white"><img height="28" width="40" src="/assets/images/distance.svg"></A></th>
+                        <th style="background-color: beige"><A href="?sortby=1&sortorder=desc" style="color: white"><img height="28" width="40" src="/assets/images/switch.svg"></A></th>
+                        <th style="background-color: beige"><A href="?sortby=6&sortorder=desc" style="color: white"><img height="28" width="40" src="/assets/images/tree.svg"></A></th>
+                        <th style="background-color: beige"><A href="?sortby=2&sortorder=desc" style="color: white"><img height="28" width="40" src="/assets/images/loco.svg"></A></th>
+                        <th style="background-color: beige"><A href="?sortby=3&sortorder=desc" style="color: white"><img height="28" width="40" src="/assets/images/cart.svg"></A></th>
+                        <th style="background-color: beige"><A href="?sortby=4&sortorder=desc" style="color: white"><img height="28" width="40" src="/assets/images/slope.svg"></A></th>
                     </thead>';
 ?>
 <body>
