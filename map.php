@@ -89,7 +89,7 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
                 <input name="replant" value="YES" type="hidden"/>
                 <button class="button">Replant Trees</button>
                 <h4>Players</h4>
-                <table class="export__mapper">
+                <table id="editPlayersTable" class="export__mapper">
                     <tr>
                         <th>Player</th>
                         <th>XP</th>
@@ -97,7 +97,6 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
                         <th>near</th>
                         <th>Delete</th>
                     </tr>
-                    ' . $this->prows . '
                 </table>
                 <button class="button">Apply Player Changes</button>
                 <h4>Industries</h4>

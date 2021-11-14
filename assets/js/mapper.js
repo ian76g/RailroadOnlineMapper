@@ -46,8 +46,14 @@ class Mapper {
         if (!('Players' in this.json)) {
             return null
         }
-        const playerInfoTable = document.getElementById("playerTable");
-        for (const player of this.json.Players) {
+
+        const playerTable = document.getElementById("playerTable");
+        const editPlayersTable = document.getElementById("editPlayersTable");
+
+        for (let index = 0; index < this.json.Players.length; index++) {
+            const player = this.json.Players[index];
+
+            // First populate the Info menu
             const playerInfoRow = document.createElement("tr");
 
             const nameValue = document.createElement("td");
@@ -65,7 +71,50 @@ class Mapper {
             moneyValue.appendChild(moneyTextNode);
             playerInfoRow.appendChild(moneyValue);
 
-            playerInfoTable.appendChild(playerInfoRow);
+            playerTable.appendChild(playerInfoRow);
+
+            // Then populate the Edit menu
+            const playerEditInfoRow = document.createElement("tr");
+
+            const playerEditValue = document.createElement("td");
+            const playerEditTextNode = document.createTextNode(player['Name']);
+            playerEditValue.appendChild(playerEditTextNode);
+            playerEditInfoRow.appendChild(playerEditValue);
+
+            const playerEditXpValue = document.createElement("td");
+            const playerEditXpInput = document.createElement("input");
+            playerEditXpInput.size = 5;
+            playerEditXpInput.maxLength = 15;
+            playerEditXpInput.name = "xp_" + index;
+            playerEditXpInput.value = player['Xp'];
+            playerEditXpValue.appendChild(playerEditXpInput);
+            playerEditInfoRow.appendChild(playerEditXpValue);
+
+            const playerEditMoneyValue = document.createElement("td");
+            const playerEditMoneyInput = document.createElement("input");
+            playerEditMoneyInput.size = 5;
+            playerEditMoneyInput.maxLength = 15;
+            playerEditMoneyInput.name = "number_" + index;
+            playerEditMoneyInput.value = player['Money'];
+            playerEditMoneyValue.appendChild(playerEditMoneyInput);
+            playerEditInfoRow.appendChild(playerEditMoneyValue);
+
+            const playerEditNearValue = document.createElement("td");
+            let playerEditNearTextNode = document.createTextNode("Unknown");
+            if ('Industries' in this.json) {
+                playerEditNearTextNode = document.createTextNode(this._nearestIndustry(player['Location'], this.json.Industries));
+            }
+            playerEditNearValue.appendChild(playerEditNearTextNode);
+            playerEditInfoRow.appendChild(playerEditNearValue);
+
+            const playerEditDeleteValue = document.createElement("td");
+            const playerEditDeleteInput = document.createElement("input");
+            playerEditDeleteInput.type = "checkbox"
+            playerEditDeleteInput.name = "deletePlayer_" + index;
+            playerEditDeleteValue.appendChild(playerEditDeleteInput);
+            playerEditInfoRow.appendChild(playerEditDeleteValue);
+
+            editPlayersTable.appendChild(playerEditInfoRow);
         }
     }
 
