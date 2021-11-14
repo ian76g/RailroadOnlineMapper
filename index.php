@@ -118,7 +118,7 @@ require_once 'config.php';
                                 }
 
                             } else {
-                              echo '<td><a href="'.substr($file, 0, -5).'"</a>'.substr($file, 0, -5).'</td>';
+                              echo '<td><a href="'.WWW_ROOT.'maps/' .$file.'"</a>'.substr($file, 0, -5).'</td>';
                             }
                             echo '
                                 <!-- Track Length -->
