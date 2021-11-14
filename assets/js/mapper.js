@@ -96,7 +96,7 @@ class Mapper {
             const playerEditMoneyInput = document.createElement("input");
             playerEditMoneyInput.size = 5;
             playerEditMoneyInput.maxLength = 15;
-            playerEditMoneyInput.name = "number_" + index;
+            playerEditMoneyInput.name = "money_" + index;
             playerEditMoneyInput.value = player['Money'];
             playerEditMoneyValue.appendChild(playerEditMoneyInput);
             playerEditInfoRow.appendChild(playerEditMoneyValue);

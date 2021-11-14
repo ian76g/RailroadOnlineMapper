@@ -78,7 +78,7 @@ foreach ($files as $file) {
     $newSaveFileContents = $myParser->parseData(file_get_contents($file), false, true);
     unset($myParser);
 
-    $newFileName = str_replace('.sav', '_modifed.sav', $NEWUPLOADEDFILE);
+    $newFileName = str_replace('.sav', '_edited.sav', $NEWUPLOADEDFILE);
     $file = fopen($newFileName, 'wb');
     if ($file === false) {
         die('Unable to write file.');

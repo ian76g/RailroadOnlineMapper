@@ -14,6 +14,11 @@ require_once 'utils/GVASParser.php';
 $saveFile = null;
 $json = null;
 
+function modified(): bool
+{
+    return substr($_GET['name'], -7) === "_edited";
+}
+
 if (isset($_GET['name']) && $_GET['name'] != '') {
     $saveFile = "./saves/" . $_GET['name'] . ".sav";
     if (file_exists($saveFile)) {
@@ -43,6 +48,7 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
 
     <div class="export__panel info-panel">
         <div class="export__panel-scroll-content">
+            <?php var_dump(modified()); ?>
             <h3>Player Info</h3>
             <table id="playerTable">
                 <thead>
@@ -96,6 +102,9 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
     <div class="export__panel edit-panel">
         <div class="export__panel-scroll-content">
             <h3>Edit</h3><br/>
+            <?php if (modified()) { ?>
+                <span>You are viewing an edited save, only original saves can be edited.</span>
+            <?php } ?>
             <div class="edit-panel__extras">
                 <h4>Rolling Stock</h4>
                 <form method="POST" action="/converter.php">
@@ -110,13 +119,17 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
                             <th>Amount</th>
                         </tr>
                     </table>
-                    <button class="button">Apply Rolling Stock changes</button>
+                    <?php if (!modified()) { ?>
+                        <button class="button">Apply Rolling Stock changes</button>
+                    <?php } ?>
                 </form>
                 <h4>Trees</h4>
                 <form method="POST" action="/converter.php">
                     <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
                     <input name="replant" value="YES" type="hidden"/>
-                    <button class="button">Replant Trees</button>
+                    <?php if (!modified()) { ?>
+                        <button class="button">Replant Trees</button>
+                    <?php } ?>
                 </form>
                 <h4>Players</h4>
                 <form method="POST" action="/converter.php">
@@ -130,7 +143,9 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
                             <th>Delete</th>
                         </tr>
                     </table>
-                    <button class="button">Apply Player Changes</button>
+                    <?php if (!modified()) { ?>
+                        <button class="button">Apply Player Changes</button>
+                    <?php } ?>
                 </form>
                 <h4>Industries</h4>
                 <form method="POST" action="/converter.php">
@@ -144,15 +159,19 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
                             <th>Item 4</th>
                         </tr>
                     </table>
-                    <button class="button">Apply Industry Changes</button>
+                    <?php if (!modified()) { ?>
+                        <button class="button">Apply Industry Changes</button>
+                    <?php } ?>
                 </form>
                 <h4>Carts</h4>
                 <form method="POST" action="/converter.php">
                     <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
                     <table id="undergroundCartsTable" class="export__mapper"></table>
-                    <button class="button">Get Carts from Underground</button>
+                    <?php if (!modified()) { ?>
+                        <button class="button">Get Carts from Underground</button>
+                    <?php } ?>
                 </form>
-                <br />
+                <br/>
                 <a class="button" href="<?php echo $saveFile; ?>">Download Save</a>
             </div>
         </div>
