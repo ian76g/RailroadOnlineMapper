@@ -111,7 +111,7 @@ require_once 'config.php';
                               $timediff = time() - $uploaded; // Measure difference between current time and save file creation time
 
                                 // Timecheck to remove public link for download
-                                if ($expired < 1.45) {
+                                if ($timediff < (60 * 60 * 24 * 2)) { // two days
                                     echo '<td><a href="'.WWW_ROOT.'maps/' .$file. '">'.substr($file, 0, -5) .'</a> <a href="'.WWW_ROOT.'saves/public/'.$saveFile.'">(DL)</a></td>';
                                 } else {
                                     echo '<td><a href="'.WWW_ROOT.'maps/' .$file. '">'.substr($file, 0, -5) .'</a></td>';
