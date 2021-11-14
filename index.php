@@ -109,7 +109,6 @@ require_once 'config.php';
 
                               $uploaded = filemtime(SHELL_ROOT.'saves/public/'.$saveFile); // Checks the timestamp of saves in the public folder
                               $timediff = time() - $uploaded; // Measure difference between current time and save file creation time
-                              $expired = round($timediff/1000/60,1); // Formula to show how many days and round to 2 decimal places
 
                                 // Timecheck to remove public link for download
                                 if ($expired < 1.45) {
