@@ -111,12 +111,9 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
                 </table>
                 <button class="button">Apply Industry Changes</button>
                 <h4>Carts</h4>
-                <table class="export__mapper">
-                    ###UMROWS###
-                </table>
+                <table id="undergroundCartsTable" class="export__mapper"></table>
                 <button class="button">Get Carts from Underground</button>
-                ###EXTRAS###
-                <a href="<?php echo $saveFile; ?>">Download Save</a>
+                <a class="button" href="<?php echo $saveFile; ?>">Download Save</a>
             </div>
         </div>
     </div>

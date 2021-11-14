@@ -522,6 +522,8 @@ class Mapper {
             return
         }
 
+        const undergroundCartsTable = document.getElementById("undergroundCartsTable");
+
         const cartOptions = {
             'handcar': [this.engineRadius, 'black'],
             'porter_040': [this.engineRadius, 'black'],
@@ -542,6 +544,7 @@ class Mapper {
             'flatcar_tanker': [this.engineRadius / 3 * 2, 'grey'],
         }
 
+        let index = 0;
         for (const vehicle of this.json.Frames) {
             const x = (this.imx - ((vehicle['Location'][0] - this.minX) / 100 * this.scale));
             const y = (this.imy - ((vehicle['Location'][1] - this.minY) / 100 * this.scale));
@@ -570,6 +573,12 @@ class Mapper {
                 sunkenVehicleLabel.setAttribute("y", y.toString());
                 sunkenVehicleLabel.appendChild(textNode);
                 this.shapes.push(sunkenVehicleLabel);
+
+                const cartInput = document.createElement("input");
+                cartInput.name = "underground_"+index;
+                cartInput.value = "1";
+                cartInput.type = "hidden";
+                undergroundCartsTable.appendChild(cartInput);
             }
 
             if (['porter_040', 'porter_042', 'handcar', 'eureka', 'climax', 'heisler', 'class70', 'cooke260'].indexOf(vehicle['Type']) >= 0) {
@@ -597,6 +606,7 @@ class Mapper {
             } else {
                 this.totalCarts += 1;
             }
+            index ++;
         }
     }
 
