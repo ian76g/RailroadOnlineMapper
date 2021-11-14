@@ -187,7 +187,7 @@ class Mapper {
 
                                 continue; //This may cause issues down the road. We may need to stop at this point and return the errors segment.
                             } else {
-                                let slope = (height * 100 / length);
+                                slope = (height * 100 / length);
                                 if (slope > this.maxSlope) {
                                     slopecoords = [xCenter, yCenter];
                                 }
@@ -198,7 +198,7 @@ class Mapper {
                         const slopeTrigger = 2;
                         const slopeTriggerPrefix = '..';
                         const slopeTriggerDecimals = 1;
-                        if (distance > 0 && type in [4, 0]) {
+                        if (distance > 0 && (type === 4 || type === 0)) {
                             if (Math.abs(slope) > slopeTrigger) {
                                 const tanA = (
                                     (segment['LocationEnd']['Y'] - segment['LocationStart']['Y']) /
