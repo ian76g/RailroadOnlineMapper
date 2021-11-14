@@ -21,7 +21,7 @@ require_once 'config.php';
     }
 
     $tableHeader = '<thead>
-                        <th style="background-color: beige"><img height="28" width="40" src="images/player.svg"></th>
+                        <th style="background-color: beige">                                                        <img height="28" width="40" src="images/player.svg"></th>
                         <th style="background-color: beige"><A href="?sortby=0&sortorder=desc" style="color: white"><img height="28" width="40" src="images/distance.svg"></A></th>
                         <th style="background-color: beige"><A href="?sortby=1&sortorder=desc" style="color: white"><img height="28" width="40" src="images/switch.svg"></A></th>
                         <th style="background-color: beige"><A href="?sortby=6&sortorder=desc" style="color: white"><img height="28" width="40" src="images/tree.svg"></A></th>
