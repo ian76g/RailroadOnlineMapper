@@ -18,6 +18,21 @@
   height: 100%;
 }
 
+.export__map--background-list li {
+  margin-left: 0;
+  list-style: none;
+  margin-bottom: 1em;
+}
+
+.export__map--background-list img {
+  border: #524c49 1px solid;
+  cursor: pointer;
+}
+
+.export__map--background-list span {
+  font-size: 0.8rem;
+}
+
 .export__nav {
   display: flex;
   justify-content: space-between;

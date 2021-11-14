@@ -53,6 +53,32 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
                 </tr>
                 </thead>
             </table>
+            <hr/>
+            <h3>Change background</h3>
+            <div>
+                <ul class="export__map--background-list">
+                    <li>
+                        <img id="bg" src="/assets/images/bg_90x90.png" width="90" height="90" alt="Old background"
+                             onclick="changeBackground(this)">
+                        <span>Old background</span>
+                    </li>
+                    <li>
+                        <img id="bg3" src="/assets/images/bg3_90x90.png" width="90" height="90" alt="New background"
+                             onclick="changeBackground(this)">
+                        <span>New background</span>
+                    </li>
+                    <li>
+                        <img id="bg4" src="/assets/images/bg4_90x90.png" width="90" height="90" alt="Psawhns background"
+                             onclick="changeBackground(this)">
+                        <span>Psawhns background</span>
+                    </li>
+                    <li>
+                        <img id="bg5" src="/assets/images/bg5_90x90.png" width="90" height="90"
+                             alt="Psawhns background with kanados" onclick="changeBackground(this)">
+                        <span>Psawhns background with kanados overlay</span>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 
@@ -131,6 +157,27 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
 <script type="text/javascript">
     map = new Mapper(<?php echo $json; ?>);
     map.drawSVG('demo-tiger');
+
+    const backgrounds = {
+        'bg': [8000, 8000, 0, 0, 8000, 8000, 'bg.jpg'],
+        'bg3': [8000, 8000, 0, 50, 8000, 8000, 'bg3.jpg'],
+        'bg4': [8000, 8000, 0, 0, 8000, 8000, 'bg4.jpg'],
+        'bg5': [8000, 8000, 0, 0, 8000, 8000, 'bg5.jpg']
+    }
+    const pattern = document.getElementsByTagName("pattern")[0];
+    const image = document.getElementsByTagName("image")[0];
+
+    function changeBackground(clickedImage) {
+        if (clickedImage.id in backgrounds) {
+            pattern.setAttribute("width", backgrounds[clickedImage.id][0].toString());
+            pattern.setAttribute("height", backgrounds[clickedImage.id][1].toString());
+            image.setAttribute("x", backgrounds[clickedImage.id][2].toString());
+            image.setAttribute("y", backgrounds[clickedImage.id][3].toString());
+            image.setAttribute("width", backgrounds[clickedImage.id][4].toString());
+            image.setAttribute("height", backgrounds[clickedImage.id][5].toString());
+            image.setAttribute("href", "/assets/images/" + backgrounds[clickedImage.id][6]);
+        }
+    }
 </script>
 </body>
 </html>
