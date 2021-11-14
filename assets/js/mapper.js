@@ -134,7 +134,10 @@ class Mapper {
             rollingStockInfoRow.appendChild(numberValue);
 
             const nearValue = document.createElement("td");
-            const nearTextNode = document.createTextNode("near");
+            let nearTextNode = document.createTextNode("Unknown");
+            if ('Industries' in this.json) {
+                nearTextNode = document.createTextNode(this._nearestIndustry(vehicle['Location'], this.json.Industries));
+            }
             nearValue.appendChild(nearTextNode);
             rollingStockInfoRow.appendChild(nearValue);
 
@@ -731,4 +734,57 @@ class Mapper {
         return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
     }
 
+    _nearestIndustry(coords, industryCoords) {
+        let minDist = 800000;
+        let ind = 0;
+        for (const i of industryCoords) {
+            if (i['Type'] < 10) {
+                const d = this._dist(i['Location'], coords);
+                if (d < minDist) {
+                    minDist = d;
+                    ind = i['Type'];
+                }
+            }
+        }
+
+        switch (ind) {
+            case 1:
+                name = 'Logging Camp';
+                break;
+            case 2:
+                name = 'Sawmill';
+                break;
+            case 3:
+                name = 'Smelter';
+                break;
+            case 4:
+                name = 'Ironworks';
+                break;
+            case 5:
+                name = 'Oilfield';
+                break;
+            case 6:
+                name = 'Refinery';
+                break;
+            case 7:
+                name = 'Coal Mine';
+                break;
+            case 8:
+                name = 'Iron Mine';
+                break;
+            case 9:
+                name = 'Freight Depot';
+                break;
+        }
+
+        return name;
+    }
+
+    _dist(coords, coords2) {
+        return Math.sqrt(
+            Math.pow(coords[0] - coords2[0], 2) +
+            Math.pow(coords[1] - coords2[1], 2) +
+            Math.pow(coords[2] - coords2[2], 2)
+        );
+    }
 }

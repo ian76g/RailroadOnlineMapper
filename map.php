@@ -83,14 +83,11 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
                             <th>Amount</th>
                         </tr>
                     </table>
-                    <br/>
                     <button class="button">Apply Rolling Stock changes</button>
                 </form>
-                <br/><br/>
                 <h4>Trees</h4>
                 <input name="replant" value="YES" type="hidden"/>
                 <button class="button">Replant Trees</button>
-                <br/><br/>
                 <h4>Players</h4>
                 <table class="export__mapper">
                     <tr>
@@ -102,9 +99,7 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
                     </tr>
                     ' . $this->prows . '
                 </table>
-                <br/>
                 <button class="button">Apply Player Changes</button>
-                <br/><br/>
                 <h4>Industries</h4>
                 <table class="export__mapper">
                     <tr>
@@ -116,14 +111,11 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
                     </tr>
                     ' . $this->irows . '
                 </table>
-                <br/>
                 <button class="button">Apply Industry Changes</button>
-                <br/><br/>
                 <h4>Carts</h4>
                 <table class="export__mapper">
                     ###UMROWS###
                 </table>
-                <br/>
                 <button class="button">Get Carts from Underground</button>
                 ###EXTRAS###
                 <a href="<?php echo $saveFile; ?>">Download Save</a>
