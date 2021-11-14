@@ -28,7 +28,7 @@ $tableHeader = '<thead>
 <body>
 <header class="header">
     <h1 class="logo">RailroadsOnlineMapper</h1>
-    <a class="button" href="upload.php">Upload Savegame</a>
+    <a class="button" id="uploadButton">Upload Savegame</a>
 </header>
 <main>
     <section class="uploads">
@@ -63,7 +63,50 @@ $tableHeader = '<thead>
             </table>
         </div>
     </section>
+
+    <div id="uploadForm" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <form action="upload.php" class="upload-form" method="post" enctype="multipart/form-data">
+                <h1>Upload your savefile</h1>
+                <p>Open explorer at <code>%localappdata%\arr\saved\savegames\</code></p>
+                <br>
+
+                <section>
+                    <h3>1. Select savefile</h3>
+                    <input type="file" name="fileToUpload" id="fileToUpload">
+                </section>
+
+                <section>
+                    <h3>2. Enter your name</h3>
+                    <div class="input-group">
+                        <label for="discordName">Your Name on Discord or similar:</label>
+                        <input placeholder="Enter your name" id="discordName" type="text" name="discordName"
+                               maxlength="8">
+                    </div>
+
+                </section>
+                <input class="button" type="submit" value="Upload" name="submit">
+            </form>
+        </div>
+    </div>
 </main>
 <?php include_once('includes/footer.php') ?>
+<script type="text/javascript">
+    const modal = document.getElementById("uploadForm");
+    const btn = document.getElementById("uploadButton");
+    const span = document.getElementsByClassName("close")[0];
+    btn.onclick = function () {
+        modal.style.display = "block";
+    }
+    span.onclick = function () {
+        modal.style.display = "none";
+    }
+    window.onclick = function (event) {
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    }
+</script>
 </body>
 </html>
