@@ -67,7 +67,7 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
         </svg>
     </div>
 
-    <div class="export__panel edit-panel export__panel--open">
+    <div class="export__panel edit-panel">
         <div class="export__panel-scroll-content">
             <h3>Edit</h3><br/>
             <div class="edit-panel__extras">

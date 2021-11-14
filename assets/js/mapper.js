@@ -531,9 +531,11 @@ class Mapper {
 
             let cargo = "firewood";
             let amount = vehicle['Tender']['Fuelamount'];
+            let amountString = "tenderamount_";
             if (vehicle['Type'] in possibleCargos) {
                 cargo = possibleCargos[vehicle['Type']];
                 amount = vehicle['Freight']['Amount'];
+                amountString = "freightamount_";
             }
 
             const rollingStockInfoRow = document.createElement("tr");
@@ -589,7 +591,7 @@ class Mapper {
 
             const amountValue = document.createElement("td");
             const amountTextInput = document.createElement("input");
-            amountTextInput.name = "tenderamount_" + index;
+            amountTextInput.name = amountString + index;
             amountTextInput.value = amount;
             amountTextInput.size = 2;
             amountTextInput.maxLength = 4;
