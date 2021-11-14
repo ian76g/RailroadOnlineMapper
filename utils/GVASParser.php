@@ -442,8 +442,8 @@ class GVASParser
 
                 if (trim($object->NAME) == 'TenderFuelAmountArray') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
-                        if (isset($_POST['tenderfuelamount_' . $index]) && trim($_POST['tenderfuelamount_' . $index])) {
-                            $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['tenderfuelamount_' . $index]);
+                        if (isset($_POST['tenderamount_' . $index]) && trim($_POST['tenderamount_' . $index])) {
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['tenderamount_' . $index]);
                         }
                     }
                 }
