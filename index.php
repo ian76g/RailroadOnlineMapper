@@ -8,7 +8,7 @@ require_once 'config.php';
     include_once(SHELL_ROOT . 'includes/head.php');
 
     // Create required folders if they don't exist
-    $folders = array("public", "saves", "uploads");
+    $folders = array("saves", "saves/public", "uploads");
     foreach ($folders as $folder) {
         if (!file_exists($folder)) {
             mkdir($folder);
@@ -21,7 +21,7 @@ require_once 'config.php';
     }
 
     $tableHeader = '<thead>
-                                                                                <th style="background-color: beige"><img height="28" width="40" src="images/player.svg"></th>
+                        <th style="background-color: beige"><img height="28" width="40" src="images/player.svg"></th>
                         <th style="background-color: beige"><A href="?sortby=0&sortorder=desc" style="color: white"><img height="28" width="40" src="images/distance.svg"></A></th>
                         <th style="background-color: beige"><A href="?sortby=1&sortorder=desc" style="color: white"><img height="28" width="40" src="images/switch.svg"></A></th>
                         <th style="background-color: beige"><A href="?sortby=6&sortorder=desc" style="color: white"><img height="28" width="40" src="images/tree.svg"></A></th>
@@ -83,6 +83,7 @@ require_once 'config.php';
                         $hard_limit = 1600;
                         $soft_limit = 800;
                         $dbkeys = array_keys($db);
+
                         for ($i = 0; $i < sizeof($files); $i++) {
 
                             $file = $files[array_keys($files)[$i]];
@@ -100,16 +101,26 @@ require_once 'config.php';
                                 continue;
                             }
 
-                            $dl = '';
-                            if (file_exists(SHELL_ROOT . 'public/' . substr($file, 5, -5) . '.sav')) {
-                                $dl = ' (DL)';
+                            // Create savefile name from map file
+                            $saveFile = substr($file, 0, -5) .'.sav';
+
+                            // Check to see if savefile exists in public folder and create download link
+                            if (file_exists(SHELL_ROOT.'saves/public/' . $saveFile)) {
+
+                              $uploaded = filemtime(SHELL_ROOT.'saves/public/'.$saveFile); // Checks the timestamp of saves in the public folder
+                              $timediff = time() - $uploaded; // Measure difference between current time and save file creation time
+
+                                // Timecheck to remove public link for download
+                                if ($timediff < (60 * 60 * 24 * 2)) { // two days
+                                    echo '<td><a href="'.WWW_ROOT.'maps/' .$file. '">'.substr($file, 0, -5) .'</a> <a href="'.WWW_ROOT.'saves/public/'.$saveFile.'">(DL)</a></td>';
+                                } else {
+                                    echo '<td><a href="'.WWW_ROOT.'maps/' .$file. '">'.substr($file, 0, -5) .'</a></td>';
+                                }
+
+                            } else {
+                              echo '<td><a href="'.substr($file, 0, -5).'"</a>'.substr($file, 0, -5).'</td>';
                             }
-
-                            echo
-                                '<tr>
-                                <!-- Owner of Map -->
-                                <td><a href="'.WWW_ROOT.'maps/' . $file. '">' . substr($file, 0, -5) . '</a></td>
-
+                            echo '
                                 <!-- Track Length -->
                                 <td>' . round($db[substr($file, 0, -5) . '.sav'][0] / 100000, 2) . 'km</td>
 
@@ -119,29 +130,15 @@ require_once 'config.php';
                                 <!-- Tree Death Count -->
                                 <td>' . $db[substr($file, 0, -5) . '.sav'][6] . '</td>
 
-                                <!-- Locomotives Owned -->
+                                <!-- Locos -->
                                 <td>' . $db[substr($file, 0, -5) . '.sav'][2] . '</td>
 
-                                <!-- Rolling Stock Owned -->
+                                <!-- Carts -->
                                 <td>' . $db[substr($file, 0, -5) . '.sav'][3] . '</td>
 
                                 <!-- Max Slope -->
-                                <td>' . round($db[substr($file, 0, -5) . '.sav'][4]) . '%</td>
-                                <!-- Shared Link -->';
+                                <td>' . round($db[substr($file, 0, -5) . '.sav'][4]) . '%</td>';
 
-                            // Checks public save folder to see if we can provide a link
-//                            $saveCheck = SHELL_ROOT . 'saves/public/' . substr($file, 5, -5) . '.sav';
-//                            if (file_exists($saveCheck)) {
-//                                $upTime = filemtime($saveCheck);
-//                                $timeCheck = time() - $upTime;
-//                                if ($timeCheck < 172800) {
-//                                    echo '<td><a href="' . WWW_ROOT . 'saves/public/' . substr($file, 5, -5) . '.sav">Link</a></td>';
-//                                } else {
-//                                    echo '<td>Expired</td>';
-//                                }
-//                            } else {
-//                                echo '<td> </td>';
-//                            }
                             echo '</tr>';
                             if (!(($i + 1) % 15)) {
                                 if (($i + 1) < $soft_limit) {
