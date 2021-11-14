@@ -21,13 +21,13 @@ require_once 'config.php';
     }
 
     $tableHeader = '<thead>
-                        <th>Player</th>
-                        <th><A href="?sortby=0&sortorder=desc" style="color: white">TL</A></th>
-                        <th><A href="?sortby=1&sortorder=desc" style="color: white">Y</A></th>
-                        <th><A href="?sortby=2&sortorder=desc" style="color: white">Tr</A></th>
-                        <th><A href="?sortby=3&sortorder=desc" style="color: white">En</th>
-                        <th><A href="?sortby=4&sortorder=desc" style="color: white">Ct</th>
-                        <th><A href="?sortby=5&sortorder=desc" style="color: white">Slope</A></th>
+                        <th style="background-color: beige"><img height="28" width="40" src="images/player.svg"></th>
+                        <th style="background-color: beige"><A href="?sortby=0&sortorder=desc" style="color: white"><img height="28" width="40" src="images/distance.svg"></A></th>
+                        <th style="background-color: beige"><A href="?sortby=1&sortorder=desc" style="color: white"><img height="28" width="40" src="images/switch.svg"></A></th>
+                        <th style="background-color: beige"><A href="?sortby=6&sortorder=desc" style="color: white"><img height="28" width="40" src="images/tree.svg"></A></th>
+                        <th style="background-color: beige"><A href="?sortby=2&sortorder=desc" style="color: white"><img height="28" width="40" src="images/loco.svg"></A></th>
+                        <th style="background-color: beige"><A href="?sortby=3&sortorder=desc" style="color: white"><img height="28" width="40" src="images/cart.svg"></A></th>
+                        <th style="background-color: beige"><A href="?sortby=4&sortorder=desc" style="color: white"><img height="28" width="40" src="images/slope.svg"></A></th>
                     </thead>';
 
     function mysort($a, $b)
