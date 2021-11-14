@@ -218,18 +218,6 @@ class Mapper {
 
             rollingStockTable.appendChild(rollingStockInfoRow);
         }
-
-        /*
-        <tr>
-          <th>Type</th>
-          <th>Name</th>
-          <th>Number</th>
-          <th>near</th>
-          <th>Cargo</th>
-          <th>Amount</th>
-        </tr>
-        */
-
     }
 
     getTracksAndBeds() {
@@ -617,6 +605,7 @@ class Mapper {
             return
         }
 
+        const industriesTable = document.getElementById("industriesTable");
         let index = 0;
         for (const industry of this.json.Industries) {
             let name = '';
@@ -719,17 +708,47 @@ class Mapper {
                     console.log("Unknown industry: " + JSON.stringify(industry, null, 2));
             }
 
-            try {
-                const industryLabel = document.createElementNS(this.svgNS, "text");
-                const textNode = document.createTextNode(name);
-                industryLabel.setAttribute("x", (this.imx - ((industry['Location'][0] - this.minX) / 100 * this.scale) + xoff).toString());
-                industryLabel.setAttribute("y", (this.imy - ((industry['Location'][1] - this.minY) / 100 * this.scale) + yoff).toString());
-                industryLabel.setAttribute("transform", "rotate(" + rotation + ", " + (this.imx - ((industry['Location'][0] - this.minX) / 100 * this.scale) + xoff) + ", " + (this.imy - ((industry['Location'][1] - this.minY) / 100 * this.scale) + yoff) + ")");
-                industryLabel.appendChild(textNode);
-                this.shapes.push(industryLabel);
-            } catch (err) {
-                console.log(err);
+            const industryLabel = document.createElementNS(this.svgNS, "text");
+            const textNode = document.createTextNode(name);
+            industryLabel.setAttribute("x", (this.imx - ((industry['Location'][0] - this.minX) / 100 * this.scale) + xoff).toString());
+            industryLabel.setAttribute("y", (this.imy - ((industry['Location'][1] - this.minY) / 100 * this.scale) + yoff).toString());
+            industryLabel.setAttribute("transform", "rotate(" + rotation + ", " + (this.imx - ((industry['Location'][0] - this.minX) / 100 * this.scale) + xoff) + ", " + (this.imy - ((industry['Location'][1] - this.minY) / 100 * this.scale) + yoff) + ")");
+            industryLabel.appendChild(textNode);
+            this.shapes.push(industryLabel);
+
+            const eductRow = document.createElement("tr");
+            const eductnameColumn = document.createElement("td");
+            const eductnameColumnText = document.createTextNode(name + " Educts");
+            eductnameColumn.appendChild(eductnameColumnText);
+            eductRow.appendChild(eductnameColumn);
+            for (let i = 0; i < industry['EductsStored'].length; i++) {
+                const itemColumn = document.createElement("td");
+                const itemInput = document.createElement("input");
+                itemInput.size = 5;
+                itemInput.maxLength = 15;
+                itemInput.name = "educt"+i+"_"+index;
+                itemInput.value = industry['EductsStored'][i];
+                itemColumn.appendChild(itemInput);
+                eductRow.appendChild(itemColumn);
             }
+            industriesTable.appendChild(eductRow);
+
+            const productRow = document.createElement("tr");
+            const productNameColumn = document.createElement("td");
+            const productNameColumnText = document.createTextNode(name + " Products");
+            productNameColumn.appendChild(productNameColumnText);
+            productRow.appendChild(productNameColumn);
+            for (let i = 0; i < industry['ProductsStored'].length; i++) {
+                const itemColumn = document.createElement("td");
+                const itemInput = document.createElement("input");
+                itemInput.size = 5;
+                itemInput.maxLength = 15;
+                itemInput.name = "product"+i+"_"+index;
+                itemInput.value = industry['ProductsStored'][i];
+                itemColumn.appendChild(itemInput);
+                productRow.appendChild(itemColumn);
+            }
+            industriesTable.appendChild(productRow);
 
             index += 1;
         }

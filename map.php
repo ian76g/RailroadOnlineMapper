@@ -100,7 +100,7 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
                 </table>
                 <button class="button">Apply Player Changes</button>
                 <h4>Industries</h4>
-                <table class="export__mapper">
+                <table id="industriesTable" class="export__mapper">
                     <tr>
                         <th>Industry</th>
                         <th>Item 1</th>
@@ -108,7 +108,6 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
                         <th>Item 3</th>
                         <th>Item 4</th>
                     </tr>
-                    ' . $this->irows . '
                 </table>
                 <button class="button">Apply Industry Changes</button>
                 <h4>Carts</h4>
