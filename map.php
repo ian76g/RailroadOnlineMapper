@@ -131,8 +131,6 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
 <script type="text/javascript">
     map = new Mapper(<?php echo $json; ?>);
     map.drawSVG('demo-tiger');
-    map.populatePlayerTable();
-    map.populateRollingStockTable();
 </script>
 </body>
 </html>
