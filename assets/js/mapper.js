@@ -69,6 +69,117 @@ class Mapper {
         }
     }
 
+    populateRollingStockTable() {
+        if (!('Frames' in this.json)) {
+            return
+        }
+
+        const rollingStockTable = document.getElementById("rollingStockTable");
+        const possibleCargos = {
+            'flatcar_logs': ['log'],
+            'flatcar_stakes': ['rail', 'lumber', 'beam', 'rawiron'],
+            'flatcar_hopper': ['ironore', 'coal'],
+            'flatcar_cordwood': ['cordwood'],
+        }
+
+        const cargoNames = {
+            'log': 'Logs',
+            'cordwood': 'Cordwood',
+            'beam': 'Beams',
+            'lumber': 'Lumber',
+            'ironore': 'Iron Ore',
+            'rail': 'Rails',
+            'rawiron': 'Raw Iron',
+            'coal': 'Coal',
+            'steelpipe': 'Steel Pipes',
+            'crate_tools': 'Tools',
+            'crudeoil': 'Crude Oil',
+            'oilbarrel': 'Oil Barrels',
+        }
+
+        for (let index = 0; index < this.json.Frames.length; index++) {
+            const vehicle = this.json.Frames[index];
+
+            let cargo = "firewood";
+            let amount = vehicle['Tender']['Fuelamount'];
+            if (vehicle['Type'] in possibleCargos) {
+                cargo = possibleCargos[vehicle['Type']];
+                amount = vehicle['Freight']['Amount'];
+            }
+
+            const rollingStockInfoRow = document.createElement("tr");
+
+            const typeValue = document.createElement("td");
+            const typeImage = document.createElement("img");
+            typeImage.src = "/assets/images/" + vehicle['Type'] + ".png";
+            typeValue.appendChild(typeImage);
+            rollingStockInfoRow.appendChild(typeValue);
+
+            const nameValue = document.createElement("td");
+            const nameTextInput = document.createElement("input");
+            nameTextInput.size = 5;
+            nameTextInput.maxLength = 15;
+            nameTextInput.name = "name_" + index;
+            nameTextInput.value = vehicle['Name'].replace(/<\/?[^>]+(>|$)/g, "").toUpperCase()
+            nameValue.appendChild(nameTextInput);
+            rollingStockInfoRow.appendChild(nameValue);
+
+            const numberValue = document.createElement("td");
+            const numberTextInput = document.createElement("input");
+            numberTextInput.size = 5;
+            numberTextInput.maxLength = 15;
+            numberTextInput.name = "number_" + index;
+            numberTextInput.value = vehicle['Number'].replace(/<\/?[^>]+(>|$)/g, "");
+            numberValue.appendChild(numberTextInput);
+            rollingStockInfoRow.appendChild(numberValue);
+
+            const nearValue = document.createElement("td");
+            const nearTextNode = document.createTextNode("near");
+            nearValue.appendChild(nearTextNode);
+            rollingStockInfoRow.appendChild(nearValue);
+
+            const cargoValue = document.createElement("td");
+            if (typeof cargo === "object") {
+                const select = document.createElement("select");
+                for (const cargoType of cargo) {
+                    const option = document.createElement("option");
+                    option.text = cargoNames[cargoType];
+                    option.value = cargoType;
+                    option.selected = vehicle['Freight']['Type'] === cargoType;
+                    select.add(option);
+                }
+                cargoValue.appendChild(select);
+            } else {
+                const cargoTextNode = document.createTextNode(cargo);
+                cargoValue.appendChild(cargoTextNode);
+            }
+            rollingStockInfoRow.appendChild(cargoValue);
+
+            const amountValue = document.createElement("td");
+            const amountTextInput = document.createElement("input");
+            amountTextInput.name = "tenderamount_" + index;
+            amountTextInput.value = amount;
+            amountTextInput.size = 2;
+            amountTextInput.maxLength = 4;
+            amountValue.appendChild(amountTextInput);
+            rollingStockInfoRow.appendChild(amountValue);
+
+            rollingStockTable.appendChild(rollingStockInfoRow);
+        }
+
+        /*
+        <tr>
+          <th>Type</th>
+          <th>Name</th>
+          <th>Number</th>
+          <th>near</th>
+          <th>Cargo</th>
+          <th>Amount</th>
+        </tr>
+        */
+
+    }
+
     getTracksAndBeds() {
         const drawOrder = [
             // [type, stroke-width, stroke]

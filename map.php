@@ -26,12 +26,12 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta charset="UTF8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <title>Railroads Online Map</title>
-    <link rel="stylesheet" href="/assets/css/reset.css" />
-    <link rel="stylesheet" href="/assets/css/main.css" />
-    <link rel="stylesheet" href="/assets/css/export.css" />
+    <link rel="stylesheet" href="/assets/css/reset.css"/>
+    <link rel="stylesheet" href="/assets/css/main.css"/>
+    <link rel="stylesheet" href="/assets/css/export.css"/>
 </head>
 <body class="export">
 <main class="export__main">
@@ -67,10 +67,64 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
         </svg>
     </div>
 
-    <div class="export__panel edit-panel">
+    <div class="export__panel edit-panel export__panel--open">
         <div class="export__panel-scroll-content">
             <h3>Edit</h3><br/>
             <div class="edit-panel__extras">
+                <h4>Rolling Stock</h4>
+                <form method="POST" action="../converter.php">
+                    <table id="rollingStockTable" class="export__mapper">
+                        <tr>
+                            <th>Type</th>
+                            <th>Name</th>
+                            <th>Number</th>
+                            <th>Near</th>
+                            <th>Cargo</th>
+                            <th>Amount</th>
+                        </tr>
+                    </table>
+                    <br/>
+                    <button class="button">Apply Rolling Stock changes</button>
+                </form>
+                <br/><br/>
+                <h4>Trees</h4>
+                <input name="replant" value="YES" type="hidden"/>
+                <button class="button">Replant Trees</button>
+                <br/><br/>
+                <h4>Players</h4>
+                <table class="export__mapper">
+                    <tr>
+                        <th>Player</th>
+                        <th>XP</th>
+                        <th>Money</th>
+                        <th>near</th>
+                        <th>Delete</th>
+                    </tr>
+                    ' . $this->prows . '
+                </table>
+                <br/>
+                <button class="button">Apply Player Changes</button>
+                <br/><br/>
+                <h4>Industries</h4>
+                <table class="export__mapper">
+                    <tr>
+                        <th>Industry</th>
+                        <th>Item 1</th>
+                        <th>Item 2</th>
+                        <th>Item 3</th>
+                        <th>Item 4</th>
+                    </tr>
+                    ' . $this->irows . '
+                </table>
+                <br/>
+                <button class="button">Apply Industry Changes</button>
+                <br/><br/>
+                <h4>Carts</h4>
+                <table class="export__mapper">
+                    ###UMROWS###
+                </table>
+                <br/>
+                <button class="button">Get Carts from Underground</button>
                 ###EXTRAS###
                 <a href="<?php echo $saveFile; ?>">Download Save</a>
             </div>
@@ -91,6 +145,7 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
     map = new Mapper(<?php echo $json; ?>);
     map.drawSVG('demo-tiger');
     map.populatePlayerTable();
+    map.populateRollingStockTable();
 </script>
 </body>
 </html>
