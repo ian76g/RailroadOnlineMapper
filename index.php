@@ -109,10 +109,9 @@ require_once 'config.php';
 
                               $uploaded = filemtime(SHELL_ROOT.'saves/public/'.$saveFile); // Checks the timestamp of saves in the public folder
                               $timediff = time() - $uploaded; // Measure difference between current time and save file creation time
-                              $expired = round($timediff/1000/60,1); // Formula to show how many days and round to 2 decimal places
 
                                 // Timecheck to remove public link for download
-                                if ($expired < 1.45) {
+                                if ($timediff < (60 * 60 * 24 * 2)) { // two days
                                     echo '<td><a href="'.WWW_ROOT.'maps/' .$file. '">'.substr($file, 0, -5) .'</a> <a href="'.WWW_ROOT.'saves/public/'.$saveFile.'">(DL)</a></td>';
                                 } else {
                                     echo '<td><a href="'.WWW_ROOT.'maps/' .$file. '">'.substr($file, 0, -5) .'</a></td>';
