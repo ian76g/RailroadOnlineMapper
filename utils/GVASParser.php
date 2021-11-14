@@ -18,7 +18,7 @@ class GVASParser
      * @param bool $againAllowed
      * @return false|string
      */
-    public function parseData($x, $againAllowed = true)
+    public function parseData($x, $againAllowed = true, $edit = false)
     {
         $this->x = $x;
         $this->goldenBucket = array();
@@ -249,6 +249,9 @@ class GVASParser
          */
 
         $tmp = $this->handleEditAndSave($againAllowed);
+        if ($edit) {
+            return $tmp;
+        }
         if ($tmp == 'AGAIN') {
             return $tmp;
         }
@@ -256,10 +259,9 @@ class GVASParser
         $this->goldenBucket = $this->convert_from_latin1_to_utf8_recursively($this->goldenBucket);
 
         $json = json_encode($this->goldenBucket, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-//echo json_last_error_msg();
         file_put_contents('xx.json', $json);
-        return $json;
 
+        return $json;
     }
 
 
@@ -302,7 +304,7 @@ class GVASParser
      * @param $againAllowed
      * @return string
      */
-    function handleEditAndSave($againAllowed)
+    function handleEditAndSave($againAllowed): string
     {
         $output = '';
         foreach ($this->saveObject['objects'] as $saveObjectIndex => $object) {
@@ -571,5 +573,6 @@ class GVASParser
             }
         }
         $output .= hex2bin('050000004e6f6e650000000000');
+        return $output;
     }
 }

@@ -98,7 +98,8 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
             <h3>Edit</h3><br/>
             <div class="edit-panel__extras">
                 <h4>Rolling Stock</h4>
-                <form method="POST" action="../converter.php">
+                <form method="POST" action="/converter.php">
+                    <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
                     <table id="rollingStockTable" class="export__mapper">
                         <tr>
                             <th>Type</th>
@@ -112,33 +113,46 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
                     <button class="button">Apply Rolling Stock changes</button>
                 </form>
                 <h4>Trees</h4>
-                <input name="replant" value="YES" type="hidden"/>
-                <button class="button">Replant Trees</button>
+                <form method="POST" action="/converter.php">
+                    <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
+                    <input name="replant" value="YES" type="hidden"/>
+                    <button class="button">Replant Trees</button>
+                </form>
                 <h4>Players</h4>
-                <table id="editPlayersTable" class="export__mapper">
-                    <tr>
-                        <th>Player</th>
-                        <th>XP</th>
-                        <th>Money</th>
-                        <th>near</th>
-                        <th>Delete</th>
-                    </tr>
-                </table>
-                <button class="button">Apply Player Changes</button>
+                <form method="POST" action="/converter.php">
+                    <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
+                    <table id="editPlayersTable" class="export__mapper">
+                        <tr>
+                            <th>Player</th>
+                            <th>XP</th>
+                            <th>Money</th>
+                            <th>near</th>
+                            <th>Delete</th>
+                        </tr>
+                    </table>
+                    <button class="button">Apply Player Changes</button>
+                </form>
                 <h4>Industries</h4>
-                <table id="industriesTable" class="export__mapper">
-                    <tr>
-                        <th>Industry</th>
-                        <th>Item 1</th>
-                        <th>Item 2</th>
-                        <th>Item 3</th>
-                        <th>Item 4</th>
-                    </tr>
-                </table>
-                <button class="button">Apply Industry Changes</button>
+                <form method="POST" action="/converter.php">
+                    <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
+                    <table id="industriesTable" class="export__mapper">
+                        <tr>
+                            <th>Industry</th>
+                            <th>Item 1</th>
+                            <th>Item 2</th>
+                            <th>Item 3</th>
+                            <th>Item 4</th>
+                        </tr>
+                    </table>
+                    <button class="button">Apply Industry Changes</button>
+                </form>
                 <h4>Carts</h4>
-                <table id="undergroundCartsTable" class="export__mapper"></table>
-                <button class="button">Get Carts from Underground</button>
+                <form method="POST" action="/converter.php">
+                    <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
+                    <table id="undergroundCartsTable" class="export__mapper"></table>
+                    <button class="button">Get Carts from Underground</button>
+                </form>
+                <br />
                 <a class="button" href="<?php echo $saveFile; ?>">Download Save</a>
             </div>
         </div>

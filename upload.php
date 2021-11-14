@@ -42,7 +42,6 @@ if (isset($_POST) && !empty($_POST)) {
         // if everything is ok, try to upload file
     } else {
         if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
-            require_once 'utils/ArithmeticHelper.php';
             require_once 'utils/dtAbstractData.php';
             require_once 'utils/dtDynamic.php';
             require_once 'utils/dtHeader.php';
@@ -55,7 +54,6 @@ if (isset($_POST) && !empty($_POST)) {
             require_once 'utils/GVASParser.php';
             require_once 'utils/SaveReader.php';
 
-            $arithmeticHelper = new ArithmeticHelper();
             $myParser = new GVASParser();
             $myParser->NEWUPLOADEDFILE = $target_file;
             $myParser->parseData(file_get_contents($target_file), false);

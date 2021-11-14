@@ -3,7 +3,7 @@
 <?php
 $PageTitle = "RailroadsOnlineMapper";
 include_once('includes/head.php');
-include_once('utils/tools.php');
+include_once('utils/functions.php');
 
 // Create required folder if it don't exist
 if (!file_exists('./saves/')) {
