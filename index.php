@@ -21,14 +21,13 @@ require_once 'config.php';
     }
 
     $tableHeader = '<thead>
-                        <th>Player</th>
-                        <th><A href="?sortby=0&sortorder=desc" style="color: white">Length</A></th>
-                        <th><A href="?sortby=1&sortorder=desc" style="color: white">Switches</A></th>
-                        <th><A href="?sortby=6&sortorder=desc" style="color: white">Trees</A></th>
-                        <th><A href="?sortby=2&sortorder=desc" style="color: white">Locos</A></th>
-                        <th><A href="?sortby=3&sortorder=desc" style="color: white">Carts</A></th>
-                        <th><A href="?sortby=4&sortorder=desc" style="color: white">Slope</A></th>
-                        <th><A href="?sortby=4&sortorder=desc" style="color: white">(DL)</th>
+                                                                                <th style="background-color: beige"><img height="28" width="40" src="images/player.svg"></th>
+                        <th style="background-color: beige"><A href="?sortby=0&sortorder=desc" style="color: white"><img height="28" width="40" src="images/distance.svg"></A></th>
+                        <th style="background-color: beige"><A href="?sortby=1&sortorder=desc" style="color: white"><img height="28" width="40" src="images/switch.svg"></A></th>
+                        <th style="background-color: beige"><A href="?sortby=6&sortorder=desc" style="color: white"><img height="28" width="40" src="images/tree.svg"></A></th>
+                        <th style="background-color: beige"><A href="?sortby=2&sortorder=desc" style="color: white"><img height="28" width="40" src="images/loco.svg"></A></th>
+                        <th style="background-color: beige"><A href="?sortby=3&sortorder=desc" style="color: white"><img height="28" width="40" src="images/cart.svg"></A></th>
+                        <th style="background-color: beige"><A href="?sortby=4&sortorder=desc" style="color: white"><img height="28" width="40" src="images/slope.svg"></A></th>
                     </thead>';
 
     function mysort($a, $b)
@@ -131,18 +130,18 @@ require_once 'config.php';
                                 <!-- Shared Link -->';
 
                             // Checks public save folder to see if we can provide a link
-                            $saveCheck = SHELL_ROOT . 'saves/public/' . substr($file, 5, -5) . '.sav';
-                            if (file_exists($saveCheck)) {
-                                $upTime = filemtime($saveCheck);
-                                $timeCheck = time() - $upTime;
-                                if ($timeCheck < 172800) {
-                                    echo '<td><a href="' . WWW_ROOT . 'saves/public/' . substr($file, 5, -5) . '.sav">Link</a></td>';
-                                } else {
-                                    echo '<td>Expired</td>';
-                                }
-                            } else {
-                                echo '<td> </td>';
-                            }
+//                            $saveCheck = SHELL_ROOT . 'saves/public/' . substr($file, 5, -5) . '.sav';
+//                            if (file_exists($saveCheck)) {
+//                                $upTime = filemtime($saveCheck);
+//                                $timeCheck = time() - $upTime;
+//                                if ($timeCheck < 172800) {
+//                                    echo '<td><a href="' . WWW_ROOT . 'saves/public/' . substr($file, 5, -5) . '.sav">Link</a></td>';
+//                                } else {
+//                                    echo '<td>Expired</td>';
+//                                }
+//                            } else {
+//                                echo '<td> </td>';
+//                            }
                             echo '</tr>';
                             if (!(($i + 1) % 15)) {
                                 if (($i + 1) < $soft_limit) {
