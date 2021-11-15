@@ -1073,7 +1073,7 @@ class Mapper
                     array_pop($site['EductsStored']);
                     array_pop($site['EductsStored']);
                     array_pop($site['EductsStored']);
-                    $pos = array('logs.png', 'cordwood.png', 'cordwood.png', 'logs.png');
+                    $pos = array('logs_p.svg', 'cordwood_p.svg', 'cordwood_p.svg', 'logs_p.svg');
                     $name = 'Logging Camp';
                     $rotation = 0;
                     $xoff = -70;
@@ -1086,8 +1086,8 @@ class Mapper
                     array_pop($site['EductsStored']);
                     array_pop($site['ProductsStored']);
                     array_pop($site['ProductsStored']);
-                    $pos = array('lumber.png', 'beams.png');
-                    $pis = array('logs.png');
+                    $pos = array('lumber_p.svg', 'beams_p.svg');
+                    $pis = array('logs_p.svg');
 //                    $name .= "\nI:" . implode(',', $site['EductsStored']) . "\nO:" . implode(',', $site['ProductsStored']);
                     $xoff = -35;
                     $yoff = 15;
@@ -1099,8 +1099,8 @@ class Mapper
                     array_pop($site['EductsStored']);
                     array_pop($site['ProductsStored']);
                     array_pop($site['ProductsStored']);
-                    $pos = array('iron.png', 'rails.png');
-                    $pis = array('ironore.png', 'cordwood.png');
+                    $pos = array('iron_p.svg', 'rails_p.svg');
+                    $pis = array('ironore_p.svg', 'cordwood_p.svg');
 //                    $name .= "\nI:" . implode(',', $site['EductsStored']) . "\nO:" . implode(',', $site['ProductsStored']);
                     $rotation = 90;
                     break;
@@ -1110,8 +1110,8 @@ class Mapper
                     array_pop($site['EductsStored']);
                     array_pop($site['ProductsStored']);
                     array_pop($site['ProductsStored']);
-                    $pos = array('pipes.png', 'tools.png');
-                    $pis = array('iron.png', 'coal.png');
+                    $pos = array('pipes_p.svg', 'tools_p.svg');
+                    $pis = array('iron_p.svg', 'coal_p.svg');
 //                    $name .= "\nI:" . implode(',', $site['EductsStored']) . "\nO:" . implode(',', $site['ProductsStored']);
                     $rotation = 90;
                     break;
@@ -1121,8 +1121,8 @@ class Mapper
                     array_pop($site['ProductsStored']);
                     array_pop($site['ProductsStored']);
                     array_pop($site['ProductsStored']);
-                    $pis = array('pipes.png', 'beams.png', 'tools.png');
-                    $pos = array('oil.png');
+                    $pis = array('pipes_p.svg', 'beams_p.svg', 'tools_p.svg');
+                    $pos = array('oil_p.svg');
 //                    $name .= "\nI:" . implode(',', $site['EductsStored']) . "\nO:" . implode(',', $site['ProductsStored']);
                     $rotation = 0;
                     break;
@@ -1131,8 +1131,8 @@ class Mapper
                     array_pop($site['EductsStored']);
                     array_pop($site['ProductsStored']);
                     array_pop($site['ProductsStored']);
-                    $pis = array('oil.png', 'pipes.png', 'lumber.png');
-                    $pos = array('barrels.png', 'barrels.png');
+                    $pis = array('oil_p.svg', 'pipes_p.svg', 'lumber_p.svg');
+                    $pos = array('barrels_p.svg', 'barrels_p.svg');
 //                    $name .= "\nI:" . implode(',', $site['EductsStored']) . "\nO:" . implode(',', $site['ProductsStored']);
                     $rotation = 0;
                     break;
@@ -1143,8 +1143,8 @@ class Mapper
                     array_pop($site['ProductsStored']);
                     array_pop($site['ProductsStored']);
                     array_pop($site['ProductsStored']);
-                    $pis = array('beams.png', 'rails.png');
-                    $pos = array('coal.png');
+                    $pis = array('beams_p.svg', 'rails_p.svg');
+                    $pos = array('coal_p.svg');
 //                    $name .= "\nI:" . implode(',', $site['EductsStored']) . "\nO:" . implode(',', $site['ProductsStored']);
                     $rotation = -20;
                     $xoff = -20;
@@ -1157,8 +1157,8 @@ class Mapper
                     array_pop($site['ProductsStored']);
                     array_pop($site['ProductsStored']);
                     array_pop($site['ProductsStored']);
-                    $pis = array('lumber.png', 'beams.png');
-                    $pos = array('ironore.png');
+                    $pis = array('lumber_p.svg', 'beams_p.svg');
+                    $pos = array('ironore_p.svg');
 //                    $name .= "\nI:" . implode(',', $site['EductsStored']) . "\nO:" . implode(',', $site['ProductsStored']);
                     $rotation = 45;
                     $yoff = +50;
@@ -1180,7 +1180,7 @@ class Mapper
                     array_pop($site['EductsStored']);
                     array_pop($site['EductsStored']);
                     array_pop($site['EductsStored']);
-                    $pis = array('cordwood.png');
+                    $pis = array('cordwood_p.svg');
                     $name = 'F';
                     $name .= "#$number";
                     $rotation = ($site['Rotation'][1] > 0) ? ($site['Rotation'][1] - 90) : ($site['Rotation'][1] + 90);
@@ -1197,9 +1197,9 @@ class Mapper
 
             $educts = sizeof($site['EductsStored']);
             if ($educts) {
-                $irows .= '<tr> <td>' . $name . ' Educts</td>';
+                $irows .= '<tr class="export__educts"> <td>' . $name . ' Educts</td>';
                 for ($i = 0; $i < $educts; $i++) {
-                    $irows .= '<td><input style="width:30px;" size="2" maxlength="3" name="educt' . $i . '_' . $number . '" value="' . $site['EductsStored'][$i] . '">';
+                    $irows .= '<td><input style="width:30px;vertical-align:middle;" size="2" maxlength="3" name="educt' . $i . '_' . $number . '" value="' . $site['EductsStored'][$i] . '">';
                     if (isset($pis[$i])) {
                         $irows .= '<img style="float:right" src="' . WWW_ROOT . 'images/' . $pis[$i] . '" height="30" />';
                     }
@@ -1211,9 +1211,9 @@ class Mapper
                 $irows .= '</tr>';
             }
             $educts = sizeof($site['ProductsStored']);
-            $irows .= '<tr> <td>' . $name . ' Products</td>';
+            $irows .= '<tr class="export__products"> <td>' . $name . ' Products</td>';
             for ($i = 0; $i < $educts; $i++) {
-                $irows .= '<td><input style="width:30px;" size="2" maxlength="3" name="product' . $i . '_' . $number . '" value="' . $site['ProductsStored'][$i] . '"> ';
+                $irows .= '<td><input style="width:30px;vertical-align:middle;" size="2" maxlength="3" name="product' . $i . '_' . $number . '" value="' . $site['ProductsStored'][$i] . '"> ';
                 if (isset($pos[$i])) {
                     $irows .= '<img style="float:right" src="' . WWW_ROOT . 'images/' . $pos[$i] . '" height="30" />';
                 }
