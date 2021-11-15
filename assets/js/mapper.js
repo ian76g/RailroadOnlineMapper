@@ -202,7 +202,7 @@ class Mapper {
                             if (Math.abs(slope) > slopeTrigger) {
                                 const tanA = (
                                     (segment['LocationEnd']['Y'] - segment['LocationStart']['Y']) /
-                                    (segment['LocationEnd']['X'] - segment['LocationStart']['X'])
+                                    Math.max(0.00001, (segment['LocationEnd']['X'] - segment['LocationStart']['X']))
                                 );
                                 let degrees = this._rad2deg(Math.atan(tanA));
                                 if (degrees > 0) {
@@ -438,7 +438,7 @@ class Mapper {
         }
 
         const cartOptions = {
-            'handcar': [this.engineRadius, 'black'],
+            'handcar': [this.engineRadius, 'white'],
             'porter_040': [this.engineRadius, 'black'],
             'porter_042': [this.engineRadius, 'black'],
             'eureka': [this.engineRadius, 'black'],
@@ -461,14 +461,41 @@ class Mapper {
         for (const vehicle of this.json.Frames) {
             const x = (this.imx - ((vehicle['Location'][0] - this.minX) / 100 * this.scale));
             const y = (this.imy - ((vehicle['Location'][1] - this.minY) / 100 * this.scale));
-            const vehicleEllipse = document.createElementNS(this.svgNS, "ellipse");
-            vehicleEllipse.setAttribute("cx", x.toString());
-            vehicleEllipse.setAttribute("cy", y.toString());
-            vehicleEllipse.setAttribute("rx", (this.engineRadius / 2).toString());
-            vehicleEllipse.setAttribute("ry", (this.engineRadius / 3).toString());
-            vehicleEllipse.setAttribute("style", "fill:" + cartOptions[vehicle['Type']][1] + ";stroke:black;stroke-width:1");
-            vehicleEllipse.setAttribute("transform", "rotate(" + vehicle['Rotation'][1] + ", " + (this.imx - ((vehicle['Location'][0] - this.minX) / 100 * this.scale)) + ", " + (this.imy - ((vehicle['Location'][1] - this.minY) / 100 * this.scale)) + ")");
-            this.shapes.push(vehicleEllipse);
+            if (['porter_040', 'porter_042', /*'handcar', */'eureka', 'climax', 'heisler', 'class70', 'cooke260'].indexOf(vehicle['Type']) >= 0) {
+                const yl = (this.engineRadius / 3) * 2;
+                const xl = (this.engineRadius / 2) * 2;
+                const path = document.createElementNS(this.svgNS, "path");
+                path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + x + ", " + y + ")");
+                path.setAttribute("d", "M" + (x - (this.engineRadius / 2)) + "," + y + " l " + (xl / 3) + "," + (yl / 2) + " l " + (xl / 3 * 2) + ",0 l 0,-" + yl + " l -" + (xl / 3 * 2) + ",0 z");
+                path.setAttribute("fill", "purple");
+                path.setAttribute("stroke", "black");
+                path.setAttribute("stroke-width", "2");
+                this.shapes.push(path);
+            } else {
+                const yl = (this.engineRadius / 3) * 2;
+                let xl = this.engineRadius;
+
+                if (vehicle['Type'].toLowerCase().indexOf('tender') !== -1) {
+                    xl = xl / 3 * 2;
+                }
+
+                const path = document.createElementNS(this.svgNS, "path");
+                path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-" + (xl / 2) + ",-" + (yl / 2) + " h" + (xl - 4) + " a2,2 0 0 1 2,2 v" + (yl - 4) + " a2,2 0 0 1 -2,2 h-" + (xl - 4) + " a2,2 0 0 1 -2,-2 v-" + (yl - 4) + " a2,2 0 0 1 2,-2 z");
+                path.setAttribute("fill", cartOptions[vehicle['Type']][1]);
+                path.setAttribute("stroke", "black");
+                path.setAttribute("stroke-width", "1");
+                path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
+                this.shapes.push(path);
+            }
+
+            // const vehicleEllipse = document.createElementNS(this.svgNS, "ellipse");
+            // vehicleEllipse.setAttribute("cx", x.toString());
+            // vehicleEllipse.setAttribute("cy", y.toString());
+            // vehicleEllipse.setAttribute("rx", (this.engineRadius / 2).toString());
+            // vehicleEllipse.setAttribute("ry", (this.engineRadius / 3).toString());
+            // vehicleEllipse.setAttribute("style", "fill:" + cartOptions[vehicle['Type']][1] + ";stroke:black;stroke-width:1");
+            // vehicleEllipse.setAttribute("transform", "rotate(" + vehicle['Rotation'][1] + ", " + (this.imx - ((vehicle['Location'][0] - this.minX) / 100 * this.scale)) + ", " + (this.imy - ((vehicle['Location'][1] - this.minY) / 100 * this.scale)) + ")");
+            // this.shapes.push(vehicleEllipse);
 
             if (vehicle['Location'][2] < 1000) { // Assuming this checks for vehicles under ground, rename sunkenVehicle if otherwise.
                 const sunkenVehicle = document.createElementNS(this.svgNS, "ellipse");
@@ -488,13 +515,13 @@ class Mapper {
                 this.shapes.push(sunkenVehicleLabel);
 
                 const cartInput = document.createElement("input");
-                cartInput.name = "underground_"+index;
+                cartInput.name = "underground_" + index;
                 cartInput.value = "1";
                 cartInput.type = "hidden";
                 undergroundCartsTable.appendChild(cartInput);
             }
 
-            if (['porter_040', 'porter_042', 'handcar', 'eureka', 'climax', 'heisler', 'class70', 'cooke260'].indexOf(vehicle['Type']) >= 0) {
+            if (['porter_040', 'porter_042', /*'handcar', */'eureka', 'climax', 'heisler', 'class70', 'cooke260'].indexOf(vehicle['Type']) >= 0) {
                 let name = vehicle['Name'].replace(/(<([^>]+)>)/gi, "").toUpperCase();
                 if (!name) {
                     name = this._capitalize(vehicle['Type']);
@@ -510,6 +537,9 @@ class Mapper {
 
                 const vehicleLabel = document.createElementNS(this.svgNS, "text");
                 const textNode = document.createTextNode(".." + name);
+                vehicleLabel.setAttribute("stroke", "black");
+                vehicleLabel.setAttribute("fill", "white");
+                vehicleLabel.setAttribute("font-size", "1em");
                 vehicleLabel.setAttribute("x", x.toString());
                 vehicleLabel.setAttribute("y", y.toString());
                 vehicleLabel.setAttribute("transform", "rotate(" + textRotation + ", " + x + ", " + y + ")")
@@ -588,7 +618,7 @@ class Mapper {
 
             rollingStockTable.appendChild(rollingStockInfoRow);
 
-            index ++;
+            index++;
         }
     }
 
@@ -604,9 +634,16 @@ class Mapper {
             let rotation = 0;
             let xoff = 0;
             let yoff = 0;
+            let pis = [];
+            let pos = [];
 
             switch (industry['Type']) {
                 case 1:
+                    industry['EductsStored'].pop();
+                    industry['EductsStored'].pop();
+                    industry['EductsStored'].pop();
+                    industry['EductsStored'].pop();
+                    pos = ['logs_p.svg', 'cordwood_p.svg', 'cordwood_p.svg', 'logs_p.svg'];
                     name = "Logging Camp";
                     rotation = 0;
                     xoff = -70;
@@ -619,6 +656,8 @@ class Mapper {
                     industry['EductsStored'].pop();
                     industry['ProductsStored'].pop();
                     industry['ProductsStored'].pop();
+                    pos = ['lumber_p.svg', 'beams_p.svg'];
+                    pis = ['logs_p.svg'];
                     xoff = -35;
                     yoff = -15;
                     rotation = 45;
@@ -629,6 +668,8 @@ class Mapper {
                     industry['EductsStored'].pop();
                     industry['ProductsStored'].pop();
                     industry['ProductsStored'].pop();
+                    pos = ['iron_p.svg', 'rails_p.svg'];
+                    pis = ['ironore_p.svg', 'cordwood_p.svg'];
                     rotation = 90;
                     break;
                 case 4:
@@ -637,6 +678,8 @@ class Mapper {
                     industry['EductsStored'].pop();
                     industry['ProductsStored'].pop();
                     industry['ProductsStored'].pop();
+                    pos = ['pipes_p.svg', 'tools_p.svg'];
+                    pis = ['iron_p.svg', 'coal_p.svg'];
                     rotation = 90;
                     break;
                 case 5:
@@ -645,6 +688,8 @@ class Mapper {
                     industry['ProductsStored'].pop();
                     industry['ProductsStored'].pop();
                     industry['ProductsStored'].pop();
+                    pis = ['pipes_p.svg', 'beams_p.svg', 'tools_p.svg'];
+                    pos = ['oil_p.svg'];
                     rotation = 0;
                     break;
                 case 6:
@@ -653,6 +698,8 @@ class Mapper {
                     industry['ProductsStored'].pop();
                     industry['ProductsStored'].pop();
                     industry['ProductsStored'].pop();
+                    pis = ['oil_p.svg', 'pipes_p.svg', 'lumber_p.svg'];
+                    pos = ['barrels_p.svg', 'barrels_p.svg'];
                     rotation = 0;
                     break;
                 case 7:
@@ -662,6 +709,8 @@ class Mapper {
                     industry['ProductsStored'].pop();
                     industry['ProductsStored'].pop();
                     industry['ProductsStored'].pop();
+                    pis = ['beams_p.svg', 'rails_p.svg'];
+                    pos = ['coal_p.svg'];
                     rotation = -20;
                     xoff = -20;
                     yoff = 20;
@@ -673,6 +722,8 @@ class Mapper {
                     industry['ProductsStored'].pop();
                     industry['ProductsStored'].pop();
                     industry['ProductsStored'].pop();
+                    pis = ['lumber_p.svg', 'beams_p.svg'];
+                    pos = ['ironore_p.svg'];
                     rotation = 45;
                     yoff = +50;
                     xoff = -20;
@@ -693,8 +744,19 @@ class Mapper {
                     industry['EductsStored'].pop();
                     industry['EductsStored'].pop();
                     industry['EductsStored'].pop();
+                    pis = ['cordwood_p.svg'];
                     name = 'F#' + index;
                     rotation = (industry['Rotation'][1] > 0) ? (industry['Rotation'][1] - 90) : (industry['Rotation'][1] + 90);
+                    const x = (this.imx - ((industry['Location'][0] - this.minX) / 100 * this.scale));
+                    const y = (this.imy - ((industry['Location'][1] - this.minY) / 100 * this.scale));
+                    const path = document.createElementNS(this.svgNS, "path");
+                    path.setAttribute("transform", "rotate(" + Math.round(industry['Rotation'][1]) + ", " + x + ", " + y + ")");
+                    path.setAttribute("d", "M" + x + "," + y + " m-18,-15 l10,0 l0,30 l-10,0 z");
+                    path.setAttribute("fill", "orange");
+                    path.setAttribute("stroke", "brown");
+                    this.shapes.push(path);
+                    xoff = -20;
+                    yoff = 0;
                     break;
                 default:
                     console.log("Unknown industry: " + JSON.stringify(industry, null, 2));
@@ -702,13 +764,14 @@ class Mapper {
 
             const industryLabel = document.createElementNS(this.svgNS, "text");
             const textNode = document.createTextNode(name);
-            industryLabel.setAttribute("x", (this.imx - ((industry['Location'][0] - this.minX) / 100 * this.scale) + xoff).toString());
-            industryLabel.setAttribute("y", (this.imy - ((industry['Location'][1] - this.minY) / 100 * this.scale) + yoff).toString());
+            industryLabel.setAttribute("x", (this.imx - ((industry['Location'][0] - this.minX) / 100 * this.scale)).toString());
+            industryLabel.setAttribute("y", (this.imy - ((industry['Location'][1] - this.minY) / 100 * this.scale)).toString());
             industryLabel.setAttribute("transform", "rotate(" + rotation + ", " + (this.imx - ((industry['Location'][0] - this.minX) / 100 * this.scale) + xoff) + ", " + (this.imy - ((industry['Location'][1] - this.minY) / 100 * this.scale) + yoff) + ")");
             industryLabel.appendChild(textNode);
             this.shapes.push(industryLabel);
 
             const eductRow = document.createElement("tr");
+            eductRow.setAttribute("class", "export__educts");
             const eductnameColumn = document.createElement("td");
             const eductnameColumnText = document.createTextNode(name + " Educts");
             eductnameColumn.appendChild(eductnameColumnText);
@@ -718,14 +781,24 @@ class Mapper {
                 const itemInput = document.createElement("input");
                 itemInput.size = 5;
                 itemInput.maxLength = 15;
-                itemInput.name = "educt"+i+"_"+index;
+                itemInput.name = "educt" + i + "_" + index;
                 itemInput.value = industry['EductsStored'][i];
+
+                if (typeof pis[i] !== "undefined") {
+                    const itemImage = document.createElement("img");
+                    itemImage.setAttribute("style", "float:right");
+                    itemImage.setAttribute("src", "/assets/images/"+pis[i]);
+                    itemImage.setAttribute("height", "30");
+                    itemColumn.appendChild(itemImage);
+                }
+
                 itemColumn.appendChild(itemInput);
                 eductRow.appendChild(itemColumn);
             }
             industriesTable.appendChild(eductRow);
 
             const productRow = document.createElement("tr");
+            productRow.setAttribute("class", "export__products");
             const productNameColumn = document.createElement("td");
             const productNameColumnText = document.createTextNode(name + " Products");
             productNameColumn.appendChild(productNameColumnText);
@@ -735,8 +808,17 @@ class Mapper {
                 const itemInput = document.createElement("input");
                 itemInput.size = 5;
                 itemInput.maxLength = 15;
-                itemInput.name = "product"+i+"_"+index;
+                itemInput.name = "product" + i + "_" + index;
                 itemInput.value = industry['ProductsStored'][i];
+
+                if (typeof pos[i] !== "undefined") {
+                    const itemImage = document.createElement("img");
+                    itemImage.setAttribute("style", "float:right");
+                    itemImage.setAttribute("src", "/assets/images/"+pos[i]);
+                    itemImage.setAttribute("height", "30");
+                    itemColumn.appendChild(itemImage);
+                }
+
                 itemColumn.appendChild(itemInput);
                 productRow.appendChild(itemColumn);
             }
@@ -755,12 +837,20 @@ class Mapper {
             const x = this.imx - ((tower['Location'][0] - this.minX) / 100 * this.scale);
             const y = this.imy - ((tower['Location'][1] - this.minY) / 100 * this.scale);
 
-            const waterTower = document.createElementNS(this.svgNS, "text");
-            const textNode = document.createTextNode("W");
-            waterTower.setAttribute("x", x.toString());
-            waterTower.setAttribute("y", y.toString());
-            waterTower.appendChild(textNode);
+            const waterTower = document.createElementNS(this.svgNS, "path");
+            waterTower.setAttribute("transform", "rotate(" + Math.round(tower['Rotation'][1]) + ", " + x + ", " + y + ")");
+            waterTower.setAttribute("d", "M" + x + "," + y + " m -5,-5 l10,0 l0,3 l3,0 l0,4 l-3,0 l0,3 l-10,0 z");
+            waterTower.setAttribute("fill", "lightblue");
+            waterTower.setAttribute("stroke", "black");
+            waterTower.setAttribute("stroke-width", "1");
             this.shapes.push(waterTower);
+
+            const waterTowerCircle = document.createElementNS(this.svgNS, "circle");
+            waterTowerCircle.setAttribute("cx", x.toString());
+            waterTowerCircle.setAttribute("cy", y.toString());
+            waterTowerCircle.setAttribute("r", "3");
+            waterTowerCircle.setAttribute("fill", "blue");
+            this.shapes.push(waterTowerCircle);
         }
     }
 
