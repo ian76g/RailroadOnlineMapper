@@ -188,19 +188,19 @@ class GVASParser
 
                     $segmentArray[] = array(
                         'LocationStart' => array(
-                            'X' => $startLocs[0],
-                            'Y' => $startLocs[1],
-                            'Z' => $startLocs[2]
+                            'X' => round($startLocs[0]),
+                            'Y' => round($startLocs[1]),
+                            'Z' => round($startLocs[2])
                         ),
                         'LocationEnd' => array(
-                            'X' => $endLocs[0],
-                            'Y' => $endLocs[1],
-                            'Z' => $endLocs[2]
+                            'X' => round($endLocs[0]),
+                            'Y' => round($endLocs[1]),
+                            'Z' => round($endLocs[2])
                         ),
                         'LocationCenter' => array(
-                            'X' => $startLocs[0] + ($endLocs[0] - $startLocs[0]) / 2,
-                            'Y' => $startLocs[1] + ($endLocs[1] - $startLocs[1]) / 2,
-                            'Z' => $startLocs[2] + ($endLocs[2] - $startLocs[2]) / 2
+                            'X' => round($startLocs[0] + ($endLocs[0] - $startLocs[0]) / 2),
+                            'Y' => round($startLocs[1] + ($endLocs[1] - $startLocs[1]) / 2),
+                            'Z' => round($startLocs[2] + ($endLocs[2] - $startLocs[2]) / 2)
                         ),
                         'Visible' => array_shift($this->goldenBucket['Spline']['Segments']['Visibility']),
 
@@ -227,6 +227,10 @@ class GVASParser
                 $spline['Segments'] = $segmentArray;
                 $this->goldenBucket['Splines'][] = $spline;
             }
+
+//            $this->buildGraph();
+
+
         }
 
         if (isset($this->goldenBucket['Turntable'])) {
@@ -586,4 +590,129 @@ class GVASParser
         }
 
     }
+
+    private function buildGraph()
+    {
+        $segments = array();
+        foreach($this->goldenBucket['Splines'] as $spline){
+            if(!in_array($spline['Type'], array(0,4))){
+                continue;
+            }
+            foreach($spline['Segments'] as $segment){
+                if($segment['Visible']!=1)
+                {
+                    continue;
+                }
+                $segments[] = new Node(sizeof($segments), array($segment['LocationStart'], $segment['LocationEnd']));
+            }
+        }
+
+        foreach($this->goldenBucket['Switchs'] as $switch){
+            $segments[] = new SwitchNode(sizeof($segments), $this->findSwitchEndpoints($switch));
+        }
+
+        foreach($segments as $index => $node){
+            foreach($segments as $pindex=>$partner){
+                if($pindex == $index){
+                    continue;
+                }
+                if($node->hasEndpointLike($partner)){
+                    $node->addPartner($partner);
+                    $partner->addPartner($node);
+                }
+            }
+        }
+
+        print_r($segments);die();
+
+    }
+
+    function findSwitchEndpoints($switch) {
+
+        /**
+         * 0 = SwitchLeft           = lever left switch going left
+         * 1 = SwitchRight          = lever right switch going right
+         * 2 =                      = Y
+         * 3 =                      = Y mirror
+         * 4 = SwitchRightMirror    = lever left switch going right
+         * 5 = SwitchLeftMirror     = lever right switch going left
+         * 6 = SwitchCross90        = cross
+         */
+        switch ($switch['Type']) {
+            case 0 :
+                $dir = -5.7;
+                break;
+            case 1 :
+            case 3 :
+            case 4:
+                $dir = 5.7;
+                break;
+            case 2 :
+                $dir = -5.7;
+                break;
+            case 5 :
+                $dir = -5.7;
+                break;
+            default:
+                $dir = 0;
+        }
+
+
+        $length = 1880;
+        $x = round($switch['Location'][0]+cos(deg2rad($switch['Rotation'][1]+90))*$length);
+        $y = round($switch['Location'][1]+sin(deg2rad($switch['Rotation'][1]+90))*$length);
+        $point = array('X'=>$switch['Location'][0], 'Y'=>$switch['Location'][1], 'Z'=>$switch['Location'][2]);
+        $straight = array('X'=>$x, 'Y'=>$y, 'Z'=>$switch['Location'][2]);
+
+        $x = round($switch['Location'][0]+cos(deg2rad($switch['Rotation'][1]+90+$dir))*($length-7));
+        $y = round($switch['Location'][1]+sin(deg2rad($switch['Rotation'][1]+90+$dir))*($length-7));
+        $bend = array('X'=>$x, 'Y'=>$y, 'Z'=>$switch['Location'][2]);
+
+        return array($point, $straight, $bend);
+
+    }
+
+}
+
+class SwitchNode extends Node {}
+
+class Node
+{
+    var $endpoints = array();
+    var $nextNodes = array();
+    var $id;
+
+    public function __construct($id, $endpoints)
+    {
+        $this->id = $id;
+        foreach($endpoints as $endpoint){
+            $this->endpoints[] = $endpoint;
+        }
+    }
+
+    public function addPartner(Node $node)
+    {
+        $this->nextNodes[$node->id] = &$node;
+    }
+
+    public function getEndpoints()
+    {
+        return $this->endpoints;
+    }
+
+    public function hasEndPointLike(Node $node){
+        foreach($node->getEndpoints() as $point){
+            foreach($this->endpoints as $ownPoint){
+                if(
+                    abs($ownPoint['X']-$point['X'])<2 &&
+                    abs($ownPoint['Y']-$point['Y'])<2 &&
+                    abs($ownPoint['Z']-$point['Z'])<2
+                ) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 }

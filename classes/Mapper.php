@@ -130,7 +130,10 @@ class Mapper
                 $x = $this->imx - (int)(($site['Location'][0] - $this->minX) / 100 * $this->scale);
                 $y = $this->imy - (int)(($site['Location'][1] - $this->minY) / 100 * $this->scale);
                 if ($doSvg) {
-                    $svg .= '<text x="' . ($x) . '" y="' . ($y) . '" >W</text>' . "\n";
+                    $svg .= '<path transform="rotate('.round($site['Rotation'][1]).' '.$x.' '.$y.')" ';
+                    $svg .= 'd=" M'.$x.','.$y.' m -5,-5 l10,0 l0,3 l3,0 l0,4 l-3,0 l0,3 l-10,0 z" ';
+                    $svg .= 'fill="lightblue" stroke="black" stroke-width="1"/>'."\n";
+                    $svg .= '<circle cx="'.$x.'" cy="'.$y.'" r="3" fill="blue" />';
                 }
             }
         }
@@ -290,7 +293,7 @@ class Mapper
             '0' => array(3, 'black'),                          // track  darkkhaki, darkgrey,orange,blue,black
         );
 
-        if(isset($_POST['metalOverWood']) && $_POST['metalOverWood']=='YES'){
+        if (isset($_POST['metalOverWood']) && $_POST['metalOverWood'] == 'YES') {
             $order = array(
                 '1' => array(15, 'darkkhaki'),                      // variable bank
                 '2' => array(15, 'darkkhaki'),                      //  constant bank
@@ -311,15 +314,16 @@ class Mapper
          */
         foreach ($order as $current => $optionsArr) {
             if (isset($this->data['Splines'])) {
-                foreach ($this->data['Splines'] as $spline) {
+//                $continue = false;
+//                $last = false;
+                foreach ($this->data['Splines'] as $spi => $spline) {
                     $type = $spline['Type'];
                     if ($type != $current) continue;
-
                     if (in_array($type, array(1, 2, 5, 6, 3, 7))) {
                         $segments = $spline['Segments'];
-                        //'<path d="M 100 100 L 300 100 L 200 300 z" fill="red" stroke="blue" stroke-width="3" />'
                         $path = '';
-                        foreach ($segments as $segment) {
+                        //'<path d="M 100 100 L 300 100 L 200 300 z" fill="red" stroke="blue" stroke-width="3" />'
+                        foreach ($segments as $si=>$segment) {
                             if ($segment['Visible'] != 1) {
                                 $tool = 'M';
                             } else {
@@ -331,11 +335,26 @@ class Mapper
                             $yEnd = ($this->imy - (int)(($segment['LocationEnd']['Y'] - $this->minY) / 100 * $this->scale));
                             if (!$path) {
                                 $path = '<path d="M ' . $xStart . ',' . $yStart . ' ';
+                                $path .= $tool . ' ' . $xEnd . ',' . $yEnd . ' ';
                             } else {
-                                $path .= $tool. ' ' . $xEnd . ',' . $yEnd . ' ';
+                                $path .= $tool . ' ' . $xEnd . ',' . $yEnd . ' ';
                             }
+//                            $last = $xEnd.$yEnd;
                         }
-                        $path .= $tool. ' ' . $xEnd . ',' . $yEnd . ' ';
+//                        if(isset($this->data['Splines'][$spi+1])){
+//                            $test = ($this->imx - (int)(($this->data['Splines'][$spi+1]['Segments'][0]['LocationStart']['X'] - $this->minX) / 100 * $this->scale)).
+//                            ($this->imy - (int)(($this->data['Splines'][$spi+1]['Segments'][0]['LocationStart']['Y'] - $this->minY) / 100 * $this->scale));
+//                            if($last!=$test){
+//                                $path .= '" stroke="' . $optionsArr[1] . '" stroke-width="' . $optionsArr[0] . '" fill="none"/>' . "\n";
+//                                $continue = false;
+//                                $last = false;
+//                                $svg .= $path;
+//                            } else {
+//                                $continue = true;
+//                            }
+//                        } else {
+//                            $svg .= $path;
+//                        }
                         $path .= '" stroke="' . $optionsArr[1] . '" stroke-width="' . $optionsArr[0] . '" fill="none"/>' . "\n";
                         $svg .= $path;
                     } else {
@@ -400,7 +419,7 @@ class Mapper
                                 if (abs($slope) > $_POST['slopeTrigger']) {
                                     $tanA = (
                                         ($segment['LocationEnd']['Y'] - $segment['LocationStart']['Y']) /
-                                        ($segment['LocationEnd']['X'] - $segment['LocationStart']['X'])
+                                        max(0.00001, ($segment['LocationEnd']['X'] - $segment['LocationStart']['X']))
                                     );
                                     $a = rad2deg(atan($tanA));
                                     if ($a > 0) {
@@ -423,7 +442,7 @@ class Mapper
             }
         }
 //print_r($slopecoords);
-        if (isset($_POST['maxslope']) && $_POST['maxslope']) {
+        if (isset($_POST['maxslope']) && $_POST['maxslope'] && isset($slopecoords)) {
             $svg .= '<circle cx="' . $slopecoords[0] . '" cy="' . $slopecoords[1] . '" r="' . ($this->turnTableRadius * 5) . '" stroke="orange" stroke-width="5" fill="none"/>' . "\n";
             $svg .= '<circle cx="' . $slopecoords[0] . '" cy="' . $slopecoords[1] . '" r="' . ($this->turnTableRadius * 4) . '" stroke="orange" stroke-width="5" fill="none"/>' . "\n";
             $svg .= '<circle cx="' . $slopecoords[0] . '" cy="' . $slopecoords[1] . '" r="' . ($this->turnTableRadius * 3) . '" stroke="orange" stroke-width="5" fill="none"/>' . "\n";
@@ -611,7 +630,7 @@ class Mapper
          */
 
         $cartColors = array(
-            'handcar' => array($this->engineRadius, 'black'),
+            'handcar' => array($this->engineRadius, 'white'),
             'porter_040' => array($this->engineRadius, 'black'),
             'porter_042' => array($this->engineRadius, 'black'),
             'eureka' => array($this->engineRadius, 'black'),
@@ -809,10 +828,52 @@ class Mapper
             $x = ($this->imx - (int)(($vehicle['Location'][0] - $this->minX) / 100 * $this->scale));
             $y = ($this->imy - (int)(($vehicle['Location'][1] - $this->minY) / 100 * $this->scale));
             if ($doSvg) {
-                $svg .= '<ellipse cx="' . $x . '" cy="' . $y . '" rx="' . ($this->engineRadius / 2) . '" ry="' . ($this->engineRadius / 3) .
-                    '" style="fill:' . $cartColors[$vehicle['Type']][1] . ';stroke:black;stroke-width:1" transform="rotate(' . $vehicle['Rotation'][1] .
-                    ', ' . ($this->imx - (int)(($vehicle['Location'][0] - $this->minX) / 100 * $this->scale)) . ', ' . ($this->imy - (int)(($vehicle['Location'][1] - $this->minY) / 100 * $this->scale)) . ')"
-              />';
+
+                if (
+                    $vehicle['Type'] == 'porter_040'
+                    || $vehicle['Type'] == 'porter_042'
+//                    || $vehicle['Type'] == 'handcar'
+                    || $vehicle['Type'] == 'eureka'
+                    || $vehicle['Type'] == 'climax'
+                    || $vehicle['Type'] == 'heisler'
+                    || $vehicle['Type'] == 'class70'
+                    || $vehicle['Type'] == 'cooke260'
+                ) {
+                    $yl=($this->engineRadius / 3)*2;
+                    $xl=($this->engineRadius / 2)*2;
+
+                    $svg .= '<path transform="rotate('.round($vehicle['Rotation'][1]).' '.$x.' '.$y.')" ';
+                    $svg .= 'd="M'.($x-($this->engineRadius / 2)).','.$y;
+                    $svg .= ' l '.($xl/3).','.($yl/2).' l '.($xl/3*2).',0 l 0,-'.$yl;
+                    $svg .= ' l -'.($xl/3*2).',0 z" fill="purple" stroke="black" stroke-width="2"/>'."\n";
+                } else {
+
+                    $yl=($this->engineRadius / 3)*2;
+                    $xl=$this->engineRadius;
+
+                    if(strpos(strtolower($vehicle['Type']), 'tender')){
+                        $xl=$xl/3*2;
+                    }
+
+
+                    $svg.= '<path d="M'.round($x).','.round($y).' m-'.(($xl / 2)).',-'.
+                        (($yl / 2) ).' h'.($xl -4)
+                        .' a2,2 0 0 1 2,2 v'.($yl -4)
+                        .' a2,2 0 0 1 -2,2 h-'.($xl -4)
+                        .' a2,2 0 0 1 -2,-2 v-'.($yl -4)
+                        .' a2,2 0 0 1 2,-2 z" fill="'.$cartColors[$vehicle['Type']][1].'" stroke="black" stroke-width="1" 
+                        transform="rotate(' . round($vehicle['Rotation'][1]) .
+                        ', ' . round($x) .
+                        ', ' . round($y) . ')"
+                        />';
+
+
+//                    $svg .= '<ellipse cx="' . $x . '" cy="' . $y . '" rx="' . ($this->engineRadius / 2) . '" ry="' . ($this->engineRadius / 3) .
+//                        '" style="fill:' . $cartColors[$vehicle['Type']][1] . ';stroke:black;stroke-width:1" transform="rotate(' . $vehicle['Rotation'][1] .
+//                        ', ' . ($this->imx - (int)(($vehicle['Location'][0] - $this->minX) / 100 * $this->scale)) . ', ' . ($this->imy - (int)(($vehicle['Location'][1] - $this->minY) / 100 * $this->scale)) . ')"
+//              />';
+                }
+
 
                 if ($vehicle['Location'][2] < 1000) {
                     $svg .= '<ellipse cx="' . $x . '" cy="' . $y . '" rx="' . (($this->engineRadius / 2) * 10) .
@@ -831,7 +892,7 @@ class Mapper
                 $vehicle['Type'] == 'porter_040'
 
                 || $vehicle['Type'] == 'porter_042'
-                || $vehicle['Type'] == 'handcar'
+//                || $vehicle['Type'] == 'handcar'
                 || $vehicle['Type'] == 'eureka'
                 || $vehicle['Type'] == 'climax'
                 || $vehicle['Type'] == 'heisler'
@@ -856,11 +917,16 @@ class Mapper
 
                 if ($doSvg) {
                     $this->allLabels[] = array($x, $y);
-                    $svg .= '<text x="' . $x . '" y="' . $y . '" transform="rotate(' . $textRotation . ', ' . $x . ', ' . $y . ')">' . '..' . $name . '</text>' . "\n";
+                    $svg .= '<text x="' . $x . '" y="' . $y .
+                        '" transform="rotate(' . $textRotation . ', ' . $x . ', ' .
+                        $y . ')"  stroke="black" fill="white" font-size="1em" >' .
+                        '..' . $name . '</text>' . "\n";
 
                 }
             } else {
-                $this->totalCarts++;
+                if($vehicle['Type']!='handcar'){
+                    $this->totalCarts++;
+                }
             }
 
         }
@@ -998,9 +1064,16 @@ class Mapper
             /**
              * again - fix some issues with wrong INPUT from json
              */
+            $pis = array();
+            $pos = array();
             $xoff = $yoff = 0;
             switch ($site['Type']) {
                 case '1':
+                    array_pop($site['EductsStored']);
+                    array_pop($site['EductsStored']);
+                    array_pop($site['EductsStored']);
+                    array_pop($site['EductsStored']);
+                    $pos = array('logs_p.svg', 'cordwood_p.svg', 'cordwood_p.svg', 'logs_p.svg');
                     $name = 'Logging Camp';
                     $rotation = 0;
                     $xoff = -70;
@@ -1013,6 +1086,8 @@ class Mapper
                     array_pop($site['EductsStored']);
                     array_pop($site['ProductsStored']);
                     array_pop($site['ProductsStored']);
+                    $pos = array('lumber_p.svg', 'beams_p.svg');
+                    $pis = array('logs_p.svg');
 //                    $name .= "\nI:" . implode(',', $site['EductsStored']) . "\nO:" . implode(',', $site['ProductsStored']);
                     $xoff = -35;
                     $yoff = 15;
@@ -1024,6 +1099,8 @@ class Mapper
                     array_pop($site['EductsStored']);
                     array_pop($site['ProductsStored']);
                     array_pop($site['ProductsStored']);
+                    $pos = array('iron_p.svg', 'rails_p.svg');
+                    $pis = array('ironore_p.svg', 'cordwood_p.svg');
 //                    $name .= "\nI:" . implode(',', $site['EductsStored']) . "\nO:" . implode(',', $site['ProductsStored']);
                     $rotation = 90;
                     break;
@@ -1033,6 +1110,8 @@ class Mapper
                     array_pop($site['EductsStored']);
                     array_pop($site['ProductsStored']);
                     array_pop($site['ProductsStored']);
+                    $pos = array('pipes_p.svg', 'tools_p.svg');
+                    $pis = array('iron_p.svg', 'coal_p.svg');
 //                    $name .= "\nI:" . implode(',', $site['EductsStored']) . "\nO:" . implode(',', $site['ProductsStored']);
                     $rotation = 90;
                     break;
@@ -1042,6 +1121,8 @@ class Mapper
                     array_pop($site['ProductsStored']);
                     array_pop($site['ProductsStored']);
                     array_pop($site['ProductsStored']);
+                    $pis = array('pipes_p.svg', 'beams_p.svg', 'tools_p.svg');
+                    $pos = array('oil_p.svg');
 //                    $name .= "\nI:" . implode(',', $site['EductsStored']) . "\nO:" . implode(',', $site['ProductsStored']);
                     $rotation = 0;
                     break;
@@ -1050,7 +1131,8 @@ class Mapper
                     array_pop($site['EductsStored']);
                     array_pop($site['ProductsStored']);
                     array_pop($site['ProductsStored']);
-                    array_pop($site['ProductsStored']);
+                    $pis = array('oil_p.svg', 'pipes_p.svg', 'lumber_p.svg');
+                    $pos = array('barrels_p.svg', 'barrels_p.svg');
 //                    $name .= "\nI:" . implode(',', $site['EductsStored']) . "\nO:" . implode(',', $site['ProductsStored']);
                     $rotation = 0;
                     break;
@@ -1061,6 +1143,8 @@ class Mapper
                     array_pop($site['ProductsStored']);
                     array_pop($site['ProductsStored']);
                     array_pop($site['ProductsStored']);
+                    $pis = array('beams_p.svg', 'rails_p.svg');
+                    $pos = array('coal_p.svg');
 //                    $name .= "\nI:" . implode(',', $site['EductsStored']) . "\nO:" . implode(',', $site['ProductsStored']);
                     $rotation = -20;
                     $xoff = -20;
@@ -1073,6 +1157,8 @@ class Mapper
                     array_pop($site['ProductsStored']);
                     array_pop($site['ProductsStored']);
                     array_pop($site['ProductsStored']);
+                    $pis = array('lumber_p.svg', 'beams_p.svg');
+                    $pos = array('ironore_p.svg');
 //                    $name .= "\nI:" . implode(',', $site['EductsStored']) . "\nO:" . implode(',', $site['ProductsStored']);
                     $rotation = 45;
                     $yoff = +50;
@@ -1094,27 +1180,44 @@ class Mapper
                     array_pop($site['EductsStored']);
                     array_pop($site['EductsStored']);
                     array_pop($site['EductsStored']);
+                    $pis = array('cordwood_p.svg');
                     $name = 'F';
                     $name .= "#$number";
                     $rotation = ($site['Rotation'][1] > 0) ? ($site['Rotation'][1] - 90) : ($site['Rotation'][1] + 90);
+                    $x = ($this->imx - (int)(($site['Location'][0] - $this->minX) / 100 * $this->scale));
+                    $y = ($this->imy - (int)(($site['Location'][1] - $this->minY) / 100 * $this->scale));
+                    $svg .= '<path transform="rotate('.round($site['Rotation'][1]).' '.$x.' '.$y.')" ';
+                    $svg .= 'd="M'.$x.','.$y.' m-18,-15 l10,0 l0,30 l-10,0 z" fill="orange" stroke="brown" />'."\n";
+                    $xoff = -20;
+                    $yoff=0;
                     break;
                 default:
                     die('unknown industry');
             }
 
             $educts = sizeof($site['EductsStored']);
-            $irows .= '<tr> <td>' . $name . ' Educts</td>';
-            for ($i = 0; $i < $educts; $i++) {
-                $irows .= '<td><input size="5" maxlength="15" name="educt' . $i . '_' . $number . '" value="' . $site['EductsStored'][$i] . '"></td>';
+            if ($educts) {
+                $irows .= '<tr class="export__educts"> <td>' . $name . ' Educts</td>';
+                for ($i = 0; $i < $educts; $i++) {
+                    $irows .= '<td><input style="width:30px;vertical-align:middle;" size="2" maxlength="3" name="educt' . $i . '_' . $number . '" value="' . $site['EductsStored'][$i] . '">';
+                    if (isset($pis[$i])) {
+                        $irows .= '<img style="float:right" src="' . WWW_ROOT . 'images/' . $pis[$i] . '" height="30" />';
+                    }
+                    $irows .= '</td>';
+                }
+                for ($i = $educts; $i < 4; $i++) {
+                    $irows .= '<td>&nbsp;</td>';
+                }
+                $irows .= '</tr>';
             }
-            for ($i = $educts; $i < 4; $i++) {
-                $irows .= '<td>&nbsp;</td>';
-            }
-            $irows .= '</tr>';
             $educts = sizeof($site['ProductsStored']);
-            $irows .= '<tr> <td>' . $name . ' Products</td>';
+            $irows .= '<tr class="export__products"> <td>' . $name . ' Products</td>';
             for ($i = 0; $i < $educts; $i++) {
-                $irows .= '<td><input size="5" maxlength="15" name="product' . $i . '_' . $number . '" value="' . $site['ProductsStored'][$i] . '"></td>';
+                $irows .= '<td><input style="width:30px;vertical-align:middle;" size="2" maxlength="3" name="product' . $i . '_' . $number . '" value="' . $site['ProductsStored'][$i] . '"> ';
+                if (isset($pos[$i])) {
+                    $irows .= '<img style="float:right" src="' . WWW_ROOT . 'images/' . $pos[$i] . '" height="30" />';
+                }
+                $irows .= ' </td>';
             }
             for ($i = $educts; $i < 4; $i++) {
                 $irows .= '<td>&nbsp;</td>';
@@ -1124,8 +1227,8 @@ class Mapper
             // label the industries
             $svg .= '<text x="' . ($this->imx - (int)(($site['Location'][0] - $this->minX) / 100 * $this->scale) + $xoff) .
                 '" y="' . ($this->imy - (int)(($site['Location'][1] - $this->minY) / 100 * $this->scale) + $yoff) . '" transform="rotate(' . $rotation .
-                ',' . ($this->imx - (int)(($site['Location'][0] - $this->minX) / 100 * $this->scale) + $xoff) .
-                ', ' . ($this->imy - (int)(($site['Location'][1] - $this->minY) / 100 * $this->scale) + $yoff) . ')" >' . $name . '</text>' . "\n";
+                ',' . ($this->imx - (int)(($site['Location'][0] - $this->minX) / 100 * $this->scale)) .
+                ', ' . ($this->imy - (int)(($site['Location'][1] - $this->minY) / 100 * $this->scale)) . ')" >' . $name . '</text>' . "\n";
         }
 
         $this->irows = $irows;

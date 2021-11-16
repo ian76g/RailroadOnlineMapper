@@ -97,6 +97,26 @@
   width: 4.5rem;
 }
 
+.export__products {
+  background-color: #DAF7A6;
+  vertical-align: middle;
+}
+
+.export__products td img {
+  max-width: none;
+  width: 7rem;
+}   
+
+.export__educts{
+  background-color: #F9DCF4;
+  vertical-align: middle;
+}
+
+.export__educts td img {
+  max-width: none;
+  width: 7rem;
+}   
+
 .export__controls{
   position: fixed;
   bottom: 0;
