@@ -1,5 +1,7 @@
 <?php
 require_once 'config.php';
+require_once 'includes/savemaintainer.php'
+
 ?>
     <!DOCTYPE html>
     <html lang="en">
@@ -103,6 +105,21 @@ require_once 'config.php';
 
                             // Create savefile name from map file
                             $saveFile = substr($file, 0, -5) .'.sav';
+
+                            $results = findFiles(SHELL_ROOT.'saves', $saveFile); // Locating oldest file in the saves/ folder
+                            arsort($results); // Sort in reverse order, preserving the array keys, which are the filenames. The oldest file should be at the bottom.
+
+                            // Get the oldest file (the last array key)
+                            $filenames = array_keys($results);
+                            $saves = count($filenames);
+                            $oldestFile = end($filenames);
+
+                            // Checks count of files and if there is only 1 do not remove it!!!
+                            if($saves < 2 ) {
+                              echo "";
+                            } else {
+                              @unlink($oldestFile);
+                            }
 
                             // Check to see if savefile exists in public folder and create download link
                             if (file_exists(SHELL_ROOT.'saves/public/' . $saveFile)) {
