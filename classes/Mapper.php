@@ -651,6 +651,28 @@ class Mapper
 
 // build some extra HTML for a form to edit cart data
 
+
+        $dh=opendir(SHELL_ROOT.'/includes');
+        $textFiles = array();
+        while($textFiles[]=readdir($dh));
+        $textOptions = '';
+        foreach($textFiles as $textFile){
+            if(substr($textFile, -4) == '.txt'){
+                $data = file_get_contents(SHELL_ROOT.'/includes/'.$textFile);
+                $data = explode("\n", $data);
+                $header = array_shift($data).' ('.sizeof($data).')';
+                $value = substr($textFile,0,-4);
+
+                if(!$textOptions){
+                    $checked = ' checked';
+                } else {
+                    $checked = '';
+                }
+                $textOptions.='<input type="radio" name="nameAllCountries" value="'.$value.'"'.$checked.'/>'.$header.'<br />';
+
+            }
+        }
+
         $cartExtraStr = '
         <br/>
         <h4>Rolling Stock</h4>
@@ -668,10 +690,27 @@ class Mapper
         <button class="button">Apply Rolling Stock changes</button></form>
 
         <br/><br/>
+        <form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $this->NEWUPLOADEDFILE . '">
+        '.$textOptions.'
+        <button class="button">Rename everything to selected schema</button></form>
+
+        <br/><br/>
+        <form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $this->NEWUPLOADEDFILE . '">
+        <input name="allBrakes" value="YES" type="hidden" />
+        <button class="button">Apply all brakes</button></form>
+
+
+        <br/><br/>
         <h4>Trees</h4>
         <form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $this->NEWUPLOADEDFILE . '">
         <input name="replant" value="YES" type="hidden" />
         <button class="button">Replant Trees</button></form>
+
+        <!--br/><br/>
+        <h4>I Hate Stones</h4>
+        <form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $this->NEWUPLOADEDFILE . '">
+        <input name="removestones" value="YES" type="hidden" />
+        <button class="button">Remove All Stones</button></form-->
 
         <br/><br/>
         <h4>Players</h4>

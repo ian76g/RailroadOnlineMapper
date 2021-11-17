@@ -50,6 +50,7 @@ function getUserIpAddr()
 //$_POST['underground_0'] = 10;
 //$_POST['deletePlayer_0'] = '1';
 //$_POST['product0_0'] = '1';
+//$_POST['allBrakes'] = 'YES';
 
 // Define some stuff we need later
 

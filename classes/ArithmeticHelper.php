@@ -3,15 +3,21 @@
 class ArithmeticHelper
 {
 
-    function nearestIndustry($coords, $industryCoords)
+    var $industries;
+
+    function nearestIndustry($coords, $industryCoords = null)
     {
         $minDist = 800000;
-        foreach ($industryCoords as $i) {
-            if ($i['Type'] < 10) {
-                $d = $this->dist($i['Location'], $coords);
+        if(!$industryCoords){
+            $industryCoords = $this->industries;
+        }
+        foreach ($industryCoords as $index => $industry) {
+            if ($industry['Type']) {
+                $d = $this->dist($industry['Location'], $coords);
                 if ($d < $minDist) {
                     $minDist = $d;
-                    $ind = $i['Type'];
+                    $ind = $industry['Type'];
+                    $indx = $index;
                 }
             }
         }
@@ -44,18 +50,44 @@ class ArithmeticHelper
             case '9':
                 $name = 'Freight Depot';
                 break;
+            default:
+                $name = '#'.$indx;
         }
 
         return $name;
     }
 
-    function dist($coords, $coords2)
+    public function dist($coords, $coords2)
     {
-        $distance = sqrt(
-            pow($coords[0] - $coords2[0], 2) +
-            pow($coords[1] - $coords2[1], 2) +
-            pow($coords[2] - $coords2[2], 2)
-        );
+        if(isset($coords['X'])){
+            if(isset($coords2['X'])){
+                $distance = sqrt(
+                    pow($coords['X'] - $coords2['X'], 2) +
+                    pow($coords['Y'] - $coords2['Y'], 2) +
+                    pow($coords['Z'] - $coords2['Y'], 2)
+                );
+            } else {
+                $distance = sqrt(
+                    pow($coords['X'] - $coords2[0], 2) +
+                    pow($coords['Y'] - $coords2[1], 2) +
+                    pow($coords['Z'] - $coords2[2], 2)
+                );
+            }
+        } else {
+            if(isset($coords2['X'])){
+                $distance = sqrt(
+                    pow($coords[0] - $coords2['X'], 2) +
+                    pow($coords[1] - $coords2['Y'], 2) +
+                    pow($coords[2] - $coords2['Z'], 2)
+                );
+            } else {
+                $distance = sqrt(
+                    pow($coords[0] - $coords2[0], 2) +
+                    pow($coords[1] - $coords2[1], 2) +
+                    pow($coords[2] - $coords2[2], 2)
+                );
+            }
+        }
 
         return $distance;
     }

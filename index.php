@@ -94,7 +94,7 @@ require_once 'config.php';
                             }
 
                             if ($i > $hard_limit) {
-                                unlink(SHELL_ROOT . "maps/" . substr($file, 5, -5) . ".html");
+                                @unlink(SHELL_ROOT . "maps/" . substr($file, 5, -5) . ".html");
                             }
 
                             if ($i >= $soft_limit) {
