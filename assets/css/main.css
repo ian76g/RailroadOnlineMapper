@@ -346,3 +346,11 @@ tbody td {
   text-decoration: none;
   cursor: pointer;
 }
+
+.trees_default {
+  display: none;
+}
+
+.trees_user {
+  display: none;
+}

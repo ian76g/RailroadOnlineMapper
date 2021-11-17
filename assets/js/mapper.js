@@ -22,10 +22,12 @@ class Mapper {
         this.imy = this.y / 100 * this.scale;
         this.maxSlope = 0;
         this.allLabels = [[0, 0]];
+        this.initialTreesDown = 1750;
     }
 
     drawSVG(htmlElement) {
         this.svgTag = document.getElementById(htmlElement);
+        this.getReplantableTrees();
         this.getTracksAndBeds();
         this.getSwitches();
         this.getTurntables();
@@ -48,8 +50,8 @@ class Mapper {
         const playerTable = document.getElementById("playerTable");
         const editPlayersTable = document.getElementById("editPlayersTable");
 
-        for (let index = 0; index < this.json.Players.length; index++) {
-            const player = this.json.Players[index];
+        for (let index = 0; index < this.json['Players'].length; index++) {
+            const player = this.json['Players'][index];
 
             // First populate the Info menu
             const playerInfoRow = document.createElement("tr");
@@ -787,7 +789,7 @@ class Mapper {
                 if (typeof pis[i] !== "undefined") {
                     const itemImage = document.createElement("img");
                     itemImage.setAttribute("style", "float:right");
-                    itemImage.setAttribute("src", "/assets/images/"+pis[i]);
+                    itemImage.setAttribute("src", "/assets/images/" + pis[i]);
                     itemImage.setAttribute("height", "30");
                     itemColumn.appendChild(itemImage);
                 }
@@ -814,7 +816,7 @@ class Mapper {
                 if (typeof pos[i] !== "undefined") {
                     const itemImage = document.createElement("img");
                     itemImage.setAttribute("style", "float:right");
-                    itemImage.setAttribute("src", "/assets/images/"+pos[i]);
+                    itemImage.setAttribute("src", "/assets/images/" + pos[i]);
                     itemImage.setAttribute("height", "30");
                     itemColumn.appendChild(itemImage);
                 }
@@ -854,6 +856,62 @@ class Mapper {
         }
     }
 
+    getReplantableTrees() {
+        if (!('Removed' in this.json)) {
+            return
+        }
+
+        const firstTreeGroup = document.createElementNS(this.svgNS, "g");
+        firstTreeGroup.setAttribute("class", "trees_default");
+        const userTreeGroup = document.createElementNS(this.svgNS, "g");
+        userTreeGroup.setAttribute("class", "trees_user");
+
+        for (let i = 0; i < this.json['Removed']['Vegetation'].length; i++) {
+            const tree = this.json['Removed']['Vegetation'][i];
+            const treeX = Math.floor((200000 + tree[0]) / 100000);
+            const treeY = Math.floor((200000 + tree[1]) / 100000);
+            let minDistanceToSomething = 80000000;
+
+            if (this.json['Segments'][treeX][treeY] !== undefined) {
+                for (const segment of this.json['Segments'][treeX][treeY]) {
+                    if (segment['LocationCenter']['X'] < tree[0] - 6000) {
+                        continue;
+                    }
+                    if (segment['LocationCenter']['X'] > tree[0] + 6000) {
+                        continue;
+                    }
+                    if (segment['LocationCenter']['Y'] < tree[1] - 6000) {
+                        continue;
+                    }
+                    if (segment['LocationCenter']['Y'] > tree[1] + 6000) {
+                        continue;
+                    }
+                    minDistanceToSomething = Math.min(minDistanceToSomething, this._dist(tree, segment['LocationCenter']));
+                }
+            }
+            if (minDistanceToSomething > 700) {
+                const x = (this.imx - ((tree[0] - this.minX) / 100 * this.scale));
+                const y = (this.imy - ((tree[1] - this.minY) / 100 * this.scale));
+                const treeCircle = document.createElementNS(this.svgNS, "circle");
+                treeCircle.setAttribute("cx", x.toString());
+                treeCircle.setAttribute("cy", y.toString());
+                treeCircle.setAttribute("r", "6");
+                treeCircle.setAttribute("stroke", "darkgreen");
+                treeCircle.setAttribute("stroke-width", "2");
+                if (i < this.initialTreesDown) {
+                    treeCircle.setAttribute("fill", "orange");
+                    firstTreeGroup.appendChild(treeCircle);
+                } else {
+                    treeCircle.setAttribute("fill", "green");
+                    userTreeGroup.appendChild(treeCircle);
+                }
+            }
+        }
+
+        this.shapes.push(firstTreeGroup);
+        this.shapes.push(userTreeGroup);
+    }
+
     _getDistanceToNearestLabel(newLabel) {
         const minDistance = 8000;
         for (const oldLabel of this.allLabels) {
@@ -869,6 +927,7 @@ class Mapper {
     }
 
     _round(value, decimals) {
+        // noinspection JSCheckFunctionSignatures
         return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
     }
 
@@ -881,7 +940,7 @@ class Mapper {
     }
 
     _capitalize(string) {
-        return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+        return String(string).charAt(0).toUpperCase() + string.slice(1).toLowerCase();
     }
 
     _nearestIndustry(coords, industryCoords) {
@@ -930,11 +989,10 @@ class Mapper {
         return name;
     }
 
-    _dist(coords, coords2) {
+    _dist(a, b) {
         return Math.sqrt(
-            Math.pow(coords[0] - coords2[0], 2) +
-            Math.pow(coords[1] - coords2[1], 2) +
-            Math.pow(coords[2] - coords2[2], 2)
+            Math.pow(a[0] - b['X'], 2) +
+            Math.pow(a[1] - b['Y'], 2)
         );
     }
 }
