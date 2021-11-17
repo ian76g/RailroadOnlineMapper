@@ -47,6 +47,7 @@ function getUserIpAddr()
 //$_POST['underground_0'] = 10;
 //$_POST['deletePlayer_0'] = '1';
 //$_POST['product0_0'] = '1';
+//$_POST['allBrakes'] = 'YES';
 
 if (!isset($NEWUPLOADEDFILE)) {
     if (isset($_POST['save']) && $_POST['save']) {

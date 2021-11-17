@@ -1,4 +1,5 @@
 <?php
+require_once 'ArithmeticHelper.php';
 
 /**
  * Class GVASParser
@@ -83,53 +84,54 @@ class GVASParser
             }
         }
 
-        foreach ($this->goldenBucket['Frames'] as $i => $frame) {
-            if (isset($this->goldenBucket['Boilers'][$i]))
-                $this->goldenBucket['Frames'][$i]['Boiler'] = $this->goldenBucket['Boilers'][$i];
+        if (isset($this->goldenBucket['Frames'])) {
+            foreach ($this->goldenBucket['Frames'] as $i => $frame) {
+                if (isset($this->goldenBucket['Boilers'][$i]))
+                    $this->goldenBucket['Frames'][$i]['Boiler'] = $this->goldenBucket['Boilers'][$i];
 
-            if (isset($this->goldenBucket['Headlights'][$i]))
-                $this->goldenBucket['Frames'][$i]['Headlights'] = $this->goldenBucket['Headlights'][$i];
+                if (isset($this->goldenBucket['Headlights'][$i]))
+                    $this->goldenBucket['Frames'][$i]['Headlights'] = $this->goldenBucket['Headlights'][$i];
 
-            if (isset($this->goldenBucket['Freights'][$i]))
-                $this->goldenBucket['Frames'][$i]['Freight'] = $this->goldenBucket['Freights'][$i];
+                if (isset($this->goldenBucket['Freights'][$i]))
+                    $this->goldenBucket['Frames'][$i]['Freight'] = $this->goldenBucket['Freights'][$i];
 
-            if (isset($this->goldenBucket['Compressors'][$i]))
-                $this->goldenBucket['Frames'][$i]['Compressor'] = $this->goldenBucket['Compressors'][$i];
+                if (isset($this->goldenBucket['Compressors'][$i]))
+                    $this->goldenBucket['Frames'][$i]['Compressor'] = $this->goldenBucket['Compressors'][$i];
 
-            if (isset($this->goldenBucket['Tenders'][$i]))
-                $this->goldenBucket['Frames'][$i]['Tender'] = $this->goldenBucket['Tenders'][$i];
+                if (isset($this->goldenBucket['Tenders'][$i]))
+                    $this->goldenBucket['Frames'][$i]['Tender'] = $this->goldenBucket['Tenders'][$i];
 
-            if (isset($this->goldenBucket['Couplers'][$i]))
-                $this->goldenBucket['Frames'][$i]['Coupler'] = $this->goldenBucket['Couplers'][$i];
+                if (isset($this->goldenBucket['Couplers'][$i]))
+                    $this->goldenBucket['Frames'][$i]['Coupler'] = $this->goldenBucket['Couplers'][$i];
 
-            if (isset($this->goldenBucket['Regulatorvalue'][$i]))
-                $this->goldenBucket['Frames'][$i]['Regulator'] = $this->goldenBucket['Regulatorvalue'][$i];
+                if (isset($this->goldenBucket['Regulatorvalue'][$i]))
+                    $this->goldenBucket['Frames'][$i]['Regulator'] = $this->goldenBucket['Regulatorvalue'][$i];
 
-            if (isset($this->goldenBucket['Brakevalue'][$i]))
-                $this->goldenBucket['Frames'][$i]['Brake'] = $this->goldenBucket['Brakevalue'][$i];
+                if (isset($this->goldenBucket['Brakevalue'][$i]))
+                    $this->goldenBucket['Frames'][$i]['Brake'] = $this->goldenBucket['Brakevalue'][$i];
 
-            if (isset($this->goldenBucket['Reverservalue'][$i]))
-                $this->goldenBucket['Frames'][$i]['Reverser'] = $this->goldenBucket['Reverservalue'][$i];
+                if (isset($this->goldenBucket['Reverservalue'][$i]))
+                    $this->goldenBucket['Frames'][$i]['Reverser'] = $this->goldenBucket['Reverservalue'][$i];
 
-            if (isset($this->goldenBucket['Reverservalue'][$i]))
-                $this->goldenBucket['Frames'][$i]['Smokestack'] = $this->goldenBucket['Smokestacktype'][$i];
+                if (isset($this->goldenBucket['Reverservalue'][$i]))
+                    $this->goldenBucket['Frames'][$i]['Smokestack'] = $this->goldenBucket['Smokestacktype'][$i];
 
-            if (isset($this->goldenBucket['Reverservalue'][$i]))
-                $this->goldenBucket['Frames'][$i]['Generatorvalvevalue'] = $this->goldenBucket['Generatorvalvevalue'][$i];
+                if (isset($this->goldenBucket['Reverservalue'][$i]))
+                    $this->goldenBucket['Frames'][$i]['Generatorvalvevalue'] = $this->goldenBucket['Generatorvalvevalue'][$i];
 
-            if (isset($this->goldenBucket['Marker'][$i]))
-                $this->goldenBucket['Frames'][$i]['Marker']['Front']['Right'] = $this->goldenBucket['Marker']['Lights']['Front']['Right'][$i];
+                if (isset($this->goldenBucket['Marker'][$i]))
+                    $this->goldenBucket['Frames'][$i]['Marker']['Front']['Right'] = $this->goldenBucket['Marker']['Lights']['Front']['Right'][$i];
 
-            if (isset($this->goldenBucket['Marker'][$i]))
-                $this->goldenBucket['Frames'][$i]['Marker']['Front']['Left'] = $this->goldenBucket['Marker']['Lights']['Front']['Left'][$i];
+                if (isset($this->goldenBucket['Marker'][$i]))
+                    $this->goldenBucket['Frames'][$i]['Marker']['Front']['Left'] = $this->goldenBucket['Marker']['Lights']['Front']['Left'][$i];
 
-            if (isset($this->goldenBucket['Marker'][$i]))
-                $this->goldenBucket['Frames'][$i]['Marker']['Rear']['Right'] = $this->goldenBucket['Marker']['Lights']['Rear']['Right'][$i];
+                if (isset($this->goldenBucket['Marker'][$i]))
+                    $this->goldenBucket['Frames'][$i]['Marker']['Rear']['Right'] = $this->goldenBucket['Marker']['Lights']['Rear']['Right'][$i];
 
-            if (isset($this->goldenBucket['Marker'][$i]))
-                $this->goldenBucket['Frames'][$i]['Marker']['Rear']['Left'] = $this->goldenBucket['Marker']['Lights']['Rear']['Left'][$i];
+                if (isset($this->goldenBucket['Marker'][$i]))
+                    $this->goldenBucket['Frames'][$i]['Marker']['Rear']['Left'] = $this->goldenBucket['Marker']['Lights']['Rear']['Left'][$i];
+            }
         }
-
         unset($this->goldenBucket['Headlights']);
         unset($this->goldenBucket['Boilers']);
         unset($this->goldenBucket['Freights']);
@@ -378,9 +380,15 @@ class GVASParser
                     }
                 }
                 if (trim($object->NAME) == 'FrameNameArray') {
+                    if (isset($_POST['nameAllCountries'])) {
+                        $countryObj = new CountryNames($_POST['nameAllCountries']);
+                    }
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['name_' . $index]) && trim($_POST['name_' . $index])) {
                             $object->CONTENTOBJECTS[3]->contentElements[$index] = new dtTextProperty(trim($_POST['name_' . $index]));
+                        }
+                        if (isset($_POST['nameAllCountries'])) {
+                            $object->CONTENTOBJECTS[3]->contentElements[$index] = new dtTextProperty($countryObj->getName());
                         }
                     }
                 }
@@ -388,7 +396,7 @@ class GVASParser
                 if (trim($object->NAME) == 'FrameRotationArray') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['underground_' . $index]) && trim($_POST['underground_' . $index])) {
-                            $object->CONTENTOBJECTS[3]->contentElements[$index]->content = array(0,90,0);
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->content = array(0, 90, 0);
                         }
                     }
                 }
@@ -402,7 +410,7 @@ class GVASParser
                         [1800, -2503, 10160],
                         [1800, -461, 10160],
                     );
-                    $used=0;
+                    $used = 0;
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['underground_' . $index]) && trim($_POST['underground_' . $index])) {
 //spawnZOffset = {
@@ -431,7 +439,7 @@ class GVASParser
 //        else:
 //            return i
 //    return None
-                            $object->CONTENTOBJECTS[3]->contentElements[$index]->content = $spawnPositions[max($used++,5)];
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->content = $spawnPositions[max($used++, 5)];
                         }
                     }
                 }
@@ -452,6 +460,14 @@ class GVASParser
                     }
                 }
 
+                if (trim($object->NAME) == 'BrakeValueArray') {
+                    foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
+                        if (isset($_POST['allBrakes'])) {
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->value = 1;
+                        }
+                    }
+                }
+
                 //PlayerXPArray
                 //PlayerMoneyArray
                 //PlayerNameArray
@@ -463,7 +479,7 @@ class GVASParser
                         if (isset($_POST['xp_' . $index]) && trim($_POST['xp_' . $index])) {
                             $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['xp_' . $index]);
                         }
-                        if(isset($_POST['deletePlayer_' . $index])) {
+                        if (isset($_POST['deletePlayer_' . $index])) {
                             unset($object->CONTENTOBJECTS[3]->contentElements[$index]);
                             $object->CONTENTOBJECTS[3]->COUNTER->value--;
                         }
@@ -474,7 +490,7 @@ class GVASParser
                         if (isset($_POST['money_' . $index]) && trim($_POST['money_' . $index])) {
                             $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['money_' . $index]);
                         }
-                        if(isset($_POST['deletePlayer_' . $index])) {
+                        if (isset($_POST['deletePlayer_' . $index])) {
                             unset($object->CONTENTOBJECTS[3]->contentElements[$index]);
                             $object->CONTENTOBJECTS[3]->COUNTER->value--;
                         }
@@ -482,7 +498,7 @@ class GVASParser
                 }
                 if (trim($object->NAME) == 'PlayerNameArray') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
-                        if(isset($_POST['deletePlayer_' . $index])) {
+                        if (isset($_POST['deletePlayer_' . $index])) {
                             unset($object->CONTENTOBJECTS[3]->contentElements[$index]);
                             $object->CONTENTOBJECTS[3]->COUNTER->value--;
                         }
@@ -490,7 +506,7 @@ class GVASParser
                 }
                 if (trim($object->NAME) == 'PlayerRotationArray') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
-                        if(isset($_POST['deletePlayer_' . $index])) {
+                        if (isset($_POST['deletePlayer_' . $index])) {
                             unset($object->CONTENTOBJECTS[3]->contentElements[$index]);
                             $object->CONTENTOBJECTS[3]->COUNTER->value--;
                         }
@@ -498,7 +514,7 @@ class GVASParser
                 }
                 if (trim($object->NAME) == 'PlayerLocationArray') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
-                        if(isset($_POST['deletePlayer_' . $index])) {
+                        if (isset($_POST['deletePlayer_' . $index])) {
                             unset($object->CONTENTOBJECTS[3]->contentElements[$index]);
                             $object->CONTENTOBJECTS[3]->COUNTER->value--;
                         }
@@ -582,41 +598,80 @@ class GVASParser
 
     private function buildGraph()
     {
+        $ah = new ArithmeticHelper();
+        $ah->industries = $this->goldenBucket['Industries'];
+
+        $industryTracks = array();
+
         $segments = array();
-        foreach($this->goldenBucket['Splines'] as $spline){
-            if(!in_array($spline['Type'], array(0,4))){
+        foreach ($this->goldenBucket['Splines'] as $spIndex => $spline) {
+            if (!in_array($spline['Type'], array(0, 4))) {
                 continue;
             }
-            foreach($spline['Segments'] as $segment){
-                if($segment['Visible']!=1)
-                {
+            foreach ($spline['Segments'] as $seIndex => $segment) {
+                if ($segment['Visible'] != 1) {
                     continue;
                 }
-                $segments[] = new Node(sizeof($segments), array($segment['LocationStart'], $segment['LocationEnd']));
+
+                $id = $spIndex . '-' . $seIndex;
+
+                $divisionS = floor($segment['LocationStart']['X'] / 10000) . '-' . floor($segment['LocationStart']['Y'] / 10000);
+                $divisionE = floor($segment['LocationEnd']['X'] / 10000) . '-' . floor($segment['LocationEnd']['Y'] / 10000);
+
+                $segments[$divisionS][$id] = new Node($id, array($segment['LocationStart'], $segment['LocationEnd']), $ah);
+                $segments[$divisionE][$id] = new Node($id, array($segment['LocationStart'], $segment['LocationEnd']), $ah);
+
+                foreach($this->goldenBucket['Industries'] as $i => $industry){
+                    $d = $ah->dist($industry['Location'], $segment['LocationCenter']);
+                    if(!isset($industryTracks[$i]) || $industryTracks[$i]['d']>$d){
+                        $industryTracks[$i]['d'] = $d;
+                        $industryTracks[$i]['trackNode'] = $segments[$divisionS][$id];
+                    }
+                }
+
             }
         }
 
-        foreach($this->goldenBucket['Switchs'] as $switch){
-            $segments[] = new SwitchNode(sizeof($segments), $this->findSwitchEndpoints($switch));
+        foreach ($this->goldenBucket['Switchs'] as $swIndex => $switch) {
+            $ses = $this->findSwitchEndpoints($switch);
+            $divisionS = floor($ses[0]['X'] / 10000) . '-' . floor($ses[0]['Y'] / 10000);
+            $divisionSS = floor($ses[1]['X'] / 10000) . '-' . floor($ses[1]['Y'] / 10000);
+            $divisionSB = floor($ses[2]['X'] / 10000) . '-' . floor($ses[2]['Y'] / 10000);
+
+            $segments[$divisionS]['SW-' . $swIndex] = new SwitchNode('SW-' . $swIndex, $ses, $switch['Side'], $ah);
+            $segments[$divisionSS]['SW-' . $swIndex] = new SwitchNode('SW-' . $swIndex, $ses, $switch['Side'], $ah);
+            $segments[$divisionSB]['SW-' . $swIndex] = new SwitchNode('SW-' . $swIndex, $ses, $switch['Side'], $ah);
         }
 
-        foreach($segments as $index => $node){
-            foreach($segments as $pindex=>$partner){
-                if($pindex == $index){
-                    continue;
-                }
-                if($node->hasEndpointLike($partner)){
-                    $node->addPartner($partner);
-                    $partner->addPartner($node);
+        foreach ($segments as $region => $regionSegments) {
+//            echo "$region..";
+            foreach ($regionSegments as $index => $node) {
+                foreach ($segments as $pRegion => $pRegionSegments) {
+                    if ($region != $pRegion) {
+                        continue;
+                    }
+                    //                    echo "$pRegion\n";
+                    foreach ($pRegionSegments as $pindex => $partner) {
+                        if ($pindex == $index) {
+                            continue; // same node
+                        }
+                        /** @var Node $node */
+                        if ($node->hasEndpointLike($partner)) {
+                            $node->addPartner($partner);
+                            $partner->addPartner($node);
+                        }
+                    }
                 }
             }
         }
-
-        print_r($segments);die();
+        ksort($segments);
+        print_r($segments);
+        die();
 
     }
 
-    function findSwitchEndpoints($switch) {
+    function findSwitchEndpoints($switch)
+    {
 
         /**
          * 0 = SwitchLeft           = lever left switch going left
@@ -648,14 +703,14 @@ class GVASParser
 
 
         $length = 1880;
-        $x = round($switch['Location'][0]+cos(deg2rad($switch['Rotation'][1]+90))*$length);
-        $y = round($switch['Location'][1]+sin(deg2rad($switch['Rotation'][1]+90))*$length);
-        $point = array('X'=>$switch['Location'][0], 'Y'=>$switch['Location'][1], 'Z'=>$switch['Location'][2]);
-        $straight = array('X'=>$x, 'Y'=>$y, 'Z'=>$switch['Location'][2]);
+        $x = round($switch['Location'][0] + cos(deg2rad($switch['Rotation'][1] + 90)) * $length);
+        $y = round($switch['Location'][1] + sin(deg2rad($switch['Rotation'][1] + 90)) * $length);
+        $point = array('X' => $switch['Location'][0], 'Y' => $switch['Location'][1], 'Z' => $switch['Location'][2]);
+        $straight = array('X' => $x, 'Y' => $y, 'Z' => $switch['Location'][2]);
 
-        $x = round($switch['Location'][0]+cos(deg2rad($switch['Rotation'][1]+90+$dir))*($length-7));
-        $y = round($switch['Location'][1]+sin(deg2rad($switch['Rotation'][1]+90+$dir))*($length-7));
-        $bend = array('X'=>$x, 'Y'=>$y, 'Z'=>$switch['Location'][2]);
+        $x = round($switch['Location'][0] + cos(deg2rad($switch['Rotation'][1] + 90 + $dir)) * ($length - 7));
+        $y = round($switch['Location'][1] + sin(deg2rad($switch['Rotation'][1] + 90 + $dir)) * ($length - 7));
+        $bend = array('X' => $x, 'Y' => $y, 'Z' => $switch['Location'][2]);
 
         return array($point, $straight, $bend);
 
@@ -663,22 +718,38 @@ class GVASParser
 
 }
 
-class SwitchNode extends Node {}
+class SwitchNode extends Node
+{
+    public function __construct($id, $endpoints, $side, ArithmeticHelper $ah)
+    {
+        parent::__construct($id, $endpoints, $ah);
+        $this->side = $side;
+    }
+}
 
 class Node
 {
     var $endpoints = array();
     var $nextNodes = array();
     var $id;
+    var ArithmeticHelper $ah;
+    var $near;
 
-    public function __construct($id, $endpoints)
+    public function __construct($id, $endpoints, ArithmeticHelper $ah)
     {
+        $this->ah = $ah;
         $this->id = $id;
-        foreach($endpoints as $endpoint){
+        foreach ($endpoints as $endpoint) {
             $this->endpoints[] = $endpoint;
         }
+        $this->near = $this->ah->nearestIndustry($endpoint);
+        // DEBUG
+        unset($this->ah);
     }
 
+    /**
+     * @param Node $node
+     */
     public function addPartner(Node $node)
     {
         $this->nextNodes[$node->id] = &$node;
@@ -689,13 +760,18 @@ class Node
         return $this->endpoints;
     }
 
-    public function hasEndPointLike(Node $node){
-        foreach($node->getEndpoints() as $point){
-            foreach($this->endpoints as $ownPoint){
-                if(
-                    abs($ownPoint['X']-$point['X'])<2 &&
-                    abs($ownPoint['Y']-$point['Y'])<2 &&
-                    abs($ownPoint['Z']-$point['Z'])<2
+    /**
+     * @param Node $node
+     * @return bool
+     */
+    public function hasEndPointLike(Node $node)
+    {
+        foreach ($node->getEndpoints() as $point) {
+            foreach ($this->endpoints as $ownPoint) {
+                if (
+                    abs($ownPoint['X'] - $point['X']) < 20 &&
+                    abs($ownPoint['Y'] - $point['Y']) < 20 &&
+                    abs($ownPoint['Z'] - $point['Z']) < 20
                 ) {
                     return true;
                 }
@@ -704,4 +780,35 @@ class Node
         return false;
     }
 
+}
+
+class CountryNames
+{
+    var $names;
+
+    public function getName()
+    {
+        while (true) {
+            if (!sizeof($this->names)) {
+                return "END OF FILE";
+            }
+            $name = array_shift($this->names);
+            if (strlen($name) < 15) {
+                return $name;
+            }
+        }
+    }
+
+    public function __construct($type)
+    {
+        if (file_exists(SHELL_ROOT . '/includes/' . $type . '.txt')) {
+            $data = file_get_contents(SHELL_ROOT . '/includes/' . $type . '.txt');
+            $data = explode("\n", $data);
+            array_shift($data); // header
+            $this->names = $data;
+        } else {
+            $this->names = array('ERROR');
+        }
+        shuffle($this->names);
+    }
 }
