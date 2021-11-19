@@ -893,21 +893,23 @@ class Mapper {
 
             let minDistanceToSomething = 80000000;
 
-            for (const segment of this.json['Segments'][treeX][treeY]) {
-                if (segment['LocationCenter']['X'] < tree[0] - 6000) {
-                    continue;
+            try {
+                for (const segment of this.json['Segments'][treeX][treeY]) {
+                    if (segment['LocationCenter']['X'] < tree[0] - 6000) {
+                        continue;
+                    }
+                    if (segment['LocationCenter']['X'] > tree[0] + 6000) {
+                        continue;
+                    }
+                    if (segment['LocationCenter']['Y'] < tree[1] - 6000) {
+                        continue;
+                    }
+                    if (segment['LocationCenter']['Y'] > tree[1] + 6000) {
+                        continue;
+                    }
+                    minDistanceToSomething = Math.min(minDistanceToSomething, this._dist(tree, segment['LocationCenter']));
                 }
-                if (segment['LocationCenter']['X'] > tree[0] + 6000) {
-                    continue;
-                }
-                if (segment['LocationCenter']['Y'] < tree[1] - 6000) {
-                    continue;
-                }
-                if (segment['LocationCenter']['Y'] > tree[1] + 6000) {
-                    continue;
-                }
-                minDistanceToSomething = Math.min(minDistanceToSomething, this._dist(tree, segment['LocationCenter']));
-            }
+            } catch (err) {}
             if (minDistanceToSomething > 700) {
                 const x = (this.imx - ((tree[0] - this.minX) / 100 * this.scale));
                 const y = (this.imy - ((tree[1] - this.minY) / 100 * this.scale));
