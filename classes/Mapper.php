@@ -38,11 +38,12 @@ class Mapper
 
     /**
      * Mapper constructor.
-     * @param $data
+     * @param GVASParser $data
      */
-    public function __construct($data)
+    public function __construct(GVASParser $data)
     {
-        $this->data = $data;
+        $this->data = $data->goldenBucket;
+        $this->owner = $data->owner;
     }
 
     /**
@@ -110,7 +111,7 @@ class Mapper
         // create a "database" and store some infos about this file for the websies index page
 
         $db = @unserialize(@file_get_contents('db.db'));
-        $db[$NEWUPLOADEDFILE] = array(
+        $db[$this->owner] = array(
             $this->totalTrackLength,
             $this->totalSwitches,
             $this->totalLocos,
@@ -130,10 +131,10 @@ class Mapper
                 $x = $this->imx - (int)(($site['Location'][0] - $this->minX) / 100 * $this->scale);
                 $y = $this->imy - (int)(($site['Location'][1] - $this->minY) / 100 * $this->scale);
                 if ($doSvg) {
-                    $svg .= '<path transform="rotate('.round($site['Rotation'][1]).' '.$x.' '.$y.')" ';
-                    $svg .= 'd=" M'.$x.','.$y.' m -5,-5 l10,0 l0,3 l3,0 l0,4 l-3,0 l0,3 l-10,0 z" ';
-                    $svg .= 'fill="lightblue" stroke="black" stroke-width="1"/>'."\n";
-                    $svg .= '<circle cx="'.$x.'" cy="'.$y.'" r="3" fill="blue" />';
+                    $svg .= '<path transform="rotate(' . round($site['Rotation'][1]) . ' ' . $x . ' ' . $y . ')" ';
+                    $svg .= 'd=" M' . $x . ',' . $y . ' m -5,-5 l10,0 l0,3 l3,0 l0,4 l-3,0 l0,3 l-10,0 z" ';
+                    $svg .= 'fill="lightblue" stroke="black" stroke-width="1"/>' . "\n";
+                    $svg .= '<circle cx="' . $x . '" cy="' . $y . '" r="3" fill="blue" />';
                 }
             }
         }
@@ -323,7 +324,7 @@ class Mapper
                         $segments = $spline['Segments'];
                         $path = '';
                         //'<path d="M 100 100 L 300 100 L 200 300 z" fill="red" stroke="blue" stroke-width="3" />'
-                        foreach ($segments as $si=>$segment) {
+                        foreach ($segments as $si => $segment) {
                             if ($segment['Visible'] != 1) {
                                 $tool = 'M';
                             } else {
@@ -362,7 +363,7 @@ class Mapper
                         if ($type != $current) continue;            // if this spline is not the current type, skip it
                         $segments = $spline['Segments'];
 
-                        foreach ($segments as $segment) {
+                        foreach ($segments as $seg => $segment) {
                             if ($segment['Visible'] != 1) continue; // skip invisible tracks
 
                             $xStart = ($this->imx - (int)(($segment['LocationStart']['X'] - $this->minX) / 100 * $this->scale));
@@ -410,29 +411,53 @@ class Mapper
                                 $this->maxSlope = max($this->maxSlope, $slope);
                             }
 
+
+                            if ($segment['LocationEnd']['X'] == $segment['LocationStart']['X']) {
+                                $a = 90;
+                            } else {
+                                $tanA = (
+                                    ($segment['LocationEnd']['Y'] - $segment['LocationStart']['Y']) /
+                                    ($segment['LocationEnd']['X'] - $segment['LocationStart']['X'])
+                                );
+                                $a = rad2deg(atan($tanA));
+                                if ($a > 0) {
+                                    $a -= 90;
+                                } else {
+                                    $a += 90;
+                                }
+
+                            }
+//                            $svg .= '<text x="' . $xCenter . '" y="' . $yCenter . '" transform="rotate(' . $a .
+//                                ',' . $xCenter . ', ' . $yCenter . ')">' . $xCenter . ',' . $yCenter . ' ('.$spi.'-'.$seg.')</text>' . "\n";
+
+
 // label some splines with their slope - not yet working
 // main problem: find a spot for the text that is near to track but do not override other stuff
                             if (!isset($_POST['slopeTrigger'])) $_POST['slopeTrigger'] = 2;
                             if (!isset($_POST['slopeTriggerPrefix'])) $_POST['slopeTriggerPrefix'] = '..';
                             if (!isset($_POST['slopeTriggerDecimals'])) $_POST['slopeTriggerDecimals'] = 1;
                             if ($distance > 0 && in_array($type, array(4, 0))) {
-                                if (abs($slope) > $_POST['slopeTrigger']) {
-                                    $tanA = (
-                                        ($segment['LocationEnd']['Y'] - $segment['LocationStart']['Y']) /
-                                        max(0.00001, ($segment['LocationEnd']['X'] - $segment['LocationStart']['X']))
-                                    );
-                                    $a = rad2deg(atan($tanA));
-                                    if ($a > 0) {
-                                        $a -= 90;
-                                    } else {
-                                        $a += 90;
-                                    }
+                                if ($segment['LocationEnd']['X'] == $segment['LocationStart']['X']) {
+                                    $a = 90;
+                                } else {
+                                    if (abs($slope) > $_POST['slopeTrigger']) {
+                                        $tanA = (
+                                            ($segment['LocationEnd']['Y'] - $segment['LocationStart']['Y']) /
+                                            ($segment['LocationEnd']['X'] - $segment['LocationStart']['X'])
+                                        );
+                                        $a = rad2deg(atan($tanA));
+                                        if ($a > 0) {
+                                            $a -= 90;
+                                        } else {
+                                            $a += 90;
+                                        }
 
 
-                                    if ($this->getDistanceToNearestLabel(array($xCenter, $yCenter)) > 60) {
-                                        $this->allLabels[] = array($xCenter, $yCenter);
-                                        $svg .= '<text x="' . $xCenter . '" y="' . $yCenter . '" transform="rotate(' . $a .
-                                            ',' . $xCenter . ', ' . $yCenter . ')">' . $_POST['slopeTriggerPrefix'] . round($slope, $_POST['slopeTriggerDecimals']) . '%</text>' . "\n";
+                                        if ($this->getDistanceToNearestLabel(array($xCenter, $yCenter)) > 60) {
+                                            $this->allLabels[] = array($xCenter, $yCenter);
+                                            $svg .= '<text x="' . $xCenter . '" y="' . $yCenter . '" transform="rotate(' . $a .
+                                                ',' . $xCenter . ', ' . $yCenter . ')">' . $_POST['slopeTriggerPrefix'] . round($slope, $_POST['slopeTriggerDecimals']) . '%</text>' . "\n";
+                                        }
                                     }
                                 }
                             }
@@ -465,7 +490,7 @@ class Mapper
          */
         $types = array();
         if (!isset($this->data['Switchs'])) return '';
-        foreach ($this->data['Switchs'] as $switch) {
+        foreach ($this->data['Switchs'] as $index => $switch) {
             $this->totalSwitches++;
             $dir = false;
             $type = trim($switch['Type']);
@@ -553,6 +578,14 @@ class Mapper
                         $svg .= '<line x1="' . $x . '" y1="' . $y . '" x2="' . $xStraight . '" y2="' . $yStraight . '" stroke="black" stroke-width="3"/>' . "\n";
 
                     }
+
+
+                    $code = 'SW#' . $index;
+
+                    $a = $switch['Rotation'][1];
+                    $svg .= '<text x="' . $x . '" y="' . $y . '" transform="rotate(' . $a .
+                        ',' . $x . ', ' . $y . ')" font-size="smaller">' . $code . '</text>' . "\n";
+
                 }
             }
 
@@ -652,23 +685,23 @@ class Mapper
 // build some extra HTML for a form to edit cart data
 
 
-        $dh=opendir(SHELL_ROOT.'/includes');
+        $dh = opendir(SHELL_ROOT . '/includes');
         $textFiles = array();
-        while($textFiles[]=readdir($dh));
+        while ($textFiles[] = readdir($dh)) ;
         $textOptions = '';
-        foreach($textFiles as $textFile){
-            if(substr($textFile, -4) == '.txt'){
-                $data = file_get_contents(SHELL_ROOT.'/includes/'.$textFile);
+        foreach ($textFiles as $textFile) {
+            if (substr($textFile, -4) == '.txt') {
+                $data = file_get_contents(SHELL_ROOT . '/includes/' . $textFile);
                 $data = explode("\n", $data);
-                $header = array_shift($data).' ('.sizeof($data).')';
-                $value = substr($textFile,0,-4);
+                $header = array_shift($data) . ' (' . sizeof($data) . ')';
+                $value = substr($textFile, 0, -4);
 
-                if(!$textOptions){
+                if (!$textOptions) {
                     $checked = ' checked';
                 } else {
                     $checked = '';
                 }
-                $textOptions.='<input type="radio" name="nameAllCountries" value="'.$value.'"'.$checked.'/>'.$header.'<br />';
+                $textOptions .= '<input type="radio" name="nameAllCountries" value="' . $value . '"' . $checked . '/>' . $header . '<br />';
 
             }
         }
@@ -691,7 +724,7 @@ class Mapper
 
         <br/><br/>
         <form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $this->NEWUPLOADEDFILE . '">
-        '.$textOptions.'
+        ' . $textOptions . '
         <button class="button">Rename everything to selected schema</button></form>
 
         <br/><br/>
@@ -878,29 +911,29 @@ class Mapper
                     || $vehicle['Type'] == 'class70'
                     || $vehicle['Type'] == 'cooke260'
                 ) {
-                    $yl=($this->engineRadius / 3)*2;
-                    $xl=($this->engineRadius / 2)*2;
+                    $yl = ($this->engineRadius / 3) * 2;
+                    $xl = ($this->engineRadius / 2) * 2;
 
-                    $svg .= '<path transform="rotate('.round($vehicle['Rotation'][1]).' '.$x.' '.$y.')" ';
-                    $svg .= 'd="M'.($x-($this->engineRadius / 2)).','.$y;
-                    $svg .= ' l '.($xl/3).','.($yl/2).' l '.($xl/3*2).',0 l 0,-'.$yl;
-                    $svg .= ' l -'.($xl/3*2).',0 z" fill="purple" stroke="black" stroke-width="2"/>'."\n";
+                    $svg .= '<path transform="rotate(' . round($vehicle['Rotation'][1]) . ' ' . $x . ' ' . $y . ')" ';
+                    $svg .= 'd="M' . ($x - ($this->engineRadius / 2)) . ',' . $y;
+                    $svg .= ' l ' . ($xl / 3) . ',' . ($yl / 2) . ' l ' . ($xl / 3 * 2) . ',0 l 0,-' . $yl;
+                    $svg .= ' l -' . ($xl / 3 * 2) . ',0 z" fill="purple" stroke="black" stroke-width="2"/>' . "\n";
                 } else {
 
-                    $yl=($this->engineRadius / 3)*2;
-                    $xl=$this->engineRadius;
+                    $yl = ($this->engineRadius / 3) * 2;
+                    $xl = $this->engineRadius;
 
-                    if(strpos(strtolower($vehicle['Type']), 'tender')){
-                        $xl=$xl/3*2;
+                    if (strpos(strtolower($vehicle['Type']), 'tender')) {
+                        $xl = $xl / 3 * 2;
                     }
 
 
-                    $svg.= '<path d="M'.round($x).','.round($y).' m-'.(($xl / 2)).',-'.
-                        (($yl / 2) ).' h'.($xl -4)
-                        .' a2,2 0 0 1 2,2 v'.($yl -4)
-                        .' a2,2 0 0 1 -2,2 h-'.($xl -4)
-                        .' a2,2 0 0 1 -2,-2 v-'.($yl -4)
-                        .' a2,2 0 0 1 2,-2 z" fill="'.$cartColors[$vehicle['Type']][1].'" stroke="black" stroke-width="1" 
+                    $svg .= '<path d="M' . round($x) . ',' . round($y) . ' m-' . (($xl / 2)) . ',-' .
+                        (($yl / 2)) . ' h' . ($xl - 4)
+                        . ' a2,2 0 0 1 2,2 v' . ($yl - 4)
+                        . ' a2,2 0 0 1 -2,2 h-' . ($xl - 4)
+                        . ' a2,2 0 0 1 -2,-2 v-' . ($yl - 4)
+                        . ' a2,2 0 0 1 2,-2 z" fill="' . $cartColors[$vehicle['Type']][1] . '" stroke="black" stroke-width="1" 
                         transform="rotate(' . round($vehicle['Rotation'][1]) .
                         ', ' . round($x) .
                         ', ' . round($y) . ')"
@@ -963,7 +996,7 @@ class Mapper
 
                 }
             } else {
-                if($vehicle['Type']!='handcar'){
+                if ($vehicle['Type'] != 'handcar') {
                     $this->totalCarts++;
                 }
             }
@@ -1225,10 +1258,10 @@ class Mapper
                     $rotation = ($site['Rotation'][1] > 0) ? ($site['Rotation'][1] - 90) : ($site['Rotation'][1] + 90);
                     $x = ($this->imx - (int)(($site['Location'][0] - $this->minX) / 100 * $this->scale));
                     $y = ($this->imy - (int)(($site['Location'][1] - $this->minY) / 100 * $this->scale));
-                    $svg .= '<path transform="rotate('.round($site['Rotation'][1]).' '.$x.' '.$y.')" ';
-                    $svg .= 'd="M'.$x.','.$y.' m-18,-15 l10,0 l0,30 l-10,0 z" fill="orange" stroke="brown" />'."\n";
+                    $svg .= '<path transform="rotate(' . round($site['Rotation'][1]) . ' ' . $x . ' ' . $y . ')" ';
+                    $svg .= 'd="M' . $x . ',' . $y . ' m-18,-15 l10,0 l0,30 l-10,0 z" fill="orange" stroke="brown" />' . "\n";
                     $xoff = -20;
-                    $yoff=0;
+                    $yoff = 0;
                     break;
                 default:
                     die('unknown industry');

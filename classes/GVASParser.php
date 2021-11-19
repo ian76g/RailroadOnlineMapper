@@ -84,6 +84,8 @@ class GVASParser
             }
         }
 
+        $this->owner = preg_replace('/[[:^alnum:]]/', "", $this->goldenBucket['Players'][0]['Name']);
+
         if (isset($this->goldenBucket['Frames'])) {
             foreach ($this->goldenBucket['Frames'] as $i => $frame) {
                 if (isset($this->goldenBucket['Boilers'][$i]))
@@ -598,17 +600,16 @@ class GVASParser
                 die("This does not seem to be your save file.");
             }
             echo "SAVING FILE " . $this->NEWUPLOADEDFILE . "<br>\n";
-            file_put_contents(SHELL_ROOT . 'saves/' . $this->NEWUPLOADEDFILE, $output, FILE_BINARY);
-            echo '<A href="' . WWW_ROOT . 'saves/' . $this->NEWUPLOADEDFILE . '">Download your modified save here </A><br>';
+            file_put_contents(SHELL_ROOT . 'saves/' . $this->owner.'.sav', $output, FILE_BINARY);
+            echo '<A href="' . WWW_ROOT . 'saves/' . $this->owner.'.sav' . '">Download your modified save here </A><br>';
             echo 'Want to upload this map again?<A href="' . WWW_ROOT . 'upload.php">Add your save again</A><br>';
-        } else {
-            file_put_contents(SHELL_ROOT . 'uploads/' . $this->NEWUPLOADEDFILE, $output, FILE_BINARY);
         }
 
     }
 
     private function buildGraph()
     {
+        global $industryTracks;
         $ah = new ArithmeticHelper();
         $ah->industries = $this->goldenBucket['Industries'];
 
@@ -629,12 +630,14 @@ class GVASParser
                 $divisionS = floor($segment['LocationStart']['X'] / 10000) . '-' . floor($segment['LocationStart']['Y'] / 10000);
                 $divisionE = floor($segment['LocationEnd']['X'] / 10000) . '-' . floor($segment['LocationEnd']['Y'] / 10000);
 
-                $segments[$divisionS][$id] = new Node($id, array($segment['LocationStart'], $segment['LocationEnd']), $ah);
-                $segments[$divisionE][$id] = new Node($id, array($segment['LocationStart'], $segment['LocationEnd']), $ah);
+                $newNode = new Node($id, array($segment['LocationStart'], $segment['LocationEnd']), $ah);
 
-                foreach($this->goldenBucket['Industries'] as $i => $industry){
+                $segments[$divisionS][$id] = $newNode;
+                $segments[$divisionE][$id] = $newNode;
+
+                foreach ($this->goldenBucket['Industries'] as $i => $industry) {
                     $d = $ah->dist($industry['Location'], $segment['LocationCenter']);
-                    if(!isset($industryTracks[$i]) || $industryTracks[$i]['d']>$d){
+                    if (!isset($industryTracks[$i]) || $industryTracks[$i]['d'] > $d) {
                         $industryTracks[$i]['d'] = $d;
                         $industryTracks[$i]['trackNode'] = $segments[$divisionS][$id];
                     }
@@ -649,9 +652,11 @@ class GVASParser
             $divisionSS = floor($ses[1]['X'] / 10000) . '-' . floor($ses[1]['Y'] / 10000);
             $divisionSB = floor($ses[2]['X'] / 10000) . '-' . floor($ses[2]['Y'] / 10000);
 
-            $segments[$divisionS]['SW-' . $swIndex] = new SwitchNode('SW-' . $swIndex, $ses, $switch['Side'], $ah);
-            $segments[$divisionSS]['SW-' . $swIndex] = new SwitchNode('SW-' . $swIndex, $ses, $switch['Side'], $ah);
-            $segments[$divisionSB]['SW-' . $swIndex] = new SwitchNode('SW-' . $swIndex, $ses, $switch['Side'], $ah);
+            $switchNode = new SwitchNode('SW-' . $swIndex, $ses, $switch['Side'], $ah);
+
+            $segments[$divisionS]['SW-' . $swIndex] = $switchNode;
+            $segments[$divisionSS]['SW-' . $swIndex] = $switchNode;
+            $segments[$divisionSB]['SW-' . $swIndex] = $switchNode;
         }
 
         foreach ($segments as $region => $regionSegments) {
@@ -675,11 +680,72 @@ class GVASParser
                 }
             }
         }
-        ksort($segments);
-        print_r($segments);
-        die();
+
+        foreach ($industryTracks as $i => $industryTrack) {
+            $trackNode = $industryTrack['trackNode'];
+            /** @var Node $trackNode */
+            echo $trackNode->near . " :";
+            $this->driveAlongTrack($i, $trackNode);
+
+
+            echo "\n##############################################\n";
+        }
+
+
+        echo "1";
+//        ksort($segments);
+//        print_r($segments);
+//        die();
 
     }
+
+    function driveAlongTrack($iI, &$node, $passed = array())
+    {
+        global $industryTracks;
+        if (sizeof($passed) > 500) return;
+        if (isset($node->ww[$iI][0]) && $node->ww[$iI][0] < sizeof($passed)) {
+            return;
+        }
+        $node->ww[$iI] = sizeof($passed);
+        $passed[] = $node->id;
+//echo $node->id." ";
+        if (sizeof($node->nextNodes) < 2) {
+//            echo $node->id.' ';
+//echo 'DEAD END'."\n"; sleep(1);
+            return;
+        }
+
+        if (sizeof($node->nextNodes) == 3) {
+//            echo "SWITCH $node->id\n";
+            foreach ($node->nextNodes as $nnI => $nextNode) {
+                /** @var Node $nextNode */
+
+                if (!in_array($nextNode->id, $passed)) {
+                    $this->driveAlongTrack($iI, $nextNode, $passed);
+                }
+            }
+//            echo "\n BACK at SWITCH  $node->id ";
+        }
+        foreach ($node->nextNodes as $nnI => $nextNode) {
+            // check if i reached an industry
+            foreach ($industryTracks as $industryIndex => $industryTrack) {
+                if ($industryTrack['trackNode']->id == $nextNode->id) {
+//                    echo ' REACHED '.$industryIndex."\n";
+                    return;
+                }
+            }
+            /** @var Node $nextNode */
+            if (!in_array($nextNode->id, $passed)) {
+                $this->driveAlongTrack($iI, $nextNode, $passed);
+            } else {
+                // came from nnI
+                $node->ww[$iI] = array(sizeof($passed), $nnI);
+            }
+        }
+
+        return;
+    }
+
 
     function findSwitchEndpoints($switch)
     {
@@ -743,7 +809,10 @@ class Node
     var $endpoints = array();
     var $nextNodes = array();
     var $id;
-    var ArithmeticHelper $ah;
+    /**
+     * @var ArithmeticHelper
+     */
+    var $ah;
     var $near;
 
     public function __construct($id, $endpoints, ArithmeticHelper $ah)

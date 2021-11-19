@@ -112,27 +112,6 @@ $pattern = '
 $htmlSvg = str_replace('###PATTERN###', $pattern, $htmlSvg);
 
 
-/**
- * read all save files
- */
-
-$dh = opendir($path);
-
-$files = array();
-
-while ($file = readdir($dh)) {
-    if (substr($file, -4) == '.sav') {
-        $mtime = filemtime($path . '/' . $file);
-        $files[$mtime] = $file;
-    }
-}
-
-/**
- * find most recent save
- */
-
-krsort($files);
-
 if (!isset($NEWUPLOADEDFILE)) {                         // will be set in upload.php after upload.
     if (isset($argv[1])) {
         $NEWUPLOADEDFILE = $argv[1];                    // or we find it on command line
@@ -158,19 +137,8 @@ $arithmeticHelper = new ArithmeticHelper();             // put some math stuff i
  */
 
 foreach ($files as $file) {
-    if (!file_exists($path . '/' . $file)) {
-        // Headers already sent? Don't need to resend.
-        if (headers_sent()) {
-          echo "";
-          continue;
-        } else {
-          header('Location: /');
-          die();
-        }
 
-    }
-
-    $htmlFileName = str_replace('.sav', '', basename($file)) . '.html';
+//    $htmlFileName = str_replace('.sav', '', basename($file)) . '.html';
 
     $downloadLink = '';
 
@@ -184,18 +152,17 @@ foreach ($files as $file) {
     $htmlSvg = str_replace('###DOWNLOAD###', $downloadLink, $htmlSvg);
 
     $svg = '';
-    $savegame = $path . "/uploads/" . $file;
 
     $myParser = new GVASParser();                       // grab a Parser
     $myParser->NEWUPLOADEDFILE = $NEWUPLOADEDFILE;      // give the parser a filename
-    $myParser->parseData(file_get_contents($path . '/' . $file), false);
+    $myParser->parseData(file_get_contents($NEWUPLOADEDFILE), false);
 
-    $myMapper = new Mapper($myParser->goldenBucket);
+    $myMapper = new Mapper($myParser);
 
     $svg = $myMapper->gethtmlSVG($htmlSvg, $NEWUPLOADEDFILE, $empty, $arithmeticHelper);
 
     //@print_r($distances);
-    file_put_contents('maps/' . $htmlFileName, str_replace('&nbsp;', ' ', str_replace('###SVG###', $svg, $htmlSvg)));
+    file_put_contents('maps/' . $myParser->owner.'.html', str_replace('&nbsp;', ' ', str_replace('###SVG###', $svg, $htmlSvg)));
 
     // optionally pushing this automatically to a webserver
     // if you run this script as deamon - it uploads on each save automatically
@@ -206,10 +173,11 @@ foreach ($files as $file) {
 
     // Moves saves to appropriate folders for use
     if(isset($_POST['public'])) {
-      @rename(SHELL_ROOT.'uploads/' . $NEWUPLOADEDFILE, SHELL_ROOT.'saves/public/' . $NEWUPLOADEDFILE);
+      @rename($NEWUPLOADEDFILE, SHELL_ROOT.'saves/public/' . $myParser->owner.'.sav');
     } else {
-      @rename(SHELL_ROOT.'uploads/' . $NEWUPLOADEDFILE, SHELL_ROOT.'saves/' . $NEWUPLOADEDFILE);
+      @rename($NEWUPLOADEDFILE, SHELL_ROOT.'saves/' . $myParser->owner.'.sav');
     }
 
+    $mapFile = 'maps/' . $myParser->owner.'.html';
 
 }

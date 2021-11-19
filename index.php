@@ -34,10 +34,10 @@ require_once 'config.php';
     {
         global $db;
         $x = 1;
-        if (strtolower($db[substr($a, 0, -5) . '.sav'][$_GET['sortby']]) == strtolower($db[substr($b, 0, -5) . '.sav'][$_GET['sortby']])) {
+        if (strtolower($db[$a][$_GET['sortby']]) == strtolower($db[$b][$_GET['sortby']])) {
             return 0;
         }
-        if (strtolower($db[substr($a, 0, -5) . '.sav'][$_GET['sortby']]) > strtolower($db[substr($b, 0, -5) . '.sav'][$_GET['sortby']])) {
+        if (strtolower($db[$a][$_GET['sortby']]) > strtolower($db[$b][$_GET['sortby']])) {
             $x = -1;
         } else {
             $x = 1;
@@ -66,7 +66,11 @@ require_once 'config.php';
                     $dh = opendir(SHELL_ROOT . 'maps/');
                     while ($file = readdir($dh)) {
                         if (substr($file, -5) == '.html') {
-                            $files[filemtime(SHELL_ROOT . 'maps/' . $file)] = $file;
+                            if($file == 'ian76g.html'){
+                                $files[time()] = $file;
+                            } else {
+                                $files[filemtime(SHELL_ROOT . 'maps/' . $file)] = $file;
+                            }
                         }
                     }
 
@@ -86,15 +90,14 @@ require_once 'config.php';
 
                         for ($i = 0; $i < sizeof($files); $i++) {
 
-                            $file = $files[array_keys($files)[$i]];
+                            $file = str_replace('.html', '', $files[array_keys($files)[$i]]);
 
                             if (!$file) {
-                                echo 'BRESK';
                                 break;
                             }
 
                             if ($i > $hard_limit) {
-                                @unlink(SHELL_ROOT . "maps/" . substr($file, 5, -5) . ".html");
+                                @unlink(SHELL_ROOT . "maps/" . $file . ".html");
                             }
 
                             if ($i >= $soft_limit) {
@@ -102,7 +105,7 @@ require_once 'config.php';
                             }
 
                             // Create savefile name from map file
-                            $saveFile = substr($file, 0, -5) .'.sav';
+                            $saveFile = $file .'.sav';
 
                             // Check to see if savefile exists in public folder and create download link
                             if (file_exists(SHELL_ROOT.'saves/public/' . $saveFile)) {
@@ -112,32 +115,32 @@ require_once 'config.php';
 
                                 // Timecheck to remove public link for download
                                 if ($timediff < (60 * 60 * 24 * 2)) { // two days
-                                    echo '<td><a href="'.WWW_ROOT.'maps/' .$file. '">'.substr($file, 0, -5) .'</a> <a href="'.WWW_ROOT.'saves/public/'.$saveFile.'">(DL)</a></td>';
+                                    echo '<td><a href="'.WWW_ROOT.'maps/' .$file. '.html">'.$file .'</a> <a href="'.WWW_ROOT.'saves/public/'.$saveFile.'">(DL)</a></td>';
                                 } else {
-                                    echo '<td><a href="'.WWW_ROOT.'maps/' .$file. '">'.substr($file, 0, -5) .'</a></td>';
+                                    echo '<td><a href="'.WWW_ROOT.'maps/' .$file. '.html">'.$file.'</a></td>';
                                 }
 
                             } else {
-                              echo '<td><a href="'.WWW_ROOT.'maps/' .$file.'"</a>'.substr($file, 0, -5).'</td>';
+                              echo '<td><a href="'.WWW_ROOT.'maps/' .$file.'.html">'.$file.'</a></td>';
                             }
                             echo '
                                 <!-- Track Length -->
-                                <td>' . round($db[substr($file, 0, -5) . '.sav'][0] / 100000, 2) . 'km</td>
+                                <td>' . round($db[$file][0] / 100000, 2) . 'km</td>
 
                                 <!-- Switch Count -->
-                                <td>' . $db[substr($file, 0, -5) . '.sav'][1] . '</td>
+                                <td>' . $db[$file][1] . '</td>
 
                                 <!-- Tree Death Count -->
-                                <td>' . $db[substr($file, 0, -5) . '.sav'][6] . '</td>
+                                <td>' . $db[$file][6] . '</td>
 
                                 <!-- Locos -->
-                                <td>' . $db[substr($file, 0, -5) . '.sav'][2] . '</td>
+                                <td>' . $db[$file][2] . '</td>
 
                                 <!-- Carts -->
-                                <td>' . $db[substr($file, 0, -5) . '.sav'][3] . '</td>
+                                <td>' . $db[$file][3] . '</td>
 
                                 <!-- Max Slope -->
-                                <td>' . round($db[substr($file, 0, -5) . '.sav'][4]) . '%</td>';
+                                <td>' . round($db[$file][4]) . '%</td>';
 
                             echo '</tr>';
                             if (!(($i + 1) % 15)) {
