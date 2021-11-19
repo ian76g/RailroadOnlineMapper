@@ -233,12 +233,14 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
     }
 
     function toggleDisplayOptions (checkbox) {
+        const element = document.getElementsByClassName(checkbox.id)[0];
+        if (typeof element === "undefined") {
+            return;
+        }
         if (checkbox.checked) {
-            const element = document.getElementsByClassName(checkbox.id)[0];
             element.classList.remove('display_hide');
             element.classList.add('display_show');
         } else {
-            const element = document.getElementsByClassName(checkbox.id)[0];
             element.classList.add('display_hide');
             element.classList.remove('display_show');
         }
