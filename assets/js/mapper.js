@@ -119,6 +119,9 @@ class Mapper {
     }
 
     getTracksAndBeds() {
+        const tracksAndBedsGroup = document.createElementNS(this.svgNS, "g");
+        tracksAndBedsGroup.setAttribute("class", "tracksandbeds display_show");
+
         const drawOrder = [
             // [type, stroke-width, stroke]
             [1, 15, 'darkkhaki'], // variable bank
@@ -162,7 +165,7 @@ class Mapper {
                         trackSegment.setAttribute("y2", yEnd.toString());
                         trackSegment.setAttribute("stroke", stroke);
                         trackSegment.setAttribute("stroke-width", strokeWidth.toString());
-                        this.shapes.push(trackSegment);
+                        tracksAndBedsGroup.appendChild(trackSegment);
 
                         let distance = Math.sqrt(
                             Math.pow(segment['LocationEnd']['X'] - segment['LocationStart']['X'], 2) +
@@ -185,7 +188,7 @@ class Mapper {
                                 emptyLengthTrack.setAttribute("stroke", "red");
                                 emptyLengthTrack.setAttribute("stroke-width", "2");
                                 emptyLengthTrack.setAttribute("fill", "red");
-                                this.shapes.push(emptyLengthTrack);
+                                tracksAndBedsGroup.appendChild(emptyLengthTrack);
 
                                 continue; //This may cause issues down the road. We may need to stop at this point and return the errors segment.
                             } else {
@@ -221,7 +224,7 @@ class Mapper {
                                     slopeLabel.setAttribute("y", yCenter.toString());
                                     slopeLabel.setAttribute("transform", "rotate(" + degrees + "," + xCenter + "," + yCenter + ")");
                                     slopeLabel.appendChild(textNode);
-                                    this.shapes.push(slopeLabel);
+                                    tracksAndBedsGroup.appendChild(slopeLabel);
                                 }
                             }
                         }
@@ -242,12 +245,16 @@ class Mapper {
                 this.shapes.push(maxSlopeCircle);
             }
         }
+        this.shapes.push(tracksAndBedsGroup);
     }
 
     getSwitches() {
         if (!('Switchs' in this.json)) {
             return
         }
+
+        const switchesGroup = document.createElementNS(this.svgNS, "g");
+        switchesGroup.setAttribute("class", "switches display_show");
 
         for (const swtch of this.json.Switchs) { // can't use 'switch' as variable name
             let dir = false;
@@ -312,7 +319,7 @@ class Mapper {
                 crossSegment.setAttribute("y2", y2.toString());
                 crossSegment.setAttribute("stroke", "black");
                 crossSegment.setAttribute("stroke-width", "3");
-                this.shapes.push(crossSegment);
+                switchesGroup.appendChild(crossSegment);
 
                 crossSegment = document.createElementNS(this.svgNS, "line");
                 crossSegment.setAttribute("x1", (cx - (Math.cos(rotation) * crosslength)).toString());
@@ -321,7 +328,7 @@ class Mapper {
                 crossSegment.setAttribute("y2", (cy + (Math.sin(rotation) * crosslength)).toString());
                 crossSegment.setAttribute("stroke", "black");
                 crossSegment.setAttribute("stroke-width", "3");
-                this.shapes.push(crossSegment);
+                switchesGroup.appendChild(crossSegment);
             } else {
                 const xStraight = (this.imx - ((swtch['Location'][0] - this.minX) / 100 * this.scale) + (Math.cos(rotation) * this.switchRadius / 2));
                 const yStraight = (this.imy - ((swtch['Location'][1] - this.minY) / 100 * this.scale) + (Math.sin(rotation) * this.switchRadius / 2));
@@ -336,7 +343,7 @@ class Mapper {
                     switchSegment.setAttribute("y2", yStraight.toString());
                     switchSegment.setAttribute("stroke", "red");
                     switchSegment.setAttribute("stroke-width", "3");
-                    this.shapes.push(switchSegment);
+                    switchesGroup.appendChild(switchSegment);
 
                     switchSegment = document.createElementNS(this.svgNS, "line");
                     switchSegment.setAttribute("x1", x.toString());
@@ -345,7 +352,7 @@ class Mapper {
                     switchSegment.setAttribute("y2", ySide.toString());
                     switchSegment.setAttribute("stroke", "black");
                     switchSegment.setAttribute("stroke-width", "3");
-                    this.shapes.push(switchSegment);
+                    switchesGroup.appendChild(switchSegment);
                 } else {
                     let switchSegment = document.createElementNS(this.svgNS, "line");
                     switchSegment.setAttribute("x1", x.toString());
@@ -354,7 +361,7 @@ class Mapper {
                     switchSegment.setAttribute("y2", ySide.toString());
                     switchSegment.setAttribute("stroke", "red");
                     switchSegment.setAttribute("stroke-width", "3");
-                    this.shapes.push(switchSegment);
+                    switchesGroup.appendChild(switchSegment);
 
                     switchSegment = document.createElementNS(this.svgNS, "line");
                     switchSegment.setAttribute("x1", x.toString());
@@ -363,16 +370,20 @@ class Mapper {
                     switchSegment.setAttribute("y2", yStraight.toString());
                     switchSegment.setAttribute("stroke", "black");
                     switchSegment.setAttribute("stroke-width", "3");
-                    this.shapes.push(switchSegment);
+                    switchesGroup.appendChild(switchSegment);
                 }
             }
         }
+        this.shapes.push(switchesGroup);
     }
 
     getTurntables() {
         if (!('Turntables' in this.json)) {
             return
         }
+
+        const turntablesGroup = document.createElementNS(this.svgNS, "g");
+        turntablesGroup.setAttribute("class", "turntables display_show");
 
         for (const turntable of this.json.Turntables) {
             /**
@@ -397,7 +408,7 @@ class Mapper {
             turntableCircle.setAttribute("stroke", "black");
             turntableCircle.setAttribute("stroke-width", "1");
             turntableCircle.setAttribute("fill", "lightyellow");
-            this.shapes.push(turntableCircle);
+            turntablesGroup.appendChild(turntableCircle);
 
             const turntableLine = document.createElementNS(this.svgNS, "line");
             turntableLine.setAttribute("x1", (cx - (Math.cos(rotation2) * this.turnTableRadius / 2)).toString());
@@ -406,14 +417,18 @@ class Mapper {
             turntableLine.setAttribute("y2", (cy + (Math.sin(rotation2) * this.turnTableRadius / 2)).toString());
             turntableLine.setAttribute("stroke", "black");
             turntableLine.setAttribute("stroke-width", "3");
-            this.shapes.push(turntableLine);
+            turntablesGroup.appendChild(turntableLine);
         }
+        this.shapes.push(turntablesGroup);
     }
 
     getRollingStock() {
         if (!('Frames' in this.json)) {
             return
         }
+
+        const rollingStockGroup = document.createElementNS(this.svgNS, "g");
+        rollingStockGroup.setAttribute("class", "rollingstock display_show");
 
         const undergroundCartsTable = document.getElementById("undergroundCartsTable");
         const rollingStockTable = document.getElementById("rollingStockTable");
@@ -472,7 +487,7 @@ class Mapper {
                 path.setAttribute("fill", "purple");
                 path.setAttribute("stroke", "black");
                 path.setAttribute("stroke-width", "2");
-                this.shapes.push(path);
+                rollingStockGroup.appendChild(path);
             } else {
                 const yl = (this.engineRadius / 3) * 2;
                 let xl = this.engineRadius;
@@ -487,7 +502,7 @@ class Mapper {
                 path.setAttribute("stroke", "black");
                 path.setAttribute("stroke-width", "1");
                 path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
-                this.shapes.push(path);
+                rollingStockGroup.appendChild(path);
             }
 
             // const vehicleEllipse = document.createElementNS(this.svgNS, "ellipse");
@@ -507,14 +522,14 @@ class Mapper {
                 sunkenVehicle.setAttribute("ry", ((this.engineRadius / 2) * 10).toString());
                 sunkenVehicle.setAttribute("style", "fill:none;stroke:red;stroke-width:10");
                 sunkenVehicle.setAttribute("transform", "rotate(" + vehicle['Rotation'][1] + ", " + (this.imx - ((vehicle['Location'][0] - this.minX) / 100 * this.scale)) + ", " + (this.imy - ((vehicle['Location'][1] - this.minY) / 100 * this.scale)) + ")");
-                this.shapes.push(sunkenVehicle);
+                rollingStockGroup.appendChild(sunkenVehicle);
 
                 const sunkenVehicleLabel = document.createElementNS(this.svgNS, "text");
                 const textNode = document.createTextNode("&nbsp;&nbsp;" + vehicle['Location'][2]);
                 sunkenVehicleLabel.setAttribute("x", x.toString());
                 sunkenVehicleLabel.setAttribute("y", y.toString());
                 sunkenVehicleLabel.appendChild(textNode);
-                this.shapes.push(sunkenVehicleLabel);
+                rollingStockGroup.appendChild(sunkenVehicleLabel);
 
                 const cartInput = document.createElement("input");
                 cartInput.name = "underground_" + index;
@@ -546,7 +561,7 @@ class Mapper {
                 vehicleLabel.setAttribute("y", y.toString());
                 vehicleLabel.setAttribute("transform", "rotate(" + textRotation + ", " + x + ", " + y + ")")
                 vehicleLabel.appendChild(textNode);
-                this.shapes.push(vehicleLabel);
+                rollingStockGroup.appendChild(vehicleLabel);
             }
 
             let cargo = "firewood";
@@ -622,6 +637,7 @@ class Mapper {
 
             index++;
         }
+        this.shapes.push(rollingStockGroup);
     }
 
     getIndustries() {
@@ -862,9 +878,9 @@ class Mapper {
         }
 
         const firstTreeGroup = document.createElementNS(this.svgNS, "g");
-        firstTreeGroup.setAttribute("class", "trees_default");
+        firstTreeGroup.setAttribute("class", "trees_default display_hide");
         const userTreeGroup = document.createElementNS(this.svgNS, "g");
-        userTreeGroup.setAttribute("class", "trees_user");
+        userTreeGroup.setAttribute("class", "trees_user display_hide");
 
         for (let i = 0; i < this.json['Removed']['Vegetation'].length; i++) {
             const tree = this.json['Removed']['Vegetation'][i];

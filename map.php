@@ -48,7 +48,6 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
 
     <div class="export__panel info-panel">
         <div class="export__panel-scroll-content">
-            <?php var_dump(modified()); ?>
             <h3>Player Info</h3>
             <table id="playerTable">
                 <thead>
@@ -84,6 +83,22 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
                         <span>Psawhns background with kanados overlay</span>
                     </li>
                 </ul>
+            </div>
+            <h3>Display options</h3>
+            <div>
+                <input id="trees_user" type="checkbox" onclick="toggleDisplayOptions(this)" /> Show trees cut down by player
+            </div>
+            <div>
+                <input id="trees_default" type="checkbox" onclick="toggleDisplayOptions(this)" /> Show trees cut down by default
+            </div>
+            <div>
+                <input id="tracksandbeds" type="checkbox" onclick="toggleDisplayOptions(this)" checked /> Show tracks and beds
+            </div>
+            <div>
+                <input id="switches" type="checkbox" onclick="toggleDisplayOptions(this)" checked /> Show switches and crossings
+            </div>
+            <div>
+                <input id="rollingstock" type="checkbox" onclick="toggleDisplayOptions(this)" checked /> Show rolling stock
             </div>
         </div>
     </div>
@@ -130,6 +145,11 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
                     <?php if (!modified()) { ?>
                         <button class="button">Replant Trees</button>
                     <?php } ?>
+                </form>
+                <form method="POST" action="/converter.php">
+                    <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
+                    <input name="allBrakes" value="YES" type="hidden" />
+                    <button class="button">Apply all brakes</button>
                 </form>
                 <h4>Players</h4>
                 <form method="POST" action="/converter.php">
@@ -209,6 +229,18 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
             image.setAttribute("width", backgrounds[clickedImage.id][4].toString());
             image.setAttribute("height", backgrounds[clickedImage.id][5].toString());
             image.setAttribute("href", "/assets/images/" + backgrounds[clickedImage.id][6]);
+        }
+    }
+
+    function toggleDisplayOptions (checkbox) {
+        if (checkbox.checked) {
+            const element = document.getElementsByClassName(checkbox.id)[0];
+            element.classList.remove('display_hide');
+            element.classList.add('display_show');
+        } else {
+            const element = document.getElementsByClassName(checkbox.id)[0];
+            element.classList.add('display_hide');
+            element.classList.remove('display_show');
         }
     }
 </script>
