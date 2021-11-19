@@ -1,5 +1,5 @@
 <?php
-require_once 'ArithmeticHelper.php';
+require_once 'utils/ArithmeticHelper.php';
 
 /**
  * Class GVASParser
@@ -621,9 +621,9 @@ class GVASParser
                 $segments[$divisionS][$id] = new Node($id, array($segment['LocationStart'], $segment['LocationEnd']), $ah);
                 $segments[$divisionE][$id] = new Node($id, array($segment['LocationStart'], $segment['LocationEnd']), $ah);
 
-                foreach($this->goldenBucket['Industries'] as $i => $industry){
+                foreach ($this->goldenBucket['Industries'] as $i => $industry) {
                     $d = $ah->dist($industry['Location'], $segment['LocationCenter']);
-                    if(!isset($industryTracks[$i]) || $industryTracks[$i]['d']>$d){
+                    if (!isset($industryTracks[$i]) || $industryTracks[$i]['d'] > $d) {
                         $industryTracks[$i]['d'] = $d;
                         $industryTracks[$i]['trackNode'] = $segments[$divisionS][$id];
                     }
@@ -732,7 +732,7 @@ class Node
     var $endpoints = array();
     var $nextNodes = array();
     var $id;
-    var ArithmeticHelper $ah;
+    var $ah;
     var $near;
 
     public function __construct($id, $endpoints, ArithmeticHelper $ah)

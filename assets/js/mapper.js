@@ -204,12 +204,16 @@ class Mapper {
                         const slopeTriggerPrefix = '..';
                         const slopeTriggerDecimals = 1;
                         if (distance > 0 && (type === 4 || type === 0)) {
+                            let degrees = null;
+                            if (segment['LocationEnd']['X'] === segment['LocationStart']['X']) {
+                                degrees = 90;
+                            }
                             if (Math.abs(slope) > slopeTrigger) {
                                 const tanA = (
                                     (segment['LocationEnd']['Y'] - segment['LocationStart']['Y']) /
-                                    Math.max(0.00001, (segment['LocationEnd']['X'] - segment['LocationStart']['X']))
+                                    (segment['LocationEnd']['X'] - segment['LocationStart']['X'])
                                 );
-                                let degrees = this._rad2deg(Math.atan(tanA));
+                                degrees = this._rad2deg(Math.atan(tanA));
                                 if (degrees > 0) {
                                     degrees -= 90;
                                 } else {
@@ -886,24 +890,23 @@ class Mapper {
             const tree = this.json['Removed']['Vegetation'][i];
             const treeX = Math.floor((200000 + tree[0]) / 100000);
             const treeY = Math.floor((200000 + tree[1]) / 100000);
+
             let minDistanceToSomething = 80000000;
 
-            if (this.json['Segments'][treeX][treeY] !== undefined) {
-                for (const segment of this.json['Segments'][treeX][treeY]) {
-                    if (segment['LocationCenter']['X'] < tree[0] - 6000) {
-                        continue;
-                    }
-                    if (segment['LocationCenter']['X'] > tree[0] + 6000) {
-                        continue;
-                    }
-                    if (segment['LocationCenter']['Y'] < tree[1] - 6000) {
-                        continue;
-                    }
-                    if (segment['LocationCenter']['Y'] > tree[1] + 6000) {
-                        continue;
-                    }
-                    minDistanceToSomething = Math.min(minDistanceToSomething, this._dist(tree, segment['LocationCenter']));
+            for (const segment of this.json['Segments'][treeX][treeY]) {
+                if (segment['LocationCenter']['X'] < tree[0] - 6000) {
+                    continue;
                 }
+                if (segment['LocationCenter']['X'] > tree[0] + 6000) {
+                    continue;
+                }
+                if (segment['LocationCenter']['Y'] < tree[1] - 6000) {
+                    continue;
+                }
+                if (segment['LocationCenter']['Y'] > tree[1] + 6000) {
+                    continue;
+                }
+                minDistanceToSomething = Math.min(minDistanceToSomething, this._dist(tree, segment['LocationCenter']));
             }
             if (minDistanceToSomething > 700) {
                 const x = (this.imx - ((tree[0] - this.minX) / 100 * this.scale));
@@ -929,9 +932,9 @@ class Mapper {
     }
 
     _getDistanceToNearestLabel(newLabel) {
-        const minDistance = 8000;
+        let minDistance = 8000;
         for (const oldLabel of this.allLabels) {
-            Math.min(
+            minDistance = Math.min(
                 minDistance,
                 Math.sqrt(
                     Math.pow(newLabel[0] - oldLabel[0], 2) +
@@ -1009,6 +1012,6 @@ class Mapper {
         return Math.sqrt(
             Math.pow(a[0] - b['X'], 2) +
             Math.pow(a[1] - b['Y'], 2)
-        );
+        ).valueOf();
     }
 }
