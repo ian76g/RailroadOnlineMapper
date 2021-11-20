@@ -33,11 +33,10 @@ body {
   padding: 2rem;
   max-width: 100%;
   margin: 0;
-  background: url("/images/indexbg.jpg") no-repeat center center fixed;
+  background: url("/assets/images/indexbg.jpg") no-repeat center center fixed;
   background-size: cover;
   font-family: "Open Sans", sans-serif;
   font-size: 1rem;
-  background-size: cover;
 }
 
 /* TYPOGRAPHY */
@@ -165,6 +164,7 @@ label:hover {
   align-items: flex-start;
   margin-bottom: 2rem;
 }
+
 @media only screen and (min-width: 960px) {
   .header {
     flex-direction: row;
@@ -179,6 +179,7 @@ label:hover {
   max-width: 100%;
   word-break: break-all;
 }
+
 @media only screen and (min-width: 960px) {
   .logo {
     margin-bottom: 0;
@@ -254,6 +255,7 @@ thead th {
   color: white;
   border-bottom: 1px solid var(--secondary-color);
 }
+
 @media only screen and (min-width: 1250px) {
   thead th {
     padding: 1rem;
@@ -309,4 +311,46 @@ tbody td {
 
 .upload-form__background fieldset div img {
   margin: 0 auto;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  backdrop-filter: blur(10px);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #000;
+  width: 50%;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.display_hide {
+  display: none;
+}
+
+.display_show {
+  display: block;
 }
