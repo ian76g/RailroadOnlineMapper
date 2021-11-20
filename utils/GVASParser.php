@@ -864,6 +864,9 @@ class CountryNames
                 return "END OF FILE";
             }
             $name = array_shift($this->names);
+            if (!trim($name)) {
+                continue;
+            }
             if (strlen($name) < 15) {
                 return $name;
             }
