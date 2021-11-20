@@ -1,8 +1,6 @@
 <?php
-require_once ('config.php');
 if (isset($_POST) && !empty($_POST)) {
-
-    $target_dir = SHELL_ROOT."uploads/";
+    $target_dir = "saves/";
     $uploadOk = 1;
     $imageFileType = strtolower(pathinfo($_FILES["fileToUpload"]["tmp_name"], PATHINFO_EXTENSION));
 
@@ -13,61 +11,35 @@ if (isset($_POST) && !empty($_POST)) {
     }
 
     // Check if $uploadOk is set to 0 by an error
-        if ($uploadOk == 0) {
-            echo "Sorry, your file was not uploaded.";
-    // if everything is ok, try to upload file
+    if ($uploadOk == 0) {
+        echo "Sorry, your file was not uploaded.";
+        // if everything is ok, try to upload file
+    } else {
+        require_once 'utils/dtAbstractData.php';
+        require_once 'utils/dtDynamic.php';
+        require_once 'utils/dtHeader.php';
+        require_once 'utils/dtProperty.php';
+        require_once 'utils/dtString.php';
+        require_once 'utils/dtVector.php';
+        require_once 'utils/dtArray.php';
+        require_once 'utils/dtStruct.php';
+        require_once 'utils/dtTextProperty.php';
+        require_once 'utils/GVASParser.php';
+        require_once 'utils/SaveReader.php';
+
+        $myParser = new GVASParser();
+        $myParser->parseData(file_get_contents($_FILES["fileToUpload"]["tmp_name"]));
+        $newFilename = $myParser->owner;
+        $target_file = $target_dir . $newFilename . '.sav';
+
+        if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
+            $saveReadr = new SaveReader($myParser->goldenBucket);
+            $saveReadr->addDatabaseEntry($target_file);
+            header('Location: /map.php?name=' . $newFilename);
+            die();
         } else {
-          $NEWUPLOADEDFILE = $_FILES["fileToUpload"]["tmp_name"];
-          include('converter.php');
-          header('Location: '.$mapFile);
+            echo "Sorry, there was an error uploading your file.";
         }
-        die();
+    }
+    die();
 }
-
-?>
-<!DOCTYPE html>
-<html lang="en">
-<?php
-$PageTitle = "Upload";
-include_once(SHELL_ROOT.'includes/head.php');
-?>
-<body>
-<!--H1>I AM IN BED NOW. GAMING COMPUTER SHUT DOWN! YOUR UPLOADS WILL BE QUEUED UNTIL I WAKE UP TOMORROW.</H1>
-<H2>Due to some technical limitations this mapping can yet not be done plainely on Webservers (yet!)</H2>
-<H3>hence we miss some cruicial bits needed to display a map.</H3-->
-
-<header class="header">
-    <a class="button" href="<?php echo WWW_ROOT;?>">Go Back</a>
-</header>
-
-<main>
-    <form class="upload-form" method="post" enctype="multipart/form-data">
-        <h1>Upload your savefile</h1>
-        <p>Open explorer at %localappdata%\arr\saved\savegames\</p>
-        <br>
-
-        <section>
-            <h3>1. Select savefile</h3>
-              <input type="file" name="fileToUpload" id="fileToUpload">
-        </section>
-        <!--img src="hint.png" width="700"-->
-        <section>
-            <h3>2. Make it public</h3>
-            <div class="input-group input-group--row">
-                <input id="public" type="checkbox" name="public">
-                <label for="public">Others are allowed to download this for 2 days</label>
-
-            </div>
-
-        </section>
-
-            <input class="button" type="submit" value="Upload" name="submit">
-
-
-    </form>
-</main>
-
-<?php include_once(SHELL_ROOT.'includes/footer.php') ?>
-
-</body>
-</html>

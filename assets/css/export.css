@@ -18,6 +18,21 @@
   height: 100%;
 }
 
+.export__map--background-list li {
+  margin-left: 0;
+  list-style: none;
+  margin-bottom: 1em;
+}
+
+.export__map--background-list img {
+  border: #524c49 1px solid;
+  cursor: pointer;
+}
+
+.export__map--background-list span {
+  font-size: 0.8rem;
+}
+
 .export__nav {
   display: flex;
   justify-content: space-between;
@@ -72,19 +87,13 @@
   transform: translateX(0);
 }
 
-.info-panel__player-info{
-  display: flex;
-  justify-content: space-around;
-  width: 100%;
-}
-
 .export__mapper {
   width: 100%;
   margin: 0;
 }
 
 .export__mapper td {
-  padding: 0rem 0.5rem;
+  padding: 0 0.5rem;
   vertical-align: middle;
 }
 
@@ -121,4 +130,8 @@
   position: fixed;
   bottom: 0;
   left: 0;
+}
+
+#playerTable {
+  width: 90%;
 }

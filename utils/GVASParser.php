@@ -1,49 +1,46 @@
 <?php
-require_once SHELL_ROOT . 'classes/ArithmeticHelper.php';
+require_once 'utils/ArithmeticHelper.php';
 
 /**
  * Class GVASParser
  */
 class GVASParser
 {
+    private array $saveObject = array();
+    private int $initialTreesDown = 1750;
 
-    var $position = 0;
-    var $x = '';
-    var $goldenBucket = array();
-    var $NEWUPLOADEDFILE;
-    var $saveObject = array();
-    var $initialTreesDown = 1750;
+    public array $goldenBucket = array();
+    public string $owner;
 
     /**
-     * @param $x
-     * @param bool $againAllowed
+     * @param string $x
+     * @param bool $edit
      * @return false|string
      */
-    public function parseData($x, $againAllowed = true)
+    public function parseData(string $x, bool $edit = false)
     {
-        $this->x = $x;
         $this->goldenBucket = array();
-        $this->position = 0;
+        $position = 0;
 
         $myHeader = new dtHeader();
-        $this->position = $myHeader->unserialize($this->x, $this->position);
-        $headerTotal = substr($this->x, 0, $this->position);
+        $position = $myHeader->unserialize($x, $position);
+        $headerTotal = substr($x, 0, $position);
         $myHeader->content = $headerTotal;
 
         $this->saveObject['objects'][] = $myHeader;
 
         $myString = new dtString();
-        $results = $myString->unserialize($x, $this->position);
+        $results = $myString->unserialize($x, $position);
 //        $string = $results[0];
-        $this->position = $results[1];
+        $position = $results[1];
         $this->saveObject['objects'][] = $myString;
 
-        while ($this->position < strlen($x)) {
+        while ($position < strlen($x)) {
             $myProperty = new dtProperty();
-            $results = $myProperty->unserialize($this->x, $this->position);
+            $results = $myProperty->unserialize($x, $position);
             if ($results['0'] != 'EOF') {
 
-                $original = substr($this->x, $this->position, $results[1] - $this->position);
+                $original = substr($x, $position, $results[1] - $position);
                 $test = $myProperty->serialize();
                 if ($original != $test) {
                     file_put_contents('tmp_' . trim($myProperty->NAME), $original);
@@ -51,7 +48,7 @@ class GVASParser
                 }
 
                 $this->saveObject['objects'][] = $myProperty;
-                $this->position = $results[1];
+                $position = $results[1];
                 $resultRows = $results[0];
                 foreach ($resultRows as $row) {
                     $pieces = $row[0];
@@ -256,7 +253,10 @@ class GVASParser
          * HANDLE DATA MANIPULATION AND SAVE FILE
          */
 
-        $tmp = $this->handleEditAndSave($againAllowed);
+        $tmp = $this->handleEditAndSave();
+        if ($edit) {
+            return $tmp;
+        }
         if ($tmp == 'AGAIN') {
             return $tmp;
         }
@@ -264,10 +264,9 @@ class GVASParser
         $this->goldenBucket = $this->convert_from_latin1_to_utf8_recursively($this->goldenBucket);
 
         $json = json_encode($this->goldenBucket, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-//echo json_last_error_msg();
         file_put_contents('xx.json', $json);
-        return $json;
 
+        return $json;
     }
 
 
@@ -300,17 +299,16 @@ class GVASParser
      * @param $b
      * @return float
      */
-    function distance($a, $b)
+    function distance($a, $b): float
     {
 
         return sqrt(pow($a[0] - $b['X'], 2) + pow($a[1] - $b['Y'], 2));
     }
 
     /**
-     * @param $againAllowed
      * @return string
      */
-    function handleEditAndSave($againAllowed)
+    function handleEditAndSave(): string
     {
         $output = '';
         foreach ($this->saveObject['objects'] as $saveObjectIndex => $object) {
@@ -351,7 +349,7 @@ class GVASParser
                         //echo round($minDistanceToSomething)." ";
                     }
                     foreach ($toRemove as $tri) {
-                        if (isset($_POST['replant']) && $_POST['replant'] == 'YES') {
+                        if (isset($_POST['replant']) && $_POST['replant'] === 'YES') {
                             unset($object->CONTENTOBJECTS[3]->contentElements[$tri]);
                         } else {
                             $this->goldenBucket['Removed']['Vegetation'][$tri]['replant'] = true;
@@ -365,7 +363,6 @@ class GVASParser
                 if (trim($object->NAME) == 'FrameNumberArray') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['number_' . $index]) && trim($_POST['number_' . $index])) {
-                            $x = 2;
                             if (!isset($object->CONTENTOBJECTS[3]->contentElements[$index]->lines[0])) {
                                 $string = new dtString();
                                 $string->nullBytes = 1;
@@ -379,6 +376,7 @@ class GVASParser
                         }
                     }
                 }
+                $countryObj = null;
                 if (trim($object->NAME) == 'FrameNameArray') {
                     if (isset($_POST['nameAllCountries'])) {
                         $countryObj = new CountryNames($_POST['nameAllCountries']);
@@ -593,18 +591,7 @@ class GVASParser
             }
         }
         $output .= hex2bin('050000004e6f6e650000000000');
-
-        if (isset($_POST['save'])) {
-            $db = unserialize(file_get_contents('db.db'));
-            if (getUserIpAddr() != $db[$this->NEWUPLOADEDFILE][5]) {
-                die("This does not seem to be your save file.");
-            }
-            echo "SAVING FILE " . $this->NEWUPLOADEDFILE . "<br>\n";
-            file_put_contents(SHELL_ROOT . 'saves/' . $this->owner.'.sav', $output, FILE_BINARY);
-            echo '<A href="' . WWW_ROOT . 'saves/' . $this->owner.'.sav' . '">Download your modified save here </A><br>';
-            echo 'Want to upload this map again?<A href="' . WWW_ROOT . 'upload.php">Add your save again</A><br>';
-        }
-
+        return $output;
     }
 
     private function buildGraph()
@@ -742,12 +729,10 @@ class GVASParser
                 $node->ww[$iI] = array(sizeof($passed), $nnI);
             }
         }
-
-        return;
     }
 
 
-    function findSwitchEndpoints($switch)
+    function findSwitchEndpoints($switch): array
     {
 
         /**
@@ -760,6 +745,8 @@ class GVASParser
          * 6 = SwitchCross90        = cross
          */
         switch ($switch['Type']) {
+            case 2:
+            case 5:
             case 0 :
                 $dir = -5.7;
                 break;
@@ -767,12 +754,6 @@ class GVASParser
             case 3 :
             case 4:
                 $dir = 5.7;
-                break;
-            case 2 :
-                $dir = -5.7;
-                break;
-            case 5 :
-                $dir = -5.7;
                 break;
             default:
                 $dir = 0;
@@ -806,14 +787,11 @@ class SwitchNode extends Node
 
 class Node
 {
-    var $endpoints = array();
-    var $nextNodes = array();
-    var $id;
-    /**
-     * @var ArithmeticHelper
-     */
-    var $ah;
-    var $near;
+    var array $endpoints = array();
+    var array $nextNodes = array();
+    var int $id;
+    var ArithmeticHelper $ah;
+    var string $near;
 
     public function __construct($id, $endpoints, ArithmeticHelper $ah)
     {
@@ -835,7 +813,7 @@ class Node
         $this->nextNodes[$node->id] = &$node;
     }
 
-    public function getEndpoints()
+    public function getEndpoints(): array
     {
         return $this->endpoints;
     }
@@ -844,7 +822,7 @@ class Node
      * @param Node $node
      * @return bool
      */
-    public function hasEndPointLike(Node $node)
+    public function hasEndPointLike(Node $node): bool
     {
         foreach ($node->getEndpoints() as $point) {
             foreach ($this->endpoints as $ownPoint) {
@@ -881,8 +859,8 @@ class CountryNames
 
     public function __construct($type)
     {
-        if (file_exists(SHELL_ROOT . '/includes/' . $type . '.txt')) {
-            $data = file_get_contents(SHELL_ROOT . '/includes/' . $type . '.txt');
+        if (file_exists('/includes/' . $type . '.txt')) {
+            $data = file_get_contents('/includes/' . $type . '.txt');
             $data = explode("\n", $data);
             array_shift($data); // header
             $this->names = $data;
