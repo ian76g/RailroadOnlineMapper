@@ -187,7 +187,16 @@ foreach ($textFiles as $textFile) {
                 <form method="POST" action="/converter.php"><input type="hidden" name="save"
                                                                    value="<?php echo $saveFile; ?>">
                     <?php echo $textOptions; ?>
-                    <button class="button">Rename everything to selected schema</button>
+
+                    <span style="font-size: smaller">Have another list? mail it to locolist@pordi.com</span><br>
+                    apply to <select name="renameWhat">
+                        <option value="everything">everything</option>
+                        <option value="locos">only locomotives</option>
+                        <option value="tenders">only tenders</option>
+                        <option value="carts">only carts</option>
+                        <option value="handcarts">only handcarts</option>
+                    </select><br />
+                    <button class="button">Apply name schema</button>
                 </form>
 
                 <br/><br/>
@@ -241,7 +250,7 @@ foreach ($textFiles as $textFile) {
                     <button class="button">Get Carts from Underground</button>
                 </form>
                 <br/>
-                <a class="button" href="<?php echo $saveFile; ?>">Download Save</a>
+                <!--a class="button" href="<?php echo $saveFile; ?>">Download Save</a-->
             </div>
         </div>
     </div>

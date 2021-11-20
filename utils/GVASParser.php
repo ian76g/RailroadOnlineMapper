@@ -390,7 +390,27 @@ class GVASParser
                             $object->CONTENTOBJECTS[3]->contentElements[$index] = new dtTextProperty(trim($_POST['name_' . $index]));
                         }
                         if (isset($_POST['nameAllCountries'])) {
-                            $object->CONTENTOBJECTS[3]->contentElements[$index] = new dtTextProperty($countryObj->getName());
+
+                            $locos = array('porter_040', 'porter_042', 'eureka', 'heisler', 'class70', 'cooke260','climax');
+                            $tenders = array('eureka_tender', 'class70_tender', 'cooke260_tender');
+                            $carts = array('flatcar_logs','flatcar_cordwood','flatcar_stakes','flatcar_hopper','boxcar','flatcar_tanker');
+                            $currentType = $this->goldenBucket['Frames'][$index]['Type'];
+                            if($_POST['renameWhat'] == 'locos' || $_POST['renameWhat'] == 'everything'){
+                                if(in_array($currentType, $locos)){
+                                    $object->CONTENTOBJECTS[3]->contentElements[$index] = new dtTextProperty($countryObj->getName());
+                                }
+                            }
+                            if($_POST['renameWhat'] == 'carts' || $_POST['renameWhat'] == 'everything'){
+                                if(in_array($currentType, $carts)){
+                                    $object->CONTENTOBJECTS[3]->contentElements[$index] = new dtTextProperty($countryObj->getName());
+                                }
+                            }
+                            if($_POST['renameWhat'] == 'tenders' || $_POST['renameWhat'] == 'everything'){
+                                if(in_array($currentType, $tenders)){
+                                    $object->CONTENTOBJECTS[3]->contentElements[$index] = new dtTextProperty($countryObj->getName());
+                                }
+                            }
+//                                        'handcar': [this.engineRadius, 'white'],
                         }
                     }
                 }
