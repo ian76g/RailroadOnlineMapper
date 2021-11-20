@@ -312,10 +312,14 @@ class GVASParser
      */
     function handleEditAndSave($againAllowed)
     {
+        $sevenHundret = 700;
+        if(isset($_POST['replant'])){
+            $sevenHundret = $_POST['replant'];
+        }
         $output = '';
         foreach ($this->saveObject['objects'] as $saveObjectIndex => $object) {
             if (is_object($object)) {
-                if (trim($object->NAME) == 'RemovedVegetationAssetsArray' && isset($_POST['replant']) && $_POST['replant'] == 'YES') {
+                if (trim($object->NAME) == 'RemovedVegetationAssetsArray' && isset($_POST['replant'])) {
                     $v = 0;
                     $toRemove = array();
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $vector) {
@@ -345,13 +349,13 @@ class GVASParser
                                 $minDistanceToSomething = min($minDistanceToSomething, $this->distance($vector->content, $segment['LocationCenter']));
                             }
                         }
-                        if ($minDistanceToSomething > 700) {
+                        if ($minDistanceToSomething > $sevenHundret) {
                             $toRemove[] = $index;
                         }
                         //echo round($minDistanceToSomething)." ";
                     }
                     foreach ($toRemove as $tri) {
-                        if (isset($_POST['replant']) && $_POST['replant'] == 'YES') {
+                        if (isset($_POST['replant'])) {
                             unset($object->CONTENTOBJECTS[3]->contentElements[$tri]);
                         } else {
                             $this->goldenBucket['Removed']['Vegetation'][$tri]['replant'] = true;
@@ -596,11 +600,12 @@ class GVASParser
 
         if (isset($_POST['save'])) {
             $db = unserialize(file_get_contents('db.db'));
-            if (getUserIpAddr() != $db[$this->NEWUPLOADEDFILE][5]) {
+            if (getUserIpAddr() != $db[$this->owner][5]) {
                 die("This does not seem to be your save file.");
             }
             echo "SAVING FILE " . $this->NEWUPLOADEDFILE . "<br>\n";
             file_put_contents(SHELL_ROOT . 'saves/' . $this->owner.'.sav', $output, FILE_BINARY);
+            chown(SHELL_ROOT . 'saves/' . $this->owner.'.sav', 0777);
             echo '<A href="' . WWW_ROOT . 'saves/' . $this->owner.'.sav' . '">Download your modified save here </A><br>';
             echo 'Want to upload this map again?<A href="' . WWW_ROOT . 'upload.php">Add your save again</A><br>';
         }

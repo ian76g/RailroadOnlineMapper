@@ -706,10 +706,12 @@ class Mapper
             }
         }
 
+        $saveFile = 'saves/' . $this->owner . '.sav';
+
         $cartExtraStr = '
         <br/>
         <h4>Rolling Stock</h4>
-        <form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $this->NEWUPLOADEDFILE . '">
+        <form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $saveFile . '">
         <table class="export__mapper">
         <tr>
         <th>Type</th>
@@ -723,31 +725,31 @@ class Mapper
         <button class="button">Apply Rolling Stock changes</button></form>
 
         <br/><br/>
-        <form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $this->NEWUPLOADEDFILE . '">
+        <form method="POST" action="../converter.php"><input type="hidden" name="save" value="'.$saveFile.'">
         ' . $textOptions . '
         <button class="button">Rename everything to selected schema</button></form>
 
         <br/><br/>
-        <form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $this->NEWUPLOADEDFILE . '">
+        <form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $saveFile . '">
         <input name="allBrakes" value="YES" type="hidden" />
         <button class="button">Apply all brakes</button></form>
 
 
         <br/><br/>
         <h4>Trees</h4>
-        <form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $this->NEWUPLOADEDFILE . '">
-        <input name="replant" value="YES" type="hidden" />
+        <form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $saveFile . '">
+        <input name="replant" value="700" /> cm away from center of segments
         <button class="button">Replant Trees</button></form>
 
         <!--br/><br/>
         <h4>I Hate Stones</h4>
-        <form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $this->NEWUPLOADEDFILE . '">
+        <form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $saveFile . '">
         <input name="removestones" value="YES" type="hidden" />
         <button class="button">Remove All Stones</button></form-->
 
         <br/><br/>
         <h4>Players</h4>
-        <form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $this->NEWUPLOADEDFILE . '">
+        <form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $saveFile . '">
         <table class="export__mapper">
         <tr>
         <th>Player</th>
@@ -761,7 +763,7 @@ class Mapper
 
         <br/><br/>
         <h4>Industries</h4>
-        <form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $this->NEWUPLOADEDFILE . '">
+        <form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $saveFile . '">
         <table class="export__mapper">
         <tr>
         <th>Industry</th>
@@ -775,7 +777,7 @@ class Mapper
 
         <br/><br/>
         <h4>Carts</h4>
-        <form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $this->NEWUPLOADEDFILE . '">
+        <form method="POST" action="../converter.php"><input type="hidden" name="save" value="' . $saveFile . '">
         <table class="export__mapper">
         ###UMROWS###
         </table>
