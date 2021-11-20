@@ -77,6 +77,11 @@ $tableHeader = '<thead>
                     <input type="file" name="fileToUpload" id="fileToUpload">
                 </section>
 
+                <section>
+                    <h3>Make it public</h3>
+                    <input type="checkbox" name="public" id="public" />
+                </section>
+
                 <input class="button" type="submit" value="Upload" name="submit">
             </form>
         </div>

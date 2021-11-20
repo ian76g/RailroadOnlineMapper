@@ -618,7 +618,7 @@ class GVASParser
 
         if (isset($_POST['save'])) {
             $db = unserialize(file_get_contents('db.db'));
-            if (getUserIpAddr() != $db[$this->owner][5]) {
+            if (!isset($db[$this->owner][5]) || getUserIpAddr() != $db[$this->owner][5]) {
                 die("This does not seem to be your save file.");
             }
         }

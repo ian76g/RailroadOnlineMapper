@@ -90,6 +90,6 @@ foreach ($files as $file) {
     $myParser = new GVASParser();
     $myParser->parseData(file_get_contents($fileName), false);
     $saveReadr = new SaveReader($myParser->goldenBucket);
-    $saveReadr->addDatabaseEntry($fileName);
+    $saveReadr->addDatabaseEntry($fileName, isset($_POST['public']));
     header('Location: /map.php?name=' . str_replace('.sav', '', basename($fileName)));
 }

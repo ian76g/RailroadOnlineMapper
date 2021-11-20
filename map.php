@@ -250,7 +250,7 @@ foreach ($textFiles as $textFile) {
                     <button class="button">Get Carts from Underground</button>
                 </form>
                 <br/>
-                <!--a class="button" href="<?php echo $saveFile; ?>">Download Save</a-->
+                <a class="button" href="download.php?map=<?php echo substr(basename($saveFile),0,-4); ?>">Download Save</a>
             </div>
         </div>
     </div>

@@ -34,7 +34,7 @@ if (isset($_POST) && !empty($_POST)) {
 
         if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
             $saveReadr = new SaveReader($myParser->goldenBucket);
-            $saveReadr->addDatabaseEntry($newFilename);
+            $saveReadr->addDatabaseEntry($newFilename, isset($_POST['public']));
             header('Location: /map.php?name=' . $newFilename);
             die();
         } else {
