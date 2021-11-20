@@ -126,9 +126,8 @@ class Mapper {
         const tracksGroup = document.createElementNS(this.svgNS, "g");
         const bedsGroup = document.createElementNS(this.svgNS, "g");
         const maxSlopeLabelGroup = document.createElementNS(this.svgNS, "g");
-        // tracksAndBedsGroup.setAttribute("class", "tracksandbeds display_show");
-        tracksGroup.setAttribute("class", "tracks display_show");
-        bedsGroup.setAttribute("class", "beds display_show");
+        tracksGroup.setAttribute("class", "tracks");
+        bedsGroup.setAttribute("class", "beds");
 
         const slopeLabelGroup = Array(
             document.createElementNS(this.svgNS, "g"),
@@ -137,11 +136,11 @@ class Mapper {
             document.createElementNS(this.svgNS, "g")
         );
 
-        slopeLabelGroup[0].setAttribute("class", "slopeLabel0 display_hide");
-        slopeLabelGroup[1].setAttribute("class", "slopeLabel1 display_hide");
-        slopeLabelGroup[2].setAttribute("class", "slopeLabel2 display_show");
-        slopeLabelGroup[3].setAttribute("class", "slopeLabel3 display_show");
-        maxSlopeLabelGroup.setAttribute("class", "maxSlopeLabel display_show");
+        slopeLabelGroup[0].setAttribute("class", "slopeLabel0");
+        slopeLabelGroup[1].setAttribute("class", "slopeLabel1");
+        slopeLabelGroup[2].setAttribute("class", "slopeLabel2");
+        slopeLabelGroup[3].setAttribute("class", "slopeLabel3");
+        maxSlopeLabelGroup.setAttribute("class", "maxSlopeLabel");
 
         // [type, stroke-width, stroke]
         const drawOrder = {};
@@ -328,7 +327,7 @@ class Mapper {
         }
 
         const switchesGroup = document.createElementNS(this.svgNS, "g");
-        switchesGroup.setAttribute("class", "switches display_show");
+        switchesGroup.setAttribute("class", "switches");
 
         for (const swtch of this.json.Switchs) { // can't use 'switch' as variable name
             let dir = false;
@@ -457,7 +456,7 @@ class Mapper {
         }
 
         const turntablesGroup = document.createElementNS(this.svgNS, "g");
-        turntablesGroup.setAttribute("class", "turntables display_show");
+        turntablesGroup.setAttribute("class", "turntables");
 
         for (const turntable of this.json.Turntables) {
             /**
@@ -502,7 +501,7 @@ class Mapper {
         }
 
         const rollingStockGroup = document.createElementNS(this.svgNS, "g");
-        rollingStockGroup.setAttribute("class", "rollingstock display_show");
+        rollingStockGroup.setAttribute("class", "rollingstock");
 
         const undergroundCartsTable = document.getElementById("undergroundCartsTable");
         const rollingStockTable = document.getElementById("rollingStockTable");
@@ -952,9 +951,9 @@ class Mapper {
         }
 
         const firstTreeGroup = document.createElementNS(this.svgNS, "g");
-        firstTreeGroup.setAttribute("class", "trees_default display_hide");
+        firstTreeGroup.setAttribute("class", "trees_default");
         const userTreeGroup = document.createElementNS(this.svgNS, "g");
-        userTreeGroup.setAttribute("class", "trees_user display_hide");
+        userTreeGroup.setAttribute("class", "trees_user");
 
         for (let i = 0; i < this.json['Removed']['Vegetation'].length; i++) {
             const tree = this.json['Removed']['Vegetation'][i];

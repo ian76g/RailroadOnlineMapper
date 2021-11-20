@@ -260,6 +260,14 @@ foreach ($textFiles as $textFile) {
     map = new Mapper(<?php echo $json; ?>);
     map.drawSVG('demo-tiger');
 
+    // Set different display options based on checkbox state
+    const options = document.getElementsByTagName("input");
+    for (const element of options) {
+        if (element.type === "checkbox" && typeof element.onclick == "function") {
+            toggleDisplayOptions(element);
+        }
+    }
+
     const backgrounds = {
         'bg': [8000, 8000, 0, 0, 8000, 8000, 'bg.jpg'],
         'bg3': [8000, 8000, 0, 0, 8000, 8000, 'bg3.jpg'],
