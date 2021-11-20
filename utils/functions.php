@@ -53,15 +53,17 @@ function map_entries($sortby = null, $sortorder = null): Generator
                 unlink($file);
             }
 
+            $user = substr(basename($file),0,-4);
+
             yield array(
                 "filename" => $file,
                 "name" => pathinfo($file, PATHINFO_FILENAME),
-                "trackLength" => round($db[$file][0] / 100000, 2),
-                "numY" => ($db[$file][1] == null ? '0' : $db[$file][1]),
-                "numT" => ($db[$file][6] == null ? '0' : $db[$file][6]),
-                "numLocs" => ($db[$file][2] == null ? '0' : $db[$file][2]),
-                "numCarts" => ($db[$file][3] == null ? '0' : $db[$file][3]),
-                "slope" => round(($db[$file][4] == null ? '0' : $db[$file][4]))
+                "trackLength" => round($db[$user][0] / 100000, 2),
+                "numY" => ($db[$user][1] == null ? '0' : $db[$user][1]),
+                "numT" => ($db[$user][6] == null ? '0' : $db[$user][6]),
+                "numLocs" => ($db[$user][2] == null ? '0' : $db[$user][2]),
+                "numCarts" => ($db[$user][3] == null ? '0' : $db[$user][3]),
+                "slope" => round(($db[$user][4] == null ? '0' : $db[$user][4]))
             );
             $i++;
         }
