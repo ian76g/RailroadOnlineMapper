@@ -252,12 +252,11 @@ foreach ($textFiles as $textFile) {
         <button class="button" id="reset">Reset</button>
     </div>
 </main>
-
 <script type="text/javascript" src="/assets/js/svg-pan-zoom.js"></script>
 <script type="text/javascript" src="/assets/js/export.js"></script>
 <script type="text/javascript" src="/assets/js/mapper.js?<?php echo time(); ?>"></script>
 <script type="text/javascript">
-    map = new Mapper(<?php echo $json; ?>);
+    map = new Mapper(<?php echo $json; ?>, "<?php (isset($_GET['prefix']) && $_GET['prefix'] != "" ? print($_GET['prefix']) : print("..")) ?>");
     map.drawSVG('demo-tiger');
 
     // Set different display options based on checkbox state

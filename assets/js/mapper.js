@@ -1,5 +1,5 @@
 class Mapper {
-    constructor(json) {
+    constructor(json, gradePrefix) {
         this.svgNS = "http://www.w3.org/2000/svg";
         this.svgTag = null;
         this.shapes = [];
@@ -20,6 +20,7 @@ class Mapper {
         this.turnTableRadius = (10 / 2.2107077) * this.scale;
         this.imx = this.x / 100 * this.scale;
         this.imy = this.y / 100 * this.scale;
+        this.gradePrefix = gradePrefix;
         this.maxSlope = 0;
         this.allLabels = [[0, 0]];
         this.initialTreesDown = 1750;
@@ -260,7 +261,6 @@ class Mapper {
                             }
                         }
 
-                        const slopeTriggerPrefix = '..';
                         const slopeTriggerDecimals = 1;
                         if (distance > 0 && (type === 4 || type === 0)) {
                             let degrees = null;
@@ -286,7 +286,7 @@ class Mapper {
 
                                 this.allLabels.push([xCenter, yCenter]);
                                 const slopeLabel = document.createElementNS(this.svgNS, "text");
-                                const textNode = document.createTextNode(slopeTriggerPrefix + percentage + "%");
+                                const textNode = document.createTextNode(this.gradePrefix + percentage + "%");
                                 slopeLabel.setAttribute("x", xCenter.toString());
                                 slopeLabel.setAttribute("y", yCenter.toString());
                                 slopeLabel.setAttribute("transform", "rotate(" + degrees + "," + xCenter + "," + yCenter + ")");
