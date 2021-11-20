@@ -872,8 +872,8 @@ class CountryNames
 
     public function __construct($type)
     {
-        if (file_exists(SHELL_ROOT . '/includes/' . $type . '.txt')) {
-            $data = file_get_contents(SHELL_ROOT . '/includes/' . $type . '.txt');
+        if (file_exists('includes/' . $type . '.txt')) {
+            $data = file_get_contents( 'includes/' . $type . '.txt');
             $data = explode("\n", $data);
             array_shift($data); // header
             $this->names = $data;

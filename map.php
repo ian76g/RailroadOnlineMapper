@@ -1,4 +1,5 @@
 <?php
+error_reporting(E_ALL);
 require_once 'utils/ArithmeticHelper.php';
 require_once 'utils/dtAbstractData.php';
 require_once 'utils/dtDynamic.php';
@@ -21,6 +22,30 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
         $json = $parser->parseData(file_get_contents($saveFile));
     }
 }
+
+
+
+$dh=opendir('includes');
+$textFiles = array();
+while($textFiles[]=readdir($dh));
+$textOptions = '';
+foreach($textFiles as $textFile){
+    if(substr($textFile, -4) == '.txt'){
+        $data = file_get_contents('includes/'.$textFile);
+        $data = explode("\n", $data);
+        $header = array_shift($data).' ('.sizeof($data).')';
+        $value = substr($textFile,0,-4);
+
+        if(!$textOptions){
+            $checked = ' checked';
+        } else {
+            $checked = '';
+        }
+        $textOptions.='<input type="radio" name="nameAllCountries" value="'.$value.'"'.$checked.'/>'.$header.'<br />';
+
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -132,17 +157,33 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
                     </table>
                     <button class="button">Apply Rolling Stock changes</button>
                 </form>
+
+
+                <br/><br/>
+                <form method="POST" action="/converter.php"><input type="hidden" name="save" value="<?php echo $saveFile; ?>">
+                    <?php echo $textOptions; ?>
+                    <button class="button">Rename everything to selected schema</button>
+                </form>
+
+                <br/><br/>
+                <form method="POST" action="/converter.php">
+                    <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
+                    <input name="allBrakes" value="YES" type="hidden"/>
+                    <button class="button">Apply all brakes</button>
+                </form>
+
+
+
+
+
                 <h4>Trees</h4>
                 <form method="POST" action="/converter.php">
                     <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
                     <input name="replant" value="YES" type="hidden"/>
                     <button class="button">Replant Trees</button>
                 </form>
-                <form method="POST" action="/converter.php">
-                    <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
-                    <input name="allBrakes" value="YES" type="hidden"/>
-                    <button class="button">Apply all brakes</button>
-                </form>
+
+
                 <h4>Players</h4>
                 <form method="POST" action="/converter.php">
                     <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
