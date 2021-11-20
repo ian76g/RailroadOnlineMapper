@@ -14,16 +14,10 @@ require_once 'utils/GVASParser.php';
 $saveFile = null;
 $json = null;
 
-function modified(): bool
-{
-    return substr($_GET['name'], -7) === "_edited";
-}
-
 if (isset($_GET['name']) && $_GET['name'] != '') {
     $saveFile = "./saves/" . $_GET['name'] . ".sav";
     if (file_exists($saveFile)) {
         $parser = new GVASParser();
-        $parser->NEWUPLOADEDFILE = $saveFile;
         $json = $parser->parseData(file_get_contents($saveFile));
     }
 }
@@ -86,19 +80,24 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
             </div>
             <h3>Display options</h3>
             <div>
-                <input id="trees_user" type="checkbox" onclick="toggleDisplayOptions(this)" /> Show trees cut down by player
+                <input id="trees_user" type="checkbox" onclick="toggleDisplayOptions(this)"/> Show trees cut down by
+                player
             </div>
             <div>
-                <input id="trees_default" type="checkbox" onclick="toggleDisplayOptions(this)" /> Show trees cut down by default
+                <input id="trees_default" type="checkbox" onclick="toggleDisplayOptions(this)"/> Show trees cut down by
+                default
             </div>
             <div>
-                <input id="tracksandbeds" type="checkbox" onclick="toggleDisplayOptions(this)" checked /> Show tracks and beds
+                <input id="tracksandbeds" type="checkbox" onclick="toggleDisplayOptions(this)" checked/> Show tracks and
+                beds
             </div>
             <div>
-                <input id="switches" type="checkbox" onclick="toggleDisplayOptions(this)" checked /> Show switches and crossings
+                <input id="switches" type="checkbox" onclick="toggleDisplayOptions(this)" checked/> Show switches and
+                crossings
             </div>
             <div>
-                <input id="rollingstock" type="checkbox" onclick="toggleDisplayOptions(this)" checked /> Show rolling stock
+                <input id="rollingstock" type="checkbox" onclick="toggleDisplayOptions(this)" checked/> Show rolling
+                stock
             </div>
         </div>
     </div>
@@ -117,9 +116,6 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
     <div class="export__panel edit-panel">
         <div class="export__panel-scroll-content">
             <h3>Edit</h3><br/>
-            <?php if (modified()) { ?>
-                <span>You are viewing an edited save, only original saves can be edited.</span>
-            <?php } ?>
             <div class="edit-panel__extras">
                 <h4>Rolling Stock</h4>
                 <form method="POST" action="/converter.php">
@@ -134,21 +130,17 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
                             <th>Amount</th>
                         </tr>
                     </table>
-                    <?php if (!modified()) { ?>
-                        <button class="button">Apply Rolling Stock changes</button>
-                    <?php } ?>
+                    <button class="button">Apply Rolling Stock changes</button>
                 </form>
                 <h4>Trees</h4>
                 <form method="POST" action="/converter.php">
                     <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
                     <input name="replant" value="YES" type="hidden"/>
-                    <?php if (!modified()) { ?>
-                        <button class="button">Replant Trees</button>
-                    <?php } ?>
+                    <button class="button">Replant Trees</button>
                 </form>
                 <form method="POST" action="/converter.php">
                     <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
-                    <input name="allBrakes" value="YES" type="hidden" />
+                    <input name="allBrakes" value="YES" type="hidden"/>
                     <button class="button">Apply all brakes</button>
                 </form>
                 <h4>Players</h4>
@@ -163,9 +155,7 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
                             <th>Delete</th>
                         </tr>
                     </table>
-                    <?php if (!modified()) { ?>
-                        <button class="button">Apply Player Changes</button>
-                    <?php } ?>
+                    <button class="button">Apply Player Changes</button>
                 </form>
                 <h4>Industries</h4>
                 <form method="POST" action="/converter.php">
@@ -179,17 +169,13 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
                             <th>Item 4</th>
                         </tr>
                     </table>
-                    <?php if (!modified()) { ?>
-                        <button class="button">Apply Industry Changes</button>
-                    <?php } ?>
+                    <button class="button">Apply Industry Changes</button>
                 </form>
                 <h4>Carts</h4>
                 <form method="POST" action="/converter.php">
                     <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
                     <table id="undergroundCartsTable" class="export__mapper"></table>
-                    <?php if (!modified()) { ?>
-                        <button class="button">Get Carts from Underground</button>
-                    <?php } ?>
+                    <button class="button">Get Carts from Underground</button>
                 </form>
                 <br/>
                 <a class="button" href="<?php echo $saveFile; ?>">Download Save</a>
@@ -232,7 +218,7 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
         }
     }
 
-    function toggleDisplayOptions (checkbox) {
+    function toggleDisplayOptions(checkbox) {
         const element = document.getElementsByClassName(checkbox.id)[0];
         if (typeof element === "undefined") {
             return;

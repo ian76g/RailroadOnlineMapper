@@ -62,7 +62,6 @@ $files = array($NEWUPLOADEDFILE);
 
 foreach ($files as $file) {
     if (!file_exists($file)) {
-        // Headers already sent? Don't need to resend.
         if (headers_sent()) {
             echo "";
             continue;
@@ -73,14 +72,13 @@ foreach ($files as $file) {
     }
 
     error_log("Starting parser");
+    $fileName = $file;
 
     $myParser = new GVASParser();
-    $myParser->NEWUPLOADEDFILE = $NEWUPLOADEDFILE;
-    $newSaveFileContents = $myParser->parseData(file_get_contents($file), true);
+    $newSaveFileContents = $myParser->parseData(file_get_contents($fileName), true);
     unset($myParser);
 
-    $newFileName = str_replace('.sav', '_edited.sav', $NEWUPLOADEDFILE);
-    $file = fopen($newFileName, 'wb');
+    $file = fopen($fileName, 'wb');
     if ($file === false) {
         die('Unable to write file.');
     }
@@ -88,9 +86,8 @@ foreach ($files as $file) {
     fclose($file);
 
     $myParser = new GVASParser();
-    $myParser->NEWUPLOADEDFILE = $newFileName;
-    $myParser->parseData(file_get_contents($newFileName), false);
+    $myParser->parseData(file_get_contents($fileName), false);
     $saveReadr = new SaveReader($myParser->goldenBucket);
-    $saveReadr->addDatabaseEntry($newFileName);
-    header('Location: /map.php?name=' . str_replace('.sav', '', basename($newFileName)));
+    $saveReadr->addDatabaseEntry($fileName);
+    header('Location: /map.php?name=' . str_replace('.sav', '', basename($fileName)));
 }
