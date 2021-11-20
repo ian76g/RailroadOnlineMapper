@@ -118,34 +118,95 @@ class Mapper {
         }
     }
 
+    /**
+     *
+     */
     getTracksAndBeds() {
-        const tracksAndBedsGroup = document.createElementNS(this.svgNS, "g");
-        tracksAndBedsGroup.setAttribute("class", "tracksandbeds display_show");
+        // const tracksAndBedsGroup = document.createElementNS(this.svgNS, "g");
+        const tracksGroup = document.createElementNS(this.svgNS, "g");
+        const bedsGroup = document.createElementNS(this.svgNS, "g");
+        const maxSlopeLabelGroup = document.createElementNS(this.svgNS, "g");
+        // tracksAndBedsGroup.setAttribute("class", "tracksandbeds display_show");
+        tracksGroup.setAttribute("class", "tracks display_show");
+        bedsGroup.setAttribute("class", "beds display_show");
 
-        const drawOrder = [
-            // [type, stroke-width, stroke]
-            [1, 15, 'darkkhaki'], // variable bank
-            [2, 15, 'darkkhaki'], // constant bank
-            [5, 15, 'darkgrey'],  // variable wall
-            [6, 15, 'darkgrey'],  // constant wall
-            [7, 15, 'lightblue'], // iron bridge
-            [3, 15, 'orange'],    // wooden bridge
-            [4, 3, 'black'],      // trendle track
-            [0, 3, 'black']       // track        darkkhaki, darkgrey, orange, blue, black
-        ]
+        const slopeLabelGroup = Array(
+            document.createElementNS(this.svgNS, "g"),
+            document.createElementNS(this.svgNS, "g"),
+            document.createElementNS(this.svgNS, "g"),
+            document.createElementNS(this.svgNS, "g")
+        );
+
+        slopeLabelGroup[0].setAttribute("class", "slopeLabel0 display_hide");
+        slopeLabelGroup[1].setAttribute("class", "slopeLabel1 display_hide");
+        slopeLabelGroup[2].setAttribute("class", "slopeLabel2 display_show");
+        slopeLabelGroup[3].setAttribute("class", "slopeLabel3 display_show");
+        maxSlopeLabelGroup.setAttribute("class", "maxSlopeLabel display_show");
+
+        // [type, stroke-width, stroke]
+        const drawOrder = {};
+        drawOrder[1] = [1, 15, 'darkkhaki', 2]; // variable bank
+        drawOrder[2] = [2, 15, 'darkkhaki', 2]; // constant bank
+        drawOrder[5] = [5, 15, 'darkgrey', 3];  // variable wall
+        drawOrder[6] = [6, 15, 'darkgrey', 3];  // constant wall
+        drawOrder[7] = [7, 15, 'lightblue', 4]; // iron bridge
+        drawOrder[3] = [3, 15, 'orange', 5];    // wooden bridge
+        drawOrder[4] = [4, 3, 'black', 8];      // trendle track
+        drawOrder[0] = [0, 3, 'black', 8];      // track        darkkhaki, darkgrey, orange, blue, black
 
         let slopecoords = [0, 0];
 
-        for (const entry of drawOrder) {
-            const [current, strokeWidth, stroke] = entry;
-            if ('Splines' in this.json) {
-                for (const spline of this.json.Splines) {
-                    let type = spline['Type'];
-                    if (type !== current) {
-                        continue
+        if ('Splines' in this.json) {
+            // for (const entry of drawOrder) {
+            for (const spline of this.json.Splines) {
+                let type = spline['Type'];
+                let entry = drawOrder[type];
+                const [current, strokeWidth, stroke, zindex] = entry;
+                // if (type !== current) {
+                //     continue
+                // }
+
+                let segments = spline['Segments'];
+                if ([1, 2, 5, 6, 3, 7].indexOf(type) > -1) {
+                    const bedSegment = document.createElementNS(this.svgNS, 'path');
+                    let path = '';
+                    let tool = '';
+                    for (const segment of segments) {
+                        //'<path d="M 100 100 L 300 100 L 200 300 z" fill="red" stroke="blue" stroke-width="3" />'
+                        if (segment['Visible'] !== 1) {
+                            tool = 'M';
+                        } else {
+                            tool = 'L';
+                        }
+                        let xStart = (this.imx - ((segment['LocationStart']['X'] - this.minX) / 100 * this.scale));
+                        let yStart = (this.imy - ((segment['LocationStart']['Y'] - this.minY) / 100 * this.scale));
+                        let xEnd = (this.imx - ((segment['LocationEnd']['X'] - this.minX) / 100 * this.scale));
+                        let yEnd = (this.imy - ((segment['LocationEnd']['Y'] - this.minY) / 100 * this.scale));
+                        let xCenter = (this.imx - ((segment['LocationCenter']['X'] - this.minX) / 100 * this.scale));
+                        let yCenter = (this.imy - ((segment['LocationCenter']['Y'] - this.minY) / 100 * this.scale));
+
+                        if (path === '') {
+                            path = 'M ' + xStart + ',' + yStart + ' ';
+                            path += tool + ' ' + xEnd + ',' + yEnd + ' ';
+                        } else {
+                            path += tool + ' ' + xEnd + ',' + yEnd + ' ';
+                        }
+                    }
+                    bedSegment.setAttribute("d", path);
+                    bedSegment.setAttribute("style", "z-index:"+zindex);
+                    bedSegment.setAttribute("fill", 'none');
+                    bedSegment.setAttribute("stroke", stroke);
+                    bedSegment.setAttribute("stroke-width", strokeWidth.toString());
+
+                    if (type === 3) {
+                        bedSegment.setAttribute("class", "wooden");
+                    } else if (type === 7) {
+                        bedSegment.setAttribute("class", "iron");
                     }
 
-                    let segments = spline['Segments'];
+                    bedsGroup.appendChild(bedSegment);
+                } else {
+                    // tracks..
                     for (const segment of segments) {
                         if (segment['Visible'] !== 1) {
                             continue
@@ -165,7 +226,7 @@ class Mapper {
                         trackSegment.setAttribute("y2", yEnd.toString());
                         trackSegment.setAttribute("stroke", stroke);
                         trackSegment.setAttribute("stroke-width", strokeWidth.toString());
-                        tracksAndBedsGroup.appendChild(trackSegment);
+                        tracksGroup.appendChild(trackSegment);
 
                         let distance = Math.sqrt(
                             Math.pow(segment['LocationEnd']['X'] - segment['LocationStart']['X'], 2) +
@@ -188,7 +249,7 @@ class Mapper {
                                 emptyLengthTrack.setAttribute("stroke", "red");
                                 emptyLengthTrack.setAttribute("stroke-width", "2");
                                 emptyLengthTrack.setAttribute("fill", "red");
-                                tracksAndBedsGroup.appendChild(emptyLengthTrack);
+                                tracksGroup.appendChild(emptyLengthTrack);
 
                                 continue; //This may cause issues down the road. We may need to stop at this point and return the errors segment.
                             } else {
@@ -200,7 +261,6 @@ class Mapper {
                             }
                         }
 
-                        const slopeTrigger = 2;
                         const slopeTriggerPrefix = '..';
                         const slopeTriggerDecimals = 1;
                         if (distance > 0 && (type === 4 || type === 0)) {
@@ -208,34 +268,38 @@ class Mapper {
                             if (segment['LocationEnd']['X'] === segment['LocationStart']['X']) {
                                 degrees = 90;
                             }
-                            if (Math.abs(slope) > slopeTrigger) {
-                                const tanA = (
-                                    (segment['LocationEnd']['Y'] - segment['LocationStart']['Y']) /
-                                    (segment['LocationEnd']['X'] - segment['LocationStart']['X'])
-                                );
-                                degrees = this._rad2deg(Math.atan(tanA));
-                                if (degrees > 0) {
-                                    degrees -= 90;
-                                } else {
-                                    degrees += 90;
-                                }
+                            const tanA = (
+                                (segment['LocationEnd']['Y'] - segment['LocationStart']['Y']) /
+                                (segment['LocationEnd']['X'] - segment['LocationStart']['X'])
+                            );
+                            degrees = this._rad2deg(Math.atan(tanA));
+                            if (degrees > 0) {
+                                degrees -= 90;
+                            } else {
+                                degrees += 90;
+                            }
 
-                                if (this._getDistanceToNearestLabel([xCenter, yCenter]) > 60) {
-                                    this.allLabels.push([xCenter, yCenter]);
-                                    const slopeLabel = document.createElementNS(this.svgNS, "text");
-                                    const textNode = document.createTextNode(slopeTriggerPrefix + this._round(slope, slopeTriggerDecimals) + "%");
-                                    slopeLabel.setAttribute("x", xCenter.toString());
-                                    slopeLabel.setAttribute("y", yCenter.toString());
-                                    slopeLabel.setAttribute("transform", "rotate(" + degrees + "," + xCenter + "," + yCenter + ")");
-                                    slopeLabel.appendChild(textNode);
-                                    tracksAndBedsGroup.appendChild(slopeLabel);
-                                }
+                            if (this._getDistanceToNearestLabel([xCenter, yCenter]) > 60) {
+
+                                let percentage = this._round(slope, slopeTriggerDecimals);
+
+                                let numberX = Math.min(3, Math.floor(slope));
+
+                                this.allLabels.push([xCenter, yCenter]);
+                                const slopeLabel = document.createElementNS(this.svgNS, "text");
+                                const textNode = document.createTextNode(slopeTriggerPrefix + percentage + "%");
+                                slopeLabel.setAttribute("x", xCenter.toString());
+                                slopeLabel.setAttribute("y", yCenter.toString());
+                                slopeLabel.setAttribute("transform", "rotate(" + degrees + "," + xCenter + "," + yCenter + ")");
+                                slopeLabel.appendChild(textNode);
+                                slopeLabelGroup[numberX].appendChild(slopeLabel);
                             }
                         }
                     }
                 }
             }
         }
+        // }
 
         if (this.drawMaxSlope) {
             for (const r in [5, 4, 3, 2]) {
@@ -246,10 +310,16 @@ class Mapper {
                 maxSlopeCircle.setAttribute("stroke", "orange");
                 maxSlopeCircle.setAttribute("stroke-width", "5");
                 maxSlopeCircle.setAttribute("fill", "none");
-                this.shapes.push(maxSlopeCircle);
+                maxSlopeLabelGroup.appendChild(maxSlopeCircle);
+                this.shapes.push(maxSlopeLabelGroup);
             }
         }
-        this.shapes.push(tracksAndBedsGroup);
+        this.shapes.push(bedsGroup);
+        this.shapes.push(tracksGroup);
+        this.shapes.push(slopeLabelGroup[0]);
+        this.shapes.push(slopeLabelGroup[1]);
+        this.shapes.push(slopeLabelGroup[2]);
+        this.shapes.push(slopeLabelGroup[3]);
     }
 
     getSwitches() {
@@ -909,7 +979,8 @@ class Mapper {
                     }
                     minDistanceToSomething = Math.min(minDistanceToSomething, this._dist(tree, segment['LocationCenter']));
                 }
-            } catch (err) {}
+            } catch (err) {
+            }
             if (minDistanceToSomething > 700) {
                 const x = (this.imx - ((tree[0] - this.minX) / 100 * this.scale));
                 const y = (this.imy - ((tree[1] - this.minY) / 100 * this.scale));

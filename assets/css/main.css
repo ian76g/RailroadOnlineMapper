@@ -354,3 +354,7 @@ tbody td {
 .display_show {
   display: block;
 }
+
+.draw_top {
+  z-index: 6!important;
+}

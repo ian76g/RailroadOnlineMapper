@@ -23,24 +23,23 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
 }
 
 
-
-$dh=opendir('includes');
+$dh = opendir('includes');
 $textFiles = array();
-while($textFiles[]=readdir($dh));
+while ($textFiles[] = readdir($dh)) ;
 $textOptions = '';
-foreach($textFiles as $textFile){
-    if(substr($textFile, -4) == '.txt'){
-        $data = file_get_contents('includes/'.$textFile);
+foreach ($textFiles as $textFile) {
+    if (substr($textFile, -4) == '.txt') {
+        $data = file_get_contents('includes/' . $textFile);
         $data = explode("\n", $data);
-        $header = array_shift($data).' ('.sizeof($data).')';
-        $value = substr($textFile,0,-4);
+        $header = array_shift($data) . ' (' . sizeof($data) . ')';
+        $value = substr($textFile, 0, -4);
 
-        if(!$textOptions){
+        if (!$textOptions) {
             $checked = ' checked';
         } else {
             $checked = '';
         }
-        $textOptions.='<input type="radio" name="nameAllCountries" value="'.$value.'"'.$checked.'/>'.$header.'<br />';
+        $textOptions .= '<input type="radio" name="nameAllCountries" value="' . $value . '"' . $checked . '/>' . $header . '<br />';
 
     }
 }
@@ -112,8 +111,10 @@ foreach($textFiles as $textFile){
                 default
             </div>
             <div>
-                <input id="tracksandbeds" type="checkbox" onclick="toggleDisplayOptions(this)" checked/> Show tracks and
-                beds
+                <input id="beds" type="checkbox" onclick="toggleDisplayOptions(this)" checked/> Show beds
+            </div>
+            <div>
+                <input id="tracks" type="checkbox" onclick="toggleDisplayOptions(this)" checked/> Show tracks
             </div>
             <div>
                 <input id="switches" type="checkbox" onclick="toggleDisplayOptions(this)" checked/> Show switches and
@@ -122,6 +123,30 @@ foreach($textFiles as $textFile){
             <div>
                 <input id="rollingstock" type="checkbox" onclick="toggleDisplayOptions(this)" checked/> Show rolling
                 stock
+            </div>
+            <div>
+                <input id="slopeLabel0" type="checkbox" onclick="toggleDisplayOptions(this)"/> Show Slope Labels 0% to
+                1%
+            </div>
+            <div>
+                <input id="slopeLabel1" type="checkbox" onclick="toggleDisplayOptions(this)"/> Show Slope Labels 1% to
+                2%
+            </div>
+            <div>
+                <input id="slopeLabel2" type="checkbox" onclick="toggleDisplayOptions(this)" checked/> Show Slope Labels
+                2% to 3%
+            </div>
+            <div>
+                <input id="slopeLabel3" type="checkbox" onclick="toggleDisplayOptions(this)" checked/> Show Slope Labels
+                above 3%
+            </div>
+            <div>
+                <input id="maxSlopeLabel" type="checkbox" onclick="toggleDisplayOptions(this)" checked/> Show max Slope
+                Circle
+            </div>
+            <div>
+                <input id="drawIron" type="checkbox" onclick="toggleDisplayOptions(this)" checked/> Show Iron bridge on
+                top of Wood bridge
             </div>
         </div>
     </div>
@@ -159,7 +184,8 @@ foreach($textFiles as $textFile){
 
 
                 <br/><br/>
-                <form method="POST" action="/converter.php"><input type="hidden" name="save" value="<?php echo $saveFile; ?>">
+                <form method="POST" action="/converter.php"><input type="hidden" name="save"
+                                                                   value="<?php echo $saveFile; ?>">
                     <?php echo $textOptions; ?>
                     <button class="button">Rename everything to selected schema</button>
                 </form>
@@ -170,9 +196,6 @@ foreach($textFiles as $textFile){
                     <input name="allBrakes" value="YES" type="hidden"/>
                     <button class="button">Apply all brakes</button>
                 </form>
-
-
-
 
 
                 <h4>Trees</h4>
@@ -232,7 +255,7 @@ foreach($textFiles as $textFile){
 
 <script type="text/javascript" src="/assets/js/svg-pan-zoom.js"></script>
 <script type="text/javascript" src="/assets/js/export.js"></script>
-<script type="text/javascript" src="/assets/js/mapper.js"></script>
+<script type="text/javascript" src="/assets/js/mapper.js?<?php echo time(); ?>"></script>
 <script type="text/javascript">
     map = new Mapper(<?php echo $json; ?>);
     map.drawSVG('demo-tiger');
@@ -259,10 +282,26 @@ foreach($textFiles as $textFile){
     }
 
     function toggleDisplayOptions(checkbox) {
+        if (checkbox.id === "drawIron") {
+            const ironBridges = document.getElementsByClassName("iron");
+            if (ironBridges.length <= 0) {
+                return;
+            }
+            for (const bridge of ironBridges) {
+                if (checkbox.checked) {
+                    bridge.classList.add("draw_top");
+                } else {
+                    bridge.classList.remove("draw_top");
+                }
+            }
+        }
+
         const element = document.getElementsByClassName(checkbox.id)[0];
         if (typeof element === "undefined") {
             return;
         }
+
+
         if (checkbox.checked) {
             element.classList.remove('display_hide');
             element.classList.add('display_show');
