@@ -1,5 +1,4 @@
 <?php
-error_reporting(E_ALL);
 require_once 'utils/ArithmeticHelper.php';
 require_once 'utils/dtAbstractData.php';
 require_once 'utils/dtDynamic.php';
