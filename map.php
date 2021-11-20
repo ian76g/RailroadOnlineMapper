@@ -24,7 +24,7 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
     if (file_exists($saveFile)) {
         $parser = new GVASParser();
         $parser->NEWUPLOADEDFILE = $saveFile;
-        $json = $parser->parseData(file_get_contents($saveFile), false);
+        $json = $parser->parseData(file_get_contents($saveFile));
     }
 }
 ?>

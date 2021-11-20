@@ -6,44 +6,41 @@ require_once 'utils/ArithmeticHelper.php';
  */
 class GVASParser
 {
+    private array $saveObject = array();
+    private int $initialTreesDown = 1750;
 
-    var $position = 0;
-    var $x = '';
-    var $goldenBucket = array();
-    var $NEWUPLOADEDFILE;
-    var $saveObject = array();
-    var $initialTreesDown = 1750;
+    public array $goldenBucket = array();
+    public string $owner;
 
     /**
-     * @param $x
-     * @param bool $againAllowed
+     * @param string $x
+     * @param bool $edit
      * @return false|string
      */
-    public function parseData($x, $againAllowed = true, $edit = false)
+    public function parseData(string $x, bool $edit = false)
     {
-        $this->x = $x;
         $this->goldenBucket = array();
-        $this->position = 0;
+        $position = 0;
 
         $myHeader = new dtHeader();
-        $this->position = $myHeader->unserialize($this->x, $this->position);
-        $headerTotal = substr($this->x, 0, $this->position);
+        $position = $myHeader->unserialize($x, $position);
+        $headerTotal = substr($x, 0, $position);
         $myHeader->content = $headerTotal;
 
         $this->saveObject['objects'][] = $myHeader;
 
         $myString = new dtString();
-        $results = $myString->unserialize($x, $this->position);
+        $results = $myString->unserialize($x, $position);
 //        $string = $results[0];
-        $this->position = $results[1];
+        $position = $results[1];
         $this->saveObject['objects'][] = $myString;
 
-        while ($this->position < strlen($x)) {
+        while ($position < strlen($x)) {
             $myProperty = new dtProperty();
-            $results = $myProperty->unserialize($this->x, $this->position);
+            $results = $myProperty->unserialize($x, $position);
             if ($results['0'] != 'EOF') {
 
-                $original = substr($this->x, $this->position, $results[1] - $this->position);
+                $original = substr($x, $position, $results[1] - $position);
                 $test = $myProperty->serialize();
                 if ($original != $test) {
                     file_put_contents('tmp_' . trim($myProperty->NAME), $original);
@@ -51,7 +48,7 @@ class GVASParser
                 }
 
                 $this->saveObject['objects'][] = $myProperty;
-                $this->position = $results[1];
+                $position = $results[1];
                 $resultRows = $results[0];
                 foreach ($resultRows as $row) {
                     $pieces = $row[0];
@@ -83,6 +80,8 @@ class GVASParser
                 $this->goldenBucket[$key . 's'] = $silverPlate[$key . 's'];
             }
         }
+
+        $this->owner = preg_replace('/[[:^alnum:]]/', "", $this->goldenBucket['Players'][0]['Name']);
 
         if (isset($this->goldenBucket['Frames'])) {
             foreach ($this->goldenBucket['Frames'] as $i => $frame) {
@@ -254,7 +253,7 @@ class GVASParser
          * HANDLE DATA MANIPULATION AND SAVE FILE
          */
 
-        $tmp = $this->handleEditAndSave($againAllowed);
+        $tmp = $this->handleEditAndSave();
         if ($edit) {
             return $tmp;
         }
@@ -300,17 +299,16 @@ class GVASParser
      * @param $b
      * @return float
      */
-    function distance($a, $b)
+    function distance($a, $b): float
     {
 
         return sqrt(pow($a[0] - $b['X'], 2) + pow($a[1] - $b['Y'], 2));
     }
 
     /**
-     * @param $againAllowed
      * @return string
      */
-    function handleEditAndSave($againAllowed): string
+    function handleEditAndSave(): string
     {
         $output = '';
         foreach ($this->saveObject['objects'] as $saveObjectIndex => $object) {
@@ -351,7 +349,7 @@ class GVASParser
                         //echo round($minDistanceToSomething)." ";
                     }
                     foreach ($toRemove as $tri) {
-                        if (isset($_POST['replant']) && $_POST['replant'] == 'YES') {
+                        if (isset($_POST['replant']) && $_POST['replant'] === 'YES') {
                             unset($object->CONTENTOBJECTS[3]->contentElements[$tri]);
                         } else {
                             $this->goldenBucket['Removed']['Vegetation'][$tri]['replant'] = true;
@@ -365,7 +363,6 @@ class GVASParser
                 if (trim($object->NAME) == 'FrameNumberArray') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['number_' . $index]) && trim($_POST['number_' . $index])) {
-                            $x = 2;
                             if (!isset($object->CONTENTOBJECTS[3]->contentElements[$index]->lines[0])) {
                                 $string = new dtString();
                                 $string->nullBytes = 1;
@@ -379,6 +376,7 @@ class GVASParser
                         }
                     }
                 }
+                $countryObj = null;
                 if (trim($object->NAME) == 'FrameNameArray') {
                     if (isset($_POST['nameAllCountries'])) {
                         $countryObj = new CountryNames($_POST['nameAllCountries']);
@@ -598,6 +596,7 @@ class GVASParser
 
     private function buildGraph()
     {
+        global $industryTracks;
         $ah = new ArithmeticHelper();
         $ah->industries = $this->goldenBucket['Industries'];
 
@@ -618,8 +617,10 @@ class GVASParser
                 $divisionS = floor($segment['LocationStart']['X'] / 10000) . '-' . floor($segment['LocationStart']['Y'] / 10000);
                 $divisionE = floor($segment['LocationEnd']['X'] / 10000) . '-' . floor($segment['LocationEnd']['Y'] / 10000);
 
-                $segments[$divisionS][$id] = new Node($id, array($segment['LocationStart'], $segment['LocationEnd']), $ah);
-                $segments[$divisionE][$id] = new Node($id, array($segment['LocationStart'], $segment['LocationEnd']), $ah);
+                $newNode = new Node($id, array($segment['LocationStart'], $segment['LocationEnd']), $ah);
+
+                $segments[$divisionS][$id] = $newNode;
+                $segments[$divisionE][$id] = $newNode;
 
                 foreach ($this->goldenBucket['Industries'] as $i => $industry) {
                     $d = $ah->dist($industry['Location'], $segment['LocationCenter']);
@@ -638,9 +639,11 @@ class GVASParser
             $divisionSS = floor($ses[1]['X'] / 10000) . '-' . floor($ses[1]['Y'] / 10000);
             $divisionSB = floor($ses[2]['X'] / 10000) . '-' . floor($ses[2]['Y'] / 10000);
 
-            $segments[$divisionS]['SW-' . $swIndex] = new SwitchNode('SW-' . $swIndex, $ses, $switch['Side'], $ah);
-            $segments[$divisionSS]['SW-' . $swIndex] = new SwitchNode('SW-' . $swIndex, $ses, $switch['Side'], $ah);
-            $segments[$divisionSB]['SW-' . $swIndex] = new SwitchNode('SW-' . $swIndex, $ses, $switch['Side'], $ah);
+            $switchNode = new SwitchNode('SW-' . $swIndex, $ses, $switch['Side'], $ah);
+
+            $segments[$divisionS]['SW-' . $swIndex] = $switchNode;
+            $segments[$divisionSS]['SW-' . $swIndex] = $switchNode;
+            $segments[$divisionSB]['SW-' . $swIndex] = $switchNode;
         }
 
         foreach ($segments as $region => $regionSegments) {
@@ -664,13 +667,72 @@ class GVASParser
                 }
             }
         }
-        ksort($segments);
-        print_r($segments);
-        die();
+
+        foreach ($industryTracks as $i => $industryTrack) {
+            $trackNode = $industryTrack['trackNode'];
+            /** @var Node $trackNode */
+            echo $trackNode->near . " :";
+            $this->driveAlongTrack($i, $trackNode);
+
+
+            echo "\n##############################################\n";
+        }
+
+
+        echo "1";
+//        ksort($segments);
+//        print_r($segments);
+//        die();
 
     }
 
-    function findSwitchEndpoints($switch)
+    function driveAlongTrack($iI, &$node, $passed = array())
+    {
+        global $industryTracks;
+        if (sizeof($passed) > 500) return;
+        if (isset($node->ww[$iI][0]) && $node->ww[$iI][0] < sizeof($passed)) {
+            return;
+        }
+        $node->ww[$iI] = sizeof($passed);
+        $passed[] = $node->id;
+//echo $node->id." ";
+        if (sizeof($node->nextNodes) < 2) {
+//            echo $node->id.' ';
+//echo 'DEAD END'."\n"; sleep(1);
+            return;
+        }
+
+        if (sizeof($node->nextNodes) == 3) {
+//            echo "SWITCH $node->id\n";
+            foreach ($node->nextNodes as $nnI => $nextNode) {
+                /** @var Node $nextNode */
+
+                if (!in_array($nextNode->id, $passed)) {
+                    $this->driveAlongTrack($iI, $nextNode, $passed);
+                }
+            }
+//            echo "\n BACK at SWITCH  $node->id ";
+        }
+        foreach ($node->nextNodes as $nnI => $nextNode) {
+            // check if i reached an industry
+            foreach ($industryTracks as $industryIndex => $industryTrack) {
+                if ($industryTrack['trackNode']->id == $nextNode->id) {
+//                    echo ' REACHED '.$industryIndex."\n";
+                    return;
+                }
+            }
+            /** @var Node $nextNode */
+            if (!in_array($nextNode->id, $passed)) {
+                $this->driveAlongTrack($iI, $nextNode, $passed);
+            } else {
+                // came from nnI
+                $node->ww[$iI] = array(sizeof($passed), $nnI);
+            }
+        }
+    }
+
+
+    function findSwitchEndpoints($switch): array
     {
 
         /**
@@ -683,6 +745,8 @@ class GVASParser
          * 6 = SwitchCross90        = cross
          */
         switch ($switch['Type']) {
+            case 2:
+            case 5:
             case 0 :
                 $dir = -5.7;
                 break;
@@ -690,12 +754,6 @@ class GVASParser
             case 3 :
             case 4:
                 $dir = 5.7;
-                break;
-            case 2 :
-                $dir = -5.7;
-                break;
-            case 5 :
-                $dir = -5.7;
                 break;
             default:
                 $dir = 0;
@@ -729,11 +787,11 @@ class SwitchNode extends Node
 
 class Node
 {
-    var $endpoints = array();
-    var $nextNodes = array();
-    var $id;
-    var $ah;
-    var $near;
+    var array $endpoints = array();
+    var array $nextNodes = array();
+    var int $id;
+    var ArithmeticHelper $ah;
+    var string $near;
 
     public function __construct($id, $endpoints, ArithmeticHelper $ah)
     {
@@ -755,7 +813,7 @@ class Node
         $this->nextNodes[$node->id] = &$node;
     }
 
-    public function getEndpoints()
+    public function getEndpoints(): array
     {
         return $this->endpoints;
     }
@@ -764,7 +822,7 @@ class Node
      * @param Node $node
      * @return bool
      */
-    public function hasEndPointLike(Node $node)
+    public function hasEndPointLike(Node $node): bool
     {
         foreach ($node->getEndpoints() as $point) {
             foreach ($this->endpoints as $ownPoint) {
@@ -801,8 +859,8 @@ class CountryNames
 
     public function __construct($type)
     {
-        if (file_exists(SHELL_ROOT . '/includes/' . $type . '.txt')) {
-            $data = file_get_contents(SHELL_ROOT . '/includes/' . $type . '.txt');
+        if (file_exists('/includes/' . $type . '.txt')) {
+            $data = file_get_contents('/includes/' . $type . '.txt');
             $data = explode("\n", $data);
             array_shift($data); // header
             $this->names = $data;

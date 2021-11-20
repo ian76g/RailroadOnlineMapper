@@ -15,7 +15,7 @@ if (!file_exists('counter')) {
     file_put_contents('counter', 0);
 }
 
-    $tableHeader = '<thead>
+$tableHeader = '<thead>
                         <th style="background-color: beige">                                                        <img height="28" width="40" src="/assets/images/player.svg"></th>
                         <th style="background-color: beige"><A href="?sortby=0&sortorder=desc" style="color: white"><img height="28" width="40" src="/assets/images/distance.svg"></A></th>
                         <th style="background-color: beige"><A href="?sortby=1&sortorder=desc" style="color: white"><img height="28" width="40" src="/assets/images/switch.svg"></A></th>
@@ -73,19 +73,10 @@ if (!file_exists('counter')) {
                 <br>
 
                 <section>
-                    <h3>1. Select savefile</h3>
+                    <h3>Select savefile</h3>
                     <input type="file" name="fileToUpload" id="fileToUpload">
                 </section>
 
-                <section>
-                    <h3>2. Enter your name</h3>
-                    <div class="input-group">
-                        <label for="discordName">Your Name on Discord or similar:</label>
-                        <input placeholder="Enter your name" id="discordName" type="text" name="discordName"
-                               maxlength="8">
-                    </div>
-
-                </section>
                 <input class="button" type="submit" value="Upload" name="submit">
             </form>
         </div>

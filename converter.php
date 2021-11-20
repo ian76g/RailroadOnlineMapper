@@ -76,7 +76,7 @@ foreach ($files as $file) {
 
     $myParser = new GVASParser();
     $myParser->NEWUPLOADEDFILE = $NEWUPLOADEDFILE;
-    $newSaveFileContents = $myParser->parseData(file_get_contents($file), false, true);
+    $newSaveFileContents = $myParser->parseData(file_get_contents($file), true);
     unset($myParser);
 
     $newFileName = str_replace('.sav', '_edited.sav', $NEWUPLOADEDFILE);
@@ -89,7 +89,7 @@ foreach ($files as $file) {
 
     $myParser = new GVASParser();
     $myParser->NEWUPLOADEDFILE = $newFileName;
-    $myParser->parseData(file_get_contents($newFileName), false, false);
+    $myParser->parseData(file_get_contents($newFileName), false);
     $saveReadr = new SaveReader($myParser->goldenBucket);
     $saveReadr->addDatabaseEntry($newFileName);
     header('Location: /map.php?name=' . str_replace('.sav', '', basename($newFileName)));
