@@ -27,9 +27,16 @@ if (isset($_POST) && !empty($_POST)) {
         require_once 'utils/GVASParser.php';
         require_once 'utils/SaveReader.php';
 
+        $x = str_replace(array('slot', '.sav'), '', $_FILES['fileToUpload']['name']);
+        if($x == ''.intval($x)){
+            $slotNumber = '-'.$x;
+        } else {
+            $slotNumber = '';
+        }
+
         $myParser = new GVASParser();
         $myParser->parseData(file_get_contents($_FILES["fileToUpload"]["tmp_name"]));
-        $newFilename = $myParser->owner;
+        $newFilename = $myParser->owner.$slotNumber;
         $target_file = $target_dir . $newFilename . '.sav';
 
         if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {

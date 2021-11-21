@@ -15,7 +15,7 @@ class Mapper {
         this.y = this.maxY - this.minY;
         this.max = Math.max(this.x, this.y);
         this.scale = (this.imageWidth * 100 / this.max);
-        this.switchRadius = (80 / 2.2107077) * this.scale;
+        this.switchRadius = 80;
         this.engineRadius = 6 * this.scale;
         this.turnTableRadius = (10 / 2.2107077) * this.scale;
         this.imx = this.x / 100 * this.scale;
@@ -346,20 +346,20 @@ class Mapper {
             let state = swtch['Side'];
             switch (type) {
                 case 0:
-                    dir = -7;
+                    dir = -6;
                     state = !state;
                     break;
                 case 1:
                 case 3:
                 case 4:
-                    dir = 7;
+                    dir = 6;
                     break;
                 case 2:
-                    dir = -7;
+                    dir = -6;
                     break;
                 case 5:
                     state = !state;
-                    dir = -7;
+                    dir = -6;
                     break;
                 case 6:
                     dir = 99;
