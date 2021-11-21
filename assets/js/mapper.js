@@ -1127,7 +1127,6 @@ class Mapper {
         firstTreeGroup.setAttribute("class", "trees_default display_hide");
         const userTreeGroup = document.createElementNS(this.svgNS, "g");
         userTreeGroup.setAttribute("class", "trees_user display_hide");
-
         for (let i = 0; i < this.json['Removed']['Vegetation'].length; i++) {
             const tree = this.json['Removed']['Vegetation'][i];
             const treeX = Math.floor((200000 + tree[0]) / 100000);
@@ -1139,11 +1138,9 @@ class Mapper {
                     if (spline['Type'] !== 0 && spline['Type'] !== 4) continue;
 
                     for (const segment of spline['Segments']) {
-                        if (segment['CX'].indexOf(treeX) !== -1) continue;
-                        if (segment['CY'].indexOf(treeY) !== -1) continue;
-// console.log(tree);
-// console.log(segment);
-                        if (segment['LocationCenter']['X'] < tree[0] - 6000) {
+                        if (segment['CX'].indexOf(treeX) === -1) continue;
+                        if (segment['CY'].indexOf(treeY) === -1) continue;
+                         if (segment['LocationCenter']['X'] < tree[0] - 6000) {
                             continue;
                         }
                         if (segment['LocationCenter']['X'] > tree[0] + 6000) {
@@ -1155,7 +1152,12 @@ class Mapper {
                         if (segment['LocationCenter']['Y'] > tree[1] + 6000) {
                             continue;
                         }
-                        minDistanceToSomething = Math.min(minDistanceToSomething, this._dist(tree, segment['LocationCenter']));
+                        minDistanceToSomething =
+                            Math.min(minDistanceToSomething,
+                                this._dist(tree, segment['LocationCenter'], true),
+                                this._dist(tree, segment['LocationStart'], true),
+                                this._dist(tree, segment['LocationEnd'], true)
+                            );
                     }
                 }
             } catch
@@ -1171,7 +1173,7 @@ class Mapper {
                 treeCircle.setAttribute("stroke", "darkgreen");
                 treeCircle.setAttribute("stroke-width", "2");
                 if (i < this.initialTreesDown) {
-                    treeCircle.setAttribute("fill", "orange");
+                    treeCircle.setAttribute("fill", "green");
                     firstTreeGroup.appendChild(treeCircle);
                 } else {
                     treeCircle.setAttribute("fill", "green");
@@ -1261,16 +1263,25 @@ class Mapper {
         return name;
     }
 
-    _dist(coords, coords2) {
+    _dist(coords, coords2, flat = false) {
+        if(coords2 === undefined){
+            return 9999999999;
+        }
         let distance = null;
         if ('X' in coords) {
             if ('X' in coords2) {
+                if(flat === true){
+                    coords['Z'] = coords2['Z'];
+                }
                 distance = Math.sqrt(
                     Math.pow(coords['X'] - coords2['X'], 2) +
                     Math.pow(coords['Y'] - coords2['Y'], 2) +
                     Math.pow(coords['Z'] - coords2['Z'], 2)
                 );
             } else {
+                if(flat === true){
+                    coords['Z'] = coords2[2];
+                }
                 distance = Math.sqrt(
                     Math.pow(coords['X'] - coords2[0], 2) +
                     Math.pow(coords['Y'] - coords2[1], 2) +
@@ -1279,6 +1290,9 @@ class Mapper {
             }
         } else {
             if ('X' in coords2) {
+                if(flat === true){
+                    coords[2] = coords2['Z'];
+                }
                 distance = Math.sqrt(
                     Math.pow(coords[0] - coords2['X'], 2) +
                     Math.pow(coords[1] - coords2['Y'], 2) +
@@ -1286,6 +1300,9 @@ class Mapper {
                 );
             }
             else {
+                if(flat === true){
+                    coords[2] = coords2[2];
+                }
                 distance = Math.sqrt(
                     Math.pow(coords[0] - coords2[0], 2) +
                     Math.pow(coords[1] - coords2[1], 2) +

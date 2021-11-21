@@ -209,12 +209,12 @@ class GVASParser
                     if(!isset($segmentArray[sizeof($segmentArray) - 1]['CX'])){
                         $segmentArray[sizeof($segmentArray) - 1]['CX'][] = $cX;
                     } else {
-                        $segmentArray[sizeof($segmentArray) - 1]['CX'][] = array_unique(array_merge(array($cX),$segmentArray[sizeof($segmentArray) - 1]['CX']));
+                        $segmentArray[sizeof($segmentArray) - 1]['CX'] = array_unique(array_merge(array($cX),$segmentArray[sizeof($segmentArray) - 1]['CX']));
                     }
                     if(!isset($segmentArray[sizeof($segmentArray) - 1]['CY'])){
                         $segmentArray[sizeof($segmentArray) - 1]['CY'][] = $cY;
                     } else {
-                        $segmentArray[sizeof($segmentArray) - 1]['CY'][] = array_unique(array_merge(array($cY),$segmentArray[sizeof($segmentArray) - 1]['CY']));
+                        $segmentArray[sizeof($segmentArray) - 1]['CY'] = array_unique(array_merge(array($cY),$segmentArray[sizeof($segmentArray) - 1]['CY']));
                     }
                     $sX = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['X']) / 100000);
                     $sY = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['Y']) / 100000);
@@ -222,14 +222,14 @@ class GVASParser
                         if(!isset($segmentArray[sizeof($segmentArray) - 1]['CX'])){
                             $segmentArray[sizeof($segmentArray) - 1]['CX'][] = $sX;
                         } else {
-                            $segmentArray[sizeof($segmentArray) - 1]['CX'][] = array_unique(array_merge(array($sX), $segmentArray[sizeof($segmentArray) - 1]['CX']));
+                            $segmentArray[sizeof($segmentArray) - 1]['CX'] = array_unique(array_merge(array($sX), $segmentArray[sizeof($segmentArray) - 1]['CX']));
                         }
                     }
                     if ($sY != $cY) {
                         if(!isset($segmentArray[sizeof($segmentArray) - 1]['CY'])){
                             $segmentArray[sizeof($segmentArray) - 1]['CY'][] = $sY;
                         } else {
-                            $segmentArray[sizeof($segmentArray) - 1]['CY'][] = array_unique(array_merge(array($sY), $segmentArray[sizeof($segmentArray) - 1]['CY']));
+                            $segmentArray[sizeof($segmentArray) - 1]['CY'] = array_unique(array_merge(array($sY), $segmentArray[sizeof($segmentArray) - 1]['CY']));
                         }
                     }
 
@@ -239,14 +239,14 @@ class GVASParser
                         if(!isset($segmentArray[sizeof($segmentArray) - 1]['CX'])){
                             $segmentArray[sizeof($segmentArray) - 1]['CX'][] = $eX;
                         } else {
-                            $segmentArray[sizeof($segmentArray) - 1]['CX'][] = array_unique(array_merge(array($eX), $segmentArray[sizeof($segmentArray) - 1]['CX']));
+                            $segmentArray[sizeof($segmentArray) - 1]['CX'] = array_unique(array_merge(array($eX), $segmentArray[sizeof($segmentArray) - 1]['CX']));
                         }
                     }
                     if ($eY != $cY) {
                         if(!isset($segmentArray[sizeof($segmentArray) - 1]['CY'])){
                             $segmentArray[sizeof($segmentArray) - 1]['CY'][] = $eY;
                         } else {
-                            $segmentArray[sizeof($segmentArray) - 1]['CY'][] = array_unique(array_merge(array($eY), $segmentArray[sizeof($segmentArray) - 1]['CY']));
+                            $segmentArray[sizeof($segmentArray) - 1]['CY'] = array_unique(array_merge(array($eY), $segmentArray[sizeof($segmentArray) - 1]['CY']));
                         }
                     }
                 }
@@ -292,7 +292,10 @@ class GVASParser
         $json = json_encode($this->goldenBucket, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         file_put_contents('xx.json', $json);
 
-        return json_encode($this->goldenBucket, JSON_UNESCAPED_UNICODE);
+        $jsonMin =  json_encode($this->goldenBucket, JSON_UNESCAPED_UNICODE);
+        file_put_contents('xx.min.json', $jsonMin);
+
+        return $jsonMin;
     }
 
 
