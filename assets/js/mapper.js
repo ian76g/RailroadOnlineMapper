@@ -848,7 +848,7 @@ class Mapper {
             const nearValue = document.createElement("td");
             let nearTextNode = document.createTextNode("Unknown");
             if ('Industries' in this.json) {
-                nearTextNode = document.createTextNode(this._nearestIndustry(vehicle['Location'], this.json.Industries));
+                nearTextNode = document.createTextNode(this._nearestIndustry(vehicle['Location'], this.json['Industries']));
             }
             nearValue.appendChild(nearTextNode);
             rollingStockInfoRow.appendChild(nearValue);
@@ -1209,18 +1209,18 @@ class Mapper {
 
     _nearestIndustry(coords, industryCoords) {
         let minDist = 800000;
-        let ind = 0;
-        for (const i of industryCoords) {
-            if (i['Type'] < 10) {
-                const d = this._dist(i['Location'], coords);
-                if (d < minDist) {
-                    minDist = d;
-                    ind = i['Type'];
+        let index = 0;
+        for (const industry of industryCoords) {
+            if (industry['Type'] < 10) {
+                const distance = this._dist(industry['Location'], coords);
+                if (distance < minDist) {
+                    minDist = distance;
+                    index = industry['Type'];
                 }
             }
         }
 
-        switch (ind) {
+        switch (index) {
             case 1:
                 name = 'Logging Camp';
                 break;
@@ -1253,10 +1253,39 @@ class Mapper {
         return name;
     }
 
-    _dist(a, b) {
-        return Math.sqrt(
-            Math.pow(a[0] - b['X'], 2) +
-            Math.pow(a[1] - b['Y'], 2)
-        ).valueOf();
+    _dist(coords, coords2) {
+        let distance = null;
+        if ('X' in coords) {
+            if ('X' in coords2) {
+                distance = Math.sqrt(
+                    Math.pow(coords['X'] - coords2['X'], 2) +
+                    Math.pow(coords['Y'] - coords2['Y'], 2) +
+                    Math.pow(coords['Z'] - coords2['Z'], 2)
+                );
+            } else {
+                distance = Math.sqrt(
+                    Math.pow(coords['X'] - coords2[0], 2) +
+                    Math.pow(coords['Y'] - coords2[1], 2) +
+                    Math.pow(coords['Z'] - coords2[2], 2)
+                );
+            }
+        } else {
+            if ('X' in coords2) {
+                distance = Math.sqrt(
+                    Math.pow(coords[0] - coords2['X'], 2) +
+                    Math.pow(coords[1] - coords2['Y'], 2) +
+                    Math.pow(coords[2] - coords2['Z'], 2)
+                );
+            }
+            else {
+                distance = Math.sqrt(
+                    Math.pow(coords[0] - coords2[0], 2) +
+                    Math.pow(coords[1] - coords2[1], 2) +
+                    Math.pow(coords[2] - coords2[2], 2)
+                );
+            }
+        }
+
+        return distance;
     }
 }
