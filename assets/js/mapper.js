@@ -31,8 +31,8 @@ class Mapper {
         this.getTracksAndBeds();
         this.getSwitches();
         this.getTurntables();
-        this.getRollingStock();
         this.getIndustries();
+        this.getRollingStock();
         this.getWaterTowers();
 
         this.populatePlayerTable();
@@ -542,12 +542,12 @@ class Mapper {
             'class70_tender': [this.engineRadius, 'black'],
             'cooke260': [this.engineRadius, 'black'],
             'cooke260_tender': [this.engineRadius, 'black'],
-            'flatcar_logs': [this.engineRadius / 3, 'red'],
-            'flatcar_cordwood': [this.engineRadius / 3 * 2, 'orange'],
-            'flatcar_stakes': [this.engineRadius / 3 * 2, 'yellow'],
-            'flatcar_hopper': [this.engineRadius / 3 * 2, 'brown'],
-            'boxcar': [this.engineRadius / 3 * 2, 'purple'],
-            'flatcar_tanker': [this.engineRadius / 3 * 2, 'grey'],
+            'flatcar_logs': [this.engineRadius / 3, 'indianred', 'red'],
+            'flatcar_cordwood': [this.engineRadius / 3 * 2, 'orange', 'orangered'],
+            'flatcar_stakes': [this.engineRadius / 3 * 2, 'greenyellow', 'green'],
+            'flatcar_hopper': [this.engineRadius / 3 * 2, 'rosybrown', 'brown'],
+            'boxcar': [this.engineRadius / 3 * 2, 'mediumpurple', 'purple'],
+            'flatcar_tanker': [this.engineRadius / 3 * 2, 'lightgray', 'dimgray'],
         }
 
         let index = 0;
@@ -571,184 +571,29 @@ class Mapper {
                 if (vehicle['Type'].toLowerCase().indexOf('tender') !== -1) {
                     xl = xl / 3 * 2;
                 }
-
+                let fillColor = cartOptions[vehicle['Type']][1];
+                if(
+                    vehicle['Freight']['Amount'] !== undefined &&
+                    vehicle['Freight']['Amount']>0 &&
+                    cartOptions[vehicle['Type']][2]!== undefined
+                ){
+                    fillColor = cartOptions[vehicle['Type']][2];
+                }
+                const title = document.createElementNS(this.svgNS, "title");
+                title.textContent = vehicle['Name'].replace(/<\/?[^>]+(>|$)/g, "")+" "+vehicle['Number'].replace(/<\/?[^>]+(>|$)/g, "");
+                if(vehicle['Freight']['Amount']!== undefined && vehicle['Freight']['Amount'] === 0){
+                    title.textContent += " (empty)";
+                } else {
+                    title.textContent += " ("+vehicle['Freight']['Type']+" x"+vehicle['Freight']['Amount']+")";
+                }
                 const path = document.createElementNS(this.svgNS, "path");
                 path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-" + (xl / 2) + ",-" + (yl / 2) + " h" + (xl - 4) + " a2,2 0 0 1 2,2 v" + (yl - 4) + " a2,2 0 0 1 -2,2 h-" + (xl - 4) + " a2,2 0 0 1 -2,-2 v-" + (yl - 4) + " a2,2 0 0 1 2,-2 z");
-                path.setAttribute("fill", cartOptions[vehicle['Type']][1]);
+                path.setAttribute("fill", fillColor);
                 path.setAttribute("stroke", "black");
                 path.setAttribute("stroke-width", "1");
                 path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
+                path.appendChild(title);
                 rollingStockGroup.appendChild(path);
-
-                if (vehicle['Type'].toLowerCase().indexOf('flatcar_stakes') !== -1) {
-                    if (vehicle['Freight']['Type'].toLowerCase().indexOf('lumber') !== -1) {
-                        let cargoLength = 5;
-                        let cargoWidth = 2;
-                        if (vehicle['Freight']['Amount'] > 0) {
-                            const path = document.createElementNS(this.svgNS, "path");
-                            path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-6,-3 h" + (cargoLength) + " v" + (cargoWidth) + " h-" + (cargoLength) + " z");
-                            path.setAttribute("stroke", "brown");
-                            path.setAttribute("stroke-width", "1");
-                            path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
-                            rollingStockGroup.appendChild(path);
-                        }
-                        if (vehicle['Freight']['Amount'] > 1) {
-                            const path = document.createElementNS(this.svgNS, "path");
-                            path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-6,-1 h" + (cargoLength) + " v" + (cargoWidth) + " h-" + (cargoLength) + " z");
-                            path.setAttribute("fill", cartOptions[vehicle['Type']][1]);
-                            path.setAttribute("stroke", "brown");
-                            path.setAttribute("stroke-width", "1");
-                            path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
-                            rollingStockGroup.appendChild(path);
-                        }
-                        if (vehicle['Freight']['Amount'] > 2) {
-                            const path = document.createElementNS(this.svgNS, "path");
-                            path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-6,1 h" + (cargoLength) + " v" + (cargoWidth) + " h-" + (cargoLength) + " z");
-                            path.setAttribute("fill", cartOptions[vehicle['Type']][1]);
-                            path.setAttribute("stroke", "brown");
-                            path.setAttribute("stroke-width", "1");
-                            path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
-                            rollingStockGroup.appendChild(path);
-                        }
-                        if (vehicle['Freight']['Amount'] > 3) {
-                            const path = document.createElementNS(this.svgNS, "path");
-                            path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m1,-3 h" + (cargoLength) + " v" + (cargoWidth) + " h-" + (cargoLength) + " z");
-                            path.setAttribute("fill", cartOptions[vehicle['Type']][1]);
-                            path.setAttribute("stroke", "brown");
-                            path.setAttribute("stroke-width", "1");
-                            path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
-                            rollingStockGroup.appendChild(path);
-                        }
-                        if (vehicle['Freight']['Amount'] > 4) {
-                            const path = document.createElementNS(this.svgNS, "path");
-                            path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m1,-1 h" + (cargoLength) + " v" + (cargoWidth) + " h-" + (cargoLength) + " z");
-                            path.setAttribute("fill", cartOptions[vehicle['Type']][1]);
-                            path.setAttribute("stroke", "brown");
-                            path.setAttribute("stroke-width", "1");
-                            path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
-                            rollingStockGroup.appendChild(path);
-                        }
-                        if (vehicle['Freight']['Amount'] > 5) {
-                            const path = document.createElementNS(this.svgNS, "path");
-                            path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m1,1 h" + (cargoLength) + " v" + (cargoWidth) + " h-" + (cargoLength) + " z");
-                            path.setAttribute("fill", cartOptions[vehicle['Type']][1]);
-                            path.setAttribute("stroke", "brown");
-                            path.setAttribute("stroke-width", "1");
-                            path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
-                            rollingStockGroup.appendChild(path);
-                        }
-                    }
-                }
-                if (vehicle['Type'].toLowerCase().indexOf('flatcar_logs') !== -1) {
-                    if (vehicle['Freight']['Type'].toLowerCase().indexOf('log') !== -1) {
-                        let cargoLength = 10;
-                        let cargoWidth = 2;
-                        if (vehicle['Freight']['Amount'] > 0) {
-                            const path = document.createElementNS(this.svgNS, "path");
-                            path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-6,-3 h" + (cargoLength) + " v" + (cargoWidth) + " h-" + (cargoLength) + " z");
-                            path.setAttribute("stroke", "brown");
-                            path.setAttribute("stroke-width", "1");
-                            path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
-                            rollingStockGroup.appendChild(path);
-                        }
-                        if (vehicle['Freight']['Amount'] > 1) {
-                            const path = document.createElementNS(this.svgNS, "path");
-                            path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-6,-1 h" + (cargoLength) + " v" + (cargoWidth) + " h-" + (cargoLength) + " z");
-                            path.setAttribute("fill", cartOptions[vehicle['Type']][1]);
-                            path.setAttribute("stroke", "yellow");
-                            path.setAttribute("stroke-width", "1");
-                            path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
-                            rollingStockGroup.appendChild(path);
-                        }
-                        if (vehicle['Freight']['Amount'] > 2) {
-                            const path = document.createElementNS(this.svgNS, "path");
-                            path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-6,1 h" + (cargoLength) + " v" + (cargoWidth) + " h-" + (cargoLength) + " z");
-                            path.setAttribute("fill", cartOptions[vehicle['Type']][1]);
-                            path.setAttribute("stroke", "yellow");
-                            path.setAttribute("stroke-width", "1");
-                            path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
-                            rollingStockGroup.appendChild(path);
-                        }
-                        if (vehicle['Freight']['Amount'] > 3) {
-                            const path = document.createElementNS(this.svgNS, "path");
-                            path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-6,-2 h" + (cargoLength) + " v" + (cargoWidth) + " h-" + (cargoLength) + " z");
-                            path.setAttribute("fill", cartOptions[vehicle['Type']][1]);
-                            path.setAttribute("stroke", "yellow");
-                            path.setAttribute("stroke-width", "1");
-                            path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
-                            rollingStockGroup.appendChild(path);
-                        }
-                        if (vehicle['Freight']['Amount'] > 4) {
-                            const path = document.createElementNS(this.svgNS, "path");
-                            path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-6,0 h" + (cargoLength) + " v" + (cargoWidth) + " h-" + (cargoLength) + " z");
-                            path.setAttribute("fill", cartOptions[vehicle['Type']][1]);
-                            path.setAttribute("stroke", "yellow");
-                            path.setAttribute("stroke-width", "1");
-                            path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
-                            rollingStockGroup.appendChild(path);
-                        }
-                        if (vehicle['Freight']['Amount'] > 5) {
-                            const path = document.createElementNS(this.svgNS, "path");
-                            path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-6,-1 h" + (cargoLength) + " v" + (cargoWidth) + " h-" + (cargoLength) + " z");
-                            path.setAttribute("fill", cartOptions[vehicle['Type']][1]);
-                            path.setAttribute("stroke", "yellow");
-                            path.setAttribute("stroke-width", "1");
-                            path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
-                            rollingStockGroup.appendChild(path);
-                        }
-                    }
-                }
-                if (vehicle['Type'].toLowerCase().indexOf('flatcar_stakes') !== -1) {
-                    if (vehicle['Freight']['Type'].toLowerCase().indexOf('beam') !== -1) {
-                        let cargoLength = 10;
-                        let cargoWidth = 2;
-                        if (vehicle['Freight']['Amount'] > 0) {
-                            const path = document.createElementNS(this.svgNS, "path");
-                            path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-6,-3 h" + (cargoLength) + " v" + (cargoWidth) + " h-" + (cargoLength) + " z");
-                            path.setAttribute("stroke", "red");
-                            path.setAttribute("stroke-width", "1");
-                            path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
-                            rollingStockGroup.appendChild(path);
-                        }
-                        if (vehicle['Freight']['Amount'] > 1) {
-                            const path = document.createElementNS(this.svgNS, "path");
-                            path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-6,-1 h" + (cargoLength) + " v" + (cargoWidth) + " h-" + (cargoLength) + " z");
-                            path.setAttribute("fill", cartOptions[vehicle['Type']][1]);
-                            path.setAttribute("stroke", "red");
-                            path.setAttribute("stroke-width", "1");
-                            path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
-                            rollingStockGroup.appendChild(path);
-                        }
-                        if (vehicle['Freight']['Amount'] > 2) {
-                            const path = document.createElementNS(this.svgNS, "path");
-                            path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-6,1 h" + (cargoLength) + " v" + (cargoWidth) + " h-" + (cargoLength) + " z");
-                            path.setAttribute("fill", cartOptions[vehicle['Type']][1]);
-                            path.setAttribute("stroke", "red");
-                            path.setAttribute("stroke-width", "1");
-                            path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
-                            rollingStockGroup.appendChild(path);
-                        }
-                    }
-                }
-                if (vehicle['Type'].toLowerCase().indexOf('flatcar_stakes') !== -1) {
-                    if (vehicle['Freight']['Type'].toLowerCase().indexOf('rail') !== -1) {
-                        let cargoLength = vehicle['Freight']['Amount'];
-                        let cargoWidth = 2;
-                        const path = document.createElementNS(this.svgNS, "path");
-                        path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-6,-2 h" + (cargoLength) + " v1");
-                        path.setAttribute("stroke", "black");
-                        path.setAttribute("stroke-width", "1");
-                        path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
-                        rollingStockGroup.appendChild(path);
-                        const path2 = document.createElementNS(this.svgNS, "path");
-                        path2.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-6,2 h" + (cargoLength) + " v1");
-                        path2.setAttribute("stroke", "black");
-                        path2.setAttribute("stroke-width", "1");
-                        path2.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
-                        rollingStockGroup.appendChild(path2);
-                    }
-                }
-
             }
 
             // const vehicleEllipse = document.createElementNS(this.svgNS, "ellipse");
@@ -856,6 +701,7 @@ class Mapper {
             const cargoValue = document.createElement("td");
             if (typeof cargo === "object") {
                 const select = document.createElement("select");
+                select.name = "cargoType_" + index;
                 for (const cargoType of cargo) {
                     const option = document.createElement("option");
                     option.text = cargoNames[cargoType];

@@ -507,6 +507,13 @@ class GVASParser
                         }
                     }
                 }
+                if (trim($object->NAME) == 'FreightTypeArray') {
+                    foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $dtDynamic) {
+                        if (isset($_POST['cargoType_' . $index]) && trim($_POST['cargoType_' . $index])) {
+                            $object->CONTENTOBJECTS[3]->contentElements[$index] = new dtString($_POST['cargoType_' . $index]);
+                        }
+                    }
+                }
 
                 if (trim($object->NAME) == 'TenderFuelAmountArray') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {

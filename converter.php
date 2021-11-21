@@ -36,7 +36,7 @@ function getUserIpAddr()
     return $ip;
 }
 
-//$_POST['save'] = 'Joetraincool.sav';
+$_POST['save'] = 'Joetraincool.sav';
 //$_POST['replant'] = 'NO';
 //$_POST['firstTree'] = 'A';
 //$_POST['userTree'] = 'A';
@@ -50,6 +50,7 @@ function getUserIpAddr()
 //$_POST['allBrakes'] = 'YES';
 //$_POST['renameWhat'] = 'locos';
 //$_POST['nameAllCountries'] = 'dnrgLocomotives';
+$_POST['cargoType_2'] = 'log';
 
 if (!isset($NEWUPLOADEDFILE)) {
     if (isset($_POST['save']) && $_POST['save']) {
