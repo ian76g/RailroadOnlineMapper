@@ -735,13 +735,13 @@ class Mapper {
                         let cargoLength = vehicle['Freight']['Amount'];
                         let cargoWidth = 2;
                         const path = document.createElementNS(this.svgNS, "path");
-                        path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-6,-2 h" + (cargoLength)+ " v1");
+                        path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-6,-2 h" + (cargoLength) + " v1");
                         path.setAttribute("stroke", "black");
                         path.setAttribute("stroke-width", "1");
                         path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
                         rollingStockGroup.appendChild(path);
                         const path2 = document.createElementNS(this.svgNS, "path");
-                        path2.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-6,2 h" + (cargoLength)+ " v1");
+                        path2.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-6,2 h" + (cargoLength) + " v1");
                         path2.setAttribute("stroke", "black");
                         path2.setAttribute("stroke-width", "1");
                         path2.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
@@ -1134,24 +1134,32 @@ class Mapper {
             const treeY = Math.floor((200000 + tree[1]) / 100000);
 
             let minDistanceToSomething = 80000000;
-
             try {
-                for (const segment of this.json['Segments'][treeX][treeY]) {
-                    if (segment['LocationCenter']['X'] < tree[0] - 6000) {
-                        continue;
+                for (const spline of this.json['Splines']) {
+                    if (spline['Type'] !== 0 && spline['Type'] !== 4) continue;
+
+                    for (const segment of spline['Segments']) {
+                        if (segment['CX'].indexOf(treeX) !== -1) continue;
+                        if (segment['CY'].indexOf(treeY) !== -1) continue;
+// console.log(tree);
+// console.log(segment);
+                        if (segment['LocationCenter']['X'] < tree[0] - 6000) {
+                            continue;
+                        }
+                        if (segment['LocationCenter']['X'] > tree[0] + 6000) {
+                            continue;
+                        }
+                        if (segment['LocationCenter']['Y'] < tree[1] - 6000) {
+                            continue;
+                        }
+                        if (segment['LocationCenter']['Y'] > tree[1] + 6000) {
+                            continue;
+                        }
+                        minDistanceToSomething = Math.min(minDistanceToSomething, this._dist(tree, segment['LocationCenter']));
                     }
-                    if (segment['LocationCenter']['X'] > tree[0] + 6000) {
-                        continue;
-                    }
-                    if (segment['LocationCenter']['Y'] < tree[1] - 6000) {
-                        continue;
-                    }
-                    if (segment['LocationCenter']['Y'] > tree[1] + 6000) {
-                        continue;
-                    }
-                    minDistanceToSomething = Math.min(minDistanceToSomething, this._dist(tree, segment['LocationCenter']));
                 }
-            } catch (err) {
+            } catch
+                (err) {
             }
             if (minDistanceToSomething > 700) {
                 const x = (this.imx - ((tree[0] - this.minX) / 100 * this.scale));
@@ -1253,10 +1261,38 @@ class Mapper {
         return name;
     }
 
-    _dist(a, b) {
-        return Math.sqrt(
-            Math.pow(a[0] - b['X'], 2) +
-            Math.pow(a[1] - b['Y'], 2)
-        ).valueOf();
-    }
-}
+    _dist(coords, coords2) {
+        let distance = null;
+        if ('X' in coords) {
+            if ('X' in coords2) {
+                distance = Math.sqrt(
+                    Math.pow(coords['X'] - coords2['X'], 2) +
+                    Math.pow(coords['Y'] - coords2['Y'], 2) +
+                    Math.pow(coords['Z'] - coords2['Z'], 2)
+                );
+            } else {
+                distance = Math.sqrt(
+                    Math.pow(coords['X'] - coords2[0], 2) +
+                    Math.pow(coords['Y'] - coords2[1], 2) +
+                    Math.pow(coords['Z'] - coords2[2], 2)
+                );
+            }
+        } else {
+            if ('X' in coords2) {
+                distance = Math.sqrt(
+                    Math.pow(coords[0] - coords2['X'], 2) +
+                    Math.pow(coords[1] - coords2['Y'], 2) +
+                    Math.pow(coords[2] - coords2['Z'], 2)
+                );
+            }
+            else {
+                distance = Math.sqrt(
+                    Math.pow(coords[0] - coords2[0], 2) +
+                    Math.pow(coords[1] - coords2[1], 2) +
+                    Math.pow(coords[2] - coords2[2], 2)
+                );
+            }
+        }
+
+        return distance;
+    }}

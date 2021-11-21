@@ -262,9 +262,21 @@ foreach ($textFiles as $textFile) {
     </div>
 </main>
 
-<script type="text/javascript" src="/assets/js/svg-pan-zoom.js"></script>
+<script type="text/javascript" src="/assets/js/svg-pan-zoom.js.min.js"></script>
 <script type="text/javascript" src="/assets/js/export.js"></script>
-<script type="text/javascript" src="/assets/js/mapper.js?<?php echo time(); ?>"></script>
+
+<?php
+//require_once 'utils/Minifier.php';
+
+//if(!file_exists('assets/js/mapper.js.min.js') || filemtime('assets/js/mapper.js') > filemtime('assets/js/mapper.js.min.js')) {
+//    $output = JShrink\Minifier::minify(file_get_contents('assets/js/mapper.js'));
+//    file_put_contents('assets/js/mapper.js.min.js', $output);
+//    //echo $output;
+//}
+
+?>
+
+<script type="text/javascript" src="/assets/js/mapper.js?<?php echo filemtime('assets/js/mapper.js'); ?>"></script>
 <script type="text/javascript">
     map = new Mapper(<?php echo $json; ?>);
     map.drawSVG('demo-tiger');
