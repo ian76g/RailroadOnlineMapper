@@ -290,9 +290,12 @@ class GVASParser
         $this->goldenBucket = $this->convert_from_latin1_to_utf8_recursively($this->goldenBucket);
 
         $json = json_encode($this->goldenBucket, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-        file_put_contents('xx.json', $json);
+        $json_min = json_encode($this->reduce_bucket(), JSON_UNESCAPED_UNICODE);
 
-        return json_encode($this->goldenBucket, JSON_UNESCAPED_UNICODE);
+        file_put_contents('xx.json', $json);
+        file_put_contents('xx.min.json', $json_min);
+
+        return $json_min;
     }
 
 
@@ -838,6 +841,47 @@ class GVASParser
 
     }
 
+    private function reduce_bucket(): array
+    {
+        $reduced = $this->goldenBucket;
+        $carts = array('flatcar_logs','flatcar_cordwood','flatcar_stakes','flatcar_hopper','boxcar','flatcar_tanker');
+
+        // We don't use player rotation
+        foreach ($reduced['Players'] as $index => $player) {
+            unset($reduced['Players'][$index]['Rotation']);
+        }
+
+        // Carts don't need the same attributes as locomotives
+        foreach ($reduced['Frames'] as $index => $frame) {
+            if (in_array($frame['Type'], $carts)) {
+                unset($reduced['Frames'][$index]['Boiler']);
+                unset($reduced['Frames'][$index]['Headlights']);
+                unset($reduced['Frames'][$index]['Compressor']);
+                unset($reduced['Frames'][$index]['Regulator']);
+                unset($reduced['Frames'][$index]['Smokestack']);
+                unset($reduced['Frames'][$index]['Generatorvalvevalue']);
+                unset($reduced['Frames'][$index]['Reverser']);
+                unset($reduced['Frames'][$index]['Tender']);
+                unset($reduced['Frames'][$index]['Marker']);
+            } else {
+                unset($reduced['Frames'][$index]['Freight']);
+            }
+        }
+
+        // We don't show Watertower level
+        foreach ($reduced['Watertowers'] as $index => $watertower) {
+            unset($reduced['Watertowers'][$index]['Waterlevel']);
+        }
+
+        // Industries 1-9 have a fixed rotation
+        foreach ($reduced['Industries'] as $index => $watertower) {
+            if (in_array($reduced['Industries'][$index]['Type'], range(1,9))) {
+                unset($reduced['Industries'][$index]['Rotation']);
+            }
+        }
+
+        return $reduced;
+    }
 }
 
 class SwitchNode extends Node
