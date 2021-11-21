@@ -193,7 +193,7 @@ class Mapper {
                         }
                     }
                     bedSegment.setAttribute("d", path);
-                    bedSegment.setAttribute("style", "z-index:"+zindex);
+                    bedSegment.setAttribute("style", "z-index:" + zindex);
                     bedSegment.setAttribute("fill", 'none');
                     bedSegment.setAttribute("stroke", stroke);
                     bedSegment.setAttribute("stroke-width", strokeWidth.toString());
@@ -507,10 +507,12 @@ class Mapper {
         const undergroundCartsTable = document.getElementById("undergroundCartsTable");
         const rollingStockTable = document.getElementById("rollingStockTable");
         const possibleCargos = {
-            'flatcar_logs': ['log'],
+            'flatcar_logs': ['log', 'steelpipe'],
             'flatcar_stakes': ['rail', 'lumber', 'beam', 'rawiron'],
             'flatcar_hopper': ['ironore', 'coal'],
-            'flatcar_cordwood': ['cordwood'],
+            'flatcar_cordwood': ['cordwood', 'oilbarrel'],
+            'flatcar_tanker': ['crudeoil'],
+            'boxcar': ['crate_tools'],
         }
 
         const cargoNames = {
@@ -577,6 +579,176 @@ class Mapper {
                 path.setAttribute("stroke-width", "1");
                 path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
                 rollingStockGroup.appendChild(path);
+
+                if (vehicle['Type'].toLowerCase().indexOf('flatcar_stakes') !== -1) {
+                    if (vehicle['Freight']['Type'].toLowerCase().indexOf('lumber') !== -1) {
+                        let cargoLength = 5;
+                        let cargoWidth = 2;
+                        if (vehicle['Freight']['Amount'] > 0) {
+                            const path = document.createElementNS(this.svgNS, "path");
+                            path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-6,-3 h" + (cargoLength) + " v" + (cargoWidth) + " h-" + (cargoLength) + " z");
+                            path.setAttribute("stroke", "brown");
+                            path.setAttribute("stroke-width", "1");
+                            path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
+                            rollingStockGroup.appendChild(path);
+                        }
+                        if (vehicle['Freight']['Amount'] > 1) {
+                            const path = document.createElementNS(this.svgNS, "path");
+                            path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-6,-1 h" + (cargoLength) + " v" + (cargoWidth) + " h-" + (cargoLength) + " z");
+                            path.setAttribute("fill", cartOptions[vehicle['Type']][1]);
+                            path.setAttribute("stroke", "brown");
+                            path.setAttribute("stroke-width", "1");
+                            path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
+                            rollingStockGroup.appendChild(path);
+                        }
+                        if (vehicle['Freight']['Amount'] > 2) {
+                            const path = document.createElementNS(this.svgNS, "path");
+                            path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-6,1 h" + (cargoLength) + " v" + (cargoWidth) + " h-" + (cargoLength) + " z");
+                            path.setAttribute("fill", cartOptions[vehicle['Type']][1]);
+                            path.setAttribute("stroke", "brown");
+                            path.setAttribute("stroke-width", "1");
+                            path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
+                            rollingStockGroup.appendChild(path);
+                        }
+                        if (vehicle['Freight']['Amount'] > 3) {
+                            const path = document.createElementNS(this.svgNS, "path");
+                            path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m1,-3 h" + (cargoLength) + " v" + (cargoWidth) + " h-" + (cargoLength) + " z");
+                            path.setAttribute("fill", cartOptions[vehicle['Type']][1]);
+                            path.setAttribute("stroke", "brown");
+                            path.setAttribute("stroke-width", "1");
+                            path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
+                            rollingStockGroup.appendChild(path);
+                        }
+                        if (vehicle['Freight']['Amount'] > 4) {
+                            const path = document.createElementNS(this.svgNS, "path");
+                            path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m1,-1 h" + (cargoLength) + " v" + (cargoWidth) + " h-" + (cargoLength) + " z");
+                            path.setAttribute("fill", cartOptions[vehicle['Type']][1]);
+                            path.setAttribute("stroke", "brown");
+                            path.setAttribute("stroke-width", "1");
+                            path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
+                            rollingStockGroup.appendChild(path);
+                        }
+                        if (vehicle['Freight']['Amount'] > 5) {
+                            const path = document.createElementNS(this.svgNS, "path");
+                            path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m1,1 h" + (cargoLength) + " v" + (cargoWidth) + " h-" + (cargoLength) + " z");
+                            path.setAttribute("fill", cartOptions[vehicle['Type']][1]);
+                            path.setAttribute("stroke", "brown");
+                            path.setAttribute("stroke-width", "1");
+                            path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
+                            rollingStockGroup.appendChild(path);
+                        }
+                    }
+                }
+                if (vehicle['Type'].toLowerCase().indexOf('flatcar_logs') !== -1) {
+                    if (vehicle['Freight']['Type'].toLowerCase().indexOf('log') !== -1) {
+                        let cargoLength = 10;
+                        let cargoWidth = 2;
+                        if (vehicle['Freight']['Amount'] > 0) {
+                            const path = document.createElementNS(this.svgNS, "path");
+                            path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-6,-3 h" + (cargoLength) + " v" + (cargoWidth) + " h-" + (cargoLength) + " z");
+                            path.setAttribute("stroke", "brown");
+                            path.setAttribute("stroke-width", "1");
+                            path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
+                            rollingStockGroup.appendChild(path);
+                        }
+                        if (vehicle['Freight']['Amount'] > 1) {
+                            const path = document.createElementNS(this.svgNS, "path");
+                            path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-6,-1 h" + (cargoLength) + " v" + (cargoWidth) + " h-" + (cargoLength) + " z");
+                            path.setAttribute("fill", cartOptions[vehicle['Type']][1]);
+                            path.setAttribute("stroke", "yellow");
+                            path.setAttribute("stroke-width", "1");
+                            path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
+                            rollingStockGroup.appendChild(path);
+                        }
+                        if (vehicle['Freight']['Amount'] > 2) {
+                            const path = document.createElementNS(this.svgNS, "path");
+                            path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-6,1 h" + (cargoLength) + " v" + (cargoWidth) + " h-" + (cargoLength) + " z");
+                            path.setAttribute("fill", cartOptions[vehicle['Type']][1]);
+                            path.setAttribute("stroke", "yellow");
+                            path.setAttribute("stroke-width", "1");
+                            path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
+                            rollingStockGroup.appendChild(path);
+                        }
+                        if (vehicle['Freight']['Amount'] > 3) {
+                            const path = document.createElementNS(this.svgNS, "path");
+                            path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-6,-2 h" + (cargoLength) + " v" + (cargoWidth) + " h-" + (cargoLength) + " z");
+                            path.setAttribute("fill", cartOptions[vehicle['Type']][1]);
+                            path.setAttribute("stroke", "yellow");
+                            path.setAttribute("stroke-width", "1");
+                            path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
+                            rollingStockGroup.appendChild(path);
+                        }
+                        if (vehicle['Freight']['Amount'] > 4) {
+                            const path = document.createElementNS(this.svgNS, "path");
+                            path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-6,0 h" + (cargoLength) + " v" + (cargoWidth) + " h-" + (cargoLength) + " z");
+                            path.setAttribute("fill", cartOptions[vehicle['Type']][1]);
+                            path.setAttribute("stroke", "yellow");
+                            path.setAttribute("stroke-width", "1");
+                            path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
+                            rollingStockGroup.appendChild(path);
+                        }
+                        if (vehicle['Freight']['Amount'] > 5) {
+                            const path = document.createElementNS(this.svgNS, "path");
+                            path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-6,-1 h" + (cargoLength) + " v" + (cargoWidth) + " h-" + (cargoLength) + " z");
+                            path.setAttribute("fill", cartOptions[vehicle['Type']][1]);
+                            path.setAttribute("stroke", "yellow");
+                            path.setAttribute("stroke-width", "1");
+                            path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
+                            rollingStockGroup.appendChild(path);
+                        }
+                    }
+                }
+                if (vehicle['Type'].toLowerCase().indexOf('flatcar_stakes') !== -1) {
+                    if (vehicle['Freight']['Type'].toLowerCase().indexOf('beam') !== -1) {
+                        let cargoLength = 10;
+                        let cargoWidth = 2;
+                        if (vehicle['Freight']['Amount'] > 0) {
+                            const path = document.createElementNS(this.svgNS, "path");
+                            path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-6,-3 h" + (cargoLength) + " v" + (cargoWidth) + " h-" + (cargoLength) + " z");
+                            path.setAttribute("stroke", "red");
+                            path.setAttribute("stroke-width", "1");
+                            path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
+                            rollingStockGroup.appendChild(path);
+                        }
+                        if (vehicle['Freight']['Amount'] > 1) {
+                            const path = document.createElementNS(this.svgNS, "path");
+                            path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-6,-1 h" + (cargoLength) + " v" + (cargoWidth) + " h-" + (cargoLength) + " z");
+                            path.setAttribute("fill", cartOptions[vehicle['Type']][1]);
+                            path.setAttribute("stroke", "red");
+                            path.setAttribute("stroke-width", "1");
+                            path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
+                            rollingStockGroup.appendChild(path);
+                        }
+                        if (vehicle['Freight']['Amount'] > 2) {
+                            const path = document.createElementNS(this.svgNS, "path");
+                            path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-6,1 h" + (cargoLength) + " v" + (cargoWidth) + " h-" + (cargoLength) + " z");
+                            path.setAttribute("fill", cartOptions[vehicle['Type']][1]);
+                            path.setAttribute("stroke", "red");
+                            path.setAttribute("stroke-width", "1");
+                            path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
+                            rollingStockGroup.appendChild(path);
+                        }
+                    }
+                }
+                if (vehicle['Type'].toLowerCase().indexOf('flatcar_stakes') !== -1) {
+                    if (vehicle['Freight']['Type'].toLowerCase().indexOf('rail') !== -1) {
+                        let cargoLength = vehicle['Freight']['Amount'];
+                        let cargoWidth = 2;
+                        const path = document.createElementNS(this.svgNS, "path");
+                        path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-6,-2 h" + (cargoLength)+ " v1");
+                        path.setAttribute("stroke", "black");
+                        path.setAttribute("stroke-width", "1");
+                        path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
+                        rollingStockGroup.appendChild(path);
+                        const path2 = document.createElementNS(this.svgNS, "path");
+                        path2.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-6,2 h" + (cargoLength)+ " v1");
+                        path2.setAttribute("stroke", "black");
+                        path2.setAttribute("stroke-width", "1");
+                        path2.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
+                        rollingStockGroup.appendChild(path2);
+                    }
+                }
+
             }
 
             // const vehicleEllipse = document.createElementNS(this.svgNS, "ellipse");
