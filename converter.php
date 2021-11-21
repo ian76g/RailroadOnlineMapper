@@ -74,7 +74,6 @@ foreach ($files as $file) {
         }
     }
 
-    error_log("Starting parser");
     $fileName = $file;
 
     $myParser = new GVASParser();

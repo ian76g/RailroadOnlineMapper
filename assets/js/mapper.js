@@ -369,7 +369,7 @@ class Mapper {
             }
 
             if (!dir) {
-                console.log("Switch error in switch " + swtch);
+                console.log("Switch error in switch " + JSON.stringify(swtch));
             }
 
             const rotation = this._deg2rad(swtch['Rotation'][1] - 90);
@@ -656,12 +656,14 @@ class Mapper {
             }
 
             let cargo = "firewood";
-            let amount = vehicle['Tender']['Fuelamount'];
+            let amount;
             let amountString = "tenderamount_";
             if (vehicle['Type'] in possibleCargos) {
                 cargo = possibleCargos[vehicle['Type']];
                 amount = vehicle['Freight']['Amount'];
                 amountString = "freightamount_";
+            } else {
+                amount = vehicle['Tender']['Fuelamount'];
             }
 
             const rollingStockInfoRow = document.createElement("tr");
@@ -869,7 +871,7 @@ class Mapper {
                     yoff = 0;
                     break;
                 default:
-                    console.log("Unknown industry: " + JSON.stringify(industry, null, 2));
+                    console.log("Unknown industry: " + JSON.stringify(industry));
             }
 
             const industryLabel = document.createElementNS(this.svgNS, "text");
