@@ -573,7 +573,8 @@ class Mapper {
                 }
                 let fillColor = cartOptions[vehicle['Type']][1];
                 if(
-                    vehicle['Freight']['Amount'] !== undefined &&
+                    typeof vehicle['Freight'] !== 'undefined' &&
+                    typeof vehicle['Freight']['Amount'] !== 'undefined' &&
                     vehicle['Freight']['Amount']>0 &&
                     cartOptions[vehicle['Type']][2]!== undefined
                 ){
@@ -581,10 +582,18 @@ class Mapper {
                 }
                 const title = document.createElementNS(this.svgNS, "title");
                 title.textContent = vehicle['Name'].replace(/<\/?[^>]+(>|$)/g, "")+" "+vehicle['Number'].replace(/<\/?[^>]+(>|$)/g, "");
-                if(vehicle['Freight']['Amount']!== undefined && vehicle['Freight']['Amount'] === 0){
+                if(
+                    typeof vehicle['Freight'] !== 'undefined' &&
+                    typeof vehicle['Freight']['Amount'] !== 'undefined' &&
+                    vehicle['Freight']['Amount'] === 0){
                     title.textContent += " (empty)";
                 } else {
-                    title.textContent += " ("+vehicle['Freight']['Type']+" x"+vehicle['Freight']['Amount']+")";
+                    if(typeof vehicle['Freight'] !== 'undefined' &&
+                        typeof vehicle['Freight']['Type'] !== 'undefined'
+                    ){
+                            title.textContent += " ("+vehicle['Freight']['Type']+" x"+vehicle['Freight']['Amount']+")";
+
+                    }
                 }
                 const path = document.createElementNS(this.svgNS, "path");
                 path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-" + (xl / 2) + ",-" + (yl / 2) + " h" + (xl - 4) + " a2,2 0 0 1 2,2 v" + (yl - 4) + " a2,2 0 0 1 -2,2 h-" + (xl - 4) + " a2,2 0 0 1 -2,-2 v-" + (yl - 4) + " a2,2 0 0 1 2,-2 z");

@@ -660,6 +660,7 @@ class GVASParser
         if (isset($_POST['save'])) {
             $db = unserialize(file_get_contents('db.db'));
             if (!isset($db[$this->owner][5]) || getUserIpAddr() != $db[$this->owner][5]) {
+                echo 'Your IP is: '. getUserIpAddr() .' but game was uploaded from: '.$db[$this->owner][5]."\n";
                 die("This does not seem to be your save file.");
             }
         }
@@ -876,8 +877,10 @@ class GVASParser
         }
 
         // We don't show Watertower level
-        foreach ($reduced['Watertowers'] as $index => $watertower) {
-            unset($reduced['Watertowers'][$index]['Waterlevel']);
+        if($reduced['Watertowers']){
+            foreach ($reduced['Watertowers'] as $index => $watertower) {
+                unset($reduced['Watertowers'][$index]['Waterlevel']);
+            }
         }
 
         // Industries 1-9 have a fixed rotation

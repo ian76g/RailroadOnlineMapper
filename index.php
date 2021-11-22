@@ -32,7 +32,7 @@ $tableHeader = '<thead>
 </header>
 <main>
     <section class="uploads">
-        <h2>Latest uploads</h2>
+        <h2>Latest uploads (* = as download available)</h2>
         <div class="uploads__tables">
             <table>
                 <?php
@@ -40,9 +40,13 @@ $tableHeader = '<thead>
                 $soft_limit = 800;
 
                 $i = 0;
-                foreach (map_entries() as $entry) {
+                foreach (map_entries((isset($_GET['sortby'])?$_GET['sortby']:null), $_GET['sortorder']) as $entry) {
+                    $asterix = '';
+                    if ($entry['public']) {
+                        $asterix = '*';
+                    }
                     print('<tr>' . PHP_EOL);
-                    print('<td><a href="map.php?name=' . $entry['name'] . '">' . $entry['name'] . '</a></td>' . PHP_EOL);
+                    print('<td>'.$asterix.'<a href="map.php?name=' . $entry['name'] . '">' . $entry['name'] . '</a></td>' . PHP_EOL);
                     print('<td>' . $entry['trackLength'] . 'km</td>' . PHP_EOL);
                     print('<td>' . $entry['numY'] . '</td>' . PHP_EOL);
                     print('<td>' . $entry['numT'] . '</td>' . PHP_EOL);

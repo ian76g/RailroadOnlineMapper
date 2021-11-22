@@ -3,10 +3,10 @@
 function mysort($a, $b): int
 {
     global $db;
-    if (strtolower($db[substr($a, 5, -5) . '.sav'][$_GET['sortby']]) == strtolower($db[substr($b, 5, -5) . '.sav'][$_GET['sortby']])) {
+    if (strtolower($db[substr(basename($a),0,-4)][$_GET['sortby']]) == strtolower($db[substr(basename($b),0,-4)][$_GET['sortby']])) {
         return 0;
     }
-    if (strtolower($db[substr($a, 5, -5) . '.sav'][$_GET['sortby']]) > strtolower($db[substr($b, 5, -5) . '.sav'][$_GET['sortby']])) {
+    if (strtolower($db[substr(basename($a),0,-4)][$_GET['sortby']]) > strtolower($db[substr(basename($b),0,-4)][$_GET['sortby']])) {
         $x = -1;
     } else {
         $x = 1;
@@ -35,11 +35,12 @@ function map_entries($sortby = null, $sortorder = null): Generator
 {
     $file_limit = 1600;
     $files = list_sav_files();
+    global $db;
 
     if ((isset($files) && $files != null) && file_exists('db.db')) {
         $db = unserialize(file_get_contents('db.db'));
 
-        if (!$sortby || !$sortorder) {
+        if (!$sortorder) {
             krsort($files);
         } else {
             usort($files, 'mysort');
@@ -50,7 +51,7 @@ function map_entries($sortby = null, $sortorder = null): Generator
             if (!$file) break;
 
             if ($i > $file_limit) {
-                unlink($file);
+//                unlink($file);
             }
 
             $user = substr(basename($file),0,-4);
@@ -63,7 +64,8 @@ function map_entries($sortby = null, $sortorder = null): Generator
                 "numT" => ($db[$user][6] == null ? '0' : $db[$user][6]),
                 "numLocs" => ($db[$user][2] == null ? '0' : $db[$user][2]),
                 "numCarts" => ($db[$user][3] == null ? '0' : $db[$user][3]),
-                "slope" => round(($db[$user][4] == null ? '0' : $db[$user][4]))
+                "slope" => round(($db[$user][4] == null ? '0' : $db[$user][4])),
+                "public" => $db[$user][7],
             );
             $i++;
         }
