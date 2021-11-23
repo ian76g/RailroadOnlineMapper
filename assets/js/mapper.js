@@ -1,5 +1,5 @@
 class Mapper {
-    constructor(json, gradePrefix) {
+    constructor(json, cookies) {
         this.svgNS = "http://www.w3.org/2000/svg";
         this.svgTag = null;
         this.shapes = [];
@@ -20,10 +20,15 @@ class Mapper {
         this.turnTableRadius = (10 / 2.2107077) * this.scale;
         this.imx = this.x / 100 * this.scale;
         this.imy = this.y / 100 * this.scale;
-        this.gradePrefix = gradePrefix;
         this.maxSlope = 0;
         this.allLabels = [[0, 0]];
         this.initialTreesDown = 1750;
+
+        this.config = {
+            labelPrefix: cookies.get('labelPrefix') || '..',
+            slopeDecimals: cookies.get('labelPrefix') || 2,
+            ironOverWood: cookies.get('ironOverWood') || true
+        }
     }
 
     drawSVG(htmlElement) {
@@ -143,28 +148,34 @@ class Mapper {
         slopeLabelGroup[3].setAttribute("class", "slopeLabel3");
         maxSlopeLabelGroup.setAttribute("class", "maxSlopeLabel");
 
-        // [type, stroke-width, stroke]
-        const drawOrder = {};
-        drawOrder[1] = [1, 15, 'darkkhaki', 2]; // variable bank
-        drawOrder[2] = [2, 15, 'darkkhaki', 2]; // constant bank
-        drawOrder[5] = [5, 15, 'darkgrey', 3];  // variable wall
-        drawOrder[6] = [6, 15, 'darkgrey', 3];  // constant wall
-        drawOrder[7] = [7, 15, 'lightblue', 4]; // iron bridge
-        drawOrder[3] = [3, 15, 'orange', 5];    // wooden bridge
-        drawOrder[4] = [4, 3, 'black', 8];      // trendle track
-        drawOrder[0] = [0, 3, 'black', 8];      // track        darkkhaki, darkgrey, orange, blue, black
+        const drawOrder = {}; // [type, stroke-width, stroke]
+        if (this.config.ironOverWood) {
+            drawOrder[1] = [1, 15, 'darkkhaki']; // variable bank
+            drawOrder[2] = [2, 15, 'darkkhaki']; // constant bank
+            drawOrder[5] = [5, 15, 'darkgrey'];  // variable wall
+            drawOrder[6] = [6, 15, 'darkgrey'];  // constant wall
+            drawOrder[3] = [3, 15, 'orange'];    // wooden bridge
+            drawOrder[7] = [7, 15, 'lightblue']; // iron bridge
+            drawOrder[4] = [4, 3, 'black'];      // trendle track
+            drawOrder[0] = [0, 3, 'black'];      // track        darkkhaki, darkgrey, orange, blue, black
+        } else {
+            drawOrder[1] = [1, 15, 'darkkhaki']; // variable bank
+            drawOrder[2] = [2, 15, 'darkkhaki']; // constant bank
+            drawOrder[5] = [5, 15, 'darkgrey'];  // variable wall
+            drawOrder[6] = [6, 15, 'darkgrey'];  // constant wall
+            drawOrder[7] = [7, 15, 'lightblue']; // iron bridge
+            drawOrder[3] = [3, 15, 'orange'];    // wooden bridge
+            drawOrder[4] = [4, 3, 'black'];      // trendle track
+            drawOrder[0] = [0, 3, 'black'];      // track        darkkhaki, darkgrey, orange, blue, black
+        }
 
         let slopecoords = [0, 0];
 
         if ('Splines' in this.json) {
-            // for (const entry of drawOrder) {
-            for (const spline of this.json.Splines) {
+            for (const spline of this.json['Splines']) {
                 let type = spline['Type'];
                 let entry = drawOrder[type];
-                const [current, strokeWidth, stroke, zindex] = entry;
-                // if (type !== current) {
-                //     continue
-                // }
+                const [current, strokeWidth, stroke] = entry;
 
                 let segments = spline['Segments'];
                 if ([1, 2, 5, 6, 3, 7].indexOf(type) > -1) {
@@ -193,7 +204,6 @@ class Mapper {
                         }
                     }
                     bedSegment.setAttribute("d", path);
-                    bedSegment.setAttribute("style", "z-index:" + zindex);
                     bedSegment.setAttribute("fill", 'none');
                     bedSegment.setAttribute("stroke", stroke);
                     bedSegment.setAttribute("stroke-width", strokeWidth.toString());
@@ -286,7 +296,7 @@ class Mapper {
 
                                 this.allLabels.push([xCenter, yCenter]);
                                 const slopeLabel = document.createElementNS(this.svgNS, "text");
-                                const textNode = document.createTextNode(this.gradePrefix + percentage + "%");
+                                const textNode = document.createTextNode(this.config.labelPrefix + percentage + "%");
                                 slopeLabel.setAttribute("x", xCenter.toString());
                                 slopeLabel.setAttribute("y", yCenter.toString());
                                 slopeLabel.setAttribute("transform", "rotate(" + degrees + "," + xCenter + "," + yCenter + ")");
@@ -652,7 +662,7 @@ class Mapper {
                 this.allLabels.push([x, y]);
 
                 const vehicleLabel = document.createElementNS(this.svgNS, "text");
-                const textNode = document.createTextNode(".." + name);
+                const textNode = document.createTextNode(this.config.labelPrefix + name);
                 vehicleLabel.setAttribute("stroke", "black");
                 vehicleLabel.setAttribute("fill", "white");
                 vehicleLabel.setAttribute("font-size", "1em");

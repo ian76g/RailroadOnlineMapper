@@ -103,49 +103,49 @@ foreach ($textFiles as $textFile) {
             </div>
             <h3>Display options</h3>
             <div>
-                <input id="trees_user" type="checkbox" onclick="toggleDisplayOptions(this)"/> Show trees cut down by
+                <input id="trees_user" type="checkbox" onclick="toggleDisplayOptions(this)" <?php if ($_COOKIE['trees_user']) { print("checked"); } ?>/> Show trees cut down by
                 player
             </div>
             <div>
-                <input id="trees_default" type="checkbox" onclick="toggleDisplayOptions(this)"/> Show trees cut down by
+                <input id="trees_default" type="checkbox" onclick="toggleDisplayOptions(this)" <?php if ($_COOKIE['trees_default']) { print("checked"); } ?>/> Show trees cut down by
                 default
             </div>
             <div>
-                <input id="beds" type="checkbox" onclick="toggleDisplayOptions(this)" checked/> Show beds
+                <input id="beds" type="checkbox" onclick="toggleDisplayOptions(this)"  <?php if ($_COOKIE['beds']) { print("checked"); } ?>/> Show beds
             </div>
             <div>
-                <input id="tracks" type="checkbox" onclick="toggleDisplayOptions(this)" checked/> Show tracks
+                <input id="tracks" type="checkbox" onclick="toggleDisplayOptions(this)"  <?php if ($_COOKIE['tracks']) { print("checked"); } ?>/> Show tracks
             </div>
             <div>
-                <input id="switches" type="checkbox" onclick="toggleDisplayOptions(this)" checked/> Show switches and
+                <input id="switches" type="checkbox" onclick="toggleDisplayOptions(this)"  <?php if ($_COOKIE['switches']) { print("checked"); } ?>/> Show switches and
                 crossings
             </div>
             <div>
-                <input id="rollingstock" type="checkbox" onclick="toggleDisplayOptions(this)" checked/> Show rolling
+                <input id="rollingstock" type="checkbox" onclick="toggleDisplayOptions(this)"  <?php if ($_COOKIE['rollingstock']) { print("checked"); } ?>/> Show rolling
                 stock
             </div>
             <div>
-                <input id="slopeLabel0" type="checkbox" onclick="toggleDisplayOptions(this)"/> Show Slope Labels 0% to
+                <input id="slopeLabel0" type="checkbox" onclick="toggleDisplayOptions(this)" <?php if ($_COOKIE['slopeLabel0']) { print("checked"); } ?>/> Show Slope Labels 0% to
                 1%
             </div>
             <div>
-                <input id="slopeLabel1" type="checkbox" onclick="toggleDisplayOptions(this)"/> Show Slope Labels 1% to
+                <input id="slopeLabel1" type="checkbox" onclick="toggleDisplayOptions(this)" <?php if ($_COOKIE['slopeLabel1']) { print("checked"); } ?>/> Show Slope Labels 1% to
                 2%
             </div>
             <div>
-                <input id="slopeLabel2" type="checkbox" onclick="toggleDisplayOptions(this)" checked/> Show Slope Labels
+                <input id="slopeLabel2" type="checkbox" onclick="toggleDisplayOptions(this)"  <?php if ($_COOKIE['slopeLabel2']) { print("checked"); } ?>/> Show Slope Labels
                 2% to 3%
             </div>
             <div>
-                <input id="slopeLabel3" type="checkbox" onclick="toggleDisplayOptions(this)" checked/> Show Slope Labels
+                <input id="slopeLabel3" type="checkbox" onclick="toggleDisplayOptions(this)"  <?php if ($_COOKIE['slopeLabel3']) { print("checked"); } ?>/> Show Slope Labels
                 above 3%
             </div>
             <div>
-                <input id="maxSlopeLabel" type="checkbox" onclick="toggleDisplayOptions(this)" checked/> Show max Slope
+                <input id="maxSlopeLabel" type="checkbox" onclick="toggleDisplayOptions(this)"  <?php if ($_COOKIE['maxSlopeLabel']) { print("checked"); } ?>/> Show max Slope
                 Circle
             </div>
             <div>
-                <input id="drawIron" type="checkbox" onclick="toggleDisplayOptions(this)" checked/> Show Iron bridge on
+                <input id="drawIron" type="checkbox" onclick="toggleDisplayOptions(this)"  <?php if ($_COOKIE['ironOverWood']) { print("checked"); } ?>/> Show Iron bridge on
                 top of Wood bridge
             </div>
         </div>
@@ -277,8 +277,14 @@ foreach ($textFiles as $textFile) {
 ?>
 
 <script type="text/javascript" src="/assets/js/mapper.js?<?php echo filemtime('assets/js/mapper.js'); ?>"></script>
+<script type="text/javascript" src="/assets/js/js.cookie.min.js"></script>
 <script type="text/javascript">
-    map = new Mapper(<?php echo $json; ?>, "<?php (isset($_GET['prefix']) && $_GET['prefix'] != "" ? print($_GET['prefix']) : print("..")) ?>");
+    const cookies = Cookies.withAttributes({
+        path: '/',
+        secure: true
+    })
+
+    map = new Mapper(<?php echo $json; ?>, cookies);
     map.drawSVG('demo-tiger');
 
     // Set different display options based on checkbox state
@@ -312,16 +318,10 @@ foreach ($textFiles as $textFile) {
 
     function toggleDisplayOptions(checkbox) {
         if (checkbox.id === "drawIron") {
-            const ironBridges = document.getElementsByClassName("iron");
-            if (ironBridges.length <= 0) {
-                return;
-            }
-            for (const bridge of ironBridges) {
-                if (checkbox.checked) {
-                    bridge.classList.add("draw_top");
-                } else {
-                    bridge.classList.remove("draw_top");
-                }
+            if (checkbox.checked) {
+                cookies.set('ironOverWood', true);
+            } else {
+                cookies.remove('ironOverWood');
             }
         }
 
@@ -330,13 +330,14 @@ foreach ($textFiles as $textFile) {
             return;
         }
 
-
         if (checkbox.checked) {
             element.classList.remove('display_hide');
             element.classList.add('display_show');
+            cookies.set(checkbox.id, true);
         } else {
             element.classList.add('display_hide');
             element.classList.remove('display_show');
+            cookies.remove(checkbox.id);
         }
     }
 </script>
