@@ -15,7 +15,7 @@ class Mapper {
         this.y = this.maxY - this.minY;
         this.max = Math.max(this.x, this.y);
         this.scale = (this.imageWidth * 100 / this.max);
-        this.switchRadius = (80 / 2.2107077) * this.scale;
+        this.switchRadius = 80;
         this.engineRadius = 6 * this.scale;
         this.turnTableRadius = (10 / 2.2107077) * this.scale;
         this.imx = this.x / 100 * this.scale;
@@ -32,8 +32,8 @@ class Mapper {
         this.getTracksAndBeds();
         this.getSwitches();
         this.getTurntables();
-        this.getRollingStock();
         this.getIndustries();
+        this.getRollingStock();
         this.getWaterTowers();
 
         this.populatePlayerTable();
@@ -193,7 +193,7 @@ class Mapper {
                         }
                     }
                     bedSegment.setAttribute("d", path);
-                    bedSegment.setAttribute("style", "z-index:"+zindex);
+                    bedSegment.setAttribute("style", "z-index:" + zindex);
                     bedSegment.setAttribute("fill", 'none');
                     bedSegment.setAttribute("stroke", stroke);
                     bedSegment.setAttribute("stroke-width", strokeWidth.toString());
@@ -345,20 +345,20 @@ class Mapper {
             let state = swtch['Side'];
             switch (type) {
                 case 0:
-                    dir = -7;
+                    dir = -6;
                     state = !state;
                     break;
                 case 1:
                 case 3:
                 case 4:
-                    dir = 7;
+                    dir = 6;
                     break;
                 case 2:
-                    dir = -7;
+                    dir = -6;
                     break;
                 case 5:
                     state = !state;
-                    dir = -7;
+                    dir = -6;
                     break;
                 case 6:
                     dir = 99;
@@ -368,7 +368,7 @@ class Mapper {
             }
 
             if (!dir) {
-                console.log("Switch error in switch " + swtch);
+                console.log("Switch error in switch " + JSON.stringify(swtch));
             }
 
             const rotation = this._deg2rad(swtch['Rotation'][1] - 90);
@@ -506,10 +506,12 @@ class Mapper {
         const undergroundCartsTable = document.getElementById("undergroundCartsTable");
         const rollingStockTable = document.getElementById("rollingStockTable");
         const possibleCargos = {
-            'flatcar_logs': ['log'],
+            'flatcar_logs': ['log', 'steelpipe'],
             'flatcar_stakes': ['rail', 'lumber', 'beam', 'rawiron'],
             'flatcar_hopper': ['ironore', 'coal'],
-            'flatcar_cordwood': ['cordwood'],
+            'flatcar_cordwood': ['cordwood', 'oilbarrel'],
+            'flatcar_tanker': ['crudeoil'],
+            'boxcar': ['crate_tools'],
         }
 
         const cargoNames = {
@@ -539,12 +541,12 @@ class Mapper {
             'class70_tender': [this.engineRadius, 'black'],
             'cooke260': [this.engineRadius, 'black'],
             'cooke260_tender': [this.engineRadius, 'black'],
-            'flatcar_logs': [this.engineRadius / 3, 'red'],
-            'flatcar_cordwood': [this.engineRadius / 3 * 2, 'orange'],
-            'flatcar_stakes': [this.engineRadius / 3 * 2, 'yellow'],
-            'flatcar_hopper': [this.engineRadius / 3 * 2, 'brown'],
-            'boxcar': [this.engineRadius / 3 * 2, 'purple'],
-            'flatcar_tanker': [this.engineRadius / 3 * 2, 'grey'],
+            'flatcar_logs': [this.engineRadius / 3, 'indianred', 'red'],
+            'flatcar_cordwood': [this.engineRadius / 3 * 2, 'orange', 'orangered'],
+            'flatcar_stakes': [this.engineRadius / 3 * 2, 'greenyellow', 'green'],
+            'flatcar_hopper': [this.engineRadius / 3 * 2, 'rosybrown', 'brown'],
+            'boxcar': [this.engineRadius / 3 * 2, 'mediumpurple', 'purple'],
+            'flatcar_tanker': [this.engineRadius / 3 * 2, 'lightgray', 'dimgray'],
         }
 
         let index = 0;
@@ -568,13 +570,37 @@ class Mapper {
                 if (vehicle['Type'].toLowerCase().indexOf('tender') !== -1) {
                     xl = xl / 3 * 2;
                 }
+                let fillColor = cartOptions[vehicle['Type']][1];
+                if(
+                    typeof vehicle['Freight'] !== 'undefined' &&
+                    typeof vehicle['Freight']['Amount'] !== 'undefined' &&
+                    vehicle['Freight']['Amount']>0 &&
+                    cartOptions[vehicle['Type']][2]!== undefined
+                ){
+                    fillColor = cartOptions[vehicle['Type']][2];
+                }
+                const title = document.createElementNS(this.svgNS, "title");
+                title.textContent = vehicle['Name'].replace(/<\/?[^>]+(>|$)/g, "")+" "+vehicle['Number'].replace(/<\/?[^>]+(>|$)/g, "");
+                if(
+                    typeof vehicle['Freight'] !== 'undefined' &&
+                    typeof vehicle['Freight']['Amount'] !== 'undefined' &&
+                    vehicle['Freight']['Amount'] === 0){
+                    title.textContent += " (empty)";
+                } else {
+                    if(typeof vehicle['Freight'] !== 'undefined' &&
+                        typeof vehicle['Freight']['Type'] !== 'undefined'
+                    ){
+                            title.textContent += " ("+vehicle['Freight']['Type']+" x"+vehicle['Freight']['Amount']+")";
 
+                    }
+                }
                 const path = document.createElementNS(this.svgNS, "path");
                 path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-" + (xl / 2) + ",-" + (yl / 2) + " h" + (xl - 4) + " a2,2 0 0 1 2,2 v" + (yl - 4) + " a2,2 0 0 1 -2,2 h-" + (xl - 4) + " a2,2 0 0 1 -2,-2 v-" + (yl - 4) + " a2,2 0 0 1 2,-2 z");
-                path.setAttribute("fill", cartOptions[vehicle['Type']][1]);
+                path.setAttribute("fill", fillColor);
                 path.setAttribute("stroke", "black");
                 path.setAttribute("stroke-width", "1");
                 path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
+                path.appendChild(title);
                 rollingStockGroup.appendChild(path);
             }
 
@@ -638,12 +664,14 @@ class Mapper {
             }
 
             let cargo = "firewood";
-            let amount = vehicle['Tender']['Fuelamount'];
+            let amount;
             let amountString = "tenderamount_";
             if (vehicle['Type'] in possibleCargos) {
                 cargo = possibleCargos[vehicle['Type']];
                 amount = vehicle['Freight']['Amount'];
                 amountString = "freightamount_";
+            } else {
+                amount = vehicle['Tender']['Fuelamount'];
             }
 
             const rollingStockInfoRow = document.createElement("tr");
@@ -683,6 +711,7 @@ class Mapper {
             const cargoValue = document.createElement("td");
             if (typeof cargo === "object") {
                 const select = document.createElement("select");
+                select.name = "cargoType_" + index;
                 for (const cargoType of cargo) {
                     const option = document.createElement("option");
                     option.text = cargoNames[cargoType];
@@ -850,7 +879,7 @@ class Mapper {
                     yoff = 0;
                     break;
                 default:
-                    console.log("Unknown industry: " + JSON.stringify(industry, null, 2));
+                    console.log("Unknown industry: " + JSON.stringify(industry));
             }
 
             const industryLabel = document.createElementNS(this.svgNS, "text");
@@ -961,24 +990,35 @@ class Mapper {
             const treeY = Math.floor((200000 + tree[1]) / 100000);
 
             let minDistanceToSomething = 80000000;
-
             try {
-                for (const segment of this.json['Segments'][treeX][treeY]) {
-                    if (segment['LocationCenter']['X'] < tree[0] - 6000) {
-                        continue;
+                for (const spline of this.json['Splines']) {
+                    if (spline['Type'] !== 0 && spline['Type'] !== 4) continue;
+
+                    for (const segment of spline['Segments']) {
+                        if (segment['CX'].indexOf(treeX) === -1) continue;
+                        if (segment['CY'].indexOf(treeY) === -1) continue;
+                         if (segment['LocationCenter']['X'] < tree[0] - 6000) {
+                            continue;
+                        }
+                        if (segment['LocationCenter']['X'] > tree[0] + 6000) {
+                            continue;
+                        }
+                        if (segment['LocationCenter']['Y'] < tree[1] - 6000) {
+                            continue;
+                        }
+                        if (segment['LocationCenter']['Y'] > tree[1] + 6000) {
+                            continue;
+                        }
+                        minDistanceToSomething =
+                            Math.min(minDistanceToSomething,
+                                this._dist(tree, segment['LocationCenter'], true),
+                                this._dist(tree, segment['LocationStart'], true),
+                                this._dist(tree, segment['LocationEnd'], true)
+                            );
                     }
-                    if (segment['LocationCenter']['X'] > tree[0] + 6000) {
-                        continue;
-                    }
-                    if (segment['LocationCenter']['Y'] < tree[1] - 6000) {
-                        continue;
-                    }
-                    if (segment['LocationCenter']['Y'] > tree[1] + 6000) {
-                        continue;
-                    }
-                    minDistanceToSomething = Math.min(minDistanceToSomething, this._dist(tree, segment['LocationCenter']));
                 }
-            } catch (err) {
+            } catch
+                (err) {
             }
             if (minDistanceToSomething > 700) {
                 const x = (this.imx - ((tree[0] - this.minX) / 100 * this.scale));
@@ -990,7 +1030,7 @@ class Mapper {
                 treeCircle.setAttribute("stroke", "darkgreen");
                 treeCircle.setAttribute("stroke-width", "2");
                 if (i < this.initialTreesDown) {
-                    treeCircle.setAttribute("fill", "orange");
+                    treeCircle.setAttribute("fill", "green");
                     firstTreeGroup.appendChild(treeCircle);
                 } else {
                     treeCircle.setAttribute("fill", "green");
@@ -1080,10 +1120,53 @@ class Mapper {
         return name;
     }
 
-    _dist(a, b) {
-        return Math.sqrt(
-            Math.pow(a[0] - b['X'], 2) +
-            Math.pow(a[1] - b['Y'], 2)
-        ).valueOf();
-    }
-}
+    _dist(coords, coords2, flat = false) {
+        if(coords2 === undefined){
+            return 9999999999;
+        }
+        let distance = null;
+        if ('X' in coords) {
+            if ('X' in coords2) {
+                if(flat === true){
+                    coords['Z'] = coords2['Z'];
+                }
+                distance = Math.sqrt(
+                    Math.pow(coords['X'] - coords2['X'], 2) +
+                    Math.pow(coords['Y'] - coords2['Y'], 2) +
+                    Math.pow(coords['Z'] - coords2['Z'], 2)
+                );
+            } else {
+                if(flat === true){
+                    coords['Z'] = coords2[2];
+                }
+                distance = Math.sqrt(
+                    Math.pow(coords['X'] - coords2[0], 2) +
+                    Math.pow(coords['Y'] - coords2[1], 2) +
+                    Math.pow(coords['Z'] - coords2[2], 2)
+                );
+            }
+        } else {
+            if ('X' in coords2) {
+                if(flat === true){
+                    coords[2] = coords2['Z'];
+                }
+                distance = Math.sqrt(
+                    Math.pow(coords[0] - coords2['X'], 2) +
+                    Math.pow(coords[1] - coords2['Y'], 2) +
+                    Math.pow(coords[2] - coords2['Z'], 2)
+                );
+            }
+            else {
+                if(flat === true){
+                    coords[2] = coords2[2];
+                }
+                distance = Math.sqrt(
+                    Math.pow(coords[0] - coords2[0], 2) +
+                    Math.pow(coords[1] - coords2[1], 2) +
+                    Math.pow(coords[2] - coords2[2], 2)
+                );
+            }
+        }
+
+        return distance;
+    }}

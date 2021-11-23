@@ -40,7 +40,7 @@ class SaveReader
      * @param $filename
      * @return void
      */
-    function addDatabaseEntry($filename)
+    function addDatabaseEntry($filename, $public = false)
     {
         $this->getTrackLength();
         $this->getSwitchesCount();
@@ -55,7 +55,8 @@ class SaveReader
             $this->totalCarts,
             $this->maxSlope,
             $this->getUserIpAddr(),
-            (count($this->data['Removed']['Vegetation']) - $this->initialsTreeDown)
+            (count($this->data['Removed']['Vegetation']) - $this->initialsTreeDown),
+            $public,
         );
         file_put_contents('db.db', serialize($db));
     }

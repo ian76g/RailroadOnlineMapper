@@ -36,7 +36,7 @@ function getUserIpAddr()
     return $ip;
 }
 
-//$_POST['save'] = 'slot11.sav';
+$_POST['save'] = 'Joetraincool.sav';
 //$_POST['replant'] = 'NO';
 //$_POST['firstTree'] = 'A';
 //$_POST['userTree'] = 'A';
@@ -48,6 +48,9 @@ function getUserIpAddr()
 //$_POST['deletePlayer_0'] = '1';
 //$_POST['product0_0'] = '1';
 //$_POST['allBrakes'] = 'YES';
+//$_POST['renameWhat'] = 'locos';
+//$_POST['nameAllCountries'] = 'dnrgLocomotives';
+$_POST['cargoType_2'] = 'log';
 
 if (!isset($NEWUPLOADEDFILE)) {
     if (isset($_POST['save']) && $_POST['save']) {
@@ -71,7 +74,6 @@ foreach ($files as $file) {
         }
     }
 
-    error_log("Starting parser");
     $fileName = $file;
 
     $myParser = new GVASParser();
@@ -88,6 +90,6 @@ foreach ($files as $file) {
     $myParser = new GVASParser();
     $myParser->parseData(file_get_contents($fileName), false);
     $saveReadr = new SaveReader($myParser->goldenBucket);
-    $saveReadr->addDatabaseEntry($fileName);
+    $saveReadr->addDatabaseEntry($fileName, isset($_POST['public']));
     header('Location: /map.php?name=' . str_replace('.sav', '', basename($fileName)));
 }

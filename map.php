@@ -187,7 +187,16 @@ foreach ($textFiles as $textFile) {
                 <form method="POST" action="/converter.php"><input type="hidden" name="save"
                                                                    value="<?php echo $saveFile; ?>">
                     <?php echo $textOptions; ?>
-                    <button class="button">Rename everything to selected schema</button>
+
+                    <span style="font-size: smaller">Have another list? mail it to locolist@pordi.com</span><br>
+                    apply to <select name="renameWhat">
+                        <option value="everything">everything</option>
+                        <option value="locos">only locomotives</option>
+                        <option value="tenders">only tenders</option>
+                        <option value="carts">only carts</option>
+                        <option value="handcarts">only handcarts</option>
+                    </select><br />
+                    <button class="button">Apply name schema</button>
                 </form>
 
                 <br/><br/>
@@ -241,7 +250,7 @@ foreach ($textFiles as $textFile) {
                     <button class="button">Get Carts from Underground</button>
                 </form>
                 <br/>
-                <a class="button" href="<?php echo $saveFile; ?>">Download Save</a>
+                <a class="button" href="download.php?map=<?php echo substr(basename($saveFile),0,-4); ?>">Download Save</a>
             </div>
         </div>
     </div>
@@ -252,9 +261,22 @@ foreach ($textFiles as $textFile) {
         <button class="button" id="reset">Reset</button>
     </div>
 </main>
-<script type="text/javascript" src="/assets/js/svg-pan-zoom.js"></script>
+
+<script type="text/javascript" src="/assets/js/svg-pan-zoom.js.min.js"></script>
 <script type="text/javascript" src="/assets/js/export.js"></script>
-<script type="text/javascript" src="/assets/js/mapper.js?<?php echo time(); ?>"></script>
+
+<?php
+//require_once 'utils/Minifier.php';
+
+//if(!file_exists('assets/js/mapper.js.min.js') || filemtime('assets/js/mapper.js') > filemtime('assets/js/mapper.js.min.js')) {
+//    $output = JShrink\Minifier::minify(file_get_contents('assets/js/mapper.js'));
+//    file_put_contents('assets/js/mapper.js.min.js', $output);
+//    //echo $output;
+//}
+
+?>
+
+<script type="text/javascript" src="/assets/js/mapper.js?<?php echo filemtime('assets/js/mapper.js'); ?>"></script>
 <script type="text/javascript">
     map = new Mapper(<?php echo $json; ?>, "<?php (isset($_GET['prefix']) && $_GET['prefix'] != "" ? print($_GET['prefix']) : print("..")) ?>");
     map.drawSVG('demo-tiger');

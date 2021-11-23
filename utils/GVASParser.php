@@ -83,52 +83,48 @@ class GVASParser
 
         $this->owner = preg_replace('/[[:^alnum:]]/', "", $this->goldenBucket['Players'][0]['Name']);
 
+        $carts = array('flatcar_logs','flatcar_cordwood','flatcar_stakes','flatcar_hopper','boxcar','flatcar_tanker');
+
         if (isset($this->goldenBucket['Frames'])) {
             foreach ($this->goldenBucket['Frames'] as $i => $frame) {
-                if (isset($this->goldenBucket['Boilers'][$i]))
-                    $this->goldenBucket['Frames'][$i]['Boiler'] = $this->goldenBucket['Boilers'][$i];
+                if(false && in_array($frame['Type'],$carts)){
 
-                if (isset($this->goldenBucket['Headlights'][$i]))
-                    $this->goldenBucket['Frames'][$i]['Headlights'] = $this->goldenBucket['Headlights'][$i];
+                } else {
+                    if (isset($this->goldenBucket['Boilers'][$i]))
+                        $this->goldenBucket['Frames'][$i]['Boiler'] = $this->goldenBucket['Boilers'][$i];
+                    if (isset($this->goldenBucket['Headlights'][$i]))
+                        $this->goldenBucket['Frames'][$i]['Headlights'] = $this->goldenBucket['Headlights'][$i];
+                    if (isset($this->goldenBucket['Compressors'][$i]))
+                        $this->goldenBucket['Frames'][$i]['Compressor'] = $this->goldenBucket['Compressors'][$i];
+                    if (isset($this->goldenBucket['Regulatorvalue'][$i]))
+                        $this->goldenBucket['Frames'][$i]['Regulator'] = $this->goldenBucket['Regulatorvalue'][$i];
+                    if (isset($this->goldenBucket['Smokestacktype'][$i]))
+                        $this->goldenBucket['Frames'][$i]['Smokestack'] = $this->goldenBucket['Smokestacktype'][$i];
+                    if (isset($this->goldenBucket['Generatorvalvevalue'][$i]))
+                        $this->goldenBucket['Frames'][$i]['Generatorvalvevalue'] = $this->goldenBucket['Generatorvalvevalue'][$i];
+                    if (isset($this->goldenBucket['Reverservalue'][$i]))
+                        $this->goldenBucket['Frames'][$i]['Reverser'] = $this->goldenBucket['Reverservalue'][$i];
+                    if (isset($this->goldenBucket['Tenders'][$i]))
+                        $this->goldenBucket['Frames'][$i]['Tender'] = $this->goldenBucket['Tenders'][$i];
+                    if (isset($this->goldenBucket['Marker'][$i]))
+                        $this->goldenBucket['Frames'][$i]['Marker']['Front']['Right'] = $this->goldenBucket['Marker']['Lights']['Front']['Right'][$i];
+                    if (isset($this->goldenBucket['Marker'][$i]))
+                        $this->goldenBucket['Frames'][$i]['Marker']['Front']['Left'] = $this->goldenBucket['Marker']['Lights']['Front']['Left'][$i];
+                    if (isset($this->goldenBucket['Marker'][$i]))
+                        $this->goldenBucket['Frames'][$i]['Marker']['Rear']['Right'] = $this->goldenBucket['Marker']['Lights']['Rear']['Right'][$i];
+                    if (isset($this->goldenBucket['Marker'][$i]))
+                        $this->goldenBucket['Frames'][$i]['Marker']['Rear']['Left'] = $this->goldenBucket['Marker']['Lights']['Rear']['Left'][$i];
+                }
 
                 if (isset($this->goldenBucket['Freights'][$i]))
                     $this->goldenBucket['Frames'][$i]['Freight'] = $this->goldenBucket['Freights'][$i];
 
-                if (isset($this->goldenBucket['Compressors'][$i]))
-                    $this->goldenBucket['Frames'][$i]['Compressor'] = $this->goldenBucket['Compressors'][$i];
-
-                if (isset($this->goldenBucket['Tenders'][$i]))
-                    $this->goldenBucket['Frames'][$i]['Tender'] = $this->goldenBucket['Tenders'][$i];
-
                 if (isset($this->goldenBucket['Couplers'][$i]))
                     $this->goldenBucket['Frames'][$i]['Coupler'] = $this->goldenBucket['Couplers'][$i];
-
-                if (isset($this->goldenBucket['Regulatorvalue'][$i]))
-                    $this->goldenBucket['Frames'][$i]['Regulator'] = $this->goldenBucket['Regulatorvalue'][$i];
 
                 if (isset($this->goldenBucket['Brakevalue'][$i]))
                     $this->goldenBucket['Frames'][$i]['Brake'] = $this->goldenBucket['Brakevalue'][$i];
 
-                if (isset($this->goldenBucket['Reverservalue'][$i]))
-                    $this->goldenBucket['Frames'][$i]['Reverser'] = $this->goldenBucket['Reverservalue'][$i];
-
-                if (isset($this->goldenBucket['Reverservalue'][$i]))
-                    $this->goldenBucket['Frames'][$i]['Smokestack'] = $this->goldenBucket['Smokestacktype'][$i];
-
-                if (isset($this->goldenBucket['Reverservalue'][$i]))
-                    $this->goldenBucket['Frames'][$i]['Generatorvalvevalue'] = $this->goldenBucket['Generatorvalvevalue'][$i];
-
-                if (isset($this->goldenBucket['Marker'][$i]))
-                    $this->goldenBucket['Frames'][$i]['Marker']['Front']['Right'] = $this->goldenBucket['Marker']['Lights']['Front']['Right'][$i];
-
-                if (isset($this->goldenBucket['Marker'][$i]))
-                    $this->goldenBucket['Frames'][$i]['Marker']['Front']['Left'] = $this->goldenBucket['Marker']['Lights']['Front']['Left'][$i];
-
-                if (isset($this->goldenBucket['Marker'][$i]))
-                    $this->goldenBucket['Frames'][$i]['Marker']['Rear']['Right'] = $this->goldenBucket['Marker']['Lights']['Rear']['Right'][$i];
-
-                if (isset($this->goldenBucket['Marker'][$i]))
-                    $this->goldenBucket['Frames'][$i]['Marker']['Rear']['Left'] = $this->goldenBucket['Marker']['Lights']['Rear']['Left'][$i];
             }
         }
         unset($this->goldenBucket['Headlights']);
@@ -210,18 +206,48 @@ class GVASParser
 
                     $cX = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['X']) / 100000);
                     $cY = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['Y']) / 100000);
-                    $this->goldenBucket['Segments'][$cX][$cY][] = $segmentArray[sizeof($segmentArray) - 1];
-
+                    if(!isset($segmentArray[sizeof($segmentArray) - 1]['CX'])){
+                        $segmentArray[sizeof($segmentArray) - 1]['CX'][] = $cX;
+                    } else {
+                        $segmentArray[sizeof($segmentArray) - 1]['CX'] = array_unique(array_merge(array($cX),$segmentArray[sizeof($segmentArray) - 1]['CX']));
+                    }
+                    if(!isset($segmentArray[sizeof($segmentArray) - 1]['CY'])){
+                        $segmentArray[sizeof($segmentArray) - 1]['CY'][] = $cY;
+                    } else {
+                        $segmentArray[sizeof($segmentArray) - 1]['CY'] = array_unique(array_merge(array($cY),$segmentArray[sizeof($segmentArray) - 1]['CY']));
+                    }
                     $sX = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['X']) / 100000);
                     $sY = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['Y']) / 100000);
-                    if ($sX != $cX || $sY != $cY) {
-                        $this->goldenBucket['Segments'][$sX][$sY][] = $segmentArray[sizeof($segmentArray) - 1];
+                    if ($sX != $cX) {
+                        if(!isset($segmentArray[sizeof($segmentArray) - 1]['CX'])){
+                            $segmentArray[sizeof($segmentArray) - 1]['CX'][] = $sX;
+                        } else {
+                            $segmentArray[sizeof($segmentArray) - 1]['CX'] = array_unique(array_merge(array($sX), $segmentArray[sizeof($segmentArray) - 1]['CX']));
+                        }
+                    }
+                    if ($sY != $cY) {
+                        if(!isset($segmentArray[sizeof($segmentArray) - 1]['CY'])){
+                            $segmentArray[sizeof($segmentArray) - 1]['CY'][] = $sY;
+                        } else {
+                            $segmentArray[sizeof($segmentArray) - 1]['CY'] = array_unique(array_merge(array($sY), $segmentArray[sizeof($segmentArray) - 1]['CY']));
+                        }
                     }
 
                     $eX = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['X']) / 100000);
                     $eY = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['Y']) / 100000);
-                    if ($eX != $cX || $eY != $cY) {
-                        $this->goldenBucket['Segments'][$eX][$eY][] = $segmentArray[sizeof($segmentArray) - 1];
+                    if ($eX != $cX) {
+                        if(!isset($segmentArray[sizeof($segmentArray) - 1]['CX'])){
+                            $segmentArray[sizeof($segmentArray) - 1]['CX'][] = $eX;
+                        } else {
+                            $segmentArray[sizeof($segmentArray) - 1]['CX'] = array_unique(array_merge(array($eX), $segmentArray[sizeof($segmentArray) - 1]['CX']));
+                        }
+                    }
+                    if ($eY != $cY) {
+                        if(!isset($segmentArray[sizeof($segmentArray) - 1]['CY'])){
+                            $segmentArray[sizeof($segmentArray) - 1]['CY'][] = $eY;
+                        } else {
+                            $segmentArray[sizeof($segmentArray) - 1]['CY'] = array_unique(array_merge(array($eY), $segmentArray[sizeof($segmentArray) - 1]['CY']));
+                        }
                     }
                 }
 
@@ -264,9 +290,12 @@ class GVASParser
         $this->goldenBucket = $this->convert_from_latin1_to_utf8_recursively($this->goldenBucket);
 
         $json = json_encode($this->goldenBucket, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-        file_put_contents('xx.json', $json);
+        $json_min = json_encode($this->reduce_bucket(), JSON_UNESCAPED_UNICODE);
 
-        return $json;
+        file_put_contents('xx.json', $json);
+        file_put_contents('xx.min.json', $json_min);
+
+        return $json_min;
     }
 
 
@@ -328,10 +357,15 @@ class GVASParser
                         $treeY = floor((200000 + $vector->content[1]) / 100000);
 
                         $minDistanceToSomething = 80000000;
-//                        foreach ($this->goldenBucket['Splines'] as $spline) {
-                        if (isset($this->goldenBucket['Segments'][$treeX][$treeY])) {
-//                            foreach ($spline['Segments'] as $segment) {
-                            foreach ($this->goldenBucket['Segments'][$treeX][$treeY] as $segment) {
+//                      if (isset($this->goldenBucket['Segments'][$treeX][$treeY])) {
+//                      foreach ($this->goldenBucket['Segments'][$treeX][$treeY] as $segment) {
+                        foreach ($this->goldenBucket['Splines'] as $spline) {
+                            if(!in_array($spline['Type'], array(0,4))) continue;
+                            foreach ($spline['Segments'] as $segment) {
+                                if(!in_array($treeX, $segment['CX'])) continue;
+                                if(!in_array($treeY, $segment['CY'])) continue;
+
+
                                 if ($segment['LocationCenter']['X'] < $vector->content[0] - 6000) {
                                     continue;
                                 }
@@ -390,7 +424,27 @@ class GVASParser
                             $object->CONTENTOBJECTS[3]->contentElements[$index] = new dtTextProperty(trim($_POST['name_' . $index]));
                         }
                         if (isset($_POST['nameAllCountries'])) {
-                            $object->CONTENTOBJECTS[3]->contentElements[$index] = new dtTextProperty($countryObj->getName());
+
+                            $locos = array('porter_040', 'porter_042', 'eureka', 'heisler', 'class70', 'cooke260','climax');
+                            $tenders = array('eureka_tender', 'class70_tender', 'cooke260_tender');
+                            $carts = array('flatcar_logs','flatcar_cordwood','flatcar_stakes','flatcar_hopper','boxcar','flatcar_tanker');
+                            $currentType = $this->goldenBucket['Frames'][$index]['Type'];
+                            if($_POST['renameWhat'] == 'locos' || $_POST['renameWhat'] == 'everything'){
+                                if(in_array($currentType, $locos)){
+                                    $object->CONTENTOBJECTS[3]->contentElements[$index] = new dtTextProperty($countryObj->getName());
+                                }
+                            }
+                            if($_POST['renameWhat'] == 'carts' || $_POST['renameWhat'] == 'everything'){
+                                if(in_array($currentType, $carts)){
+                                    $object->CONTENTOBJECTS[3]->contentElements[$index] = new dtTextProperty($countryObj->getName());
+                                }
+                            }
+                            if($_POST['renameWhat'] == 'tenders' || $_POST['renameWhat'] == 'everything'){
+                                if(in_array($currentType, $tenders)){
+                                    $object->CONTENTOBJECTS[3]->contentElements[$index] = new dtTextProperty($countryObj->getName());
+                                }
+                            }
+//                                        'handcar': [this.engineRadius, 'white'],
                         }
                     }
                 }
@@ -450,6 +504,13 @@ class GVASParser
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $dtDynamic) {
                         if (isset($_POST['freightamount_' . $index]) && trim($_POST['freightamount_' . $index])) {
                             $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['freightamount_' . $index]);
+                        }
+                    }
+                }
+                if (trim($object->NAME) == 'FreightTypeArray') {
+                    foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $dtDynamic) {
+                        if (isset($_POST['cargoType_' . $index]) && trim($_POST['cargoType_' . $index])) {
+                            $object->CONTENTOBJECTS[3]->contentElements[$index] = new dtString($_POST['cargoType_' . $index]);
                         }
                     }
                 }
@@ -598,7 +659,8 @@ class GVASParser
 
         if (isset($_POST['save'])) {
             $db = unserialize(file_get_contents('db.db'));
-            if (getUserIpAddr() != $db[$this->owner][5]) {
+            if (!isset($db[$this->owner][5]) || getUserIpAddr() != $db[$this->owner][5]) {
+                echo 'Your IP is: '. getUserIpAddr() .' but game was uploaded from: '.$db[$this->owner][5]."\n";
                 die("This does not seem to be your save file.");
             }
         }
@@ -787,6 +849,49 @@ class GVASParser
 
     }
 
+    private function reduce_bucket(): array
+    {
+        $reduced = $this->goldenBucket;
+        $carts = array('flatcar_logs','flatcar_cordwood','flatcar_stakes','flatcar_hopper','boxcar','flatcar_tanker');
+
+        // We don't use player rotation
+        foreach ($reduced['Players'] as $index => $player) {
+            unset($reduced['Players'][$index]['Rotation']);
+        }
+
+        // Carts don't need the same attributes as locomotives
+        foreach ($reduced['Frames'] as $index => $frame) {
+            if (in_array($frame['Type'], $carts)) {
+                unset($reduced['Frames'][$index]['Boiler']);
+                unset($reduced['Frames'][$index]['Headlights']);
+                unset($reduced['Frames'][$index]['Compressor']);
+                unset($reduced['Frames'][$index]['Regulator']);
+                unset($reduced['Frames'][$index]['Smokestack']);
+                unset($reduced['Frames'][$index]['Generatorvalvevalue']);
+                unset($reduced['Frames'][$index]['Reverser']);
+                unset($reduced['Frames'][$index]['Tender']);
+                unset($reduced['Frames'][$index]['Marker']);
+            } else {
+                unset($reduced['Frames'][$index]['Freight']);
+            }
+        }
+
+        // We don't show Watertower level
+        if($reduced['Watertowers']){
+            foreach ($reduced['Watertowers'] as $index => $watertower) {
+                unset($reduced['Watertowers'][$index]['Waterlevel']);
+            }
+        }
+
+        // Industries 1-9 have a fixed rotation
+        foreach ($reduced['Industries'] as $index => $watertower) {
+            if (in_array($reduced['Industries'][$index]['Type'], range(1,9))) {
+                unset($reduced['Industries'][$index]['Rotation']);
+            }
+        }
+
+        return $reduced;
+    }
 }
 
 class SwitchNode extends Node
