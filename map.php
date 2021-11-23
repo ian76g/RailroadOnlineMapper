@@ -144,7 +144,7 @@ foreach ($textFiles as $textFile) {
                 above 3%
             </div>
             <div>
-                <input id="slopeLabel4" type="checkbox" onclick="toggleDisplayOptions(this)" /> I want to brag with my slope using 6 decimals after the comma
+                <input id="slopeLabel4" type="checkbox" onclick="toggleDisplayOptions(this)" <?php if ($_COOKIE['slopeLabel4']) { print("checked"); } ?>/> I want to brag with my slope using 6 decimals after the comma
             </div>
             <div>
                 <input id="maxSlopeLabel" type="checkbox" onclick="toggleDisplayOptions(this)"  <?php if ($_COOKIE['maxSlopeLabel']) { print("checked"); } ?>/> Show max Slope

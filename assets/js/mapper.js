@@ -26,7 +26,7 @@ class Mapper {
 
         this.config = {
             labelPrefix: cookies.get('labelPrefix') || '..',
-            slopeDecimals: cookies.get('labelPrefix') || 2,
+            slopeDecimals: cookies.get('slopeDecimals') || 2,
             ironOverWood: cookies.get('ironOverWood') || true
         }
     }
@@ -108,7 +108,7 @@ class Mapper {
             const playerEditNearValue = document.createElement("td");
             let playerEditNearTextNode = document.createTextNode("Unknown");
             if ('Industries' in this.json) {
-                playerEditNearTextNode = document.createTextNode(this._nearestIndustry(player['Location'], this.json.Industries));
+                playerEditNearTextNode = document.createTextNode(this._nearestIndustry(player['Location'], this.json['Industries']));
             }
             playerEditNearValue.appendChild(playerEditNearTextNode);
             playerEditInfoRow.appendChild(playerEditNearValue);
@@ -150,8 +150,8 @@ class Mapper {
         slopeLabelGroup[4].setAttribute("class", "slopeLabel4");
         const slopeLabelSilly = document.createElementNS(this.svgNS, "text");
         const textNodeSilly = document.createTextNode("");
-        slopeLabelSilly.setAttribute("x", 0);
-        slopeLabelSilly.setAttribute("y", 0);
+        slopeLabelSilly.setAttribute("x", "0");
+        slopeLabelSilly.setAttribute("y", "0");
         slopeLabelSilly.appendChild(textNodeSilly);
         slopeLabelGroup[0].appendChild(slopeLabelSilly);
         slopeLabelGroup[1].appendChild(slopeLabelSilly);
@@ -189,7 +189,7 @@ class Mapper {
             for (const spline of this.json['Splines']) {
                 let type = spline['Type'];
                 let entry = drawOrder[type];
-                const [current, strokeWidth, stroke] = entry;
+                const [, strokeWidth, stroke] = entry;
 
                 let segments = spline['Segments'];
                 if ([1, 2, 5, 6, 3, 7].indexOf(type) > -1) {
@@ -207,9 +207,6 @@ class Mapper {
                         let yStart = (this.imy - ((segment['LocationStart']['Y'] - this.minY) / 100 * this.scale));
                         let xEnd = (this.imx - ((segment['LocationEnd']['X'] - this.minX) / 100 * this.scale));
                         let yEnd = (this.imy - ((segment['LocationEnd']['Y'] - this.minY) / 100 * this.scale));
-                        let xCenter = (this.imx - ((segment['LocationCenter']['X'] - this.minX) / 100 * this.scale));
-                        let yCenter = (this.imy - ((segment['LocationCenter']['Y'] - this.minY) / 100 * this.scale));
-
                         if (path === '') {
                             path = 'M ' + xStart + ',' + yStart + ' ';
                             path += tool + ' ' + xEnd + ',' + yEnd + ' ';
@@ -310,17 +307,17 @@ class Mapper {
                                 this.allLabels.push([xCenter, yCenter]);
 
                                 const slopeLabelSilly = document.createElementNS(this.svgNS, "text");
-                                const textNodeSilly = document.createTextNode(slopeTriggerPrefix + percentageSilly + "%");
-                                slopeLabelSilly.setAttribute("x", Math.round(xCenter.toString()));
-                                slopeLabelSilly.setAttribute("y", Math.round(yCenter.toString()));
+                                const textNodeSilly = document.createTextNode(this.config.labelPrefix + percentageSilly + "%");
+                                slopeLabelSilly.setAttribute("x", Math.round(xCenter).toString());
+                                slopeLabelSilly.setAttribute("y", Math.round(yCenter).toString());
                                 slopeLabelSilly.setAttribute("transform", "rotate(" + Math.round(degrees) + "," + Math.round(xCenter) + "," + Math.round(yCenter) + ")");
                                 slopeLabelSilly.appendChild(textNodeSilly);
                                 slopeLabelGroup[4].appendChild(slopeLabelSilly);
 //console.log(slopeLabelSilly);
                                 const slopeLabel = document.createElementNS(this.svgNS, "text");
                                 const textNode = document.createTextNode(this.config.labelPrefix + percentage + "%");
-                                slopeLabel.setAttribute("x", Math.round(xCenter.toString()));
-                                slopeLabel.setAttribute("y", Math.round(yCenter.toString()));
+                                slopeLabel.setAttribute("x", Math.round(xCenter).toString());
+                                slopeLabel.setAttribute("y", Math.round(yCenter).toString());
                                 slopeLabel.setAttribute("transform", "rotate(" + Math.round(degrees) + "," + Math.round(xCenter) + "," + Math.round(yCenter) + ")");
                                 slopeLabel.appendChild(textNode);
                                 slopeLabelGroup[numberX].appendChild(slopeLabel);
@@ -362,7 +359,7 @@ class Mapper {
         const switchesGroup = document.createElementNS(this.svgNS, "g");
         switchesGroup.setAttribute("class", "switches");
 
-        for (const swtch of this.json.Switchs) { // can't use 'switch' as variable name
+        for (const swtch of this.json['Switchs']) { // can't use 'switch' as variable name
             let dir = false;
             const type = swtch['Type'];
 
@@ -491,7 +488,7 @@ class Mapper {
         const turntablesGroup = document.createElementNS(this.svgNS, "g");
         turntablesGroup.setAttribute("class", "turntables");
 
-        for (const turntable of this.json.Turntables) {
+        for (const turntable of this.json['Turntables']) {
             /**
              * 0 = regular
              * 1 = light and nice
@@ -583,7 +580,7 @@ class Mapper {
         }
 
         let index = 0;
-        for (const vehicle of this.json.Frames) {
+        for (const vehicle of this.json['Frames']) {
             const x = (this.imx - ((vehicle['Location'][0] - this.minX) / 100 * this.scale));
             const y = (this.imy - ((vehicle['Location'][1] - this.minY) / 100 * this.scale));
             if (['porter_040', 'porter_042', /*'handcar', */'eureka', 'climax', 'heisler', 'class70', 'cooke260'].indexOf(vehicle['Type']) >= 0) {
@@ -736,7 +733,7 @@ class Mapper {
             const nearValue = document.createElement("td");
             let nearTextNode = document.createTextNode("Unknown");
             if ('Industries' in this.json) {
-                nearTextNode = document.createTextNode(this._nearestIndustry(vehicle['Location'], this.json.Industries));
+                nearTextNode = document.createTextNode(this._nearestIndustry(vehicle['Location'], this.json['Industries']));
             }
             nearValue.appendChild(nearTextNode);
             rollingStockInfoRow.appendChild(nearValue);
@@ -782,7 +779,7 @@ class Mapper {
 
         const industriesTable = document.getElementById("industriesTable");
         let index = 0;
-        for (const industry of this.json.Industries) {
+        for (const industry of this.json['Industries']) {
             let name = '';
             let rotation = 0;
             let xoff = 0;
@@ -986,7 +983,7 @@ class Mapper {
             return
         }
 
-        for (const tower of this.json.Watertowers) {
+        for (const tower of this.json['Watertowers']) {
             const x = this.imx - ((tower['Location'][0] - this.minX) / 100 * this.scale);
             const y = this.imy - ((tower['Location'][1] - this.minY) / 100 * this.scale);
 
@@ -1157,7 +1154,7 @@ class Mapper {
         if (coords2 === undefined) {
             return 9999999999;
         }
-        let distance = null;
+        let distance;
         if ('X' in coords) {
             if ('X' in coords2) {
                 if (flat === true) {
