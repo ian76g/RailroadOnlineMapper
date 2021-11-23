@@ -35,8 +35,8 @@ if (isset($_POST) && !empty($_POST)) {
         }
 
         $myParser = new GVASParser();
-        $myParser->parseData(file_get_contents($_FILES["fileToUpload"]["tmp_name"]));
-        $newFilename = $myParser->owner.$slotNumber;
+        $myParser->parseData(file_get_contents($_FILES["fileToUpload"]["tmp_name"]), false, $slotNumber);
+        $newFilename = $myParser->owner;
         $target_file = $target_dir . $newFilename . '.sav';
 
         if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {

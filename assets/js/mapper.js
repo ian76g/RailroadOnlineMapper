@@ -139,6 +139,7 @@ class Mapper {
             document.createElementNS(this.svgNS, "g"),
             document.createElementNS(this.svgNS, "g"),
             document.createElementNS(this.svgNS, "g"),
+            document.createElementNS(this.svgNS, "g"),
             document.createElementNS(this.svgNS, "g")
         );
 
@@ -146,6 +147,19 @@ class Mapper {
         slopeLabelGroup[1].setAttribute("class", "slopeLabel1");
         slopeLabelGroup[2].setAttribute("class", "slopeLabel2");
         slopeLabelGroup[3].setAttribute("class", "slopeLabel3");
+        slopeLabelGroup[4].setAttribute("class", "slopeLabel4");
+        const slopeLabelSilly = document.createElementNS(this.svgNS, "text");
+        const textNodeSilly = document.createTextNode("");
+        slopeLabelSilly.setAttribute("x", 0);
+        slopeLabelSilly.setAttribute("y", 0);
+        slopeLabelSilly.appendChild(textNodeSilly);
+        slopeLabelGroup[0].appendChild(slopeLabelSilly);
+        slopeLabelGroup[1].appendChild(slopeLabelSilly);
+        slopeLabelGroup[2].appendChild(slopeLabelSilly);
+        slopeLabelGroup[3].appendChild(slopeLabelSilly);
+        slopeLabelGroup[4].appendChild(slopeLabelSilly);
+
+
         maxSlopeLabelGroup.setAttribute("class", "maxSlopeLabel");
 
         const drawOrder = {}; // [type, stroke-width, stroke]
@@ -245,34 +259,32 @@ class Mapper {
                         )
 
                         let slope = 0;
-                        if (type in [4, 0]) {
-                            const height = Math.abs(segment['LocationEnd']['Z'] - segment['LocationStart']['Z']);
-                            const length = Math.sqrt(
-                                Math.pow(segment['LocationEnd']['X'] - segment['LocationStart']['X'], 2) +
-                                Math.pow(segment['LocationEnd']['Y'] - segment['LocationStart']['Y'], 2));
+                        const height = Math.abs(segment['LocationEnd']['Z'] - segment['LocationStart']['Z']);
+                        const length = Math.sqrt(
+                            Math.pow(segment['LocationEnd']['X'] - segment['LocationStart']['X'], 2) +
+                            Math.pow(segment['LocationEnd']['Y'] - segment['LocationStart']['Y'], 2));
 
-                            if (length === null || length === undefined || length === 0 || length === 0.0) {
-                                const emptyLengthTrack = document.createElementNS(this.svgNS, "circle");
-                                emptyLengthTrack.setAttribute("cx", xCenter.toString());
-                                emptyLengthTrack.setAttribute("cy", yCenter.toString());
-                                emptyLengthTrack.setAttribute("r", "10");
-                                emptyLengthTrack.setAttribute("stroke", "red");
-                                emptyLengthTrack.setAttribute("stroke-width", "2");
-                                emptyLengthTrack.setAttribute("fill", "red");
-                                tracksGroup.appendChild(emptyLengthTrack);
+                        if (length === null || length === undefined || length === 0 || length === 0.0) {
+                            const emptyLengthTrack = document.createElementNS(this.svgNS, "circle");
+                            emptyLengthTrack.setAttribute("cx", xCenter.toString());
+                            emptyLengthTrack.setAttribute("cy", yCenter.toString());
+                            emptyLengthTrack.setAttribute("r", "10");
+                            emptyLengthTrack.setAttribute("stroke", "red");
+                            emptyLengthTrack.setAttribute("stroke-width", "2");
+                            emptyLengthTrack.setAttribute("fill", "red");
+                            tracksGroup.appendChild(emptyLengthTrack);
 
-                                continue; //This may cause issues down the road. We may need to stop at this point and return the errors segment.
-                            } else {
-                                slope = (height * 100 / length);
-                                if (slope > this.maxSlope) {
-                                    slopecoords = [xCenter, yCenter];
-                                }
-                                this.maxSlope = Math.max(this.maxSlope, slope);
+                            continue; //This may cause issues down the road. We may need to stop at this point and return the errors segment.
+                        } else {
+                            slope = (height * 100 / length);
+                            if (slope > this.maxSlope) {
+                                slopecoords = [xCenter, yCenter];
                             }
+                            this.maxSlope = Math.max(this.maxSlope, slope);
                         }
 
                         const slopeTriggerDecimals = 1;
-                        if (distance > 0 && (type === 4 || type === 0)) {
+                        if (distance > 0) {
                             let degrees = null;
                             if (segment['LocationEnd']['X'] === segment['LocationStart']['X']) {
                                 degrees = 90;
@@ -288,18 +300,28 @@ class Mapper {
                                 degrees += 90;
                             }
 
-                            if (this._getDistanceToNearestLabel([xCenter, yCenter]) > 60) {
+                            if (this._getDistanceToNearestLabel([xCenter, yCenter]) > 20) {
 
                                 let percentage = this._round(slope, slopeTriggerDecimals);
+                                let percentageSilly = this._round(slope, 6);
 
                                 let numberX = Math.min(3, Math.floor(slope));
 
                                 this.allLabels.push([xCenter, yCenter]);
+
+                                const slopeLabelSilly = document.createElementNS(this.svgNS, "text");
+                                const textNodeSilly = document.createTextNode(slopeTriggerPrefix + percentageSilly + "%");
+                                slopeLabelSilly.setAttribute("x", Math.round(xCenter.toString()));
+                                slopeLabelSilly.setAttribute("y", Math.round(yCenter.toString()));
+                                slopeLabelSilly.setAttribute("transform", "rotate(" + Math.round(degrees) + "," + Math.round(xCenter) + "," + Math.round(yCenter) + ")");
+                                slopeLabelSilly.appendChild(textNodeSilly);
+                                slopeLabelGroup[4].appendChild(slopeLabelSilly);
+//console.log(slopeLabelSilly);
                                 const slopeLabel = document.createElementNS(this.svgNS, "text");
                                 const textNode = document.createTextNode(this.config.labelPrefix + percentage + "%");
-                                slopeLabel.setAttribute("x", xCenter.toString());
-                                slopeLabel.setAttribute("y", yCenter.toString());
-                                slopeLabel.setAttribute("transform", "rotate(" + degrees + "," + xCenter + "," + yCenter + ")");
+                                slopeLabel.setAttribute("x", Math.round(xCenter.toString()));
+                                slopeLabel.setAttribute("y", Math.round(yCenter.toString()));
+                                slopeLabel.setAttribute("transform", "rotate(" + Math.round(degrees) + "," + Math.round(xCenter) + "," + Math.round(yCenter) + ")");
                                 slopeLabel.appendChild(textNode);
                                 slopeLabelGroup[numberX].appendChild(slopeLabel);
                             }
@@ -329,6 +351,7 @@ class Mapper {
         this.shapes.push(slopeLabelGroup[1]);
         this.shapes.push(slopeLabelGroup[2]);
         this.shapes.push(slopeLabelGroup[3]);
+        this.shapes.push(slopeLabelGroup[4]);
     }
 
     getSwitches() {
@@ -581,26 +604,26 @@ class Mapper {
                     xl = xl / 3 * 2;
                 }
                 let fillColor = cartOptions[vehicle['Type']][1];
-                if(
+                if (
                     typeof vehicle['Freight'] !== 'undefined' &&
                     typeof vehicle['Freight']['Amount'] !== 'undefined' &&
-                    vehicle['Freight']['Amount']>0 &&
-                    cartOptions[vehicle['Type']][2]!== undefined
-                ){
+                    vehicle['Freight']['Amount'] > 0 &&
+                    cartOptions[vehicle['Type']][2] !== undefined
+                ) {
                     fillColor = cartOptions[vehicle['Type']][2];
                 }
                 const title = document.createElementNS(this.svgNS, "title");
-                title.textContent = vehicle['Name'].replace(/<\/?[^>]+(>|$)/g, "")+" "+vehicle['Number'].replace(/<\/?[^>]+(>|$)/g, "");
-                if(
+                title.textContent = vehicle['Name'].replace(/<\/?[^>]+(>|$)/g, "") + " " + vehicle['Number'].replace(/<\/?[^>]+(>|$)/g, "");
+                if (
                     typeof vehicle['Freight'] !== 'undefined' &&
                     typeof vehicle['Freight']['Amount'] !== 'undefined' &&
-                    vehicle['Freight']['Amount'] === 0){
+                    vehicle['Freight']['Amount'] === 0) {
                     title.textContent += " (empty)";
                 } else {
-                    if(typeof vehicle['Freight'] !== 'undefined' &&
+                    if (typeof vehicle['Freight'] !== 'undefined' &&
                         typeof vehicle['Freight']['Type'] !== 'undefined'
-                    ){
-                            title.textContent += " ("+vehicle['Freight']['Type']+" x"+vehicle['Freight']['Amount']+")";
+                    ) {
+                        title.textContent += " (" + vehicle['Freight']['Type'] + " x" + vehicle['Freight']['Amount'] + ")";
 
                     }
                 }
@@ -1007,7 +1030,7 @@ class Mapper {
                     for (const segment of spline['Segments']) {
                         if (segment['CX'].indexOf(treeX) === -1) continue;
                         if (segment['CY'].indexOf(treeY) === -1) continue;
-                         if (segment['LocationCenter']['X'] < tree[0] - 6000) {
+                        if (segment['LocationCenter']['X'] < tree[0] - 6000) {
                             continue;
                         }
                         if (segment['LocationCenter']['X'] > tree[0] + 6000) {
@@ -1131,13 +1154,13 @@ class Mapper {
     }
 
     _dist(coords, coords2, flat = false) {
-        if(coords2 === undefined){
+        if (coords2 === undefined) {
             return 9999999999;
         }
         let distance = null;
         if ('X' in coords) {
             if ('X' in coords2) {
-                if(flat === true){
+                if (flat === true) {
                     coords['Z'] = coords2['Z'];
                 }
                 distance = Math.sqrt(
@@ -1146,7 +1169,7 @@ class Mapper {
                     Math.pow(coords['Z'] - coords2['Z'], 2)
                 );
             } else {
-                if(flat === true){
+                if (flat === true) {
                     coords['Z'] = coords2[2];
                 }
                 distance = Math.sqrt(
@@ -1157,7 +1180,7 @@ class Mapper {
             }
         } else {
             if ('X' in coords2) {
-                if(flat === true){
+                if (flat === true) {
                     coords[2] = coords2['Z'];
                 }
                 distance = Math.sqrt(
@@ -1165,9 +1188,8 @@ class Mapper {
                     Math.pow(coords[1] - coords2['Y'], 2) +
                     Math.pow(coords[2] - coords2['Z'], 2)
                 );
-            }
-            else {
-                if(flat === true){
+            } else {
+                if (flat === true) {
                     coords[2] = coords2[2];
                 }
                 distance = Math.sqrt(
@@ -1179,4 +1201,5 @@ class Mapper {
         }
 
         return distance;
-    }}
+    }
+}

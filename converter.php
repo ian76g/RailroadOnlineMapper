@@ -36,7 +36,7 @@ function getUserIpAddr()
     return $ip;
 }
 
-$_POST['save'] = 'Joetraincool.sav';
+//$_POST['save'] = 'Joetraincool.sav';
 //$_POST['replant'] = 'NO';
 //$_POST['firstTree'] = 'A';
 //$_POST['userTree'] = 'A';
@@ -50,7 +50,7 @@ $_POST['save'] = 'Joetraincool.sav';
 //$_POST['allBrakes'] = 'YES';
 //$_POST['renameWhat'] = 'locos';
 //$_POST['nameAllCountries'] = 'dnrgLocomotives';
-$_POST['cargoType_2'] = 'log';
+//$_POST['cargoType_2'] = 'log';
 
 if (!isset($NEWUPLOADEDFILE)) {
     if (isset($_POST['save']) && $_POST['save']) {
@@ -76,8 +76,11 @@ foreach ($files as $file) {
 
     $fileName = $file;
 
+    $slotExtension = explode('-', substr($fileName,0,-4));
+    $slotExtension='-'.$slotExtension[sizeof($slotExtension)-1];
+
     $myParser = new GVASParser();
-    $newSaveFileContents = $myParser->parseData(file_get_contents($fileName), true);
+    $newSaveFileContents = $myParser->parseData(file_get_contents($fileName), true, $slotExtension);
     unset($myParser);
 
     $file = fopen($fileName, 'wb');
@@ -88,7 +91,7 @@ foreach ($files as $file) {
     fclose($file);
 
     $myParser = new GVASParser();
-    $myParser->parseData(file_get_contents($fileName), false);
+    $myParser->parseData(file_get_contents($fileName), false, $slotExtension);
     $saveReadr = new SaveReader($myParser->goldenBucket);
     $saveReadr->addDatabaseEntry($fileName, isset($_POST['public']));
     header('Location: /map.php?name=' . str_replace('.sav', '', basename($fileName)));

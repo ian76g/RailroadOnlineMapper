@@ -17,8 +17,11 @@ $json = null;
 if (isset($_GET['name']) && $_GET['name'] != '') {
     $saveFile = "./saves/" . $_GET['name'] . ".sav";
     if (file_exists($saveFile)) {
+        $slotExtension = explode('-', substr($saveFile,0,-4));
+        $slotExtension='-'.$slotExtension[sizeof($slotExtension)-1];
+
         $parser = new GVASParser();
-        $json = $parser->parseData(file_get_contents($saveFile));
+        $json = $parser->parseData(file_get_contents($saveFile), false, $slotExtension);
     }
 }
 
@@ -139,6 +142,9 @@ foreach ($textFiles as $textFile) {
             <div>
                 <input id="slopeLabel3" type="checkbox" onclick="toggleDisplayOptions(this)"  <?php if ($_COOKIE['slopeLabel3']) { print("checked"); } ?>/> Show Slope Labels
                 above 3%
+            </div>
+            <div>
+                <input id="slopeLabel4" type="checkbox" onclick="toggleDisplayOptions(this)" /> I want to brag with my slope using 6 decimals after the comma
             </div>
             <div>
                 <input id="maxSlopeLabel" type="checkbox" onclick="toggleDisplayOptions(this)"  <?php if ($_COOKIE['maxSlopeLabel']) { print("checked"); } ?>/> Show max Slope

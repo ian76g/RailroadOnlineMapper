@@ -17,7 +17,7 @@ class GVASParser
      * @param bool $edit
      * @return false|string
      */
-    public function parseData(string $x, bool $edit = false)
+    public function parseData(string $x, bool $edit = false, $slotExtension = '')
     {
         $this->goldenBucket = array();
         $position = 0;
@@ -81,7 +81,7 @@ class GVASParser
             }
         }
 
-        $this->owner = preg_replace('/[[:^alnum:]]/', "", $this->goldenBucket['Players'][0]['Name']);
+        $this->owner = preg_replace('/[[:^alnum:]]/', "", $this->goldenBucket['Players'][0]['Name']).$slotExtension;
 
         $carts = array('flatcar_logs','flatcar_cordwood','flatcar_stakes','flatcar_hopper','boxcar','flatcar_tanker');
 
@@ -660,7 +660,7 @@ class GVASParser
         if (isset($_POST['save'])) {
             $db = unserialize(file_get_contents('db.db'));
             if (!isset($db[$this->owner][5]) || getUserIpAddr() != $db[$this->owner][5]) {
-                echo 'Your IP is: '. getUserIpAddr() .' but game was uploaded from: '.$db[$this->owner][5]."\n";
+                echo 'Your IP is: '. getUserIpAddr() .' but game was uploaded from: '.$db[$this->owner][5]." [".$this->owner."]\n";
                 die("This does not seem to be your save file.");
             }
         }
