@@ -48,6 +48,14 @@ class Mapper {
         }
     }
 
+    createSVGElement(type, attrs) {
+        const element = document.createElementNS(this.svgNS, type);
+        for (const attr in attrs) {
+            element.setAttribute(attr, attrs[attr].toString());
+        }
+        return element;
+    }
+
     populatePlayerTable() {
         if (!('Players' in this.json)) {
             return null
@@ -415,23 +423,23 @@ class Mapper {
                 const cx = x + (x2 - x) / 2;
                 const cy = y + (y2 - y) / 2;
 
-                let crossSegment = document.createElementNS(this.svgNS, "line");
-                crossSegment.setAttribute("x1", x.toString());
-                crossSegment.setAttribute("y1", y.toString());
-                crossSegment.setAttribute("x2", x2.toString());
-                crossSegment.setAttribute("y2", y2.toString());
-                crossSegment.setAttribute("stroke", "black");
-                crossSegment.setAttribute("stroke-width", "3");
-                switchesGroup.appendChild(crossSegment);
+                switchesGroup.appendChild(this.createSVGElement("line", {
+                    x1: x,
+                    y1: y,
+                    x2: x2,
+                    y2: y2,
+                    stroke: "black",
+                    'stroke-width': "3"
+                }));
 
-                crossSegment = document.createElementNS(this.svgNS, "line");
-                crossSegment.setAttribute("x1", (cx - (Math.cos(rotation) * crosslength)).toString());
-                crossSegment.setAttribute("y1", (cy - (Math.sin(rotation) * crosslength)).toString());
-                crossSegment.setAttribute("x2", (cx + (Math.cos(rotation) * crosslength)).toString());
-                crossSegment.setAttribute("y2", (cy + (Math.sin(rotation) * crosslength)).toString());
-                crossSegment.setAttribute("stroke", "black");
-                crossSegment.setAttribute("stroke-width", "3");
-                switchesGroup.appendChild(crossSegment);
+                switchesGroup.appendChild(this.createSVGElement("line", {
+                    x1: (cx - (Math.cos(rotation) * crosslength)),
+                    y1: (cy - (Math.sin(rotation) * crosslength)),
+                    x2: (cx + (Math.cos(rotation) * crosslength)),
+                    y2: (cy + (Math.sin(rotation) * crosslength)),
+                    stroke: "black",
+                    'stroke-width': "3"
+                }));
             } else {
                 const xStraight = (this.imx - ((swtch['Location'][0] - this.minX) / 100 * this.scale) + (Math.cos(rotation) * this.switchRadius / 2));
                 const yStraight = (this.imy - ((swtch['Location'][1] - this.minY) / 100 * this.scale) + (Math.sin(rotation) * this.switchRadius / 2));
@@ -439,41 +447,41 @@ class Mapper {
                 const ySide = (this.imy - ((swtch['Location'][1] - this.minY) / 100 * this.scale) + (Math.sin(rotSide) * this.switchRadius / 2));
 
                 if (state) {
-                    let switchSegment = document.createElementNS(this.svgNS, "line");
-                    switchSegment.setAttribute("x1", x.toString());
-                    switchSegment.setAttribute("y1", y.toString());
-                    switchSegment.setAttribute("x2", xStraight.toString());
-                    switchSegment.setAttribute("y2", yStraight.toString());
-                    switchSegment.setAttribute("stroke", "red");
-                    switchSegment.setAttribute("stroke-width", "3");
-                    switchesGroup.appendChild(switchSegment);
+                    switchesGroup.appendChild(this.createSVGElement("line", {
+                        x1: x,
+                        y1: y,
+                        x2: xStraight,
+                        y2: yStraight,
+                        stroke: "red",
+                        'stroke-width': "3"
+                    }));
 
-                    switchSegment = document.createElementNS(this.svgNS, "line");
-                    switchSegment.setAttribute("x1", x.toString());
-                    switchSegment.setAttribute("y1", y.toString());
-                    switchSegment.setAttribute("x2", xSide.toString());
-                    switchSegment.setAttribute("y2", ySide.toString());
-                    switchSegment.setAttribute("stroke", "black");
-                    switchSegment.setAttribute("stroke-width", "3");
-                    switchesGroup.appendChild(switchSegment);
+                    switchesGroup.appendChild(this.createSVGElement("line", {
+                        x1: x,
+                        y1: y,
+                        x2: xSide,
+                        y2: ySide,
+                        stroke: "black",
+                        'stroke-width': "3"
+                    }));
                 } else {
-                    let switchSegment = document.createElementNS(this.svgNS, "line");
-                    switchSegment.setAttribute("x1", x.toString());
-                    switchSegment.setAttribute("y1", y.toString());
-                    switchSegment.setAttribute("x2", xSide.toString());
-                    switchSegment.setAttribute("y2", ySide.toString());
-                    switchSegment.setAttribute("stroke", "red");
-                    switchSegment.setAttribute("stroke-width", "3");
-                    switchesGroup.appendChild(switchSegment);
+                    switchesGroup.appendChild(this.createSVGElement("line", {
+                        x1: x,
+                        y1: y,
+                        x2: xSide,
+                        y2: ySide,
+                        stroke: "red",
+                        'stroke-width': "3"
+                    }));
 
-                    switchSegment = document.createElementNS(this.svgNS, "line");
-                    switchSegment.setAttribute("x1", x.toString());
-                    switchSegment.setAttribute("y1", y.toString());
-                    switchSegment.setAttribute("x2", xStraight.toString());
-                    switchSegment.setAttribute("y2", yStraight.toString());
-                    switchSegment.setAttribute("stroke", "black");
-                    switchSegment.setAttribute("stroke-width", "3");
-                    switchesGroup.appendChild(switchSegment);
+                    switchesGroup.appendChild(this.createSVGElement("line", {
+                        x1: x,
+                        y1: y,
+                        x2: xStraight,
+                        y2: yStraight,
+                        stroke: "black",
+                        'stroke-width': "3"
+                    }));
                 }
             }
         }
