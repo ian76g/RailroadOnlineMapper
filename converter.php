@@ -76,11 +76,15 @@ foreach ($files as $file) {
 
     $fileName = $file;
 
-    $slotExtension = explode('-', substr($fileName,0,-4));
-    $slotExtension='-'.$slotExtension[sizeof($slotExtension)-1];
+    $x = str_replace(array('slot', '.sav'), '', $fileName);
+    if($x == ''.intval($x)){
+        $slotNumber = '-'.$x;
+    } else {
+        $slotNumber = '';
+    }
 
     $myParser = new GVASParser();
-    $newSaveFileContents = $myParser->parseData(file_get_contents($fileName), true, $slotExtension);
+    $newSaveFileContents = $myParser->parseData(file_get_contents($fileName), true, $slotNumber);
     unset($myParser);
 
     $file = fopen($fileName, 'wb');
@@ -91,7 +95,7 @@ foreach ($files as $file) {
     fclose($file);
 
     $myParser = new GVASParser();
-    $myParser->parseData(file_get_contents($fileName), false, $slotExtension);
+    $myParser->parseData(file_get_contents($fileName), false, $slotNumber);
     $saveReadr = new SaveReader($myParser->goldenBucket);
     $saveReadr->addDatabaseEntry($fileName, isset($_POST['public']));
     header('Location: /map.php?name=' . str_replace('.sav', '', basename($fileName)));
