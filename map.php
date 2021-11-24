@@ -159,6 +159,28 @@ foreach ($textFiles as $textFile) {
 
     <div id="container" class="export__map">
         <svg id="demo-tiger" class="export__map-viewer" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8000 8000">
+            <script type="text/JavaScript">
+                <![CDATA[
+                function my_function(spline, segment)
+                {
+                    svg = document.getElementById('demo-tiger');
+                    var children = svg.children[1].children[6].children;
+                    alert('You clicked on Spline '+spline);
+                    for (var i = 0; i < children.length; i++) {
+                        var tableChild = children[i];
+                        // Do stuff
+                        if(''+tableChild.getAttribute('sp') === ''+spline){
+                            tableChild.setAttribute('stroke', 'lightblue');
+                            console.log('.');
+                        } else {
+                            console.log(tableChild.getAttribute('sp'));
+                        }
+                        //console.log(tableChild.sp);
+                    }
+
+                }
+                ]]>
+            </script>
             <defs>
                 <pattern id="bild" x="0" y="0" width="8000" height="8000" patternUnits="userSpaceOnUse">
                     <image x="0" y="0" width="8000" height="8000" href="/assets/images/bg5.jpg"/>
@@ -343,26 +365,7 @@ foreach ($textFiles as $textFile) {
 </body>
 </html>
 <!--
-            <script type="text/JavaScript">
-                <![CDATA[
-                function my_function(spline, segment)
-                {
-                    svg = document.getElementById('demo-tiger');
-                    var children = svg.children[1].children[6].children;
-                    alert(spline);
-                    for (var i = 0; i < children.length; i++) {
-                        var tableChild = children[i];
-                        // Do stuff
-                        if(''+tableChild.getAttribute('sp') === ''+spline){
-                            tableChild.setAttribute('stroke', 'lightblue');
-                            console.log('.');
-                        } else {
-                            console.log(tableChild.getAttribute('sp'));
-                        }
-                        //console.log(tableChild.sp);
-                    }
 
-                }
 
 
                 function getCurveCoordsBetweenSegments(segment1, segment2)
@@ -453,8 +456,4 @@ foreach ($textFiles as $textFile) {
 
                 }
 
-
-
-                ]]>
-            </script>
 -->

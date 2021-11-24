@@ -197,17 +197,22 @@ class ArithmeticHelper
 
         $num = ($yOut-$yCircle)/$radius;
         $angleEnd = asin($num);
-
+echo "<pre>";
         echo "Segment 1: ";
-        echo $segment1[0]['X'].', '.$segment1[0]['Y']."\n";
+        echo $segment1[0]['X'].', '.$segment1[0]['Y']." to ";
+        echo $segment1[1]['X'].', '.$segment1[1]['Y']."\n";
         echo "Segment 2: ";
-        echo $segment2[0]['X'].', '.$segment2[0]['Y']."\n";
+        echo $segment2[0]['X'].', '.$segment2[0]['Y']." to ";
+        echo $segment2[1]['X'].', '.$segment2[1]['Y']."\n";
 
         echo "Intersect: ";
         echo $xIntersect.', '.$yIntersect."\n";
 
         echo "Circle: ";
         echo $xCircle.', '.$yCircle."\n";
+
+        echo "Radius: ";
+        echo $radius."\n";
 
         echo "Cirle start: ";
         echo $nearest[0].', '.$nearest[1]."\n";
