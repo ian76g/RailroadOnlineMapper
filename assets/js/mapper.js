@@ -172,7 +172,9 @@ class Mapper {
 
         if ('Splines' in this.json) {
             // for (const entry of drawOrder) {
+            let splineIndex = -1;
             for (const spline of this.json.Splines) {
+                splineIndex++;
                 let type = spline['Type'];
                 let entry = drawOrder[type];
                 const [current, strokeWidth, stroke, zindex] = entry;
@@ -221,7 +223,9 @@ class Mapper {
                     bedsGroup.appendChild(bedSegment);
                 } else {
                     // tracks..
+                    let segmentIndex = -1;
                     for (const segment of segments) {
+                        segmentIndex++;
                         if (segment['Visible'] !== 1) {
                             continue
                         }
@@ -238,7 +242,11 @@ class Mapper {
                         trackSegment.setAttribute("y1", yStart.toString());
                         trackSegment.setAttribute("x2", xEnd.toString());
                         trackSegment.setAttribute("y2", yEnd.toString());
+                        trackSegment.setAttribute("sp", splineIndex);
+                        trackSegment.setAttribute("se", segmentIndex);
                         trackSegment.setAttribute("stroke", stroke);
+                        trackSegment.setAttribute('onclick',
+                            'my_function('+splineIndex+','+segmentIndex+')');
                         trackSegment.setAttribute("stroke-width", strokeWidth.toString());
                         tracksGroup.appendChild(trackSegment);
 

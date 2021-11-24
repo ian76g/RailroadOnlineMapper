@@ -339,9 +339,9 @@ class GVASParser
      */
     function handleEditAndSave(): string
     {
-        $sevenHundret = 700;
+        $sevenHundred = 700;
         if(isset($_POST['replant'])){
-            $sevenHundret = $_POST['replant'];
+            $sevenHundred = $_POST['replant'];
         }
         $output = '';
         foreach ($this->saveObject['objects'] as $saveObjectIndex => $object) {
@@ -381,7 +381,7 @@ class GVASParser
                                 $minDistanceToSomething = min($minDistanceToSomething, $this->distance($vector->content, $segment['LocationCenter']));
                             }
                         }
-                        if ($minDistanceToSomething > $sevenHundret) {
+                        if ($minDistanceToSomething > $sevenHundred) {
                             $toRemove[] = $index;
                         }
                         //echo round($minDistanceToSomething)." ";
@@ -877,7 +877,7 @@ class GVASParser
         }
 
         // We don't show Watertower level
-        if($reduced['Watertowers']){
+        if(isset($reduced['Watertowers'])){
             foreach ($reduced['Watertowers'] as $index => $watertower) {
                 unset($reduced['Watertowers'][$index]['Waterlevel']);
             }

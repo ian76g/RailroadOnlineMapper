@@ -216,7 +216,9 @@ foreach ($textFiles as $textFile) {
                 <h4>Trees</h4>
                 <form method="POST" action="/converter.php">
                     <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
-                    <input name="replant" value="YES" type="hidden"/>
+                    <input name="replant" value="700" size="4"> cm away from track!<br>
+                    <span style="font-size: smaller">for reference:<br> 65 cm washing machine, <br> 91 cm gauge,<br> 170 cm bathtub,<br> 460 cm car,<br> 1880 cm switch<br>
+                    measured to start, center and end of track-(segment) only, switches, crosses are not taken into calculation (yet)</span><br>
                     <button class="button">Replant Trees</button>
                 </form>
 
@@ -340,3 +342,119 @@ foreach ($textFiles as $textFile) {
 </script>
 </body>
 </html>
+<!--
+            <script type="text/JavaScript">
+                <![CDATA[
+                function my_function(spline, segment)
+                {
+                    svg = document.getElementById('demo-tiger');
+                    var children = svg.children[1].children[6].children;
+                    alert(spline);
+                    for (var i = 0; i < children.length; i++) {
+                        var tableChild = children[i];
+                        // Do stuff
+                        if(''+tableChild.getAttribute('sp') === ''+spline){
+                            tableChild.setAttribute('stroke', 'lightblue');
+                            console.log('.');
+                        } else {
+                            console.log(tableChild.getAttribute('sp'));
+                        }
+                        //console.log(tableChild.sp);
+                    }
+
+                }
+
+
+                function getCurveCoordsBetweenSegments(segment1, segment2)
+                {
+                    // calculate formulas for segment 1 and segment 2
+                    // y = m*x+n     x,y given 2 times - can be solved
+                    length1 = segment1[1]['X']-segment1[0]['X'];
+                    height1 = segment1[1]['Y']-segment1[0]['Y'];
+                    if(length1 === 0){
+                        die('Edge case 1/3 not implemented');
+                    }
+                    m1 = height1/length1;
+                    n1 = segment1[0]['Y']-m1*segment1[0]['X'];
+
+                    length2 = segment2[1]['X']-segment2[0]['X'];
+                    height2 = segment2[1]['Y']-segment2[0]['Y'];
+                    if(length2 === 0){
+                        die('Edge case 2/3 not implemented');
+                    }
+                    m2 = height2/length2;
+                    n2 = segment2[0]['Y']-m2*segment2[0]['X'];
+
+                    // calculate intersecting point
+                    // y = m1*x+n1
+                    // y = m2*x+n2
+                    // m1*x+n1   = m2*x+n2
+                    // m1*x      = m2*x+n2-n1
+                    // m1*x-m2*x = n2-n1
+                    // x*(m1-m2) = n2-n1
+                    // x         = (n2-n1)/(m1-m2)
+                    if(m1 === m2){
+                        die('Edge case 3/3 not implemented');
+                    }
+                    xIntersect  = (n2-n1)/(m1-m2);
+                    yIntersect  = m1*xIntersect+n1;
+
+                    // calculate half m
+                    halfM = (m1+m2)/2;
+
+                    // y = m*x+n    (given is x,y,m - what is n)
+                    halfN = yIntersect-halfM*xIntersect;
+
+                    // calculate diffs between 4 given points and the intersection - find closest point
+                    distArray[1] = this->dist(segment1[0], array(xIntersect, yIntersect));
+                    distArray[2] = this->dist(segment1[1], array(xIntersect, yIntersect));
+                    distArray[3] = this->dist(segment2[0], array(xIntersect, yIntersect));
+                    distArray[4] = this->dist(segment2[1], array(xIntersect, yIntersect));
+
+                    ksort(distArray);
+                    keys = array_keys(distArray);
+                    key = array_shift(keys);
+
+                    // calculate orthogonal through point
+                    if(key === 1 || key === 2){
+                        orthoM = 1/m1;
+                    }
+                    if(key === 2 || key === 3){
+                        orthoM = 1/m2;
+                    }
+
+                    // y = m*x+n    (given is x,y,m - what is n)
+                    if(key === 1){
+                        orthoN = segment1[0]['Y']-orthoM*segment1[0]['X'];
+                        nearest = array(segment1[0]['X'], segment1[0]['Y']);
+                    }
+                    if(key == 2){
+                        orthoN = segment1[1]['Y']-orthoM*segment1[1]['X'];
+                        nearest = array(segment1[1]['X'], segment1[1]['Y']);
+                    }
+                    if(key == 3){
+                        orthoN = segment2[0]['Y']-orthoM*segment2[0]['X'];
+                        nearest = array(segment2[0]['X'], segment2[0]['Y']);
+                    }
+                    if(key == 4){
+                        orthoN = segment2[1]['Y']-orthoM*segment2[1]['X'];
+                        nearest = array(segment2[1]['X'], segment2[1]['Y']);
+                    }
+
+                    // calculate intersection of half and ortho
+                    // x         = (n2-n1)/(m1-m2)
+                    xCircle  = (orthoN-halfN)/(halfM-orthoM);
+                    yCircle  = halfM*xCircle+halfN;
+
+                    // radius = distance circle and nearest point
+                    radius = this->dist(array(xCircle, yCircle), nearest);
+
+                    return array(xCircle, yCircle, radius);
+
+                }
+
+
+
+                ]]>
+            </script>
+-->
