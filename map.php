@@ -67,7 +67,7 @@ foreach ($textFiles as $textFile) {
         <button class="button button--toggle" id="edit-panel-toggle">Edit</button>
     </div>
 
-    <div class="export__panel info-panel export__panel--open">
+    <div class="export__panel info-panel">
         <div class="export__panel-scroll-content">
             <h3>Player Info</h3>
             <table id="playerTable">
@@ -79,6 +79,8 @@ foreach ($textFiles as $textFile) {
                 </tr>
                 </thead>
             </table>
+            <hr/>
+            <mark>All settings below are stored in cookies and will be applied on each map you visit.</mark>
             <hr/>
             <h3>Change background</h3>
             <div class="export__panel--bg-grid">
