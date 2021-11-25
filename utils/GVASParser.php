@@ -890,6 +890,43 @@ class GVASParser
             }
         }
 
+        // Remove the Z-axis
+        foreach ($reduced['Removed']['Vegetation'] as $index => $tree) {
+            unset($reduced['Removed']['Vegetation'][$index][2]);
+        }
+        foreach ($reduced['Players'] as $index => $player) {
+            unset($reduced['Players'][$index]['Location'][2]);
+        }
+        foreach ($reduced['Frames'] as $index => $frame) {
+            unset($reduced['Frames'][$index]['Rotation'][2]);
+            unset($reduced['Frames'][$index]['Location'][2]);
+        }
+        if(isset($reduced['Watertowers'])){
+            foreach ($reduced['Watertowers'] as $index => $watertower) {
+                unset($reduced['Watertowers'][$index]['Location'][2]);
+                unset($reduced['Watertowers'][$index]['Rotation'][2]);
+            }
+        }
+        foreach ($reduced['Switchs'] as $index => $switch) {
+            unset($reduced['Switchs'][$index]['Rotation'][2]);
+            unset($reduced['Switchs'][$index]['Location'][2]);
+        }
+        foreach ($reduced['Industries'] as $index => $industry) {
+            unset($reduced['Industries'][$index]['Rotation'][2]);
+            unset($reduced['Industries'][$index]['Location'][2]);
+        }
+
+        // Remove invisible segments
+        foreach ($reduced['Splines'] as $index => $spline) {
+            $spline_segments = array();
+            foreach ($spline['Segments'] as $sindex => $segment) {
+                if ($reduced['Splines'][$index]['Segments'][$sindex]['Visible'] === 1) {
+                    $spline_segments[] = $reduced['Splines'][$index]['Segments'][$sindex];
+                }
+            }
+            $reduced['Splines'][$index]['Segments'] = $spline_segments;
+        }
+
         return $reduced;
     }
 }
