@@ -283,23 +283,6 @@ if(!file_exists('assets/js/mapper.min.js') || filemtime('assets/js/mapper.js') >
 <script type="text/javascript" src="/assets/js/mapper.min.js?<?php echo filemtime('assets/js/mapper.min.js'); ?>"></script>
 <script type="text/javascript" src="/assets/js/js.cookie.min.js"></script>
 <script type="text/javascript">
-    const cookies = Cookies.withAttributes({
-        path: '/',
-        secure: true,
-        expires: 30
-    })
-
-    map = new Mapper(<?php echo $json; ?>, cookies);
-    map.drawSVG('demo-tiger');
-
-    // Set different display options based on checkbox state
-    const options = document.getElementsByTagName("input");
-    for (const element of options) {
-        if (element.type === "checkbox" && typeof element.onclick == "function") {
-            toggleDisplayOptions(element);
-        }
-    }
-
     const backgrounds = {
         'bg': [8000, 8000, 0, 0, 8000, 8000, 'bg.jpg'],
         'bg3': [8000, 8000, 0, 0, 8000, 8000, 'bg3.jpg'],
@@ -309,15 +292,42 @@ if(!file_exists('assets/js/mapper.min.js') || filemtime('assets/js/mapper.js') >
     const pattern = document.getElementsByTagName("pattern")[0];
     const image = document.getElementsByTagName("image")[0];
 
-    function changeBackground(clickedImage) {
-        if (clickedImage.id in backgrounds) {
-            pattern.setAttribute("width", backgrounds[clickedImage.id][0].toString());
-            pattern.setAttribute("height", backgrounds[clickedImage.id][1].toString());
-            image.setAttribute("x", backgrounds[clickedImage.id][2].toString());
-            image.setAttribute("y", backgrounds[clickedImage.id][3].toString());
-            image.setAttribute("width", backgrounds[clickedImage.id][4].toString());
-            image.setAttribute("height", backgrounds[clickedImage.id][5].toString());
-            image.setAttribute("href", "/assets/images/" + backgrounds[clickedImage.id][6]);
+    const cookies = Cookies.withAttributes({
+        path: '/',
+        secure: true,
+        expires: 30
+    })
+
+    map = new Mapper(<?php echo $json; ?>, cookies);
+    map.drawSVG('demo-tiger');
+
+    // Set different display options based on checkbox state or cookie value
+    const options = document.getElementsByTagName("input");
+    for (const element of options) {
+        if (element.type === "checkbox" && typeof element.onclick == "function") {
+            toggleDisplayOptions(element);
+        }
+    }
+    if (cookies.get("bg") !== undefined) {
+        changeBackground(cookies.get("bg"));
+    }
+
+    function changeBackground(bgSelector) {
+        let bg;
+        if (bgSelector.id !== undefined) {
+            bg = bgSelector.id;
+        } else {
+            bg = bgSelector;
+        }
+        if (bg in backgrounds) {
+            pattern.setAttribute("width", backgrounds[bg][0].toString());
+            pattern.setAttribute("height", backgrounds[bg][1].toString());
+            image.setAttribute("x", backgrounds[bg][2].toString());
+            image.setAttribute("y", backgrounds[bg][3].toString());
+            image.setAttribute("width", backgrounds[bg][4].toString());
+            image.setAttribute("height", backgrounds[bg][5].toString());
+            image.setAttribute("href", "/assets/images/" + backgrounds[bg][6]);
+            cookies.set("bg", bg);
         }
     }
 
