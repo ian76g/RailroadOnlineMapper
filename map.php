@@ -67,7 +67,7 @@ foreach ($textFiles as $textFile) {
         <button class="button button--toggle" id="edit-panel-toggle">Edit</button>
     </div>
 
-    <div class="export__panel info-panel">
+    <div class="export__panel info-panel export__panel--open">
         <div class="export__panel-scroll-content">
             <h3>Player Info</h3>
             <table id="playerTable">
@@ -81,29 +81,23 @@ foreach ($textFiles as $textFile) {
             </table>
             <hr/>
             <h3>Change background</h3>
-            <div>
-                <ul class="export__map--background-list">
-                    <li>
+            <div class="export__panel--bg-grid">
+                <div class="box">
                         <img id="bg" src="/assets/images/bg_90x90.png" width="90" height="90" alt="Old background"
                              onclick="changeBackground(this)">
-                        <span>Old background</span>
-                    </li>
-                    <li>
+                </div>
+                <div class="box">
                         <img id="bg3" src="/assets/images/bg3_90x90.png" width="90" height="90" alt="New background"
                              onclick="changeBackground(this)">
-                        <span>New background</span>
-                    </li>
-                    <li>
+                </div>
+                <div class="box">
                         <img id="bg4" src="/assets/images/bg4_90x90.png" width="90" height="90" alt="Psawhns background"
                              onclick="changeBackground(this)">
-                        <span>Psawhns background</span>
-                    </li>
-                    <li>
+                </div>
+                <div class="box">
                         <img id="bg5" src="/assets/images/bg5_90x90.png" width="90" height="90"
                              alt="Psawhns background with kanados" onclick="changeBackground(this)">
-                        <span>Psawhns background with kanados overlay</span>
-                    </li>
-                </ul>
+                </div>
             </div>
             <h3>Display options</h3>
             <div>
@@ -151,10 +145,20 @@ foreach ($textFiles as $textFile) {
                 <input id="maxSlopeLabel" type="checkbox" onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('maxSlopeLabel'); ?>/> Show max Slope
                 Circle
             </div>
+            <br />
+            <div>
+                The settings below will require a refresh of the page
+            </div>
+            <br />
             <div>
                 <input id="drawIron" type="checkbox" onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('ironOverWood'); ?>/> Show Iron bridge on
                 top of Wood bridge
             </div>
+            <div>
+                <label for="labelPrefix">Text label prefix: </label>
+                <input id="labelPrefix" placeholder=".." value="<?php (isset($_COOKIE['labelPrefix']) && $_COOKIE['labelPrefix'] != '') ? print($_COOKIE['labelPrefix']) : print('..'); ?>" />
+            </div>
+            <button onclick="applySettings()">Apply and refresh</button>
         </div>
     </div>
 
@@ -378,6 +382,12 @@ if(!file_exists('assets/js/mapper.min.js') || filemtime('assets/js/mapper.js') >
             element.classList.remove('display_show');
             cookies.set(checkbox.id, false);
         }
+    }
+
+    function applySettings() {
+        const labelSettings = document.getElementById('labelPrefix');
+        cookies.set('labelPrefix', labelSettings.value);
+        location.reload();
     }
 </script>
 </body>

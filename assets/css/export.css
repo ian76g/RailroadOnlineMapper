@@ -18,17 +18,6 @@
   height: 100%;
 }
 
-.export__map--background-list li {
-  margin-left: 0;
-  list-style: none;
-  margin-bottom: 1em;
-}
-
-.export__map--background-list img {
-  border: #524c49 1px solid;
-  cursor: pointer;
-}
-
 .export__map--background-list span {
   font-size: 0.8rem;
 }
@@ -134,4 +123,19 @@
 
 #playerTable {
   width: 90%;
+}
+
+.export__panel--bg-grid {
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-row: auto;
+  grid-row-gap: 20px;
+  margin-bottom: 20px;
+}
+.export__panel--bg-grid .box {
+  display: flex;
+}
+.export__panel--bg-grid .box img {
+  border: #524c49 1px solid;
+  cursor: pointer;
 }
