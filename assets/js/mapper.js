@@ -816,7 +816,7 @@ class Mapper {
                     industry['ProductsStored'].pop();
                     industry['ProductsStored'].pop();
                     pos = ['iron_p.svg', 'rails_p.svg'];
-                    pis = ['ironore_p.svg', 'cordwood_p.svg'];
+                    pis = ['cordwood_p.svg','ironore_p.svg'];
                     rotation = 90;
                     break;
                 case 4:

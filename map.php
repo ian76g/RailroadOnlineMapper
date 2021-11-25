@@ -68,7 +68,7 @@ foreach ($textFiles as $textFile) {
         <button class="button button--toggle" id="edit-panel-toggle">Edit</button>
     </div>
 
-    <div class="export__panel info-panel export__panel--open">
+    <div class="export__panel info-panel">
         <div class="export__panel-scroll-content">
             <h3>Player Info</h3>
             <div class="export__panel--player-list">
@@ -209,18 +209,18 @@ foreach ($textFiles as $textFile) {
                 function my_function(spline, segment) {
                     svg = document.getElementById('demo-tiger');
                     var children = svg.children[1].children[6].children;
-                    alert('You clicked on Spline ' + spline);
-                    for (var i = 0; i < children.length; i++) {
-                        var tableChild = children[i];
-                        // Do stuff
-                        if ('' + tableChild.getAttribute('sp') === '' + spline) {
-                            tableChild.setAttribute('stroke', 'lightblue');
-                            console.log('.');
-                        } else {
-                            console.log(tableChild.getAttribute('sp'));
-                        }
-                        //console.log(tableChild.sp);
-                    }
+                    alert('You clicked on Segment ' + spline + '-' + segment);
+                    // for (var i = 0; i < children.length; i++) {
+                    //     var tableChild = children[i];
+                    //     // Do stuff
+                    //     if(''+tableChild.getAttribute('sp') === ''+spline){
+                    //         tableChild.setAttribute('stroke', 'lightblue');
+                    //         console.log('.');
+                    //     } else {
+                    //         console.log(tableChild.getAttribute('sp'));
+                    //     }
+                    //     //console.log(tableChild.sp);
+                    // }
 
                 }
 
@@ -235,7 +235,7 @@ foreach ($textFiles as $textFile) {
         </svg>
     </div>
 
-    <div class="export__panel edit-panel export__panel--open">
+    <div class="export__panel edit-panel">
         <div class="export__panel-scroll-content">
             <h3>Edit</h3><br/>
             <div class="edit-panel__extras">
@@ -321,7 +321,7 @@ foreach ($textFiles as $textFile) {
                     <table id="undergroundCartsTable" class="export__mapper"></table>
                     <button class="button">Get Carts from Underground</button>
                 </form>
-
+                <br/>
                 <a class="button" href="download.php?map=<?php echo substr(basename($saveFile), 0, -4); ?>">Download
                     Save</a>
             </div>
@@ -411,6 +411,7 @@ if (!file_exists('assets/js/mapper.min.js') || filemtime('assets/js/mapper.js') 
         if (typeof element === "undefined") {
             return;
         }
+
 
         if (checkbox.checked) {
             element.classList.remove('display_hide');

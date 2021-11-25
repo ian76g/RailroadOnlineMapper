@@ -8,6 +8,11 @@ class dtVector extends dtAbstractData
     var $NAME='Vector';
     var $ARRCOUNTER = '';
 
+    public function getName()
+    {
+        return $this->NAME;
+    }
+
     /**
      * @param $fromX
      * @param $position

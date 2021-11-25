@@ -36,7 +36,7 @@ function getUserIpAddr()
     return $ip;
 }
 
-//$_POST['save'] = 'Joetraincool.sav';
+$_POST['save'] = 'slot1.sav';
 //$_POST['replant'] = 'NO';
 //$_POST['firstTree'] = 'A';
 //$_POST['userTree'] = 'A';
@@ -76,7 +76,8 @@ foreach ($files as $file) {
 
     $fileName = $file;
 
-    $x = str_replace(array('slot', '.sav'), '', $fileName);
+    $x = explode('-', str_replace(array('slot', '.sav'), '', $fileName));
+    $x = $x[sizeof($x)-1];
     if($x == ''.intval($x)){
         $slotNumber = '-'.$x;
     } else {

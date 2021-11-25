@@ -5,18 +5,24 @@
  */
 class dtProperty extends dtAbstractData
 {
-    var $x;
-    var $position;
-    var $last = false;
-    var $CONTENTOBJECTS;
-    var $NAME;
-    var $TYPE;
-    var $RESULTROWS;
-    var $ITEMTYPE = '';
-    var $SUBTYPE = '';
-    var $GUID = '';
+    var string $x;
+    var int $position;
 
-    var $content;
+    var array $CONTENTOBJECTS;
+    private string $NAME;
+    var string $TYPE;
+    var $RESULTROWS;
+    var string $ITEMTYPE = '';
+    var string $SUBTYPE = '';
+    var string $GUID = '';
+
+    var string $content;
+
+
+    public function __construct()
+    {
+
+    }
 
     function unserialize($fromX, $position)
     {
@@ -25,7 +31,7 @@ class dtProperty extends dtAbstractData
 
         $resultRows = $this->readUEProperty();
         $this->RESULTROWS = $resultRows;
-        $this->x = '';
+        unset($this->x);
         return array($resultRows, $this->position);
     }
 
@@ -149,19 +155,19 @@ class dtProperty extends dtAbstractData
                 $arrayObject->setByte(substr($this->x, $this->position, 1));
                 $this->position++;
 
-                $arrayCounter = new dtDynamic();
-                $arrayCounter->NAME = 'Arraycounter';
-                $arrayCounter->value = unpack('I', substr($this->x, $this->position, 4))[1];
+                $arrayCounter = new dtDynamic('Arraycounter');
+                $sub = substr($this->x, $this->position, 4);
+                $arrayCounter->setValue(unpack('I', substr($this->x, $this->position, 4))[1]);
                 $arrayCounter->pack = 'I';
 //                $this->CONTENTOBJECTS[] = $arrayCounter;
 //            echo "(ARRAY-COUNT = ".$arrayCounter->value.") ";
                 $this->position += 4;
                 $arrayObject->setCounter($arrayCounter);
 
-//                echo "ARRAYCOUNT:[$arrayCounter->value] ";
+                $toGo = $arrayCounter->getValue();
                 switch ($itemType) {
                     case 'StrProperty':
-                        for ($i = 0; $i < $arrayCounter->value; $i++) {
+                        for ($i = 0; $i < $toGo; $i++) {
                             $myString = new dtString();
                             $myString->skipNullByteStrings = false;
                             $results = $myString->unserialize($this->x, $this->position);
@@ -217,7 +223,7 @@ class dtProperty extends dtAbstractData
                         switch ($subType) {
                             case "Vector":
                             case "Rotator":
-                                for ($i = 0; $i < $arrayCounter->value; $i++) {
+                                for ($i = 0; $i < $toGo; $i++) {
                                     $myVector = new dtVector();
                                     $myVector->ARRCOUNTER = $i;
                                     $tmp = $myVector->unserialize($this->x, $this->position);
@@ -236,27 +242,25 @@ class dtProperty extends dtAbstractData
                         }
 
                     case 'FloatProperty':
-                        for ($i = 0; $i < $arrayCounter->value; $i++) {
-                            $floatObject = new dtDynamic();
-                            $floatObject->NAME = 'FloatProperty';
+                        for ($i = 0; $i < $toGo; $i++) {
+                            $floatObject = new dtDynamic('FloatProperty');
                             $floatObject->pack = 'g';
-                            $floatObject->value = unpack('g', substr($this->x, $this->position, 4))[1];
+                            $floatObject->setValue(unpack('g', substr($this->x, $this->position, 4))[1]);
                             $this->position += 4;
                             $floatObject->ARRCOUNTER = $i;
                             $arrayObject->addElement($floatObject);
 //                            $this->CONTENTOBJECTS[] = $floatObject;
                             //@$goldenBucket[$name][]= $float;
-                            $elem[] = array($pieces, $floatObject->value);
+                            $elem[] = array($pieces, $floatObject->getValue());
                         }
                         $this->CONTENTOBJECTS[] = $arrayObject;
                         return $elem;
 
                     case 'IntProperty':
-                        for ($i = 0; $i < $arrayCounter->value; $i++) {
+                        for ($i = 0; $i < $toGo; $i++) {
                             $int = unpack('V', substr($this->x, $this->position, 4))[1];
-                            $nD = new dtDynamic();
-                            $nD->NAME = 'IntProperty';
-                            $nD->value = $int;
+                            $nD = new dtDynamic('IntProperty');
+                            $nD->setValue($int);
                             $nD->ARRCOUNTER = $i;
                             $nD->pack = 'V';
 //                            $this->CONTENTOBJECTS[] = $nD;
@@ -269,22 +273,22 @@ class dtProperty extends dtAbstractData
                         return $elem;
 
                     case 'BoolProperty':
-                        for ($i = 0; $i < $arrayCounter->value; $i++) {
-                            $boolObject = new dtDynamic();
+                        for ($i = 0; $i < $toGo; $i++) {
+                            $boolObject = new dtDynamic('BoolProperty');
                             $boolObject->pack='C';
-                            $boolObject->value = unpack('C', substr($this->x, $this->position, 1))[1];
+                            $boolObject->setValue(unpack('C', substr($this->x, $this->position, 1))[1]);
 //                            $this->CONTENTOBJECTS[] = substr($this->x, $this->position, 1);
                             $this->position += 1;
                             $arrayObject->addElement($boolObject);
                             //@$goldenBucket[$name][]= $int;
-                            $elem[] = array($pieces, $boolObject->value);
+                            $elem[] = array($pieces, $boolObject->getValue());
                         }
                         $this->CONTENTOBJECTS[] = $arrayObject;
                         return $elem;
 
                     case 'TextProperty':
                         //echo "Textproperty incoming at " . $this->position . " for Name $name\n";
-                        for ($i = 0; $i < $arrayCounter->value; $i++) {
+                        for ($i = 0; $i < $toGo; $i++) {
                             $createEmptyNumber = false;
                             $createEmptyName = false;
                             if (trim($this->NAME) == 'FrameNumberArray') {
@@ -517,5 +521,10 @@ class dtProperty extends dtAbstractData
         }
 
         return array($textPropertyObject, $this->position);
+    }
+
+    public function getName()
+    {
+        return $this->NAME;
     }
 }

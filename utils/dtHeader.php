@@ -18,6 +18,11 @@ class dtHeader extends dtAbstractData
         'CustomFormatData' => 32,
     );
 
+    public function getName()
+    {
+        return $this->NAME;
+    }
+
     var $content = '';
 
     /**
