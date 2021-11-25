@@ -503,7 +503,7 @@ class GVASParser
                 if (trim($object->getName()) == 'FreightAmountArray') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $dtDynamic) {
                         if (isset($_POST['freightamount_' . $index]) && trim($_POST['freightamount_' . $index])) {
-                            $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['freightamount_' . $index]);
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->setValue(trim($_POST['freightamount_' . $index]));
                         }
                     }
                 }
@@ -518,7 +518,7 @@ class GVASParser
                 if (trim($object->getName()) == 'TenderFuelAmountArray') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['tenderamount_' . $index]) && trim($_POST['tenderamount_' . $index])) {
-                            $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['tenderamount_' . $index]);
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->setValue(($_POST['tenderamount_' . $index]));
                         }
                     }
                 }
@@ -526,7 +526,7 @@ class GVASParser
                 if (trim($object->getName()) == 'BrakeValueArray') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['allBrakes'])) {
-                            $object->CONTENTOBJECTS[3]->contentElements[$index]->value = 1;
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->setValue(1);
                         }
                     }
                 }
@@ -540,22 +540,22 @@ class GVASParser
                 if (trim($object->getName()) == 'PlayerXPArray') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['xp_' . $index]) && trim($_POST['xp_' . $index])) {
-                            $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['xp_' . $index]);
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->setValue(trim($_POST['xp_' . $index]));
                         }
                         if (isset($_POST['deletePlayer_' . $index])) {
                             unset($object->CONTENTOBJECTS[3]->contentElements[$index]);
-                            $object->CONTENTOBJECTS[3]->COUNTER->value--;
+//                            $object->CONTENTOBJECTS[3]->COUNTER->value--;
                         }
                     }
                 }
                 if (trim($object->getName()) == 'PlayerMoneyArray') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['money_' . $index]) && trim($_POST['money_' . $index])) {
-                            $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['money_' . $index]);
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->setValue(trim($_POST['money_' . $index]));
                         }
                         if (isset($_POST['deletePlayer_' . $index])) {
                             unset($object->CONTENTOBJECTS[3]->contentElements[$index]);
-                            $object->CONTENTOBJECTS[3]->COUNTER->value--;
+//                            $object->CONTENTOBJECTS[3]->COUNTER->value--;
                         }
                     }
                 }
@@ -563,7 +563,7 @@ class GVASParser
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['deletePlayer_' . $index])) {
                             unset($object->CONTENTOBJECTS[3]->contentElements[$index]);
-                            $object->CONTENTOBJECTS[3]->COUNTER->value--;
+//                                $object->CONTENTOBJECTS[3]->COUNTER->value--;
                         }
                     }
                 }
@@ -571,7 +571,7 @@ class GVASParser
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['deletePlayer_' . $index])) {
                             unset($object->CONTENTOBJECTS[3]->contentElements[$index]);
-                            $object->CONTENTOBJECTS[3]->COUNTER->value--;
+//                            $object->CONTENTOBJECTS[3]->COUNTER->value--;
                         }
                     }
                 }
@@ -579,7 +579,7 @@ class GVASParser
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['deletePlayer_' . $index])) {
                             unset($object->CONTENTOBJECTS[3]->contentElements[$index]);
-                            $object->CONTENTOBJECTS[3]->COUNTER->value--;
+//                            $object->CONTENTOBJECTS[3]->COUNTER->value--;
                         }
                     }
                 }
@@ -588,7 +588,7 @@ class GVASParser
                 if (trim($object->getName()) == 'IndustryStorageEduct1Array') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['educt0_' . $index]) && trim($_POST['educt0_' . $index])) {
-                            $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['educt0_' . $index]);
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->setValue(trim($_POST['educt0_' . $index]));
                         }
                     }
                 }
@@ -596,7 +596,7 @@ class GVASParser
                 if (trim($object->getName()) == 'IndustryStorageEduct2Array') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['educt1_' . $index]) && trim($_POST['educt1_' . $index])) {
-                            $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['educt1_' . $index]);
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->setValue(trim($_POST['educt1_' . $index]));
                         }
                     }
                 }
@@ -604,7 +604,7 @@ class GVASParser
                 if (trim($object->getName()) == 'IndustryStorageEduct3Array') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['educt2_' . $index]) && trim($_POST['educt2_' . $index])) {
-                            $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['educt2_' . $index]);
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->setValue(trim($_POST['educt2_' . $index]));
                         }
                     }
                 }
@@ -612,7 +612,7 @@ class GVASParser
                 if (trim($object->getName()) == 'IndustryStorageEduct4Array') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['educt3_' . $index]) && trim($_POST['educt3_' . $index])) {
-                            $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['educt3_' . $index]);
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->setValue(trim($_POST['educt3_' . $index]));
                         }
                     }
                 }
@@ -620,7 +620,7 @@ class GVASParser
                 if (trim($object->getName()) == 'IndustryStorageProduct1Array') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['product0_' . $index]) && trim($_POST['product0_' . $index])) {
-                            $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['product0_' . $index]);
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->setValue(trim($_POST['product0_' . $index]));
                         }
                     }
                 }
@@ -628,7 +628,7 @@ class GVASParser
                 if (trim($object->getName()) == 'IndustryStorageProduct2Array') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['product1_' . $index]) && trim($_POST['product1_' . $index])) {
-                            $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['product1_' . $index]);
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->setValue(trim($_POST['product1_' . $index]));
                         }
                     }
                 }
@@ -636,7 +636,7 @@ class GVASParser
                 if (trim($object->getName()) == 'IndustryStorageProduct3Array') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['product2_' . $index]) && trim($_POST['product2_' . $index])) {
-                            $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['product2_' . $index]);
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->setValue(trim($_POST['product2_' . $index]));
                         }
                     }
                 }
@@ -644,7 +644,7 @@ class GVASParser
                 if (trim($object->getName()) == 'IndustryStorageProduct4Array') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['product3_' . $index]) && trim($_POST['product3_' . $index])) {
-                            $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['product3_' . $index]);
+                            $object->CONTENTOBJECTS[3]->contentElements[$index]->setValue(trim($_POST['product3_' . $index]));
                         }
                     }
                 }
