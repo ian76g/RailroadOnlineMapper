@@ -907,9 +907,11 @@ class GVASParser
                 unset($reduced['Watertowers'][$index]['Rotation'][2]);
             }
         }
-        foreach ($reduced['Switchs'] as $index => $switch) {
-            unset($reduced['Switchs'][$index]['Rotation'][2]);
-            unset($reduced['Switchs'][$index]['Location'][2]);
+        if(isset($reduced['Switchs'])){
+            foreach ($reduced['Switchs'] as $index => $switch) {
+                unset($reduced['Switchs'][$index]['Rotation'][2]);
+                unset($reduced['Switchs'][$index]['Location'][2]);
+            }
         }
         foreach ($reduced['Industries'] as $index => $industry) {
             unset($reduced['Industries'][$index]['Rotation'][2]);
