@@ -273,17 +273,14 @@ foreach ($textFiles as $textFile) {
 <script type="text/javascript" src="/assets/js/export.js"></script>
 
 <?php
-//require_once 'utils/Minifier.php';
-
-//if(!file_exists('assets/js/mapper.js.min.js') || filemtime('assets/js/mapper.js') > filemtime('assets/js/mapper.js.min.js')) {
-//    $output = JShrink\Minifier::minify(file_get_contents('assets/js/mapper.js'));
-//    file_put_contents('assets/js/mapper.js.min.js', $output);
-//    //echo $output;
-//}
-
+require_once 'utils/Minifier.php';
+if(!file_exists('assets/js/mapper.min.js') || filemtime('assets/js/mapper.js') > filemtime('assets/js/mapper.min.js')) {
+    $output = JShrink\Minifier::minify(file_get_contents('assets/js/mapper.js'));
+    file_put_contents('assets/js/mapper.min.js', $output);
+}
 ?>
 
-<script type="text/javascript" src="/assets/js/mapper.js?<?php echo filemtime('assets/js/mapper.js'); ?>"></script>
+<script type="text/javascript" src="/assets/js/mapper.min.js?<?php echo filemtime('assets/js/mapper.min.js'); ?>"></script>
 <script type="text/javascript" src="/assets/js/js.cookie.min.js"></script>
 <script type="text/javascript">
     const cookies = Cookies.withAttributes({
