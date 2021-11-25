@@ -17,6 +17,11 @@ class dtTextProperty extends dtAbstractData
     var $tests = array();
     var $pack = 'i';
 
+    public function getName()
+    {
+        return $this->NAME;
+    }
+
     public function __construct($string = null)
     {
         $this->unknown = hex2bin('0000000000');

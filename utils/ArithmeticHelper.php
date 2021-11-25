@@ -99,22 +99,22 @@ class ArithmeticHelper
     {
         // calculate formulas for segment 1 and segment 2
         // y = m*x+n     x,y given 2 times - can be solved
-        $length1 = $segment1[1]['X']-$segment1[0]['X'];
-        $height1 = $segment1[1]['Y']-$segment1[0]['Y'];
+        $length1 = $segment1['LocationEnd']['X']-$segment1['LocationStart']['X'];
+        $height1 = $segment1['LocationEnd']['Y']-$segment1['LocationStart']['Y'];
         if($length1 == 0){
             die('Edge case 1/3 not implemented');
         }
         $m1 = $height1/$length1;
-        $n1 = $segment1[0]['Y']-$m1*$segment1[0]['X'];
+        $n1 = $segment1['LocationStart']['Y']-$m1*$segment1['LocationStart']['X'];
 
         //         - POINT 50,80 (3)-
-        $length2 = $segment2[1]['X']-$segment2[0]['X'];
-        $height2 = $segment2[1]['Y']-$segment2[0]['Y'];
+        $length2 = $segment2['LocationEnd']['X']-$segment2['LocationStart']['X'];
+        $height2 = $segment2['LocationEnd']['Y']-$segment2['LocationStart']['Y'];
         if($length2 == 0){
             die('Edge case 2/3 not implemented');
         }
         $m2 = $height2/$length2;
-        $n2 = $segment2[0]['Y']-$m2*$segment2[0]['X'];
+        $n2 = $segment2['LocationStart']['Y']-$m2*$segment2['LocationStart']['X'];
 
         // calculate intersecting point
         // y = m1*x+n1
@@ -133,14 +133,14 @@ class ArithmeticHelper
 
         //Segment 1: (1)10, 100    to    (2) 20, 100
         //Segment 2: (3)50, 80     to    (4) 40, 60
-        if ($this->dist( array($xIntersect, $yIntersect), $segment1[1], true) < $this->dist(array($xIntersect, $yIntersect) , $segment1[0], true)) {
-            $dir_s1['X'] = $segment1[1]['X'] - $segment1[0]['X'];
-            $dir_s1['Y'] = $segment1[1]['Y'] - $segment1[0]['Y'];
-            $nearestOne = $segment1[1];
+        if ($this->dist( array($xIntersect, $yIntersect), $segment1['LocationEnd'], true) < $this->dist(array($xIntersect, $yIntersect) , $segment1['LocationStart'], true)) {
+            $dir_s1['X'] = $segment1['LocationEnd']['X'] - $segment1['LocationStart']['X'];
+            $dir_s1['Y'] = $segment1['LocationEnd']['Y'] - $segment1['LocationStart']['Y'];
+            $nearestOne = $segment1['LocationEnd'];
         } else {
-            $dir_s1['X'] = $segment1[0]['X'] - $segment1[1]['X'];
-            $dir_s1['Y'] = $segment1[0]['Y'] - $segment1[1]['Y'];
-            $nearestOne = $segment1[0];
+            $dir_s1['X'] = $segment1['LocationStart']['X'] - $segment1['LocationEnd']['X'];
+            $dir_s1['Y'] = $segment1['LocationStart']['Y'] - $segment1['LocationEnd']['Y'];
+            $nearestOne = $segment1['LocationStart'];
         }
 
 
@@ -149,18 +149,18 @@ class ArithmeticHelper
         $normalized_dir_s1['X'] = $dir_s1['X']/$norm_dir_s1;
         $normalized_dir_s1['Y'] = $dir_s1['Y']/$norm_dir_s1;
 
-        if ($this->dist( array($xIntersect, $yIntersect), $segment2[1], true) < $this->dist(array($xIntersect, $yIntersect) , $segment2[0], true)) {
-            $dir_s1['X'] = $segment2[1]['X'] - $segment2[0]['X'];
-            $dir_s1['Y'] = $segment2[1]['Y'] - $segment2[0]['Y'];
-            $nearestOther = $segment2[1];
+        if ($this->dist( array($xIntersect, $yIntersect), $segment2['LocationEnd'], true) < $this->dist(array($xIntersect, $yIntersect) , $segment2['LocationStart'], true)) {
+            $dir_s1['X'] = $segment2['LocationEnd']['X'] - $segment2['LocationStart']['X'];
+            $dir_s1['Y'] = $segment2['LocationEnd']['Y'] - $segment2['LocationStart']['Y'];
+            $nearestOther = $segment2['LocationEnd'];
         } else {
-            $dir_s1['X'] = $segment2[0]['X'] - $segment2[1]['X'];
-            $dir_s1['Y'] = $segment2[0]['Y'] - $segment2[1]['Y'];
-            $nearestOther = $segment2[0];
+            $dir_s1['X'] = $segment2['LocationStart']['X'] - $segment2['LocationEnd']['X'];
+            $dir_s1['Y'] = $segment2['LocationStart']['Y'] - $segment2['LocationEnd']['Y'];
+            $nearestOther = $segment2['LocationStart'];
         }
 
-        $dir_s2['X'] = $segment2[1]['X'] - $segment2[0]['X'];
-        $dir_s2['Y'] = $segment2[1]['Y'] - $segment2[0]['Y'];
+        $dir_s2['X'] = $segment2['LocationEnd']['X'] - $segment2['LocationStart']['X'];
+        $dir_s2['Y'] = $segment2['LocationEnd']['Y'] - $segment2['LocationStart']['Y'];
 
 
         $norm_dir_s2 = sqrt(pow($dir_s2['X'],2) + pow($dir_s2['Y'],2));
@@ -180,10 +180,10 @@ class ArithmeticHelper
         $halfN = $yIntersect-$halfM*$xIntersect;
 
         // calculate diffs between 4 given points and the intersection - find closest point
-        $distArray[1] = $this->dist($segment1[0], array($xIntersect, $yIntersect), true);
-        $distArray[2] = $this->dist($segment1[1], array($xIntersect, $yIntersect), true);
-        $distArray[3] = $this->dist($segment2[0], array($xIntersect, $yIntersect), true);
-        $distArray[4] = $this->dist($segment2[1], array($xIntersect, $yIntersect), true);
+        $distArray[1] = $this->dist($segment1['LocationStart'], array($xIntersect, $yIntersect), true);
+        $distArray[2] = $this->dist($segment1['LocationEnd'], array($xIntersect, $yIntersect), true);
+        $distArray[3] = $this->dist($segment2['LocationStart'], array($xIntersect, $yIntersect), true);
+        $distArray[4] = $this->dist($segment2['LocationEnd'], array($xIntersect, $yIntersect), true);
 
         asort($distArray);
         $keys = array_keys($distArray);
@@ -197,7 +197,8 @@ class ArithmeticHelper
             $orthoM = $ortho_dir['Y']/$ortho_dir['X'];
 
             $theOther = $nearestOther;
-            $theOtherDirection = -$normalized_dir_s2;
+            $theOtherDirection['X'] = -$normalized_dir_s2['X'];
+            $theOtherDirection['Y'] = -$normalized_dir_s2['Y'];
         }
         if($key == 3 || $key == 4){
             $ortho_dir['X'] = -$normalized_dir_s2['Y'];
@@ -205,25 +206,26 @@ class ArithmeticHelper
             $orthoM = $ortho_dir['Y']/$ortho_dir['X'];
 
             $theOther = $nearestOne;
-            $theOtherDirection = -$normalized_dir_s1;
+            $theOtherDirection['X'] = -$normalized_dir_s1['X'];
+            $theOtherDirection['Y'] = -$normalized_dir_s1['Y'];
         }
 
         // y = m*x+n    (given is x,y,m - what is n)
         if($key == 1){
-            $orthoN = $segment1[0]['Y']-$orthoM*$segment1[0]['X'];
-            $nearest = array($segment1[0]['X'], $segment1[0]['Y']);
+            $orthoN = $segment1['LocationStart']['Y']-$orthoM*$segment1['LocationStart']['X'];
+            $nearest = array($segment1['LocationStart']['X'], $segment1['LocationStart']['Y'], 'Z'=>$segment1['LocationStart']['Z']);
         }
         if($key == 2){
-            $orthoN = $segment1[1]['Y']-$orthoM*$segment1[1]['X'];
-            $nearest = array($segment1[1]['X'], $segment1[1]['Y']);
+            $orthoN = $segment1['LocationEnd']['Y']-$orthoM*$segment1['LocationEnd']['X'];
+            $nearest = array($segment1['LocationEnd']['X'], $segment1['LocationEnd']['Y'], 'Z'=>$segment1['LocationEnd']['Z']);
         }
         if($key == 3){
-            $orthoN = $segment2[0]['Y']-$orthoM*$segment2[0]['X'];
-            $nearest = array($segment2[0]['X'], $segment2[0]['Y']);
+            $orthoN = $segment2['LocationStart']['Y']-$orthoM*$segment2['LocationStart']['X'];
+            $nearest = array($segment2['LocationStart']['X'], $segment2['LocationStart']['Y'], 'Z'=>$segment2['LocationStart']['Z']);
         }
         if($key == 4){
-            $orthoN = $segment2[1]['Y']-$orthoM*$segment2[1]['X'];
-            $nearest = array($segment2[1]['X'], $segment2[1]['Y']);
+            $orthoN = $segment2['LocationEnd']['Y']-$orthoM*$segment2['LocationEnd']['X'];
+            $nearest = array($segment2['LocationEnd']['X'], $segment2['LocationEnd']['Y'], 'Z'=>$segment2['LocationEnd']['Z']);
         }
 
         // calculate intersection of half and ortho
@@ -254,36 +256,41 @@ class ArithmeticHelper
         $yOut = $m1*($xOut)+ $n1;
 
 
+        $straight = $this->dist(array($xOut, $yOut), $theOther ,TRUE);
+
         $num = ($yOut-$yCircle)/$radius;
         $angleEnd = rad2deg(asin(max(-1,min(1,$num))));
 
         $angledelta = $angleEnd-$angleStart;
         $arclength = 2*pi()*$radius*$angledelta/360;
-        $numberOfSegments =  ceil($arclength/3);
+        $numberOfSegments =  ceil($arclength/30);
+echo "curved segments: ".$numberOfSegments." \n";
         $segmentAngle = $angledelta/$numberOfSegments;
         $curvedSegmentLength = 2*pi()*$radius*$segmentAngle/360;
 
-        $straight = $this->dist(array($xOut, $yOut), $theOther ,TRUE);
 
         $totalTrackLength = $straight + $arclength;
         $incline = $theOther['Z']-$nearest['Z']; //height difference
 
+
+        $curve[] = array(round($nearest[0]), round($nearest[1]), round($nearest['Z']));
 
         // totallength     traveled so far
         //-------------    ---------------
         // total height     height X
 
         $traveledSoFar = 0;
-        for($i=0; $i<$numberOfSegments; $i++){
+        for($i=1; $i<$numberOfSegments; $i++){
             $a = $angleStart+$i*$segmentAngle;
-            $xOnCircle = cos($a)*$radius;
-            $yOnCircle = sin($a)*$radius;
+//            echo "($a)";
+            $xOnCircle = cos(deg2rad($a))*$radius;
+            $yOnCircle = sin(deg2rad($a))*$radius;
             $z = $incline*$traveledSoFar/$totalTrackLength+$nearest['Z']; //need to add the height of the starting point
-            $curve[] = array($xOnCircle, $yOnCircle, $z);
+            $curve[] = array(round($xOnCircle+$xCircle), round($yOnCircle+$yCircle), $z);
             $traveledSoFar+=$curvedSegmentLength;
         }
 
-        $straightSegments = ceil($straight/10);
+        $straightSegments = ceil($straight/1000);
         $straightLength = $straight/$straightSegments;
 
         //$xOut, $yOut
@@ -295,52 +302,88 @@ class ArithmeticHelper
 
             $z = $incline*$traveledSoFar/$totalTrackLength+$nearest['Z'];
 
-            $curve[] = array($xOnLine, $yOnLine, $z);
+            $curve[] = array(round($xOnLine), round($yOnLine), $z);
             $traveledSoFar+=$straightLength;
 
         }
 
-        $curve[] = array($theOther['X'], $theOther['Y'], $theOther['Z']);
+        $curve[] = array(round($theOther['X']), round($theOther['Y']), round($theOther['Z']));
 
 
 
 
-echo "<pre>";
-        echo "Segment 1: ";
-        echo $segment1[0]['X'].', '.$segment1[0]['Y']." to ";
-        echo $segment1[1]['X'].', '.$segment1[1]['Y']."\n";
-        echo "Segment 2: ";
-        echo $segment2[0]['X'].', '.$segment2[0]['Y']." to ";
-        echo $segment2[1]['X'].', '.$segment2[1]['Y']."\n";
+echo "<html><body></body></html><form method='get' action='../test.php'>";
+        echo "Segment 1: <input name='x1' value='";
+        echo $segment1['LocationStart']['X']."'>, <input name='y1' value='".$segment1['LocationStart']['Y']."'> to <input name='x2' value='";
+        echo $segment1['LocationEnd']['X']."'>, <input name='y2' value='".$segment1['LocationEnd']['Y']."'><br>\n";
+        echo "Segment 2: <input name='x3' value='";
+        echo $segment2['LocationStart']['X']."'>, <input name='y3' value='".$segment2['LocationStart']['Y']."'> to <input name='x4' value='";
+        echo $segment2['LocationEnd']['X']."'>, <input name='y4' value='".$segment2['LocationEnd']['Y']."'><br>\n";
 
         echo "Intersect: ";
-        echo $xIntersect.', '.$yIntersect."\n";
+        echo $xIntersect.', '.$yIntersect."<br>\n";
 
         echo "Circle: ";
-        echo $xCircle.', '.$yCircle."\n";
+        echo $xCircle.', '.$yCircle."<br>\n";
 
         echo "Radius: ";
-        echo $radius."\n";
+        echo $radius."<br>\n";
 
         echo "Cirle start: ";
-        echo $nearest[0].', '.$nearest[1]."\n";
+        echo $nearest[0].', '.$nearest[1]."<br>\n";
 
         echo "Angle start: ";
-        echo $angleStart."\n";
+        echo $angleStart."<br>\n";
 
         echo "Circle end: ";
-        echo $xOut.', '.$yOut."\n";
+        echo $xOut.', '.$yOut."<br>\n";
 
         echo "Angle end: ";
-        echo $angleEnd."\n";
+        echo $angleEnd."<br>\n";
 
         echo "half N: ";
-        echo $halfN."\n";
+        echo $halfN."<br>\n";
         echo "orto N: ";
-        echo $orthoN."\n";
+        echo $orthoN."<br>\n";
 
+//print_r($curve);
+echo "<input type='submit'></form>";
+$s = 0.01;
+echo '
+        <svg
+          id="demo-tiger"
+          class="export__map-viewer"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 1000 1000"
+        >
+<ellipse cx="'.round($xCircle*$s).'" cy="'.round($yCircle*$s).'" rx="'.round($radius*$s).'" ry="'.round($radius*$s).'" stroke="black" fill="none"/>
+<ellipse cx="'.round($xIntersect*$s).'" cy="'.round($yIntersect*$s).'" rx="'.round(10).'" ry="'.round(10).'" stroke="black" fill="yellow"/>
+    <line stroke="blue" stroke-width="3" x1="'.$segment1['LocationStart']['X']*$s.'" x2="'.$segment1['LocationEnd']['X']*$s.'"
+    y1="'.$segment1['LocationStart']['Y']*$s.'" y2="'.$segment1['LocationEnd']['Y']*$s.'" />
+    <line stroke="green" stroke-width="3" x1="'.$segment2['LocationStart']['X']*$s.'" x2="'.$segment2['LocationEnd']['X']*$s.'"
+    y1="'.$segment2['LocationStart']['Y']*$s.'" y2="'.$segment2['LocationEnd']['Y']*$s.'" />
+    <path d="M '.round($curve[0][0]*$s).','.round($curve[0][1]*$s).' ';
+foreach($curve as $c){
+    echo 'L '.round($c[0]*$s).','.round($c[1]*$s).' ';
+}
+
+echo '" stroke-width="1" stroke="red" fill="none" />
+</svg>
+</body></html>
+';
 
         //        return array($xCircle, $yCircle, $radius);
+
+        /**
+        SplineLocationArray
+        SplineTypeArray
+        SplineControlPointsArray
+        SplineControlPointsIndexStartArray
+        SplineControlPointsIndexEndArray
+        SplineSegmentsVisibilityArray
+        SplineVisibilityStartArray
+        SplineVisibilityEndArray
+         */
 
     }
 }

@@ -7,9 +7,14 @@ class dtStruct extends dtAbstractData
 
     var $name;
     var $type;
-    var $length;
+    var array $length;
     var $subType;
     var $seventeenBytes;
+
+    public function getName()
+    {
+        return $this->NAME;
+    }
 
     /**
      * @param mixed $name

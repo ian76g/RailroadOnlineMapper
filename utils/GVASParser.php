@@ -43,8 +43,8 @@ class GVASParser
                 $original = substr($x, $position, $results[1] - $position);
                 $test = $myProperty->serialize();
                 if ($original != $test) {
-                    file_put_contents('tmp_' . trim($myProperty->NAME), $original);
-                    file_put_contents('tmp_' . trim($myProperty->NAME) . '.test', $test);
+                    file_put_contents('tmp_' . trim($myProperty->getName()), $original);
+                    file_put_contents('tmp_' . trim($myProperty->getName()) . '.test', $test);
                 }
 
                 $this->saveObject['objects'][] = $myProperty;
@@ -346,7 +346,7 @@ class GVASParser
         $output = '';
         foreach ($this->saveObject['objects'] as $saveObjectIndex => $object) {
             if (is_object($object)) {
-                if (trim($object->NAME) == 'RemovedVegetationAssetsArray' && isset($_POST['replant'])) {
+                if (trim($object->getName()) == 'RemovedVegetationAssetsArray' && isset($_POST['replant'])) {
                     $v = 0;
                     $toRemove = array();
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $vector) {
@@ -398,7 +398,7 @@ class GVASParser
 //                    echo "NEW VALUE = " . (sizeof($object->CONTENTOBJECTS[3]->contentElements));
                 }
 
-                if (trim($object->NAME) == 'FrameNumberArray') {
+                if (trim($object->getName()) == 'FrameNumberArray') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['number_' . $index]) && trim($_POST['number_' . $index])) {
                             if (!isset($object->CONTENTOBJECTS[3]->contentElements[$index]->lines[0])) {
@@ -415,7 +415,7 @@ class GVASParser
                     }
                 }
                 $countryObj = null;
-                if (trim($object->NAME) == 'FrameNameArray') {
+                if (trim($object->getName()) == 'FrameNameArray') {
                     if (isset($_POST['nameAllCountries'])) {
                         $countryObj = new CountryNames($_POST['nameAllCountries']);
                     }
@@ -449,7 +449,7 @@ class GVASParser
                     }
                 }
 
-                if (trim($object->NAME) == 'FrameRotationArray') {
+                if (trim($object->getName()) == 'FrameRotationArray') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['underground_' . $index]) && trim($_POST['underground_' . $index])) {
                             $object->CONTENTOBJECTS[3]->contentElements[$index]->content = array(0, 90, 0);
@@ -457,7 +457,7 @@ class GVASParser
                     }
                 }
 
-                if (trim($object->NAME) == 'FrameLocationArray') {
+                if (trim($object->getName()) == 'FrameLocationArray') {
                     $spawnPositions = array(
                         [720, -2503, 10160],
                         [720, -461, 10160],
@@ -500,14 +500,14 @@ class GVASParser
                     }
                 }
 
-                if (trim($object->NAME) == 'FreightAmountArray') {
+                if (trim($object->getName()) == 'FreightAmountArray') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $dtDynamic) {
                         if (isset($_POST['freightamount_' . $index]) && trim($_POST['freightamount_' . $index])) {
                             $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['freightamount_' . $index]);
                         }
                     }
                 }
-                if (trim($object->NAME) == 'FreightTypeArray') {
+                if (trim($object->getName()) == 'FreightTypeArray') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $dtDynamic) {
                         if (isset($_POST['cargoType_' . $index]) && trim($_POST['cargoType_' . $index])) {
                             $object->CONTENTOBJECTS[3]->contentElements[$index] = new dtString($_POST['cargoType_' . $index]);
@@ -515,7 +515,7 @@ class GVASParser
                     }
                 }
 
-                if (trim($object->NAME) == 'TenderFuelAmountArray') {
+                if (trim($object->getName()) == 'TenderFuelAmountArray') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['tenderamount_' . $index]) && trim($_POST['tenderamount_' . $index])) {
                             $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['tenderamount_' . $index]);
@@ -523,7 +523,7 @@ class GVASParser
                     }
                 }
 
-                if (trim($object->NAME) == 'BrakeValueArray') {
+                if (trim($object->getName()) == 'BrakeValueArray') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['allBrakes'])) {
                             $object->CONTENTOBJECTS[3]->contentElements[$index]->value = 1;
@@ -537,7 +537,7 @@ class GVASParser
                 //PlayerLocationArray
                 //PlayerRotationArray
 
-                if (trim($object->NAME) == 'PlayerXPArray') {
+                if (trim($object->getName()) == 'PlayerXPArray') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['xp_' . $index]) && trim($_POST['xp_' . $index])) {
                             $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['xp_' . $index]);
@@ -548,7 +548,7 @@ class GVASParser
                         }
                     }
                 }
-                if (trim($object->NAME) == 'PlayerMoneyArray') {
+                if (trim($object->getName()) == 'PlayerMoneyArray') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['money_' . $index]) && trim($_POST['money_' . $index])) {
                             $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['money_' . $index]);
@@ -559,7 +559,7 @@ class GVASParser
                         }
                     }
                 }
-                if (trim($object->NAME) == 'PlayerNameArray') {
+                if (trim($object->getName()) == 'PlayerNameArray') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['deletePlayer_' . $index])) {
                             unset($object->CONTENTOBJECTS[3]->contentElements[$index]);
@@ -567,7 +567,7 @@ class GVASParser
                         }
                     }
                 }
-                if (trim($object->NAME) == 'PlayerRotationArray') {
+                if (trim($object->getName()) == 'PlayerRotationArray') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['deletePlayer_' . $index])) {
                             unset($object->CONTENTOBJECTS[3]->contentElements[$index]);
@@ -575,7 +575,7 @@ class GVASParser
                         }
                     }
                 }
-                if (trim($object->NAME) == 'PlayerLocationArray') {
+                if (trim($object->getName()) == 'PlayerLocationArray') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['deletePlayer_' . $index])) {
                             unset($object->CONTENTOBJECTS[3]->contentElements[$index]);
@@ -585,7 +585,7 @@ class GVASParser
                 }
 
                 //IndustryStorageEduct1Array
-                if (trim($object->NAME) == 'IndustryStorageEduct1Array') {
+                if (trim($object->getName()) == 'IndustryStorageEduct1Array') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['educt0_' . $index]) && trim($_POST['educt0_' . $index])) {
                             $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['educt0_' . $index]);
@@ -593,7 +593,7 @@ class GVASParser
                     }
                 }
                 //IndustryStorageEduct2Array
-                if (trim($object->NAME) == 'IndustryStorageEduct2Array') {
+                if (trim($object->getName()) == 'IndustryStorageEduct2Array') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['educt1_' . $index]) && trim($_POST['educt1_' . $index])) {
                             $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['educt1_' . $index]);
@@ -601,7 +601,7 @@ class GVASParser
                     }
                 }
                 //IndustryStorageEduct3Array
-                if (trim($object->NAME) == 'IndustryStorageEduct3Array') {
+                if (trim($object->getName()) == 'IndustryStorageEduct3Array') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['educt2_' . $index]) && trim($_POST['educt2_' . $index])) {
                             $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['educt2_' . $index]);
@@ -609,7 +609,7 @@ class GVASParser
                     }
                 }
                 //IndustryStorageEduct4Array
-                if (trim($object->NAME) == 'IndustryStorageEduct4Array') {
+                if (trim($object->getName()) == 'IndustryStorageEduct4Array') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['educt3_' . $index]) && trim($_POST['educt3_' . $index])) {
                             $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['educt3_' . $index]);
@@ -617,7 +617,7 @@ class GVASParser
                     }
                 }
                 //IndustryStorageProduct1Array
-                if (trim($object->NAME) == 'IndustryStorageProduct1Array') {
+                if (trim($object->getName()) == 'IndustryStorageProduct1Array') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['product0_' . $index]) && trim($_POST['product0_' . $index])) {
                             $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['product0_' . $index]);
@@ -625,7 +625,7 @@ class GVASParser
                     }
                 }
                 //IndustryStorageProduct2Array
-                if (trim($object->NAME) == 'IndustryStorageProduct2Array') {
+                if (trim($object->getName()) == 'IndustryStorageProduct2Array') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['product1_' . $index]) && trim($_POST['product1_' . $index])) {
                             $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['product1_' . $index]);
@@ -633,7 +633,7 @@ class GVASParser
                     }
                 }
                 //IndustryStorageProduct3Array
-                if (trim($object->NAME) == 'IndustryStorageProduct3Array') {
+                if (trim($object->getName()) == 'IndustryStorageProduct3Array') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['product2_' . $index]) && trim($_POST['product2_' . $index])) {
                             $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['product2_' . $index]);
@@ -641,7 +641,7 @@ class GVASParser
                     }
                 }
                 //IndustryStorageProduct4Array
-                if (trim($object->NAME) == 'IndustryStorageProduct4Array') {
+                if (trim($object->getName()) == 'IndustryStorageProduct4Array') {
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['product3_' . $index]) && trim($_POST['product3_' . $index])) {
                             $object->CONTENTOBJECTS[3]->contentElements[$index]->value = trim($_POST['product3_' . $index]);
@@ -965,10 +965,10 @@ class CountryNames
     public function getName()
     {
         while (true) {
-            if (!sizeof($this->names)) {
+            if (!sizeof($this->NAMEs)) {
                 return "END OF FILE";
             }
-            $name = array_shift($this->names);
+            $name = array_shift($this->NAMEs);
             if (!trim($name)) {
                 continue;
             }
@@ -984,10 +984,10 @@ class CountryNames
             $data = file_get_contents( 'includes/' . $type . '.txt');
             $data = explode("\n", $data);
             array_shift($data); // header
-            $this->names = $data;
+            $this->NAMEs = $data;
         } else {
-            $this->names = array('ERROR');
+            $this->NAMEs = array('ERROR');
         }
-        shuffle($this->names);
+        shuffle($this->NAMEs);
     }
 }

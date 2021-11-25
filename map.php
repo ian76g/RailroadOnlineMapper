@@ -165,18 +165,18 @@ foreach ($textFiles as $textFile) {
                 {
                     svg = document.getElementById('demo-tiger');
                     var children = svg.children[1].children[6].children;
-                    alert('You clicked on Spline '+spline);
-                    for (var i = 0; i < children.length; i++) {
-                        var tableChild = children[i];
-                        // Do stuff
-                        if(''+tableChild.getAttribute('sp') === ''+spline){
-                            tableChild.setAttribute('stroke', 'lightblue');
-                            console.log('.');
-                        } else {
-                            console.log(tableChild.getAttribute('sp'));
-                        }
-                        //console.log(tableChild.sp);
-                    }
+                    alert('You clicked on Segment '+spline+'-'+segment);
+                    // for (var i = 0; i < children.length; i++) {
+                    //     var tableChild = children[i];
+                    //     // Do stuff
+                    //     if(''+tableChild.getAttribute('sp') === ''+spline){
+                    //         tableChild.setAttribute('stroke', 'lightblue');
+                    //         console.log('.');
+                    //     } else {
+                    //         console.log(tableChild.getAttribute('sp'));
+                    //     }
+                    //     //console.log(tableChild.sp);
+                    // }
 
                 }
                 ]]>

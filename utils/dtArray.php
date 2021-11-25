@@ -8,7 +8,7 @@ class dtArray extends dtAbstractData
 
     var $ITEMTYPE;
     var $BYTE;
-    var $COUNTER;
+    var dtDynamic $COUNTER;
 
     var $ARRCOUNTER = false;
     var $contentElements = array();
@@ -17,6 +17,11 @@ class dtArray extends dtAbstractData
      * @var bool | dtStruct
      */
     var $structObject = false;
+
+    public function getName()
+    {
+        return $this->NAME;
+    }
 
     public function setStructObject($structObject)
     {
@@ -60,6 +65,7 @@ class dtArray extends dtAbstractData
     public function addElement($object)
     {
         $this->contentElements[] = $object;
+        $this->COUNTER->updateTo(sizeof($this->contentElements));
     }
 
 }

@@ -13,6 +13,10 @@ class dtString extends dtAbstractData
     var $skipNullByteStrings = true;
     var $ARRCOUNTER = '';
 
+    public function getName()
+    {
+        return $this->NAME;
+    }
     /**
      * dtString constructor.
      * @param $string
