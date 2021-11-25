@@ -61,33 +61,11 @@ class Mapper {
             return null
         }
 
-        const playerTable = document.getElementById("playerTable");
         const editPlayersTable = document.getElementById("editPlayersTable");
 
         for (let index = 0; index < this.json['Players'].length; index++) {
             const player = this.json['Players'][index];
 
-            // First populate the Info menu
-            const playerInfoRow = document.createElement("tr");
-
-            const nameValue = document.createElement("td");
-            const nameTextNode = document.createTextNode(player['Name']);
-            nameValue.appendChild(nameTextNode);
-            playerInfoRow.appendChild(nameValue);
-
-            const xpValue = document.createElement("td");
-            const xpTextNode = document.createTextNode(player['Xp']);
-            xpValue.appendChild(xpTextNode);
-            playerInfoRow.appendChild(xpValue);
-
-            const moneyValue = document.createElement("td");
-            const moneyTextNode = document.createTextNode(player['Money']);
-            moneyValue.appendChild(moneyTextNode);
-            playerInfoRow.appendChild(moneyValue);
-
-            playerTable.appendChild(playerInfoRow);
-
-            // Then populate the Edit menu
             const playerEditInfoRow = document.createElement("tr");
 
             const playerEditValue = document.createElement("td");

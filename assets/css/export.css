@@ -32,7 +32,7 @@
   width: 100%;
 }
 
-.export__panel{
+.export__panel {
   max-width: 100%;
   height: 100vh;
   position: fixed;
@@ -42,33 +42,35 @@
   transition: all 0.2s ease-out;
 }
 
-.export__panel .button--toggle{
+.export__panel .button--toggle {
   position: absolute;
   top: 0;
 }
 
-.export__panel-scroll-content{
+.export__panel-scroll-content {
   max-width: 100%;
   height: 100vh;
   padding: 6rem 1rem 1rem;
   overflow: scroll;
 }
 
-.info-panel{
+.info-panel {
   left: 0;
   transform: translateX(-400px);
   border-right: 2px solid var(--secondary-color);
 }
-.info-panel .export__panel-scroll-content{
+
+.info-panel .export__panel-scroll-content {
   width: 400px;
 }
 
-.edit-panel{
+.edit-panel {
   right: 0;
   transform: translateX(700px);
   border-left: 2px solid var(--secondary-color);
 }
-.edit-panel .export__panel-scroll-content{
+
+.edit-panel .export__panel-scroll-content {
   width: 700px;
 }
 
@@ -103,9 +105,9 @@
 .export__products td img {
   max-width: none;
   width: 7rem;
-}   
+}
 
-.export__educts{
+.export__educts {
   background-color: #F9DCF4;
   vertical-align: middle;
 }
@@ -113,9 +115,9 @@
 .export__educts td img {
   max-width: none;
   width: 7rem;
-}   
+}
 
-.export__controls{
+.export__controls {
   position: fixed;
   bottom: 0;
   left: 0;
@@ -132,10 +134,25 @@
   grid-row-gap: 20px;
   margin-bottom: 20px;
 }
+
 .export__panel--bg-grid .box {
   display: flex;
 }
+
 .export__panel--bg-grid .box img {
   border: #524c49 1px solid;
   cursor: pointer;
+}
+
+.export__panel--player-list {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.export__panel--player-list-item {
+  box-sizing: border-box;
+  flex-grow: 1;
+  width: 33.33%;
+  padding: 0 1.2em;
+  overflow: hidden;
 }

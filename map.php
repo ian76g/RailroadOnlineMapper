@@ -18,14 +18,15 @@ $json = null;
 if (isset($_GET['name']) && $_GET['name'] != '') {
     $saveFile = "./saves/" . $_GET['name'] . ".sav";
     if (file_exists($saveFile)) {
-        $slotExtension = explode('-', substr($saveFile,0,-4));
-        $slotExtension='-'.$slotExtension[sizeof($slotExtension)-1];
+        $slotExtension = explode('-', substr($saveFile, 0, -4));
+        $slotExtension = '-' . $slotExtension[sizeof($slotExtension) - 1];
 
         $parser = new GVASParser();
         $json = $parser->parseData(file_get_contents($saveFile), false, $slotExtension);
     }
 }
 
+$dataArray = json_decode($json, true);
 
 $dh = opendir('includes');
 $textFiles = array();
@@ -67,100 +68,137 @@ foreach ($textFiles as $textFile) {
         <button class="button button--toggle" id="edit-panel-toggle">Edit</button>
     </div>
 
-    <div class="export__panel info-panel">
+    <div class="export__panel info-panel export__panel--open">
         <div class="export__panel-scroll-content">
             <h3>Player Info</h3>
-            <table id="playerTable">
-                <thead>
-                <tr>
-                    <td>Name</td>
-                    <td>XP</td>
-                    <td>Money</td>
-                </tr>
-                </thead>
-            </table>
+            <div class="export__panel--player-list">
+                <?php
+                foreach ($dataArray['Players'] as $index => $player) {
+                    ?>
+                    <div class="export__panel--player-list-item"><?= $player['Name']; ?></div>
+                    <div class="export__panel--player-list-item"><?= $player['Xp']; ?> XP</div>
+                    <div class="export__panel--player-list-item"><?= $player['Money']; ?> $</div>
+                    <?php
+                }
+                ?>
+            </div>
             <hr/>
-            <mark>All settings below are stored in cookies and will be applied on each map you visit.</mark>
-            <hr/>
+            <div class="message--alert info">
+                All settings below are stored in cookies and will be applied on each map you visit.
+            </div>
             <h3>Change background</h3>
             <div class="export__panel--bg-grid">
                 <div class="box">
-                        <img id="bg" src="/assets/images/bg_90x90.png" width="90" height="90" alt="Old background"
-                             onclick="changeBackground(this)">
+                    <img id="bg" src="/assets/images/bg_90x90.png" width="90" height="90" alt="Old background"
+                         onclick="changeBackground(this)">
                 </div>
                 <div class="box">
-                        <img id="bg3" src="/assets/images/bg3_90x90.png" width="90" height="90" alt="New background"
-                             onclick="changeBackground(this)">
+                    <img id="bg3" src="/assets/images/bg3_90x90.png" width="90" height="90" alt="New background"
+                         onclick="changeBackground(this)">
                 </div>
                 <div class="box">
-                        <img id="bg4" src="/assets/images/bg4_90x90.png" width="90" height="90" alt="Psawhns background"
-                             onclick="changeBackground(this)">
+                    <img id="bg4" src="/assets/images/bg4_90x90.png" width="90" height="90" alt="Psawhns background"
+                         onclick="changeBackground(this)">
                 </div>
                 <div class="box">
-                        <img id="bg5" src="/assets/images/bg5_90x90.png" width="90" height="90"
-                             alt="Psawhns background with kanados" onclick="changeBackground(this)">
+                    <img id="bg5" src="/assets/images/bg5_90x90.png" width="90" height="90"
+                         alt="Psawhns background with kanados" onclick="changeBackground(this)">
                 </div>
             </div>
             <h3>Display options</h3>
             <div>
-                <input id="trees_user" type="checkbox" onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('trees_user'); ?>/> Show trees cut down by
+                <input id="trees_user" type="checkbox"
+                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('trees_user'); ?>/> Show
+                trees
+                cut down by
                 player
             </div>
             <div>
-                <input id="trees_default" type="checkbox" onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('trees_default'); ?>/> Show trees cut down by
+                <input id="trees_default" type="checkbox"
+                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('trees_default'); ?>/> Show
+                trees cut down by
                 default
             </div>
             <div>
-                <input id="beds" type="checkbox" onclick="toggleDisplayOptions(this)"  <?php checked_if_true_or_default('beds'); ?>/> Show beds
+                <input id="beds" type="checkbox"
+                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('beds'); ?>/> Show beds
             </div>
             <div>
-                <input id="tracks" type="checkbox" onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('tracks'); ?>/> Show tracks
+                <input id="tracks" type="checkbox"
+                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('tracks'); ?>/> Show tracks
             </div>
             <div>
-                <input id="switches" type="checkbox" onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('switches'); ?>/> Show switches and
+                <input id="switches" type="checkbox"
+                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('switches'); ?>/> Show
+                switches
+                and
                 crossings
             </div>
             <div>
-                <input id="rollingstock" type="checkbox" onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('rollingstock'); ?>/> Show rolling
+                <input id="rollingstock" type="checkbox"
+                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('rollingstock'); ?>/> Show
+                rolling
                 stock
             </div>
             <div>
-                <input id="slopeLabel0" type="checkbox" onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel0'); ?>/> Show Slope Labels 0% to
+                <input id="slopeLabel0" type="checkbox"
+                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel0'); ?>/> Show
+                Slope
+                Labels 0% to
                 1%
             </div>
             <div>
-                <input id="slopeLabel1" type="checkbox" onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel1'); ?>/> Show Slope Labels 1% to
+                <input id="slopeLabel1" type="checkbox"
+                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel1'); ?>/> Show
+                Slope
+                Labels 1% to
                 2%
             </div>
             <div>
-                <input id="slopeLabel2" type="checkbox" onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel2'); ?>/> Show Slope Labels
+                <input id="slopeLabel2" type="checkbox"
+                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel2'); ?>/> Show
+                Slope
+                Labels
                 2% to 3%
             </div>
             <div>
-                <input id="slopeLabel3" type="checkbox" onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel3'); ?>/> Show Slope Labels
+                <input id="slopeLabel3" type="checkbox"
+                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel3'); ?>/> Show
+                Slope
+                Labels
                 above 3%
             </div>
             <div>
-                <input id="slopeLabel4" type="checkbox" onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel4'); ?>/> I want to brag with my slope using 6 decimals after the comma
+                <input id="slopeLabel4" type="checkbox"
+                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel4'); ?>/> I want
+                to
+                brag with my slope using 6 decimals after the comma
             </div>
             <div>
-                <input id="maxSlopeLabel" type="checkbox" onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('maxSlopeLabel'); ?>/> Show max Slope
+                <input id="maxSlopeLabel" type="checkbox"
+                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('maxSlopeLabel'); ?>/> Show
+                max
+                Slope
                 Circle
             </div>
-            <br />
+            <br/>
             <div>
                 The settings below will require a refresh of the page
             </div>
-            <br />
+            <br/>
             <div>
-                <input id="drawIron" type="checkbox" onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('ironOverWood'); ?>/> Show Iron bridge on
+                <input id="drawIron" type="checkbox"
+                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('ironOverWood'); ?>/> Show
+                Iron
+                bridge on
                 top of Wood bridge
             </div>
             <div>
                 <label for="labelPrefix">Text label prefix: </label>
-                <input id="labelPrefix" placeholder=".." value="<?php (isset($_COOKIE['labelPrefix']) && $_COOKIE['labelPrefix'] != '') ? print($_COOKIE['labelPrefix']) : print('..'); ?>" />
+                <input id="labelPrefix" placeholder=".."
+                       value="<?php (isset($_COOKIE['labelPrefix']) && $_COOKIE['labelPrefix'] != '') ? print($_COOKIE['labelPrefix']) : print('..'); ?>"/>
             </div>
-            <button onclick="applySettings()">Apply and refresh</button>
+            <button class="button" onclick="applySettings()">Apply and refresh</button>
         </div>
     </div>
 
@@ -168,15 +206,14 @@ foreach ($textFiles as $textFile) {
         <svg id="demo-tiger" class="export__map-viewer" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8000 8000">
             <script type="text/JavaScript">
                 <![CDATA[
-                function my_function(spline, segment)
-                {
+                function my_function(spline, segment) {
                     svg = document.getElementById('demo-tiger');
                     var children = svg.children[1].children[6].children;
-                    alert('You clicked on Spline '+spline);
+                    alert('You clicked on Spline ' + spline);
                     for (var i = 0; i < children.length; i++) {
                         var tableChild = children[i];
                         // Do stuff
-                        if(''+tableChild.getAttribute('sp') === ''+spline){
+                        if ('' + tableChild.getAttribute('sp') === '' + spline) {
                             tableChild.setAttribute('stroke', 'lightblue');
                             console.log('.');
                         } else {
@@ -186,6 +223,7 @@ foreach ($textFiles as $textFile) {
                     }
 
                 }
+
                 ]]>
             </script>
             <defs>
@@ -197,7 +235,7 @@ foreach ($textFiles as $textFile) {
         </svg>
     </div>
 
-    <div class="export__panel edit-panel">
+    <div class="export__panel edit-panel export__panel--open">
         <div class="export__panel-scroll-content">
             <h3>Edit</h3><br/>
             <div class="edit-panel__extras">
@@ -217,8 +255,6 @@ foreach ($textFiles as $textFile) {
                     <button class="button">Apply Rolling Stock changes</button>
                 </form>
 
-
-                <br/><br/>
                 <form method="POST" action="/converter.php"><input type="hidden" name="save"
                                                                    value="<?php echo $saveFile; ?>">
                     <?php echo $textOptions; ?>
@@ -230,17 +266,15 @@ foreach ($textFiles as $textFile) {
                         <option value="tenders">only tenders</option>
                         <option value="carts">only carts</option>
                         <option value="handcarts">only handcarts</option>
-                    </select><br />
+                    </select><br/>
                     <button class="button">Apply name schema</button>
                 </form>
 
-                <br/><br/>
                 <form method="POST" action="/converter.php">
                     <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
                     <input name="allBrakes" value="YES" type="hidden"/>
                     <button class="button">Apply all brakes</button>
                 </form>
-
 
                 <h4>Trees</h4>
                 <form method="POST" action="/converter.php">
@@ -250,7 +284,6 @@ foreach ($textFiles as $textFile) {
                     measured to start, center and end of track-(segment) only, switches, crosses are not taken into calculation (yet)</span><br>
                     <button class="button">Replant Trees</button>
                 </form>
-
 
                 <h4>Players</h4>
                 <form method="POST" action="/converter.php">
@@ -266,6 +299,7 @@ foreach ($textFiles as $textFile) {
                     </table>
                     <button class="button">Apply Player Changes</button>
                 </form>
+
                 <h4>Industries</h4>
                 <form method="POST" action="/converter.php">
                     <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
@@ -280,14 +314,16 @@ foreach ($textFiles as $textFile) {
                     </table>
                     <button class="button">Apply Industry Changes</button>
                 </form>
+
                 <h4>Carts</h4>
                 <form method="POST" action="/converter.php">
                     <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
                     <table id="undergroundCartsTable" class="export__mapper"></table>
                     <button class="button">Get Carts from Underground</button>
                 </form>
-                <br/>
-                <a class="button" href="download.php?map=<?php echo substr(basename($saveFile),0,-4); ?>">Download Save</a>
+
+                <a class="button" href="download.php?map=<?php echo substr(basename($saveFile), 0, -4); ?>">Download
+                    Save</a>
             </div>
         </div>
     </div>
@@ -304,13 +340,14 @@ foreach ($textFiles as $textFile) {
 
 <?php
 require_once 'utils/Minifier.php';
-if(!file_exists('assets/js/mapper.min.js') || filemtime('assets/js/mapper.js') > filemtime('assets/js/mapper.min.js')) {
+if (!file_exists('assets/js/mapper.min.js') || filemtime('assets/js/mapper.js') > filemtime('assets/js/mapper.min.js')) {
     $output = JShrink\Minifier::minify(file_get_contents('assets/js/mapper.js'));
     file_put_contents('assets/js/mapper.min.js', $output);
 }
 ?>
 
-<script type="text/javascript" src="/assets/js/mapper.min.js?<?php echo filemtime('assets/js/mapper.min.js'); ?>"></script>
+<script type="text/javascript"
+        src="/assets/js/mapper.min.js?<?php echo filemtime('assets/js/mapper.min.js'); ?>"></script>
 <script type="text/javascript" src="/assets/js/js.cookie.min.js"></script>
 <script type="text/javascript">
     const backgrounds = {

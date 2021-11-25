@@ -1,3 +1,4 @@
+/*noinspection CssUnknownTarget*/
 @import url("https://fonts.googleapis.com/css2?family=Graduate&family=Open+Sans:wght@400&display=swap");
 
 :root {
@@ -91,6 +92,7 @@ a:hover {
   border: 2px solid transparent;
   border-radius: var(--border-radius);
   transition: all 0.1s ease-out;
+  margin: 1rem 0;
 }
 
 .button:hover {
@@ -355,6 +357,15 @@ tbody td {
   display: block;
 }
 
-.draw_top {
-  z-index: 6!important;
+.message--alert {
+  padding: 20px;
+  background-color: #f44336;
+  color: white;
+  margin-bottom: 15px;
+  font-size: 0.8em;
+  text-align: center;
+}
+
+.message--alert.info {
+  background-color: var(--primary-color);
 }
