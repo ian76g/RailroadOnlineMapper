@@ -10,6 +10,7 @@ require_once 'utils/dtArray.php';
 require_once 'utils/dtStruct.php';
 require_once 'utils/dtTextProperty.php';
 require_once 'utils/GVASParser.php';
+require_once 'utils/functions.php';
 
 $saveFile = null;
 $json = null;
@@ -106,52 +107,52 @@ foreach ($textFiles as $textFile) {
             </div>
             <h3>Display options</h3>
             <div>
-                <input id="trees_user" type="checkbox" onclick="toggleDisplayOptions(this)" <?php if ($_COOKIE['trees_user']) { print("checked"); } ?>/> Show trees cut down by
+                <input id="trees_user" type="checkbox" onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('trees_user'); ?>/> Show trees cut down by
                 player
             </div>
             <div>
-                <input id="trees_default" type="checkbox" onclick="toggleDisplayOptions(this)" <?php if ($_COOKIE['trees_default']) { print("checked"); } ?>/> Show trees cut down by
+                <input id="trees_default" type="checkbox" onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('trees_default'); ?>/> Show trees cut down by
                 default
             </div>
             <div>
-                <input id="beds" type="checkbox" onclick="toggleDisplayOptions(this)"  <?php if ($_COOKIE['beds']) { print("checked"); } ?>/> Show beds
+                <input id="beds" type="checkbox" onclick="toggleDisplayOptions(this)"  <?php checked_if_true_or_default('beds'); ?>/> Show beds
             </div>
             <div>
-                <input id="tracks" type="checkbox" onclick="toggleDisplayOptions(this)"  <?php if ($_COOKIE['tracks']) { print("checked"); } ?>/> Show tracks
+                <input id="tracks" type="checkbox" onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('tracks'); ?>/> Show tracks
             </div>
             <div>
-                <input id="switches" type="checkbox" onclick="toggleDisplayOptions(this)"  <?php if ($_COOKIE['switches']) { print("checked"); } ?>/> Show switches and
+                <input id="switches" type="checkbox" onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('switches'); ?>/> Show switches and
                 crossings
             </div>
             <div>
-                <input id="rollingstock" type="checkbox" onclick="toggleDisplayOptions(this)"  <?php if ($_COOKIE['rollingstock']) { print("checked"); } ?>/> Show rolling
+                <input id="rollingstock" type="checkbox" onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('rollingstock'); ?>/> Show rolling
                 stock
             </div>
             <div>
-                <input id="slopeLabel0" type="checkbox" onclick="toggleDisplayOptions(this)" <?php if ($_COOKIE['slopeLabel0']) { print("checked"); } ?>/> Show Slope Labels 0% to
+                <input id="slopeLabel0" type="checkbox" onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel0'); ?>/> Show Slope Labels 0% to
                 1%
             </div>
             <div>
-                <input id="slopeLabel1" type="checkbox" onclick="toggleDisplayOptions(this)" <?php if ($_COOKIE['slopeLabel1']) { print("checked"); } ?>/> Show Slope Labels 1% to
+                <input id="slopeLabel1" type="checkbox" onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel1'); ?>/> Show Slope Labels 1% to
                 2%
             </div>
             <div>
-                <input id="slopeLabel2" type="checkbox" onclick="toggleDisplayOptions(this)"  <?php if ($_COOKIE['slopeLabel2']) { print("checked"); } ?>/> Show Slope Labels
+                <input id="slopeLabel2" type="checkbox" onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel2'); ?>/> Show Slope Labels
                 2% to 3%
             </div>
             <div>
-                <input id="slopeLabel3" type="checkbox" onclick="toggleDisplayOptions(this)"  <?php if ($_COOKIE['slopeLabel3']) { print("checked"); } ?>/> Show Slope Labels
+                <input id="slopeLabel3" type="checkbox" onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel3'); ?>/> Show Slope Labels
                 above 3%
             </div>
             <div>
-                <input id="slopeLabel4" type="checkbox" onclick="toggleDisplayOptions(this)" <?php if ($_COOKIE['slopeLabel4']) { print("checked"); } ?>/> I want to brag with my slope using 6 decimals after the comma
+                <input id="slopeLabel4" type="checkbox" onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel4'); ?>/> I want to brag with my slope using 6 decimals after the comma
             </div>
             <div>
-                <input id="maxSlopeLabel" type="checkbox" onclick="toggleDisplayOptions(this)"  <?php if ($_COOKIE['maxSlopeLabel']) { print("checked"); } ?>/> Show max Slope
+                <input id="maxSlopeLabel" type="checkbox" onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('maxSlopeLabel'); ?>/> Show max Slope
                 Circle
             </div>
             <div>
-                <input id="drawIron" type="checkbox" onclick="toggleDisplayOptions(this)"  <?php if ($_COOKIE['ironOverWood']) { print("checked"); } ?>/> Show Iron bridge on
+                <input id="drawIron" type="checkbox" onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('ironOverWood'); ?>/> Show Iron bridge on
                 top of Wood bridge
             </div>
         </div>
@@ -287,7 +288,8 @@ foreach ($textFiles as $textFile) {
 <script type="text/javascript">
     const cookies = Cookies.withAttributes({
         path: '/',
-        secure: true
+        secure: true,
+        expires: 30
     })
 
     map = new Mapper(<?php echo $json; ?>, cookies);
@@ -327,7 +329,7 @@ foreach ($textFiles as $textFile) {
             if (checkbox.checked) {
                 cookies.set('ironOverWood', true);
             } else {
-                cookies.remove('ironOverWood');
+                cookies.set('ironOverWood', false);
             }
         }
 
@@ -343,7 +345,7 @@ foreach ($textFiles as $textFile) {
         } else {
             element.classList.add('display_hide');
             element.classList.remove('display_show');
-            cookies.remove(checkbox.id);
+            cookies.set(checkbox.id, false);
         }
     }
 </script>

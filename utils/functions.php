@@ -71,3 +71,33 @@ function map_entries($sortby = null, $sortorder = null): Generator
         }
     }
 }
+
+function checked_if_true_or_default($name)
+{
+    $defaults = array(
+        "trees_default" => false,
+        "trees_user" => false,
+        "beds" => true,
+        "tracks" => true,
+        "switches" => true,
+        "rollingstock" => true,
+        "slopeLabel0" => false,
+        "slopeLabel1" => false,
+        "slopeLabel2" => true,
+        "slopeLabel3" => true,
+        "slopeLabel4" => false,
+        "maxSlopeLabel" => true,
+        "ironOverWood" => false
+    );
+
+    if (!isset($_COOKIE[$name])) {
+        if ($defaults[$name] === true) {
+            print("checked");
+        }
+        return;
+    }
+
+    if (isset($_COOKIE[$name]) && filter_var($_COOKIE[$name], FILTER_VALIDATE_BOOLEAN) === true) {
+        print("checked");
+    }
+}
