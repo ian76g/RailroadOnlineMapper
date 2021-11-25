@@ -194,7 +194,9 @@ class Mapper {
         let slopecoords = [0, 0];
 
         if ('Splines' in this.json) {
+            let splineIndex = -1;
             for (const spline of this.json['Splines']) {
+                splineIndex++;
                 let type = spline['Type'];
                 let entry = drawOrder[type];
                 const [, strokeWidth, stroke] = entry;
@@ -215,6 +217,9 @@ class Mapper {
                         let yStart = (this.imy - ((segment['LocationStart']['Y'] - this.minY) / 100 * this.scale));
                         let xEnd = (this.imx - ((segment['LocationEnd']['X'] - this.minX) / 100 * this.scale));
                         let yEnd = (this.imy - ((segment['LocationEnd']['Y'] - this.minY) / 100 * this.scale));
+                        let xCenter = (this.imx - ((segment['LocationCenter']['X'] - this.minX) / 100 * this.scale));
+                        let yCenter = (this.imy - ((segment['LocationCenter']['Y'] - this.minY) / 100 * this.scale));
+
                         if (path === '') {
                             path = 'M ' + xStart + ',' + yStart + ' ';
                             path += tool + ' ' + xEnd + ',' + yEnd + ' ';
@@ -236,7 +241,9 @@ class Mapper {
                     bedsGroup.appendChild(bedSegment);
                 } else {
                     // tracks..
+                    let segmentIndex = -1;
                     for (const segment of segments) {
+                        segmentIndex++;
                         if (segment['Visible'] !== 1) {
                             continue
                         }
@@ -253,7 +260,11 @@ class Mapper {
                         trackSegment.setAttribute("y1", yStart.toString());
                         trackSegment.setAttribute("x2", xEnd.toString());
                         trackSegment.setAttribute("y2", yEnd.toString());
+                        trackSegment.setAttribute("sp", splineIndex);
+                        trackSegment.setAttribute("se", segmentIndex);
                         trackSegment.setAttribute("stroke", stroke);
+                        trackSegment.setAttribute('onclick',
+                            'my_function('+splineIndex+','+segmentIndex+')');
                         trackSegment.setAttribute("stroke-width", strokeWidth.toString());
                         tracksGroup.appendChild(trackSegment);
 
