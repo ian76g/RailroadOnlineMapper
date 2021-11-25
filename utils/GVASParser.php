@@ -917,15 +917,15 @@ class GVASParser
         }
 
         // Remove invisible segments
-        foreach ($reduced['Splines'] as $index => $spline) {
-            $spline_segments = array();
-            foreach ($spline['Segments'] as $sindex => $segment) {
-                if ($reduced['Splines'][$index]['Segments'][$sindex]['Visible'] === 1) {
-                    $spline_segments[] = $reduced['Splines'][$index]['Segments'][$sindex];
-                }
-            }
-            $reduced['Splines'][$index]['Segments'] = $spline_segments;
-        }
+//        foreach ($reduced['Splines'] as $index => $spline) {
+//            $spline_segments = array();
+//            foreach ($spline['Segments'] as $sindex => $segment) {
+//                if ($reduced['Splines'][$index]['Segments'][$sindex]['Visible'] === 1) {
+//                    $spline_segments[] = $reduced['Splines'][$index]['Segments'][$sindex];
+//                }
+//            }
+//            $reduced['Splines'][$index]['Segments'] = $spline_segments;
+//        }
 
         return $reduced;
     }
