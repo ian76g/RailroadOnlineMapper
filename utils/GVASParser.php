@@ -899,7 +899,7 @@ class GVASParser
         }
         foreach ($reduced['Frames'] as $index => $frame) {
             unset($reduced['Frames'][$index]['Rotation'][2]);
-            unset($reduced['Frames'][$index]['Location'][2]);
+//            unset($reduced['Frames'][$index]['Location'][2]);
         }
         if(isset($reduced['Watertowers'])){
             foreach ($reduced['Watertowers'] as $index => $watertower) {
