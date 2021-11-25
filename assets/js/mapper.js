@@ -1,5 +1,5 @@
 class Mapper {
-    constructor(json) {
+    constructor(json, cookies) {
         this.svgNS = "http://www.w3.org/2000/svg";
         this.svgTag = null;
         this.shapes = [];
@@ -23,6 +23,12 @@ class Mapper {
         this.maxSlope = 0;
         this.allLabels = [[0, 0]];
         this.initialTreesDown = 1750;
+
+        this.config = {
+            labelPrefix: cookies.get('labelPrefix') || '..',
+            slopeDecimals: cookies.get('slopeDecimals') || 2,
+            ironOverWood: cookies.get('ironOverWood') || true
+        }
     }
 
     drawSVG(htmlElement) {
@@ -42,38 +48,24 @@ class Mapper {
         }
     }
 
+    createSVGElement(type, attrs) {
+        const element = document.createElementNS(this.svgNS, type);
+        for (const attr in attrs) {
+            element.setAttribute(attr, attrs[attr].toString());
+        }
+        return element;
+    }
+
     populatePlayerTable() {
         if (!('Players' in this.json)) {
             return null
         }
 
-        const playerTable = document.getElementById("playerTable");
         const editPlayersTable = document.getElementById("editPlayersTable");
 
         for (let index = 0; index < this.json['Players'].length; index++) {
             const player = this.json['Players'][index];
 
-            // First populate the Info menu
-            const playerInfoRow = document.createElement("tr");
-
-            const nameValue = document.createElement("td");
-            const nameTextNode = document.createTextNode(player['Name']);
-            nameValue.appendChild(nameTextNode);
-            playerInfoRow.appendChild(nameValue);
-
-            const xpValue = document.createElement("td");
-            const xpTextNode = document.createTextNode(player['Xp']);
-            xpValue.appendChild(xpTextNode);
-            playerInfoRow.appendChild(xpValue);
-
-            const moneyValue = document.createElement("td");
-            const moneyTextNode = document.createTextNode(player['Money']);
-            moneyValue.appendChild(moneyTextNode);
-            playerInfoRow.appendChild(moneyValue);
-
-            playerTable.appendChild(playerInfoRow);
-
-            // Then populate the Edit menu
             const playerEditInfoRow = document.createElement("tr");
 
             const playerEditValue = document.createElement("td");
@@ -102,7 +94,7 @@ class Mapper {
             const playerEditNearValue = document.createElement("td");
             let playerEditNearTextNode = document.createTextNode("Unknown");
             if ('Industries' in this.json) {
-                playerEditNearTextNode = document.createTextNode(this._nearestIndustry(player['Location'], this.json.Industries));
+                playerEditNearTextNode = document.createTextNode(this._nearestIndustry(player['Location'], this.json['Industries']));
             }
             playerEditNearValue.appendChild(playerEditNearTextNode);
             playerEditInfoRow.appendChild(playerEditNearValue);
@@ -126,9 +118,8 @@ class Mapper {
         const tracksGroup = document.createElementNS(this.svgNS, "g");
         const bedsGroup = document.createElementNS(this.svgNS, "g");
         const maxSlopeLabelGroup = document.createElementNS(this.svgNS, "g");
-        // tracksAndBedsGroup.setAttribute("class", "tracksandbeds display_show");
-        tracksGroup.setAttribute("class", "tracks display_show");
-        bedsGroup.setAttribute("class", "beds display_show");
+        tracksGroup.setAttribute("class", "tracks");
+        bedsGroup.setAttribute("class", "beds");
 
         const slopeLabelGroup = Array(
             document.createElementNS(this.svgNS, "g"),
@@ -138,15 +129,15 @@ class Mapper {
             document.createElementNS(this.svgNS, "g")
         );
 
-        slopeLabelGroup[0].setAttribute("class", "slopeLabel0 display_hide");
-        slopeLabelGroup[1].setAttribute("class", "slopeLabel1 display_hide");
-        slopeLabelGroup[2].setAttribute("class", "slopeLabel2 display_show");
-        slopeLabelGroup[3].setAttribute("class", "slopeLabel3 display_show");
-        slopeLabelGroup[4].setAttribute("class", "slopeLabel4 display_hide");
+        slopeLabelGroup[0].setAttribute("class", "slopeLabel0");
+        slopeLabelGroup[1].setAttribute("class", "slopeLabel1");
+        slopeLabelGroup[2].setAttribute("class", "slopeLabel2");
+        slopeLabelGroup[3].setAttribute("class", "slopeLabel3");
+        slopeLabelGroup[4].setAttribute("class", "slopeLabel4");
         const slopeLabelSilly = document.createElementNS(this.svgNS, "text");
         const textNodeSilly = document.createTextNode("");
-        slopeLabelSilly.setAttribute("x", 0);
-        slopeLabelSilly.setAttribute("y", 0);
+        slopeLabelSilly.setAttribute("x", "0");
+        slopeLabelSilly.setAttribute("y", "0");
         slopeLabelSilly.appendChild(textNodeSilly);
         slopeLabelGroup[0].appendChild(slopeLabelSilly);
         slopeLabelGroup[1].appendChild(slopeLabelSilly);
@@ -155,32 +146,38 @@ class Mapper {
         slopeLabelGroup[4].appendChild(slopeLabelSilly);
 
 
-        maxSlopeLabelGroup.setAttribute("class", "maxSlopeLabel display_show");
+        maxSlopeLabelGroup.setAttribute("class", "maxSlopeLabel");
 
-        // [type, stroke-width, stroke]
-        const drawOrder = {};
-        drawOrder[1] = [1, 15, 'darkkhaki', 2]; // variable bank
-        drawOrder[2] = [2, 15, 'darkkhaki', 2]; // constant bank
-        drawOrder[5] = [5, 15, 'darkgrey', 3];  // variable wall
-        drawOrder[6] = [6, 15, 'darkgrey', 3];  // constant wall
-        drawOrder[7] = [7, 15, 'lightblue', 4]; // iron bridge
-        drawOrder[3] = [3, 15, 'orange', 5];    // wooden bridge
-        drawOrder[4] = [4, 3, 'black', 8];      // trendle track
-        drawOrder[0] = [0, 3, 'black', 8];      // track        darkkhaki, darkgrey, orange, blue, black
+        const drawOrder = {}; // [type, stroke-width, stroke]
+        if (this.config.ironOverWood) {
+            drawOrder[1] = [1, 15, 'darkkhaki']; // variable bank
+            drawOrder[2] = [2, 15, 'darkkhaki']; // constant bank
+            drawOrder[5] = [5, 15, 'darkgrey'];  // variable wall
+            drawOrder[6] = [6, 15, 'darkgrey'];  // constant wall
+            drawOrder[3] = [3, 15, 'orange'];    // wooden bridge
+            drawOrder[7] = [7, 15, 'lightblue']; // iron bridge
+            drawOrder[4] = [4, 3, 'black'];      // trendle track
+            drawOrder[0] = [0, 3, 'black'];      // track        darkkhaki, darkgrey, orange, blue, black
+        } else {
+            drawOrder[1] = [1, 15, 'darkkhaki']; // variable bank
+            drawOrder[2] = [2, 15, 'darkkhaki']; // constant bank
+            drawOrder[5] = [5, 15, 'darkgrey'];  // variable wall
+            drawOrder[6] = [6, 15, 'darkgrey'];  // constant wall
+            drawOrder[7] = [7, 15, 'lightblue']; // iron bridge
+            drawOrder[3] = [3, 15, 'orange'];    // wooden bridge
+            drawOrder[4] = [4, 3, 'black'];      // trendle track
+            drawOrder[0] = [0, 3, 'black'];      // track        darkkhaki, darkgrey, orange, blue, black
+        }
 
         let slopecoords = [0, 0];
 
         if ('Splines' in this.json) {
-            // for (const entry of drawOrder) {
             let splineIndex = -1;
-            for (const spline of this.json.Splines) {
+            for (const spline of this.json['Splines']) {
                 splineIndex++;
                 let type = spline['Type'];
                 let entry = drawOrder[type];
-                const [current, strokeWidth, stroke, zindex] = entry;
-                // if (type !== current) {
-                //     continue
-                // }
+                const [, strokeWidth, stroke] = entry;
 
                 let segments = spline['Segments'];
                 if ([1, 2, 5, 6, 3, 7].indexOf(type) > -1) {
@@ -209,7 +206,6 @@ class Mapper {
                         }
                     }
                     bedSegment.setAttribute("d", path);
-                    bedSegment.setAttribute("style", "z-index:" + zindex);
                     bedSegment.setAttribute("fill", 'none');
                     bedSegment.setAttribute("stroke", stroke);
                     bedSegment.setAttribute("stroke-width", strokeWidth.toString());
@@ -280,7 +276,7 @@ class Mapper {
                             }
                             this.maxSlope = Math.max(this.maxSlope, slope);
                         }
-                        const slopeTriggerPrefix = '..';
+
                         const slopeTriggerDecimals = 1;
                         if (distance > 0) {
                             let degrees = null;
@@ -308,17 +304,17 @@ class Mapper {
                                 this.allLabels.push([xCenter, yCenter]);
 
                                 const slopeLabelSilly = document.createElementNS(this.svgNS, "text");
-                                const textNodeSilly = document.createTextNode(slopeTriggerPrefix + percentageSilly + "%");
-                                slopeLabelSilly.setAttribute("x", Math.round(xCenter.toString()));
-                                slopeLabelSilly.setAttribute("y", Math.round(yCenter.toString()));
+                                const textNodeSilly = document.createTextNode(this.config.labelPrefix + percentageSilly + "%");
+                                slopeLabelSilly.setAttribute("x", Math.round(xCenter).toString());
+                                slopeLabelSilly.setAttribute("y", Math.round(yCenter).toString());
                                 slopeLabelSilly.setAttribute("transform", "rotate(" + Math.round(degrees) + "," + Math.round(xCenter) + "," + Math.round(yCenter) + ")");
                                 slopeLabelSilly.appendChild(textNodeSilly);
                                 slopeLabelGroup[4].appendChild(slopeLabelSilly);
 //console.log(slopeLabelSilly);
                                 const slopeLabel = document.createElementNS(this.svgNS, "text");
-                                const textNode = document.createTextNode(slopeTriggerPrefix + percentage + "%");
-                                slopeLabel.setAttribute("x", Math.round(xCenter.toString()));
-                                slopeLabel.setAttribute("y", Math.round(yCenter.toString()));
+                                const textNode = document.createTextNode(this.config.labelPrefix + percentage + "%");
+                                slopeLabel.setAttribute("x", Math.round(xCenter).toString());
+                                slopeLabel.setAttribute("y", Math.round(yCenter).toString());
                                 slopeLabel.setAttribute("transform", "rotate(" + Math.round(degrees) + "," + Math.round(xCenter) + "," + Math.round(yCenter) + ")");
                                 slopeLabel.appendChild(textNode);
                                 slopeLabelGroup[numberX].appendChild(slopeLabel);
@@ -358,9 +354,9 @@ class Mapper {
         }
 
         const switchesGroup = document.createElementNS(this.svgNS, "g");
-        switchesGroup.setAttribute("class", "switches display_show");
+        switchesGroup.setAttribute("class", "switches");
 
-        for (const swtch of this.json.Switchs) { // can't use 'switch' as variable name
+        for (const swtch of this.json['Switchs']) { // can't use 'switch' as variable name
             let dir = false;
             const type = swtch['Type'];
 
@@ -416,23 +412,23 @@ class Mapper {
                 const cx = x + (x2 - x) / 2;
                 const cy = y + (y2 - y) / 2;
 
-                let crossSegment = document.createElementNS(this.svgNS, "line");
-                crossSegment.setAttribute("x1", x.toString());
-                crossSegment.setAttribute("y1", y.toString());
-                crossSegment.setAttribute("x2", x2.toString());
-                crossSegment.setAttribute("y2", y2.toString());
-                crossSegment.setAttribute("stroke", "black");
-                crossSegment.setAttribute("stroke-width", "3");
-                switchesGroup.appendChild(crossSegment);
+                switchesGroup.appendChild(this.createSVGElement("line", {
+                    x1: x,
+                    y1: y,
+                    x2: x2,
+                    y2: y2,
+                    stroke: "black",
+                    'stroke-width': "3"
+                }));
 
-                crossSegment = document.createElementNS(this.svgNS, "line");
-                crossSegment.setAttribute("x1", (cx - (Math.cos(rotation) * crosslength)).toString());
-                crossSegment.setAttribute("y1", (cy - (Math.sin(rotation) * crosslength)).toString());
-                crossSegment.setAttribute("x2", (cx + (Math.cos(rotation) * crosslength)).toString());
-                crossSegment.setAttribute("y2", (cy + (Math.sin(rotation) * crosslength)).toString());
-                crossSegment.setAttribute("stroke", "black");
-                crossSegment.setAttribute("stroke-width", "3");
-                switchesGroup.appendChild(crossSegment);
+                switchesGroup.appendChild(this.createSVGElement("line", {
+                    x1: (cx - (Math.cos(rotation) * crosslength)),
+                    y1: (cy - (Math.sin(rotation) * crosslength)),
+                    x2: (cx + (Math.cos(rotation) * crosslength)),
+                    y2: (cy + (Math.sin(rotation) * crosslength)),
+                    stroke: "black",
+                    'stroke-width': "3"
+                }));
             } else {
                 const xStraight = (this.imx - ((swtch['Location'][0] - this.minX) / 100 * this.scale) + (Math.cos(rotation) * this.switchRadius / 2));
                 const yStraight = (this.imy - ((swtch['Location'][1] - this.minY) / 100 * this.scale) + (Math.sin(rotation) * this.switchRadius / 2));
@@ -440,41 +436,41 @@ class Mapper {
                 const ySide = (this.imy - ((swtch['Location'][1] - this.minY) / 100 * this.scale) + (Math.sin(rotSide) * this.switchRadius / 2));
 
                 if (state) {
-                    let switchSegment = document.createElementNS(this.svgNS, "line");
-                    switchSegment.setAttribute("x1", x.toString());
-                    switchSegment.setAttribute("y1", y.toString());
-                    switchSegment.setAttribute("x2", xStraight.toString());
-                    switchSegment.setAttribute("y2", yStraight.toString());
-                    switchSegment.setAttribute("stroke", "red");
-                    switchSegment.setAttribute("stroke-width", "3");
-                    switchesGroup.appendChild(switchSegment);
+                    switchesGroup.appendChild(this.createSVGElement("line", {
+                        x1: x,
+                        y1: y,
+                        x2: xStraight,
+                        y2: yStraight,
+                        stroke: "red",
+                        'stroke-width': "3"
+                    }));
 
-                    switchSegment = document.createElementNS(this.svgNS, "line");
-                    switchSegment.setAttribute("x1", x.toString());
-                    switchSegment.setAttribute("y1", y.toString());
-                    switchSegment.setAttribute("x2", xSide.toString());
-                    switchSegment.setAttribute("y2", ySide.toString());
-                    switchSegment.setAttribute("stroke", "black");
-                    switchSegment.setAttribute("stroke-width", "3");
-                    switchesGroup.appendChild(switchSegment);
+                    switchesGroup.appendChild(this.createSVGElement("line", {
+                        x1: x,
+                        y1: y,
+                        x2: xSide,
+                        y2: ySide,
+                        stroke: "black",
+                        'stroke-width': "3"
+                    }));
                 } else {
-                    let switchSegment = document.createElementNS(this.svgNS, "line");
-                    switchSegment.setAttribute("x1", x.toString());
-                    switchSegment.setAttribute("y1", y.toString());
-                    switchSegment.setAttribute("x2", xSide.toString());
-                    switchSegment.setAttribute("y2", ySide.toString());
-                    switchSegment.setAttribute("stroke", "red");
-                    switchSegment.setAttribute("stroke-width", "3");
-                    switchesGroup.appendChild(switchSegment);
+                    switchesGroup.appendChild(this.createSVGElement("line", {
+                        x1: x,
+                        y1: y,
+                        x2: xSide,
+                        y2: ySide,
+                        stroke: "red",
+                        'stroke-width': "3"
+                    }));
 
-                    switchSegment = document.createElementNS(this.svgNS, "line");
-                    switchSegment.setAttribute("x1", x.toString());
-                    switchSegment.setAttribute("y1", y.toString());
-                    switchSegment.setAttribute("x2", xStraight.toString());
-                    switchSegment.setAttribute("y2", yStraight.toString());
-                    switchSegment.setAttribute("stroke", "black");
-                    switchSegment.setAttribute("stroke-width", "3");
-                    switchesGroup.appendChild(switchSegment);
+                    switchesGroup.appendChild(this.createSVGElement("line", {
+                        x1: x,
+                        y1: y,
+                        x2: xStraight,
+                        y2: yStraight,
+                        stroke: "black",
+                        'stroke-width': "3"
+                    }));
                 }
             }
         }
@@ -487,9 +483,9 @@ class Mapper {
         }
 
         const turntablesGroup = document.createElementNS(this.svgNS, "g");
-        turntablesGroup.setAttribute("class", "turntables display_show");
+        turntablesGroup.setAttribute("class", "turntables");
 
-        for (const turntable of this.json.Turntables) {
+        for (const turntable of this.json['Turntables']) {
             /**
              * 0 = regular
              * 1 = light and nice
@@ -532,7 +528,7 @@ class Mapper {
         }
 
         const rollingStockGroup = document.createElementNS(this.svgNS, "g");
-        rollingStockGroup.setAttribute("class", "rollingstock display_show");
+        rollingStockGroup.setAttribute("class", "rollingstock");
 
         const undergroundCartsTable = document.getElementById("undergroundCartsTable");
         const rollingStockTable = document.getElementById("rollingStockTable");
@@ -581,7 +577,7 @@ class Mapper {
         }
 
         let index = 0;
-        for (const vehicle of this.json.Frames) {
+        for (const vehicle of this.json['Frames']) {
             const x = (this.imx - ((vehicle['Location'][0] - this.minX) / 100 * this.scale));
             const y = (this.imy - ((vehicle['Location'][1] - this.minY) / 100 * this.scale));
             if (['porter_040', 'porter_042', /*'handcar', */'eureka', 'climax', 'heisler', 'class70', 'cooke260'].indexOf(vehicle['Type']) >= 0) {
@@ -683,7 +679,7 @@ class Mapper {
                 this.allLabels.push([x, y]);
 
                 const vehicleLabel = document.createElementNS(this.svgNS, "text");
-                const textNode = document.createTextNode(".." + name);
+                const textNode = document.createTextNode(this.config.labelPrefix + name);
                 vehicleLabel.setAttribute("stroke", "black");
                 vehicleLabel.setAttribute("fill", "white");
                 vehicleLabel.setAttribute("font-size", "1em");
@@ -734,7 +730,7 @@ class Mapper {
             const nearValue = document.createElement("td");
             let nearTextNode = document.createTextNode("Unknown");
             if ('Industries' in this.json) {
-                nearTextNode = document.createTextNode(this._nearestIndustry(vehicle['Location'], this.json.Industries));
+                nearTextNode = document.createTextNode(this._nearestIndustry(vehicle['Location'], this.json['Industries']));
             }
             nearValue.appendChild(nearTextNode);
             rollingStockInfoRow.appendChild(nearValue);
@@ -780,7 +776,7 @@ class Mapper {
 
         const industriesTable = document.getElementById("industriesTable");
         let index = 0;
-        for (const industry of this.json.Industries) {
+        for (const industry of this.json['Industries']) {
             let name = '';
             let rotation = 0;
             let xoff = 0;
@@ -984,7 +980,7 @@ class Mapper {
             return
         }
 
-        for (const tower of this.json.Watertowers) {
+        for (const tower of this.json['Watertowers']) {
             const x = this.imx - ((tower['Location'][0] - this.minX) / 100 * this.scale);
             const y = this.imy - ((tower['Location'][1] - this.minY) / 100 * this.scale);
 
@@ -1011,9 +1007,10 @@ class Mapper {
         }
 
         const firstTreeGroup = document.createElementNS(this.svgNS, "g");
-        firstTreeGroup.setAttribute("class", "trees_default display_hide");
+        firstTreeGroup.setAttribute("class", "trees_default");
         const userTreeGroup = document.createElementNS(this.svgNS, "g");
-        userTreeGroup.setAttribute("class", "trees_user display_hide");
+        userTreeGroup.setAttribute("class", "trees_user");
+
         for (let i = 0; i < this.json['Removed']['Vegetation'].length; i++) {
             const tree = this.json['Removed']['Vegetation'][i];
             const treeX = Math.floor((200000 + tree[0]) / 100000);
@@ -1154,7 +1151,7 @@ class Mapper {
         if (coords2 === undefined) {
             return 9999999999;
         }
-        let distance = null;
+        let distance;
         if ('X' in coords) {
             if ('X' in coords2) {
                 if (flat === true) {
