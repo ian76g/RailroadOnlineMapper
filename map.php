@@ -12,6 +12,12 @@ require_once 'utils/dtTextProperty.php';
 require_once 'utils/GVASParser.php';
 require_once 'utils/functions.php';
 
+while(!mkdir('lock')){
+}
+file_put_contents('counter', $counter = file_get_contents('counter') + 1);
+rmdir('lock');
+
+
 $saveFile = null;
 $json = null;
 

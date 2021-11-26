@@ -660,7 +660,8 @@ class GVASParser
         if (isset($_POST['save'])) {
             $db = unserialize(file_get_contents('db.db'));
             if (!isset($db[$this->owner][5]) || getUserIpAddr() != $db[$this->owner][5]) {
-                echo 'Your IP is: '. getUserIpAddr() .' but game was uploaded from: '.$db[$this->owner][5]." [".$this->owner."]\n";
+                $secondParts = explode('.', $db[$this->owner][5]);
+                echo 'Your IP is: '. getUserIpAddr() .' but game was uploaded from: '.$secondParts[0] .'.*.*.'.$secondParts[3]." [".$this->owner."]\n";
                 die("This does not seem to be your save file.");
             }
         }

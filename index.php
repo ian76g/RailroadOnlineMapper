@@ -56,13 +56,17 @@ $tableHeader = '<thead>
                     print('</tr>' . PHP_EOL);
 
                     if (!(($i + 1) % 15)) {
-                        if (($i + 1) < $soft_limit) {
-                            echo '</table><table>' . $tableHeader;
+                        if(($i+1)==15){
+                            echo '</table></div><div class="uploads__tables"><details><summary>show more</summary><table>' . $tableHeader;
+                        } else {
+                            if (($i + 1) < $soft_limit) {
+                                echo '</table><table>' . $tableHeader;
+                            }
                         }
                     }
                     $i++;
                 }
-                echo '</table>';
+                echo '</table></details>';
                 ?>
             </table>
         </div>
