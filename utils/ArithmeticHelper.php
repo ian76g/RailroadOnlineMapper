@@ -268,7 +268,6 @@ if($key==1 || $key==3) die('CRAP');
         $yOut = $m1*($xOut)+ $n1;
 
 
-        $straight = $this->dist(array($xOut, $yOut), $theOther ,TRUE);
 
         $num = ($yOut-$yCircle)/$radius;
         $angleEnd = rad2deg(asin(max(-1,min(1,$num))));
@@ -279,6 +278,7 @@ if($key==1 || $key==3) die('CRAP');
 //        $numberOfSegments =  8;
 //echo "curved segments: ".$numberOfSegments." \n";
         $segmentAngle = $angledelta/$numberOfSegments;
+        $straight = $this->dist(array($xOut, $yOut), $theOther ,TRUE);
         $curvedSegmentLength = 2*pi()*$radius*$segmentAngle/360;
 
 
