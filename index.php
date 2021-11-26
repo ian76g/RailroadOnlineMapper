@@ -15,15 +15,6 @@ if (!file_exists('counter')) {
     file_put_contents('counter', 0);
 }
 
-$tableHeader = '<thead>
-                        <th style="background-color: beige">                                                        <img height="28" width="40" src="/assets/images/player.svg"></th>
-                        <th style="background-color: beige"><A href="?sortby=0&sortorder=desc" style="color: white"><img height="28" width="40" src="/assets/images/distance.svg"></A></th>
-                        <th style="background-color: beige"><A href="?sortby=1&sortorder=desc" style="color: white"><img height="28" width="40" src="/assets/images/switch.svg"></A></th>
-                        <th style="background-color: beige"><A href="?sortby=6&sortorder=desc" style="color: white"><img height="28" width="40" src="/assets/images/tree.svg"></A></th>
-                        <th style="background-color: beige"><A href="?sortby=2&sortorder=desc" style="color: white"><img height="28" width="40" src="/assets/images/loco.svg"></A></th>
-                        <th style="background-color: beige"><A href="?sortby=3&sortorder=desc" style="color: white"><img height="28" width="40" src="/assets/images/cart.svg"></A></th>
-                        <th style="background-color: beige"><A href="?sortby=4&sortorder=desc" style="color: white"><img height="28" width="40" src="/assets/images/slope.svg"></A></th>
-                    </thead>';
 ?>
 <body>
 <header class="header">
@@ -34,19 +25,40 @@ $tableHeader = '<thead>
     <section class="uploads">
         <h2>Latest uploads (* = as download available)</h2>
         <div class="uploads__tables">
-            <table>
+            <table id="saveFiles">
+                <thead>
+                <tr>
+                    <th>
+                        <img height="28" width="40" src="/assets/images/player.svg" alt="Name">
+                    </th>
+                    <th>
+                        <img height="28" width="40" src="/assets/images/distance.svg" alt="Track length">
+                    </th>
+                    <th>
+                        <img height="28" width="40" src="/assets/images/switch.svg" alt="Number of switches">
+                    </th>
+                    <th>
+                        <img height="28" width="40" src="/assets/images/tree.svg" alt="Number of cut down trees">
+                    </th>
+                    <th>
+                        <img height="28" width="40" src="/assets/images/loco.svg" alt="Number of locomotives">
+                    </th>
+                    <th>
+                        <img height="28" width="40" src="/assets/images/cart.svg" alt="Number of carts">
+                    </th>
+                    <th>
+                        <img height="28" width="40" src="/assets/images/slope.svg" alt="Biggest slope">
+                    </th>
+                </tr>
+                </thead>
                 <?php
-                echo $tableHeader;
-                $soft_limit = 800;
-
-                $i = 0;
-                foreach (map_entries((isset($_GET['sortby'])?$_GET['sortby']:null), $_GET['sortorder']) as $entry) {
+                foreach (map_entries(($_GET['sortby'] ?? null), $_GET['sortorder']) as $entry) {
                     $asterix = '';
                     if ($entry['public']) {
                         $asterix = '*';
                     }
                     print('<tr>' . PHP_EOL);
-                    print('<td>'.$asterix.'<a href="map.php?name=' . $entry['name'] . '">' . $entry['name'] . '</a></td>' . PHP_EOL);
+                    print('<td>' . $asterix . '<a href="map.php?name=' . $entry['name'] . '">' . $entry['name'] . '</a></td>' . PHP_EOL);
                     print('<td>' . $entry['trackLength'] . 'km</td>' . PHP_EOL);
                     print('<td>' . $entry['numY'] . '</td>' . PHP_EOL);
                     print('<td>' . $entry['numT'] . '</td>' . PHP_EOL);
@@ -54,19 +66,8 @@ $tableHeader = '<thead>
                     print('<td>' . $entry['numCarts'] . '</td>' . PHP_EOL);
                     print('<td>' . $entry['slope'] . '%</td>' . PHP_EOL);
                     print('</tr>' . PHP_EOL);
-
-                    if (!(($i + 1) % 15)) {
-                        if(($i+1)==15){
-                            echo '</table></div><div class="uploads__tables"><details><summary>show more</summary><table>' . $tableHeader;
-                        } else {
-                            if (($i + 1) < $soft_limit) {
-                                echo '</table><table>' . $tableHeader;
-                            }
-                        }
-                    }
-                    $i++;
                 }
-                echo '</table></details>';
+                echo '</table>';
                 ?>
             </table>
         </div>
@@ -87,7 +88,7 @@ $tableHeader = '<thead>
 
                 <section>
                     <h3>Make it public</h3>
-                    <input type="checkbox" name="public" id="public" />
+                    <input type="checkbox" name="public" id="public"/>
                 </section>
 
                 <input class="button" type="submit" value="Upload" name="submit">
@@ -111,6 +112,11 @@ $tableHeader = '<thead>
             modal.style.display = "none";
         }
     }
+
+    const myTable = document.querySelector("#saveFiles");
+    const dataTable = new simpleDatatables.DataTable(myTable, {
+        perPage: 15
+    });
 </script>
 </body>
 </html>

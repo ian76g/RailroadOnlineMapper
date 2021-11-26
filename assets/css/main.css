@@ -101,19 +101,19 @@ a:hover {
   border-color: var(--secondary-color);
 }
 
-input[type="text"] {
-  width: 100%;
-  padding: 1rem 0.75rem;
-  background: white;
-  border: 0;
-  border-radius: var(--border-radius);
-  outline: 2px solid transparent;
-  transition: all 0.1s ease-out;
-}
+/*input[type="text"] {*/
+/*  width: 100%;*/
+/*  padding: 1rem 0.75rem;*/
+/*  background: white;*/
+/*  border: 0;*/
+/*  border-radius: var(--border-radius);*/
+/*  outline: 2px solid transparent;*/
+/*  transition: all 0.1s ease-out;*/
+/*}*/
 
-input[type="text"]:focus {
-  outline-color: var(--secondary-color);
-}
+/*input[type="text"]:focus {*/
+/*  outline-color: var(--secondary-color);*/
+/*}*/
 
 input[type="checkbox"] {
   width: 20px;
@@ -250,12 +250,13 @@ thead {
   border-bottom: 1px solid grey;
 }
 
-thead th {
+thead tr th {
   padding: 0.5rem;
   white-space: nowrap;
   background: var(--primary-color);
   color: white;
   border-bottom: 1px solid var(--secondary-color);
+  min-width: 100px;
 }
 
 @media only screen and (min-width: 1250px) {
@@ -368,4 +369,8 @@ tbody td {
 
 .message--alert.info {
   background-color: var(--primary-color);
+}
+
+#saveFiles th {
+  background-color: beige;
 }
