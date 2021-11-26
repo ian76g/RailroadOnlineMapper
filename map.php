@@ -62,9 +62,9 @@ foreach ($textFiles as $textFile) {
     <meta charset="UTF8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <title>Railroads Online Map</title>
-    <link rel="stylesheet" href="/assets/css/reset.css?<?php echo filemtime('assets/css/reset.css');?>"/>
-    <link rel="stylesheet" href="/assets/css/main.css?<?php echo filemtime('assets/css/reset.css');?>"/>
-    <link rel="stylesheet" href="/assets/css/export.css?<?php echo filemtime('assets/css/reset.css');?>"/>
+    <link rel="stylesheet" href="/assets/css/reset.css?<?php echo filemtime('assets/css/reset.css'); ?>"/>
+    <link rel="stylesheet" href="/assets/css/main.css?<?php echo filemtime('assets/css/reset.css'); ?>"/>
+    <link rel="stylesheet" href="/assets/css/export.css?<?php echo filemtime('assets/css/reset.css'); ?>"/>
 </head>
 <body class="export">
 <main class="export__main">
@@ -187,18 +187,18 @@ foreach ($textFiles as $textFile) {
                 Slope
                 Circle
             </div>
-            <br/>
             <div>
-                The settings below will require a refresh of the page
-            </div>
-            <br/>
-            <div>
-                <input id="drawIron" type="checkbox"
+                <input id="ironOverWood" type="checkbox"
                        onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('ironOverWood'); ?>/> Show
                 Iron
                 bridge on
                 top of Wood bridge
             </div>
+            <hr />
+            <h5>
+                The settings below will require a refresh of the page
+            </h5>
+
             <div>
                 <label for="labelPrefix">Text label prefix: </label>
                 <input id="labelPrefix" placeholder=".."
@@ -405,19 +405,10 @@ if (!file_exists('assets/js/mapper.min.js') || filemtime('assets/js/mapper.js') 
     }
 
     function toggleDisplayOptions(checkbox) {
-        if (checkbox.id === "drawIron") {
-            if (checkbox.checked) {
-                cookies.set('ironOverWood', true);
-            } else {
-                cookies.set('ironOverWood', false);
-            }
-        }
-
         const element = document.getElementsByClassName(checkbox.id)[0];
         if (typeof element === "undefined") {
             return;
         }
-
 
         if (checkbox.checked) {
             element.classList.remove('display_hide');

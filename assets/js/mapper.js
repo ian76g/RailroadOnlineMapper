@@ -25,9 +25,7 @@ class Mapper {
         this.initialTreesDown = 1750;
 
         this.config = {
-            labelPrefix: cookies.get('labelPrefix') || '..',
-            slopeDecimals: cookies.get('slopeDecimals') || 2,
-            ironOverWood: cookies.get('ironOverWood') || true
+            labelPrefix: cookies.get('labelPrefix') || '..'
         }
     }
 
@@ -117,9 +115,12 @@ class Mapper {
         // const tracksAndBedsGroup = document.createElementNS(this.svgNS, "g");
         const tracksGroup = document.createElementNS(this.svgNS, "g");
         const bedsGroup = document.createElementNS(this.svgNS, "g");
+        const ironBridgeGroup = document.createElementNS(this.svgNS, "g");
         const maxSlopeLabelGroup = document.createElementNS(this.svgNS, "g");
         tracksGroup.setAttribute("class", "tracks");
         bedsGroup.setAttribute("class", "beds");
+        ironBridgeGroup.setAttribute("class", "ironOverWood");
+        maxSlopeLabelGroup.setAttribute("class", "maxSlopeLabel");
 
         const slopeLabelGroup = Array(
             document.createElementNS(this.svgNS, "g"),
@@ -145,29 +146,15 @@ class Mapper {
         slopeLabelGroup[3].appendChild(slopeLabelSilly);
         slopeLabelGroup[4].appendChild(slopeLabelSilly);
 
-
-        maxSlopeLabelGroup.setAttribute("class", "maxSlopeLabel");
-
         const drawOrder = {}; // [type, stroke-width, stroke]
-        if (this.config.ironOverWood) {
-            drawOrder[1] = [1, 15, 'darkkhaki']; // variable bank
-            drawOrder[2] = [2, 15, 'darkkhaki']; // constant bank
-            drawOrder[5] = [5, 15, 'darkgrey'];  // variable wall
-            drawOrder[6] = [6, 15, 'darkgrey'];  // constant wall
-            drawOrder[3] = [3, 15, 'orange'];    // wooden bridge
-            drawOrder[7] = [7, 15, 'lightblue']; // iron bridge
-            drawOrder[4] = [4, 3, 'black'];      // trendle track
-            drawOrder[0] = [0, 3, 'black'];      // track        darkkhaki, darkgrey, orange, blue, black
-        } else {
-            drawOrder[1] = [1, 15, 'darkkhaki']; // variable bank
-            drawOrder[2] = [2, 15, 'darkkhaki']; // constant bank
-            drawOrder[5] = [5, 15, 'darkgrey'];  // variable wall
-            drawOrder[6] = [6, 15, 'darkgrey'];  // constant wall
-            drawOrder[7] = [7, 15, 'lightblue']; // iron bridge
-            drawOrder[3] = [3, 15, 'orange'];    // wooden bridge
-            drawOrder[4] = [4, 3, 'black'];      // trendle track
-            drawOrder[0] = [0, 3, 'black'];      // track        darkkhaki, darkgrey, orange, blue, black
-        }
+        drawOrder[1] = [1, 15, 'darkkhaki']; // variable bank
+        drawOrder[2] = [2, 15, 'darkkhaki']; // constant bank
+        drawOrder[5] = [5, 15, 'darkgrey'];  // variable wall
+        drawOrder[6] = [6, 15, 'darkgrey'];  // constant wall
+        drawOrder[3] = [3, 15, 'orange'];    // wooden bridge
+        drawOrder[7] = [7, 15, 'lightblue']; // iron bridge
+        drawOrder[4] = [4, 3, 'black'];      // trendle track
+        drawOrder[0] = [0, 3, 'black'];      // track        darkkhaki, darkgrey, orange, blue, black
 
         let slopecoords = [0, 0];
 
@@ -209,14 +196,10 @@ class Mapper {
                     bedSegment.setAttribute("fill", 'none');
                     bedSegment.setAttribute("stroke", stroke);
                     bedSegment.setAttribute("stroke-width", strokeWidth.toString());
-
-                    if (type === 3) {
-                        bedSegment.setAttribute("class", "wooden");
-                    } else if (type === 7) {
-                        bedSegment.setAttribute("class", "iron");
-                    }
-
                     bedsGroup.appendChild(bedSegment);
+                    if (type === 7) {
+                        ironBridgeGroup.appendChild(bedSegment.cloneNode(true));
+                    }
                 } else {
                     // tracks..
                     let segmentIndex = -1;
@@ -242,7 +225,7 @@ class Mapper {
                         trackSegment.setAttribute("se", segmentIndex);
                         trackSegment.setAttribute("stroke", stroke);
                         trackSegment.setAttribute('onclick',
-                            'my_function('+splineIndex+','+segmentIndex+')');
+                            'my_function(' + splineIndex + ',' + segmentIndex + ')');
                         trackSegment.setAttribute("stroke-width", strokeWidth.toString());
                         tracksGroup.appendChild(trackSegment);
 
@@ -340,6 +323,7 @@ class Mapper {
             }
         }
         this.shapes.push(bedsGroup);
+        this.shapes.push(ironBridgeGroup);
         this.shapes.push(tracksGroup);
         this.shapes.push(slopeLabelGroup[0]);
         this.shapes.push(slopeLabelGroup[1]);
@@ -816,7 +800,7 @@ class Mapper {
                     industry['ProductsStored'].pop();
                     industry['ProductsStored'].pop();
                     pos = ['iron_p.svg', 'rails_p.svg'];
-                    pis = ['cordwood_p.svg','ironore_p.svg'];
+                    pis = ['cordwood_p.svg', 'ironore_p.svg'];
                     rotation = 90;
                     break;
                 case 4:
