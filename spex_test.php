@@ -40,7 +40,7 @@ abstract class CurveCalcLimits
 
 function deal_with_error($err_cond, $err_msg)
 {
-    die("ERROR: " . $err_msg);
+    throw new Exception('Someone fucked it up.');
 }
 
 function vec_rotate($vec_x, $vec_y, $rel_angle)
@@ -86,6 +86,7 @@ function getCurveCoordsBetweenSegments($segment1, $segment2)
     $intersect_x = 0;
     $intersect_y = 0;
     $lines_are_parallel = false;
+    $intersect_y_2 = 0;
     // make sure they are not both vertical, which also means
     // they are parallel
     if ($s1_diff_x == 0 && $s2_diff_x == 0) {
@@ -370,23 +371,28 @@ function getCurveCoordsBetweenSegments($segment1, $segment2)
     //                           i.e. using "vec_to_near" and this directional
     //                           angle for rotation to determine segments.
 
-    echo("<pre>\n");
-    echo("intersect = (" . $intersect_x . ", " . $intersect_y . "), intersect_y_2 = " . $intersect_y_2 . "\n");
-    echo("segment1:\n");
-    echo("  start = (" . $s1_start_x . ", " . $s1_start_y . "), distance = " . $dist_s1_start . "\n");
-    echo("  end   = (" . $s1_end_x . ", " . $s1_end_y . "), distance = " . $dist_s1_end . "\n");
-    echo("  m = " . $s1_m . ", n = " . $s1_n . "\n");
-    echo("segment2:\n");
-    echo("  start = (" . $s2_start_x . ", " . $s2_start_y . "), distance = " . $dist_s2_start . "\n");
-    echo("  end   = (" . $s2_end_x . ", " . $s2_end_y . "), distance = " . $dist_s2_end . "\n");
-    echo("  m = " . $s2_m . ", n = " . $s2_n . "\n");
-    echo("near = (" . $near_x . ", " . $near_y . "), distance = " . $dist_near . "\n");
-    echo("far_off = (" . $far_off_x . ", " . $far_off_y . "), distance = " . $dist_far_off . "\n");
-    echo("far = (" . $far_x . ", " . $far_y . ")\n");
-    echo("alpha = " . $arc_angle . ", cos_a_orig = " . $cos_a_orig . "\n");
-    echo("arc_center = (" . $arc_center_x . ", " . $arc_center_y . "), radius = " . $arc_radius . "\n");
-
-echo '</pre>';
+//    echo("<pre>\n");
+//    echo("intersect = (" . $intersect_x . ", " . $intersect_y . "), intersect_y_2 = " . $intersect_y_2 . "\n");
+//    echo("segment1:\n");
+//    echo("  start = (" . $s1_start_x . ", " . $s1_start_y . "), distance = " . $dist_s1_start . "\n");
+//    echo("  end   = (" . $s1_end_x . ", " . $s1_end_y . "), distance = " . $dist_s1_end . "\n");
+//    if ($s1_diff_x != 0) {
+//        echo("  m = " . $s1_m . ", n = " . $s1_n . "\n");
+//    }
+//    echo("segment2:\n");
+//    echo("  start = (" . $s2_start_x . ", " . $s2_start_y . "), distance = " . $dist_s2_start . "\n");
+//    echo("  end   = (" . $s2_end_x . ", " . $s2_end_y . "), distance = " . $dist_s2_end . "\n");
+//    if ($s2_diff_x != 0) {
+//        echo("  m = " . $s2_m . ", n = " . $s2_n . "\n");
+//    }
+//    echo("near = (" . $near_x . ", " . $near_y . "), distance = " . $dist_near . "\n");
+//    echo("far_off = (" . $far_off_x . ", " . $far_off_y . "), distance = " . $dist_far_off . "\n");
+//    echo("far = (" . $far_x . ", " . $far_y . ")\n");
+//    echo("alpha = " . $arc_angle . ", cos_a_orig = " . $cos_a_orig . "\n");
+//    echo("arc_center = (" . $arc_center_x . ", " . $arc_center_y . "), radius = " . $arc_radius . "\n");
+//
+//echo '</pre>';
+//echo "\n-->\n";
     // NOTE: calcs will cause errors of all sorts, especially such
     //       more sophisticated stuff. floats are by no means sufficient
     //       for things like this. The very least which should be done:
@@ -413,47 +419,48 @@ echo '</pre>';
     $far_off_y;
 
     $scale = 0.01;
-    echo("\n");
-    $svg_output = '
-<svg
-    id="demo"
-    xmlns="http://www.w3.org/2000/svg"
-    >
-    <circle
-        cx="' . $arc_center_x * $scale . '" cy="' . $arc_center_y * $scale . '"
-        r="' . $arc_radius * $scale . '"
-        stroke="lightgray" fill="none"/>
-    <circle
-        cx="' . $intersect_x * $scale . '" cy="' . $intersect_y * $scale . '"
-        r="5"
-        stroke="lightgray" fill="red"/>
-    <circle
-        cx="' . $arc_center_x * $scale . '" cy="' . $arc_center_y * $scale . '"
-        r="5"
-        stroke="lightgray" fill="gray"/>
-    <circle
-        cx="' . $near_x * $scale . '" cy="' . $near_y * $scale . '"
-        r="2"
-        stroke="black" fill="orange"/>
-    <circle
-        cx="' . $far_x * $scale . '" cy="' . $far_y * $scale . '"
-        r="2"
-        stroke="black" fill="orange"/>
-    <line
-        stroke="green" stroke-width="3"
-        x1="' . $s1_start_x * $scale . '" x2="' . $s1_end_x * $scale . '"
-        y1="' . $s1_start_y * $scale . '" y2="' . $s1_end_y * $scale . '" />
-    <line
-        stroke="blue" stroke-width="3"
-        x1="' . $s2_start_x * $scale . '" x2="' . $s2_end_x * $scale . '"
-        y1="' . $s2_start_y * $scale . '" y2="' . $s2_end_y * $scale . '" />
-    <path
-        stroke-width="2" stroke="red" fill="none"
-        d="M ' . $near_x * $scale . ',' . $near_y * $scale;
-
-    //+$near_prev_x = $s2_start_x;
-    //        $near_prev_y = $s2_start_y;
-    //        $near_prev_z
+//    echo("\n");
+//    $svg_output = '
+//<svg
+//    id="demo"
+//    xmlns="http://www.w3.org/2000/svg"
+//    viewBox="-2000 -2000 4000 4000"
+//    >
+//    <circle
+//        cx="' . $arc_center_x * $scale . '" cy="' . $arc_center_y * $scale . '"
+//        r="' . $arc_radius * $scale . '"
+//        stroke="lightgray" fill="none"/>
+//    <circle
+//        cx="' . $intersect_x * $scale . '" cy="' . $intersect_y * $scale . '"
+//        r="5"
+//        stroke="lightgray" fill="red"/>
+//    <circle
+//        cx="' . $arc_center_x * $scale . '" cy="' . $arc_center_y * $scale . '"
+//        r="5"
+//        stroke="lightgray" fill="gray"/>
+//    <circle
+//        cx="' . $near_x * $scale . '" cy="' . $near_y * $scale . '"
+//        r="2"
+//        stroke="black" fill="orange"/>
+//    <circle
+//        cx="' . $far_x * $scale . '" cy="' . $far_y * $scale . '"
+//        r="2"
+//        stroke="black" fill="orange"/>
+//    <line
+//        stroke="green" stroke-width="3"
+//        x1="' . $s1_start_x * $scale . '" x2="' . $s1_end_x * $scale . '"
+//        y1="' . $s1_start_y * $scale . '" y2="' . $s1_end_y * $scale . '" />
+//    <line
+//        stroke="blue" stroke-width="3"
+//        x1="' . $s2_start_x * $scale . '" x2="' . $s2_end_x * $scale . '"
+//        y1="' . $s2_start_y * $scale . '" y2="' . $s2_end_y * $scale . '" />
+//    <path
+//        stroke-width="2" stroke="red" fill="none"
+//        d="M ' . $near_x * $scale . ',' . $near_y * $scale;
+//
+//    //+$near_prev_x = $s2_start_x;
+//    //        $near_prev_y = $s2_start_y;
+//    //        $near_prev_z
     $curve[] = array($near_prev_x, $near_prev_y, $near_prev_z);
     $curve[] = array($near_x, $near_y, $near_z);
 
@@ -508,9 +515,9 @@ echo '</pre>';
 
     $svg_output .= "\" />\n";
     $svg_output .= "</svg>\n";
-    echo($svg_output);
+//    echo($svg_output);
     // report success
-    return true;
+    return $curve;
 }
 
 
@@ -519,14 +526,33 @@ $se0 = $_GET['se0'];
 $sp1 = $_GET['sp1'];
 $se1 = $_GET['se1'];
 
+// sp0=1158&se0=17&sp1=56&se1=10
+/*
+$sp0 = 1145;
+$se0 = 72;
+$sp1 = 1145;
+$se1 = 28;
+*/
+
 $segment1 = $x['Splines'][$sp0]['Segments'][$se0];
 $segment2 = $x['Splines'][$sp1]['Segments'][$se1];
-echo "##################\n";
-print_r($segment1);
-echo "##################\n";
-print_r($segment2);
-echo "##################\n";
+//echo "<!--\n";
+//echo "##################\n";
+//print_r($segment1);
+//echo "##################\n";
+//print_r($segment2);
+//echo "##################\n";
 
 getCurveCoordsBetweenSegments($segment1, $segment2);
 
+/**
+SplineLocationArray                 -- array of Vector of SplineStart Posistions
+SplineTypeArray                     -- 4 (track)
+SplineControlPointsArray            -- all coordinates of spline segment starts
+SplineControlPointsIndexStartArray  -- array of pointer to index of start segment
+SplineControlPointsIndexEndArray    -- array of pointer to end segment
+SplineSegmentsVisibilityArray       -- array of bool 1
+SplineVisibilityStartArray          -- add index of spline start
+SplineVisibilityEndArray            -- add index of spline end
+ */
 ?>

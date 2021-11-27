@@ -29,6 +29,20 @@ class Mapper {
         }
     }
 
+    deg2rad(degrees)
+    {
+        var pi = Math.PI;
+        return degrees * (pi/180);
+    }
+
+    thingy(angle, x, y)
+    {
+        x+=Math.cos(this.deg2rad(angle))*2;
+        y+=Math.sin(this.deg2rad(angle))*2;
+
+        return [x,y];
+    }
+
     drawSVG(htmlElement) {
         this.svgTag = document.getElementById(htmlElement);
         this.getReplantableTrees();
@@ -605,12 +619,15 @@ class Mapper {
 
                     }
                 }
+                var cc, cx, cy;
+                cc = this.thingy(vehicle['Rotation'][1], x, y);
+                cx=cc[0]; cy=cc[1];
                 const path = document.createElementNS(this.svgNS, "path");
                 path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-" + (xl / 2) + ",-" + (yl / 2) + " h" + (xl - 4) + " a2,2 0 0 1 2,2 v" + (yl - 4) + " a2,2 0 0 1 -2,2 h-" + (xl - 4) + " a2,2 0 0 1 -2,-2 v-" + (yl - 4) + " a2,2 0 0 1 2,-2 z");
                 path.setAttribute("fill", fillColor);
                 path.setAttribute("stroke", "black");
                 path.setAttribute("stroke-width", "1");
-                path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(x) + ", " + Math.round(y) + ")");
+                path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(cx) + ", " + Math.round(cy) + ")");
                 path.appendChild(title);
                 rollingStockGroup.appendChild(path);
             }

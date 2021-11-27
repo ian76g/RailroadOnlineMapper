@@ -274,13 +274,13 @@ foreach ($textFiles as $textFile) {
                         <option value="handcarts">only handcarts</option>
                     </select><br/>
                     <button class="button">Apply name schema</button>
-                </form>
+                </form><br>
 
                 <form method="POST" action="/converter.php">
                     <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
                     <input name="allBrakes" value="YES" type="hidden"/>
                     <button class="button">Apply all brakes</button>
-                </form>
+                </form><br>
 
                 <h4>Trees</h4>
                 <form method="POST" action="/converter.php">
@@ -289,7 +289,15 @@ foreach ($textFiles as $textFile) {
                     <span style="font-size: smaller">for reference:<br> 65 cm washing machine, <br> 91 cm gauge,<br> 170 cm bathtub,<br> 460 cm car,<br> 1880 cm switch<br>
                     measured to start, center and end of track-(segment) only, switches, crosses are not taken into calculation (yet)</span><br>
                     <button class="button">Replant Trees</button>
-                </form>
+                </form><br>
+
+                <h4>Curves</h4>
+                <form method="POST" action="/converter.php">
+                    <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
+                    from: <input name="from" value="0-0" size="6"><br>
+                    to: <input name="to" value="0-0" size="6"><br>
+                    <button class="button">Create curve</button>
+                </form><br>
 
                 <h4>Players</h4>
                 <form method="POST" action="/converter.php">
@@ -304,7 +312,7 @@ foreach ($textFiles as $textFile) {
                         </tr>
                     </table>
                     <button class="button">Apply Player Changes</button>
-                </form>
+                </form><br>
 
                 <h4>Industries</h4>
                 <form method="POST" action="/converter.php">
@@ -319,7 +327,7 @@ foreach ($textFiles as $textFile) {
                         </tr>
                     </table>
                     <button class="button">Apply Industry Changes</button>
-                </form>
+                </form><br>
 
                 <h4>Carts</h4>
                 <form method="POST" action="/converter.php">

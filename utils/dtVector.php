@@ -13,6 +13,11 @@ class dtVector extends dtAbstractData
         return $this->NAME;
     }
 
+    public function __construct($arr = array())
+    {
+        $this->content = $arr;
+    }
+
     /**
      * @param $fromX
      * @param $position

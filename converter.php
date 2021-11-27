@@ -36,7 +36,7 @@ function getUserIpAddr()
     return $ip;
 }
 
-//$_POST['save'] = 'slot3.sav';
+//$_POST['save'] = 'slot9.sav';
 //$_POST['replant'] = 'NO';
 //$_POST['firstTree'] = 'A';
 //$_POST['userTree'] = 'A';
@@ -51,6 +51,8 @@ function getUserIpAddr()
 //$_POST['renameWhat'] = 'locos';
 //$_POST['nameAllCountries'] = 'dnrgLocomotives';
 //$_POST['cargoType_2'] = 'log';
+//$_POST['from'] = '0-0';
+//$_POST['to'] = '1-0';
 
 if (!isset($NEWUPLOADEDFILE)) {
     if (isset($_POST['save']) && $_POST['save']) {

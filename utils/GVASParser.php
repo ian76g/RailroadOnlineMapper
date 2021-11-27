@@ -81,13 +81,13 @@ class GVASParser
             }
         }
 
-        $this->owner = preg_replace('/[[:^alnum:]]/', "", $this->goldenBucket['Players'][0]['Name']).$slotExtension;
+        $this->owner = preg_replace('/[[:^alnum:]]/', "", $this->goldenBucket['Players'][0]['Name']) . $slotExtension;
 
-        $carts = array('flatcar_logs','flatcar_cordwood','flatcar_stakes','flatcar_hopper','boxcar','flatcar_tanker');
+        $carts = array('flatcar_logs', 'flatcar_cordwood', 'flatcar_stakes', 'flatcar_hopper', 'boxcar', 'flatcar_tanker');
 
         if (isset($this->goldenBucket['Frames'])) {
             foreach ($this->goldenBucket['Frames'] as $i => $frame) {
-                if(false && in_array($frame['Type'],$carts)){
+                if (false && in_array($frame['Type'], $carts)) {
 
                 } else {
                     if (isset($this->goldenBucket['Boilers'][$i]))
@@ -206,27 +206,27 @@ class GVASParser
 
                     $cX = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['X']) / 100000);
                     $cY = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['Y']) / 100000);
-                    if(!isset($segmentArray[sizeof($segmentArray) - 1]['CX'])){
+                    if (!isset($segmentArray[sizeof($segmentArray) - 1]['CX'])) {
                         $segmentArray[sizeof($segmentArray) - 1]['CX'][] = $cX;
                     } else {
-                        $segmentArray[sizeof($segmentArray) - 1]['CX'] = array_unique(array_merge(array($cX),$segmentArray[sizeof($segmentArray) - 1]['CX']));
+                        $segmentArray[sizeof($segmentArray) - 1]['CX'] = array_unique(array_merge(array($cX), $segmentArray[sizeof($segmentArray) - 1]['CX']));
                     }
-                    if(!isset($segmentArray[sizeof($segmentArray) - 1]['CY'])){
+                    if (!isset($segmentArray[sizeof($segmentArray) - 1]['CY'])) {
                         $segmentArray[sizeof($segmentArray) - 1]['CY'][] = $cY;
                     } else {
-                        $segmentArray[sizeof($segmentArray) - 1]['CY'] = array_unique(array_merge(array($cY),$segmentArray[sizeof($segmentArray) - 1]['CY']));
+                        $segmentArray[sizeof($segmentArray) - 1]['CY'] = array_unique(array_merge(array($cY), $segmentArray[sizeof($segmentArray) - 1]['CY']));
                     }
                     $sX = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['X']) / 100000);
                     $sY = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['Y']) / 100000);
                     if ($sX != $cX) {
-                        if(!isset($segmentArray[sizeof($segmentArray) - 1]['CX'])){
+                        if (!isset($segmentArray[sizeof($segmentArray) - 1]['CX'])) {
                             $segmentArray[sizeof($segmentArray) - 1]['CX'][] = $sX;
                         } else {
                             $segmentArray[sizeof($segmentArray) - 1]['CX'] = array_unique(array_merge(array($sX), $segmentArray[sizeof($segmentArray) - 1]['CX']));
                         }
                     }
                     if ($sY != $cY) {
-                        if(!isset($segmentArray[sizeof($segmentArray) - 1]['CY'])){
+                        if (!isset($segmentArray[sizeof($segmentArray) - 1]['CY'])) {
                             $segmentArray[sizeof($segmentArray) - 1]['CY'][] = $sY;
                         } else {
                             $segmentArray[sizeof($segmentArray) - 1]['CY'] = array_unique(array_merge(array($sY), $segmentArray[sizeof($segmentArray) - 1]['CY']));
@@ -236,14 +236,14 @@ class GVASParser
                     $eX = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['X']) / 100000);
                     $eY = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['Y']) / 100000);
                     if ($eX != $cX) {
-                        if(!isset($segmentArray[sizeof($segmentArray) - 1]['CX'])){
+                        if (!isset($segmentArray[sizeof($segmentArray) - 1]['CX'])) {
                             $segmentArray[sizeof($segmentArray) - 1]['CX'][] = $eX;
                         } else {
                             $segmentArray[sizeof($segmentArray) - 1]['CX'] = array_unique(array_merge(array($eX), $segmentArray[sizeof($segmentArray) - 1]['CX']));
                         }
                     }
                     if ($eY != $cY) {
-                        if(!isset($segmentArray[sizeof($segmentArray) - 1]['CY'])){
+                        if (!isset($segmentArray[sizeof($segmentArray) - 1]['CY'])) {
                             $segmentArray[sizeof($segmentArray) - 1]['CY'][] = $eY;
                         } else {
                             $segmentArray[sizeof($segmentArray) - 1]['CY'] = array_unique(array_merge(array($eY), $segmentArray[sizeof($segmentArray) - 1]['CY']));
@@ -340,10 +340,25 @@ class GVASParser
     function handleEditAndSave(): string
     {
         $sevenHundred = 700;
-        if(isset($_POST['replant'])){
+        if (isset($_POST['replant'])) {
             $sevenHundred = $_POST['replant'];
         }
         $output = '';
+
+        if (isset($_POST['from']) && isset($_POST['to'])) {
+            $one = explode('-', $_POST['from']);
+            $two = explode('-', $_POST['to']);
+            $segment1 = $this->goldenBucket['Splines'][$one[0]]['Segments'][$one[1]];
+            $segment2 = $this->goldenBucket['Splines'][$two[0]]['Segments'][$two[1]];
+            $ah = new ArithmeticHelper();
+            try {
+                $curvePoints = $ah->getCurveCoordsBetweenSegments($segment1, $segment2);
+//                array_shift($curvePoints);
+            } catch (Exception $e) {
+                $i = 9;
+            }
+        }
+
         foreach ($this->saveObject['objects'] as $saveObjectIndex => $object) {
             if (is_object($object)) {
                 if (trim($object->getName()) == 'RemovedVegetationAssetsArray' && isset($_POST['replant'])) {
@@ -360,10 +375,10 @@ class GVASParser
 //                      if (isset($this->goldenBucket['Segments'][$treeX][$treeY])) {
 //                      foreach ($this->goldenBucket['Segments'][$treeX][$treeY] as $segment) {
                         foreach ($this->goldenBucket['Splines'] as $spline) {
-                            if(!in_array($spline['Type'], array(0,4))) continue;
+                            if (!in_array($spline['Type'], array(0, 4))) continue;
                             foreach ($spline['Segments'] as $segment) {
-                                if(!in_array($treeX, $segment['CX'])) continue;
-                                if(!in_array($treeY, $segment['CY'])) continue;
+                                if (!in_array($treeX, $segment['CX'])) continue;
+                                if (!in_array($treeY, $segment['CY'])) continue;
 
 
                                 if ($segment['LocationCenter']['X'] < $vector->content[0] - 6000) {
@@ -425,22 +440,22 @@ class GVASParser
                         }
                         if (isset($_POST['nameAllCountries'])) {
 
-                            $locos = array('porter_040', 'porter_042', 'eureka', 'heisler', 'class70', 'cooke260','climax');
+                            $locos = array('porter_040', 'porter_042', 'eureka', 'heisler', 'class70', 'cooke260', 'climax');
                             $tenders = array('eureka_tender', 'class70_tender', 'cooke260_tender');
-                            $carts = array('flatcar_logs','flatcar_cordwood','flatcar_stakes','flatcar_hopper','boxcar','flatcar_tanker');
+                            $carts = array('flatcar_logs', 'flatcar_cordwood', 'flatcar_stakes', 'flatcar_hopper', 'boxcar', 'flatcar_tanker');
                             $currentType = $this->goldenBucket['Frames'][$index]['Type'];
-                            if($_POST['renameWhat'] == 'locos' || $_POST['renameWhat'] == 'everything'){
-                                if(in_array($currentType, $locos)){
+                            if ($_POST['renameWhat'] == 'locos' || $_POST['renameWhat'] == 'everything') {
+                                if (in_array($currentType, $locos)) {
                                     $object->CONTENTOBJECTS[3]->contentElements[$index] = new dtTextProperty($countryObj->getName());
                                 }
                             }
-                            if($_POST['renameWhat'] == 'carts' || $_POST['renameWhat'] == 'everything'){
-                                if(in_array($currentType, $carts)){
+                            if ($_POST['renameWhat'] == 'carts' || $_POST['renameWhat'] == 'everything') {
+                                if (in_array($currentType, $carts)) {
                                     $object->CONTENTOBJECTS[3]->contentElements[$index] = new dtTextProperty($countryObj->getName());
                                 }
                             }
-                            if($_POST['renameWhat'] == 'tenders' || $_POST['renameWhat'] == 'everything'){
-                                if(in_array($currentType, $tenders)){
+                            if ($_POST['renameWhat'] == 'tenders' || $_POST['renameWhat'] == 'everything') {
+                                if (in_array($currentType, $tenders)) {
                                     $object->CONTENTOBJECTS[3]->contentElements[$index] = new dtTextProperty($countryObj->getName());
                                 }
                             }
@@ -650,6 +665,75 @@ class GVASParser
                 }
 
 
+                if (isset($curvePoints) && sizeof($curvePoints)) {
+
+                    if (trim($object->getName()) == 'SplineControlPointsArray') {
+
+                        $beforeFuddeling = sizeof($object->CONTENTOBJECTS[3]->contentElements);
+                        // add all curve points as Vector to the array
+                        foreach ($curvePoints as $point) {
+                            $v = new dtVector($point);
+                            $object->CONTENTOBJECTS[3]->addElement($v);
+                        }
+                        $afterFuddeling = sizeof($object->CONTENTOBJECTS[3]->contentElements) - 1;
+                    }
+
+                    if (trim($object->getName()) == 'SplineLocationArray') {
+                        $beforeFuddelingSplines = sizeof($object->CONTENTOBJECTS[3]->contentElements);
+                        $v = new dtVector($curvePoints[0]);
+                        $object->CONTENTOBJECTS[3]->addElement($v);
+                        $afterFuddelingSplines = sizeof($object->CONTENTOBJECTS[3]->contentElements) - 1;
+                    }
+
+                    if (trim($object->getName()) == 'SplineTypeArray') {
+                        $v = new dtDynamic('IntProperty');
+                        $v->pack = 'V';
+                        $v->setValue(0);
+                        $object->CONTENTOBJECTS[3]->addElement($v);
+                    }
+
+                    if (trim($object->getName()) == 'SplineControlPointsIndexStartArray') {
+                        $v = new dtDynamic('IntProperty');
+                        $v->pack = 'V';
+                        $v->setValue($beforeFuddeling);
+                        $object->CONTENTOBJECTS[3]->addElement($v);
+                    }
+
+                    if (trim($object->getName()) == 'SplineControlPointsIndexEndArray') {
+                        $v = new dtDynamic('IntProperty');
+                        $v->pack = 'V';
+                        $v->setValue($afterFuddeling);
+                        $object->CONTENTOBJECTS[3]->addElement($v);
+                    }
+
+                    if (trim($object->getName()) == 'SplineSegmentsVisibilityArray') {
+                        // add all curve points as Vector to the array
+                        for ($spex = $beforeFuddeling; $spex <= $afterFuddeling+1; $spex++) {
+                            $v = new dtDynamic('IntProperty');
+                            $v->pack = 'C';
+                            $v->setValue(1);
+                            if($spex == $beforeFuddeling) {
+                                $v->setValue(0);
+                            }
+                            $object->CONTENTOBJECTS[3]->addElement($v);
+                        }
+                        $c=2;
+                    }
+                    if (trim($object->getName()) == 'SplineVisibilityStartArray') {
+                        $v = new dtDynamic('IntProperty');
+                        $v->pack = 'V';
+                        $v->setValue(1);
+                        $object->CONTENTOBJECTS[3]->addElement($v);
+                    }
+                    if (trim($object->getName()) == 'SplineVisibilityEndArray') {
+                        $v = new dtDynamic('IntProperty');
+                        $v->pack = 'V';
+                        $v->setValue(sizeof($curvePoints)-1);
+                        $object->CONTENTOBJECTS[3]->addElement($v);
+                    }
+                }
+
+
                 $output .= $object->serialize();
             } else {
                 die('WHOPSI');
@@ -661,7 +745,7 @@ class GVASParser
             $db = unserialize(file_get_contents('db.db'));
             if (!isset($db[$this->owner][5]) || getUserIpAddr() != $db[$this->owner][5]) {
                 $secondParts = explode('.', $db[$this->owner][5]);
-                echo 'Your IP is: '. getUserIpAddr() .' but game was uploaded from: '.$secondParts[0] .'.*.*.'.$secondParts[3]." [".$this->owner."]\n";
+                echo 'Your IP is: ' . getUserIpAddr() . ' but game was uploaded from: ' . $secondParts[0] . '.*.*.' . $secondParts[3] . " [" . $this->owner . "]\n";
                 die("This does not seem to be your save file.");
             }
         }
@@ -853,7 +937,7 @@ class GVASParser
     private function reduce_bucket(): array
     {
         $reduced = $this->goldenBucket;
-        $carts = array('flatcar_logs','flatcar_cordwood','flatcar_stakes','flatcar_hopper','boxcar','flatcar_tanker');
+        $carts = array('flatcar_logs', 'flatcar_cordwood', 'flatcar_stakes', 'flatcar_hopper', 'boxcar', 'flatcar_tanker');
 
         // We don't use player rotation
         foreach ($reduced['Players'] as $index => $player) {
@@ -878,7 +962,7 @@ class GVASParser
         }
 
         // We don't show Watertower level
-        if(isset($reduced['Watertowers'])){
+        if (isset($reduced['Watertowers'])) {
             foreach ($reduced['Watertowers'] as $index => $watertower) {
                 unset($reduced['Watertowers'][$index]['Waterlevel']);
             }
@@ -886,7 +970,7 @@ class GVASParser
 
         // Industries 1-9 have a fixed rotation
         foreach ($reduced['Industries'] as $index => $watertower) {
-            if (in_array($reduced['Industries'][$index]['Type'], range(1,9))) {
+            if (in_array($reduced['Industries'][$index]['Type'], range(1, 9))) {
                 unset($reduced['Industries'][$index]['Rotation']);
             }
         }
@@ -902,13 +986,13 @@ class GVASParser
             unset($reduced['Frames'][$index]['Rotation'][2]);
 //            unset($reduced['Frames'][$index]['Location'][2]);
         }
-        if(isset($reduced['Watertowers'])){
+        if (isset($reduced['Watertowers'])) {
             foreach ($reduced['Watertowers'] as $index => $watertower) {
                 unset($reduced['Watertowers'][$index]['Location'][2]);
                 unset($reduced['Watertowers'][$index]['Rotation'][2]);
             }
         }
-        if(isset($reduced['Switchs'])){
+        if (isset($reduced['Switchs'])) {
             foreach ($reduced['Switchs'] as $index => $switch) {
                 unset($reduced['Switchs'][$index]['Rotation'][2]);
                 unset($reduced['Switchs'][$index]['Location'][2]);
@@ -1021,7 +1105,7 @@ class CountryNames
     public function __construct($type)
     {
         if (file_exists('includes/' . $type . '.txt')) {
-            $data = file_get_contents( 'includes/' . $type . '.txt');
+            $data = file_get_contents('includes/' . $type . '.txt');
             $data = explode("\n", $data);
             array_shift($data); // header
             $this->NAMEs = $data;
