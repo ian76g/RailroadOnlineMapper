@@ -394,7 +394,7 @@ class GVASParser
                         }
 
                     }
-                    $object->CONTENTOBJECTS[3]->COUNTER->value = (sizeof($object->CONTENTOBJECTS[3]->contentElements));
+                    $object->CONTENTOBJECTS[3]->COUNTER->setValue((sizeof($object->CONTENTOBJECTS[3]->contentElements)));
 //                    echo "NEW VALUE = " . (sizeof($object->CONTENTOBJECTS[3]->contentElements));
                 }
 
