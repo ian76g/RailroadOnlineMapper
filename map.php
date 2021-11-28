@@ -197,24 +197,24 @@ foreach ($textFiles as $textFile) {
             <hr/>
             <h4>Cart coloring</h4>
             <div class="cart_colors">
-            <?php
-            $images = array(
-                "ce_flatcar_logs" => "flatcar_logs.png",
-                "cf_flatcar_logs" => "flatcar_logs_loaded.png",
-                "ce_flatcar_stakes" => "flatcar_stakes.png",
-                "cf_flatcar_stakes" => "flatcar_stakes_loaded.png",
-                "ce_flatcar_hopper" => "flatcar_hopper_empty.png",
-                "cf_flatcar_hopper" => "flatcar_hopper.png",
-                "ce_flatcar_cordwood" => "flatcar_cordwood.png",
-                "cf_flatcar_cordwood" => "flatcar_cordwood_loaded.png",
-                "ce_flatcar_tanker" => "flatcar_tanker_empty.png",
-                "cf_flatcar_tanker" => "flatcar_tanker.png",
-                "ce_boxcar" => "boxcar_empty.png",
-                "cf_boxcar" => "boxcar.png"
-            );
+                <?php
+                $images = array(
+                    "ce_flatcar_logs" => "flatcar_logs.png",
+                    "cf_flatcar_logs" => "flatcar_logs_loaded.png",
+                    "ce_flatcar_stakes" => "flatcar_stakes.png",
+                    "cf_flatcar_stakes" => "flatcar_stakes_loaded.png",
+                    "ce_flatcar_hopper" => "flatcar_hopper_empty.png",
+                    "cf_flatcar_hopper" => "flatcar_hopper.png",
+                    "ce_flatcar_cordwood" => "flatcar_cordwood.png",
+                    "cf_flatcar_cordwood" => "flatcar_cordwood_loaded.png",
+                    "ce_flatcar_tanker" => "flatcar_tanker_empty.png",
+                    "cf_flatcar_tanker" => "flatcar_tanker.png",
+                    "ce_boxcar" => "boxcar_empty.png",
+                    "cf_boxcar" => "boxcar.png"
+                );
 
-            foreach (array('flatcar_logs', 'flatcar_stakes', 'flatcar_hopper', 'flatcar_cordwood', 'flatcar_tanker', 'boxcar') as $cartType) {
-                ?>
+                foreach (array('flatcar_logs', 'flatcar_stakes', 'flatcar_hopper', 'flatcar_cordwood', 'flatcar_tanker', 'boxcar') as $cartType) {
+                    ?>
                     <label for="ce_<?= $cartType; ?>">
                         <img src="/assets/images/<?= $images['ce_'.$cartType]; ?>" width="72" height="72"/>
                     </label>
@@ -225,8 +225,10 @@ foreach ($textFiles as $textFile) {
                     </label>
                     <input type="color" value="<?php color_cookie_or_default('cf_' . $cartType); ?>"
                            id="cf_<?= $cartType; ?>" onchange="updateColor(this)">
-            <?php } ?>
+                <?php } ?>
             </div>
+            <button class="button" onclick="shareColors()">Share color scheme</button>
+            <button class="button" onclick="importColors()">Import color scheme</button>
             <hr />
             <h5>
                 The settings below will require a refresh of the page
@@ -387,7 +389,16 @@ foreach ($textFiles as $textFile) {
         <button class="button" id="reset">Reset</button>
     </div>
 </main>
-
+<div id="shareCodeModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3 id="shareCodeTitle">
+            Give the following share code to your friends:
+        </h3>
+        <textarea style="width: 100%" rows="6" id="shareCode"></textarea>
+        <button id="shareCodeSubmit" class="button">Apply</button>
+    </div>
+</div>
 <script type="text/javascript" src="/assets/js/svg-pan-zoom.js.min.js"></script>
 <script type="text/javascript" src="/assets/js/export.js"></script>
 
@@ -488,6 +499,53 @@ if (!file_exists('assets/js/mapper.min.js') || filemtime('assets/js/mapper.js') 
         const labelSettings = document.getElementById('labelPrefix');
         cookies.set('labelPrefix', labelSettings.value);
         location.reload();
+    }
+
+    const span = document.getElementsByClassName("close")[0];
+    const modal = document.getElementById("shareCodeModal");
+    span.onclick = function () {
+        modal.style.display = "none";
+    }
+    window.onclick = function (event) {
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    document.getElementById("shareCodeSubmit").onclick = (function () {
+        const code_string = document.getElementById("shareCode").value;
+        if (code_string != null) {
+            const code = JSON.parse(atob(code_string));
+
+            for (const input of colorInputs) {
+                if (input.type === "color") {
+                    input.value = code[input.id];
+                    updateColor(input)
+                }
+            }
+        }
+        modal.style.display = "none";
+    })
+
+    function shareColors() {
+        let code = {};
+        for (const input of colorInputs) {
+            if (input.type === "color") {
+                code[input.id] = input.value;
+            }
+        }
+
+        document.getElementById("shareCodeTitle").textContent = "Give the following share code to your friends:";
+        document.getElementById("shareCodeSubmit").style.display = "none";
+        document.getElementById("shareCode").value = btoa(JSON.stringify(code));
+        modal.style.display = "block";
+    }
+
+    function importColors() {
+        document.getElementById("shareCodeTitle").textContent = "Enter a share code:";
+        document.getElementById("shareCodeSubmit").style.display = "block";
+        document.getElementById("shareCode").value = '';
+        modal.style.display = "block";
     }
 </script>
 </body>
