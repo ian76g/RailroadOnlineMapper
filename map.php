@@ -74,30 +74,8 @@ foreach ($textFiles as $textFile) {
         <button class="button button--toggle" id="edit-panel-toggle">Edit</button>
     </div>
 
-    <div class="export__panel info-panel export__panel--open">
+    <div class="export__panel info-panel">
         <div class="export__panel-scroll-content">
-            <h4>Cart coloring</h4>
-            <?php
-            foreach (
-                    array(
-                        'flatcar_logs'     => array('flatcar_logs', 'flatcar_logs_loaded'),
-                        'flatcar_stakes'   => array('flatcar_stakes', 'flatcar_stakes_loaded'),
-                        'flatcar_hopper'   => array('flatcar_hopper', 'flatcar_hopper'),
-                        'flatcar_cordwood' => array('flatcar_cordwood', 'flatcar_cordwood_loaded'),
-                        'flatcar_tanker'   => array('flatcar_tanker_empty', 'flatcar_tanker'),
-                        'boxcar'           => array('boxcar_empty', 'boxcar'),
-                    ) as $cartType => $cartIcons) {
-                ?>
-                <div>
-                    <label for="ce_<?= $cartType; ?>"><img src="assets/images/<?= $cartIcons[0]; ?>.png"></label>
-                    <input type="color" value="<?php color_cookie_or_default('ce_' . $cartType); ?>"
-                           id="ce_<?= $cartType; ?>" onchange="updateColor(this)">
-                    <label for="cf_<?= $cartType; ?>"><img src="assets/images/<?= $cartIcons[1]; ?>.png"></label>
-                    <input type="color" value="<?php color_cookie_or_default('cf_' . $cartType); ?>"
-                           id="cf_<?= $cartType; ?>" onchange="updateColor(this)">
-                </div>
-            <?php } ?>
-
             <h3>Player Info</h3>
             <div class="export__panel--player-list">
                 <?php
@@ -217,6 +195,39 @@ foreach ($textFiles as $textFile) {
                 top of Wood bridge
             </div>
             <hr/>
+            <h4>Cart coloring</h4>
+            <div class="cart_colors">
+            <?php
+            $images = array(
+                "ce_flatcar_logs" => "flatcar_logs.png",
+                "cf_flatcar_logs" => "flatcar_logs_loaded.png",
+                "ce_flatcar_stakes" => "flatcar_stakes.png",
+                "cf_flatcar_stakes" => "flatcar_stakes_loaded.png",
+                "ce_flatcar_hopper" => "flatcar_hopper.png",
+                "cf_flatcar_hopper" => "flatcar_hopper.png",
+                "ce_flatcar_cordwood" => "flatcar_cordwood.png",
+                "cf_flatcar_cordwood" => "flatcar_cordwood_loaded.png",
+                "ce_flatcar_tanker" => "flatcar_tanker_empty.png",
+                "cf_flatcar_tanker" => "flatcar_tanker.png",
+                "ce_boxcar" => "boxcar_empty.png",
+                "cf_boxcar" => "boxcar.png"
+            );
+
+            foreach (array('flatcar_logs', 'flatcar_stakes', 'flatcar_hopper', 'flatcar_cordwood', 'flatcar_tanker', 'boxcar') as $cartType) {
+                ?>
+                    <label for="ce_<?= $cartType; ?>">
+                        <img src="/assets/images/<?= $images['ce_'.$cartType]; ?>" width="72" height="72"/>
+                    </label>
+                    <input type="color" value="<?php color_cookie_or_default('ce_' . $cartType); ?>"
+                           id="ce_<?= $cartType; ?>" onchange="updateColor(this)">
+                    <label for="cf_<?= $cartType; ?>">
+                        <img src="/assets/images/<?= $images['cf_'.$cartType]; ?>" width="72" height="72"/>
+                    </label>
+                    <input type="color" value="<?php color_cookie_or_default('cf_' . $cartType); ?>"
+                           id="cf_<?= $cartType; ?>" onchange="updateColor(this)">
+            <?php } ?>
+            </div>
+            <hr />
             <h5>
                 The settings below will require a refresh of the page
             </h5>
@@ -424,7 +435,6 @@ if (!file_exists('assets/js/mapper.min.js') || filemtime('assets/js/mapper.js') 
     const colorInputs = document.getElementsByTagName("input");
     for (const input of colorInputs) {
         if (input.type === "color") {
-            console.log(input);
             updateColor(input);
         }
     }
