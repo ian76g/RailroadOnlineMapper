@@ -203,7 +203,7 @@ foreach ($textFiles as $textFile) {
                 "cf_flatcar_logs" => "flatcar_logs_loaded.png",
                 "ce_flatcar_stakes" => "flatcar_stakes.png",
                 "cf_flatcar_stakes" => "flatcar_stakes_loaded.png",
-                "ce_flatcar_hopper" => "flatcar_hopper.png",
+                "ce_flatcar_hopper" => "flatcar_hopper_empty.png",
                 "cf_flatcar_hopper" => "flatcar_hopper.png",
                 "ce_flatcar_cordwood" => "flatcar_cordwood.png",
                 "cf_flatcar_cordwood" => "flatcar_cordwood_loaded.png",

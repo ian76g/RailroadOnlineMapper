@@ -945,23 +945,24 @@ class GVASParser
             unset($reduced['Players'][$index]['Rotation']);
         }
 
-        // Carts don't need the same attributes as locomotives
-        foreach ($reduced['Frames'] as $index => $frame) {
-            if (in_array($frame['Type'], $carts)) {
-                unset($reduced['Frames'][$index]['Boiler']);
-                unset($reduced['Frames'][$index]['Headlights']);
-                unset($reduced['Frames'][$index]['Compressor']);
-                unset($reduced['Frames'][$index]['Regulator']);
-                unset($reduced['Frames'][$index]['Smokestack']);
-                unset($reduced['Frames'][$index]['Generatorvalvevalue']);
-                unset($reduced['Frames'][$index]['Reverser']);
-                unset($reduced['Frames'][$index]['Tender']);
-                unset($reduced['Frames'][$index]['Marker']);
-            } else {
-                unset($reduced['Frames'][$index]['Freight']);
+        if(isset($reduced['Frames'])) {
+            // Carts don't need the same attributes as locomotives
+            foreach ($reduced['Frames'] as $index => $frame) {
+                if (in_array($frame['Type'], $carts)) {
+                    unset($reduced['Frames'][$index]['Boiler']);
+                    unset($reduced['Frames'][$index]['Headlights']);
+                    unset($reduced['Frames'][$index]['Compressor']);
+                    unset($reduced['Frames'][$index]['Regulator']);
+                    unset($reduced['Frames'][$index]['Smokestack']);
+                    unset($reduced['Frames'][$index]['Generatorvalvevalue']);
+                    unset($reduced['Frames'][$index]['Reverser']);
+                    unset($reduced['Frames'][$index]['Tender']);
+                    unset($reduced['Frames'][$index]['Marker']);
+                } else {
+                    unset($reduced['Frames'][$index]['Freight']);
+                }
             }
         }
-
         // We don't show Watertower level
         if (isset($reduced['Watertowers'])) {
             foreach ($reduced['Watertowers'] as $index => $watertower) {
@@ -983,9 +984,11 @@ class GVASParser
         foreach ($reduced['Players'] as $index => $player) {
             unset($reduced['Players'][$index]['Location'][2]);
         }
-        foreach ($reduced['Frames'] as $index => $frame) {
-            unset($reduced['Frames'][$index]['Rotation'][2]);
+        if(isset($reduced['Frames'])) {
+            foreach ($reduced['Frames'] as $index => $frame) {
+                unset($reduced['Frames'][$index]['Rotation'][2]);
 //            unset($reduced['Frames'][$index]['Location'][2]);
+            }
         }
         if (isset($reduced['Watertowers'])) {
             foreach ($reduced['Watertowers'] as $index => $watertower) {
