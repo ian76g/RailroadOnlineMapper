@@ -29,18 +29,16 @@ class Mapper {
         }
     }
 
-    deg2rad(degrees)
-    {
-        var pi = Math.PI;
-        return degrees * (pi/180);
+    deg2rad(degrees) {
+        const pi = Math.PI;
+        return degrees * (pi / 180);
     }
 
-    thingy(angle, x, y)
-    {
-        x+=Math.cos(this.deg2rad(angle))*2;
-        y+=Math.sin(this.deg2rad(angle))*2;
+    thingy(angle, x, y) {
+        x += Math.cos(this.deg2rad(angle)) * 2;
+        y += Math.sin(this.deg2rad(angle)) * 2;
 
-        return [x,y];
+        return [x, y];
     }
 
     drawSVG(htmlElement) {
@@ -196,9 +194,6 @@ class Mapper {
                         let yStart = (this.imy - ((segment['LocationStart']['Y'] - this.minY) / 100 * this.scale));
                         let xEnd = (this.imx - ((segment['LocationEnd']['X'] - this.minX) / 100 * this.scale));
                         let yEnd = (this.imy - ((segment['LocationEnd']['Y'] - this.minY) / 100 * this.scale));
-                        let xCenter = (this.imx - ((segment['LocationCenter']['X'] - this.minX) / 100 * this.scale));
-                        let yCenter = (this.imy - ((segment['LocationCenter']['Y'] - this.minY) / 100 * this.scale));
-
                         if (path === '') {
                             path = 'M ' + xStart + ',' + yStart + ' ';
                             path += tool + ' ' + xEnd + ',' + yEnd + ' ';
@@ -235,8 +230,8 @@ class Mapper {
                         trackSegment.setAttribute("y1", yStart.toString());
                         trackSegment.setAttribute("x2", xEnd.toString());
                         trackSegment.setAttribute("y2", yEnd.toString());
-                        trackSegment.setAttribute("sp", splineIndex);
-                        trackSegment.setAttribute("se", segmentIndex);
+                        trackSegment.setAttribute("sp", splineIndex.toString());
+                        trackSegment.setAttribute("se", segmentIndex.toString());
                         trackSegment.setAttribute("stroke", stroke);
                         trackSegment.setAttribute('onclick',
                             'my_function(' + splineIndex + ',' + segmentIndex + ')');
@@ -597,17 +592,17 @@ class Mapper {
                 }
                 const path = document.createElementNS(this.svgNS, "path");
                 let fillColor = cartOptions[vehicle['Type']][1];
-                fillColor = cookies.get('ce_'+vehicle['Type']);
-                path.setAttribute("class", 'ce_'+vehicle['Type']);
+                fillColor = cookies.get('ce_' + vehicle['Type']);
+                path.setAttribute("class", 'ce_' + vehicle['Type']);
                 if (
                     typeof vehicle['Freight'] !== 'undefined' &&
                     typeof vehicle['Freight']['Amount'] !== 'undefined' &&
                     vehicle['Freight']['Amount'] > 0 &&
                     cartOptions[vehicle['Type']][2] !== undefined
                 ) {
-                    path.setAttribute("class", 'cf_'+vehicle['Type']);
+                    path.setAttribute("class", 'cf_' + vehicle['Type']);
                     fillColor = cartOptions[vehicle['Type']][2];
-                    fillColor = cookies.get('cf_'+vehicle['Type']);
+                    fillColor = cookies.get('cf_' + vehicle['Type']);
                 }
                 const title = document.createElementNS(this.svgNS, "title");
                 title.textContent = vehicle['Name'].replace(/<\/?[^>]+(>|$)/g, "") + " " + vehicle['Number'].replace(/<\/?[^>]+(>|$)/g, "");
@@ -623,9 +618,10 @@ class Mapper {
                         title.textContent += " (" + vehicle['Freight']['Type'] + " x" + vehicle['Freight']['Amount'] + ")";
                     }
                 }
-                var cc, cx, cy;
+                let cc, cx, cy;
                 cc = this.thingy(vehicle['Rotation'][1], x, y);
-                cx=cc[0]; cy=cc[1];
+                cx = cc[0];
+                cy = cc[1];
                 path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-" + (xl / 2) + ",-" + (yl / 2) + " h" + (xl - 4) + " a2,2 0 0 1 2,2 v" + (yl - 4) + " a2,2 0 0 1 -2,2 h-" + (xl - 4) + " a2,2 0 0 1 -2,-2 v-" + (yl - 4) + " a2,2 0 0 1 2,-2 z");
                 path.setAttribute("fill", fillColor);
                 path.setAttribute("stroke", "black");
@@ -634,15 +630,6 @@ class Mapper {
                 path.appendChild(title);
                 rollingStockGroup.appendChild(path);
             }
-
-            // const vehicleEllipse = document.createElementNS(this.svgNS, "ellipse");
-            // vehicleEllipse.setAttribute("cx", x.toString());
-            // vehicleEllipse.setAttribute("cy", y.toString());
-            // vehicleEllipse.setAttribute("rx", (this.engineRadius / 2).toString());
-            // vehicleEllipse.setAttribute("ry", (this.engineRadius / 3).toString());
-            // vehicleEllipse.setAttribute("style", "fill:" + cartOptions[vehicle['Type']][1] + ";stroke:black;stroke-width:1");
-            // vehicleEllipse.setAttribute("transform", "rotate(" + vehicle['Rotation'][1] + ", " + (this.imx - ((vehicle['Location'][0] - this.minX) / 100 * this.scale)) + ", " + (this.imy - ((vehicle['Location'][1] - this.minY) / 100 * this.scale)) + ")");
-            // this.shapes.push(vehicleEllipse);
 
             if (vehicle['Location'][2] < 1000) { // Assuming this checks for vehicles under ground, rename sunkenVehicle if otherwise.
                 const sunkenVehicle = document.createElementNS(this.svgNS, "ellipse");
