@@ -101,3 +101,14 @@ function checked_if_true_or_default($name)
         print("checked");
     }
 }
+
+function color_cookie_or_default($name)
+{
+    if (!isset($_COOKIE[$name])) {
+        print("#0000ff");
+    }
+
+    if (isset($_COOKIE[$name])) {
+        print($_COOKIE[$name]);
+    }
+}

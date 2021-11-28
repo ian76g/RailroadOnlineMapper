@@ -65,90 +65,6 @@ foreach ($textFiles as $textFile) {
     <link rel="stylesheet" href="/assets/css/reset.css?<?php echo filemtime('assets/css/reset.css'); ?>"/>
     <link rel="stylesheet" href="/assets/css/main.css?<?php echo filemtime('assets/css/reset.css'); ?>"/>
     <link rel="stylesheet" href="/assets/css/export.css?<?php echo filemtime('assets/css/reset.css'); ?>"/>
-    <script>
-        var ce_flatcar_logs;
-        var cf_flatcar_logs;
-        var ce_flatcar_stakes;
-        var cf_flatcar_stakes;
-        var defaultColor = "#0000ff";
-
-        window.addEventListener("load", startup, false);
-
-        function startup() {
-            ce_flatcar_logs = document.querySelector("#ce_flatcar_logs");
-            ce_flatcar_logs.value = cookies.get('ce_flatcar_logs');
-            ce_flatcar_logs.addEventListener("input", updateFirstcefl, false);
-            ce_flatcar_logs.addEventListener("change", updateAllcefl, false);
-            ce_flatcar_logs.select();
-            cf_flatcar_logs = document.querySelector("#cf_flatcar_logs");
-            cf_flatcar_logs.value = cookies.get('cf_flatcar_logs');
-            cf_flatcar_logs.addEventListener("input", updateFirstcffl, false);
-            cf_flatcar_logs.addEventListener("change", updateAllcffl, false);
-            cf_flatcar_logs.select();
-            ce_flatcar_stakes = document.querySelector("#ce_flatcar_stakes");
-            ce_flatcar_stakes.value = cookies.get('ce_flatcar_stakes');
-            ce_flatcar_stakes.addEventListener("input", updateFirstcest, false);
-            ce_flatcar_stakes.addEventListener("change", updateAllcest, false);
-            ce_flatcar_stakes.select();
-            cf_flatcar_stakes = document.querySelector("#cf_flatcar_stakes");
-            cf_flatcar_stakes.value = cookies.get('cf_flatcar_stakes');
-            cf_flatcar_stakes.addEventListener("input", updateFirstcfst, false);
-            cf_flatcar_stakes.addEventListener("change", updateAllcfst, false);
-            cf_flatcar_stakes.select();
-        }
-
-        function updateFirstcefl(event) {
-            var p = document.querySelector(".ce_flatcar_logs");
-            if (p) {
-                p.setAttribute("fill", event.target.value);
-            }
-        }
-        function updateAllcefl(event) {
-            document.querySelectorAll(".ce_flatcar_logs").forEach(function (p) {
-                p.setAttribute("fill", event.target.value);
-            });
-            cookies.set('ce_flatcar_logs', event.target.value);
-        }
-        function updateFirstcffl(event) {
-            var p = document.querySelector(".cf_flatcar_logs");
-
-            if (p) {
-                p.setAttribute("fill", event.target.value);
-            }
-        }
-        function updateAllcffl(event) {
-            document.querySelectorAll(".cf_flatcar_logs").forEach(function (p) {
-                p.setAttribute("fill", event.target.value);
-            });
-            cookies.set('cf_flatcar_logs', event.target.value);
-        }
-
-        function updateFirstcest(event) {
-            var p = document.querySelector(".ce_flatcar_stakes");
-            if (p) {
-                p.setAttribute("fill", event.target.value);
-            }
-        }
-        function updateAllcest(event) {
-            document.querySelectorAll(".ce_flatcar_stakes").forEach(function (p) {
-                p.setAttribute("fill", event.target.value);
-            });
-            cookies.set('ce_flatcar_logs', event.target.value);
-        }
-        function updateFirstcfst(event) {
-            var p = document.querySelector(".cf_flatcar_stakes");
-
-            if (p) {
-                p.setAttribute("fill", event.target.value);
-            }
-        }
-        function updateAllcfst(event) {
-            document.querySelectorAll(".cf_flatcar_stakes").forEach(function (p) {
-                p.setAttribute("fill", event.target.value);
-            });
-            cookies.set('cf_flatcar_stakes', event.target.value);
-        }
-    </script>
 </head>
 <body class="export">
 <main class="export__main">
@@ -278,20 +194,40 @@ foreach ($textFiles as $textFile) {
                 bridge on
                 top of Wood bridge
             </div>
-            <h4>Cart coloring</h4>
-            <div>
-                <label for="ce_flatcar_logs">log_empty:</label>
-                <input type="color" value="#ff0000" id="ce_flatcar_logs">
-                <label for="cf_flatcar_logs">log_loaded:</label>
-                <input type="color" value="#ff0000" id="cf_flatcar_logs">
-            </div>
-            <div>
-                <label for="ce_flatcar_stakes">stakes_empty:</label>
-                <input type="color" value="#ff0000" id="ce_flatcar_stakes">
-                <label for="cf_flatcar_stakes">stakes_loaded:</label>
-                <input type="color" value="#ff0000" id="cf_flatcar_stakes">
-            </div>
             <hr/>
+            <h4>Cart coloring</h4>
+            <div class="cart_colors">
+            <?php
+            $images = array(
+                "ce_flatcar_logs" => "flatcar_logs.png",
+                "cf_flatcar_logs" => "flatcar_logs_loaded.png",
+                "ce_flatcar_stakes" => "flatcar_stakes.png",
+                "cf_flatcar_stakes" => "flatcar_stakes_loaded.png",
+                "ce_flatcar_hopper" => "flatcar_hopper.png",
+                "cf_flatcar_hopper" => "flatcar_hopper.png",
+                "ce_flatcar_cordwood" => "flatcar_cordwood.png",
+                "cf_flatcar_cordwood" => "flatcar_cordwood_loaded.png",
+                "ce_flatcar_tanker" => "flatcar_tanker_empty.png",
+                "cf_flatcar_tanker" => "flatcar_tanker.png",
+                "ce_boxcar" => "boxcar_empty.png",
+                "cf_boxcar" => "boxcar.png"
+            );
+
+            foreach (array('flatcar_logs', 'flatcar_stakes', 'flatcar_hopper', 'flatcar_cordwood', 'flatcar_tanker', 'boxcar') as $cartType) {
+                ?>
+                    <label for="ce_<?= $cartType; ?>">
+                        <img src="/assets/images/<?= $images['ce_'.$cartType]; ?>" width="72" height="72"/>
+                    </label>
+                    <input type="color" value="<?php color_cookie_or_default('ce_' . $cartType); ?>"
+                           id="ce_<?= $cartType; ?>" onchange="updateColor(this)">
+                    <label for="cf_<?= $cartType; ?>">
+                        <img src="/assets/images/<?= $images['cf_'.$cartType]; ?>" width="72" height="72"/>
+                    </label>
+                    <input type="color" value="<?php color_cookie_or_default('cf_' . $cartType); ?>"
+                           id="cf_<?= $cartType; ?>" onchange="updateColor(this)">
+            <?php } ?>
+            </div>
+            <hr />
             <h5>
                 The settings below will require a refresh of the page
             </h5>
@@ -496,6 +432,14 @@ if (!file_exists('assets/js/mapper.min.js') || filemtime('assets/js/mapper.js') 
         changeBackground(cookies.get("bg"));
     }
 
+    const colorInputs = document.getElementsByTagName("input");
+    for (const input of colorInputs) {
+        if (input.type === "color") {
+            updateColor(input);
+        }
+    }
+
+
     function changeBackground(bgSelector) {
         let bg;
         if (bgSelector.id !== undefined) {
@@ -530,6 +474,14 @@ if (!file_exists('assets/js/mapper.min.js') || filemtime('assets/js/mapper.js') 
             element.classList.remove('display_show');
             cookies.set(checkbox.id, false);
         }
+    }
+
+    function updateColor(input) {
+        const carts = document.getElementsByClassName(input.id);
+        for (const cart of carts) {
+            cart.setAttribute("fill", input.value);
+        }
+        cookies.set(input.id, input.value);
     }
 
     function applySettings() {
