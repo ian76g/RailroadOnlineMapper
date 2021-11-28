@@ -432,11 +432,12 @@ class GVASParser
                 $countryObj = null;
                 if (trim($object->getName()) == 'FrameNameArray') {
                     if (isset($_POST['nameAllCountries'])) {
-                        $countryObj = new CountryNames($_POST['nameAllCountries']);
+                        $countryObj22 = new CountryNames($_POST['nameAllCountries'], 22);
+                        $countryObj15 = new CountryNames($_POST['nameAllCountries'], 15);
                     }
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['name_' . $index]) && trim($_POST['name_' . $index])) {
-                            $object->CONTENTOBJECTS[3]->contentElements[$index] = new dtTextProperty(trim($_POST['name_' . $index]));
+                            $object->CONTENTOBJECTS[3]->contentElements[$index] = new dtTextProperty($_POST['name_' . $index]);
                         }
                         if (isset($_POST['nameAllCountries'])) {
 
@@ -446,17 +447,17 @@ class GVASParser
                             $currentType = $this->goldenBucket['Frames'][$index]['Type'];
                             if ($_POST['renameWhat'] == 'locos' || $_POST['renameWhat'] == 'everything') {
                                 if (in_array($currentType, $locos)) {
-                                    $object->CONTENTOBJECTS[3]->contentElements[$index] = new dtTextProperty($countryObj->getName());
+                                    $object->CONTENTOBJECTS[3]->contentElements[$index] = new dtTextProperty($countryObj22->getName());
                                 }
                             }
                             if ($_POST['renameWhat'] == 'carts' || $_POST['renameWhat'] == 'everything') {
                                 if (in_array($currentType, $carts)) {
-                                    $object->CONTENTOBJECTS[3]->contentElements[$index] = new dtTextProperty($countryObj->getName());
+                                    $object->CONTENTOBJECTS[3]->contentElements[$index] = new dtTextProperty($countryObj15->getName());
                                 }
                             }
                             if ($_POST['renameWhat'] == 'tenders' || $_POST['renameWhat'] == 'everything') {
                                 if (in_array($currentType, $tenders)) {
-                                    $object->CONTENTOBJECTS[3]->contentElements[$index] = new dtTextProperty($countryObj->getName());
+                                    $object->CONTENTOBJECTS[3]->contentElements[$index] = new dtTextProperty($countryObj15->getName());
                                 }
                             }
 //                                        'handcar': [this.engineRadius, 'white'],
@@ -743,7 +744,7 @@ class GVASParser
 
         if (isset($_POST['save'])) {
             $db = unserialize(file_get_contents('db.db'));
-            if (!isset($db[$this->owner][5]) || getUserIpAddr() != $db[$this->owner][5]) {
+            if (getUserIpAddr()!='local' && (!isset($db[$this->owner][5]) || getUserIpAddr() != $db[$this->owner][5])) {
                 $secondParts = explode('.', $db[$this->owner][5]);
                 echo 'Your IP is: ' . getUserIpAddr() . ' but game was uploaded from: ' . $secondParts[0] . '.*.*.' . $secondParts[3] . " [" . $this->owner . "]\n";
                 die("This does not seem to be your save file.");
@@ -1085,6 +1086,7 @@ class Node
 class CountryNames
 {
     var $names;
+    var $maxLength = 25;
 
     public function getName()
     {
@@ -1096,14 +1098,15 @@ class CountryNames
             if (!trim($name)) {
                 continue;
             }
-            if (strlen($name) < 15) {
+            if (strlen($name) < $this->maxLength) {
                 return $name;
             }
         }
     }
 
-    public function __construct($type)
+    public function __construct($type, $maxLength)
     {
+        $this->maxLength=$maxLength;
         if (file_exists('includes/' . $type . '.txt')) {
             $data = file_get_contents('includes/' . $type . '.txt');
             $data = explode("\n", $data);

@@ -59,7 +59,7 @@ if (!file_exists('counter')) {
                     }
                     print('<tr>' . PHP_EOL);
                     print('<td>' . $asterix . '<a href="map.php?name=' . $entry['name'] . '">' . $entry['name'] . '</a></td>' . PHP_EOL);
-                    print('<td>' . $entry['trackLength'] . 'km</td>' . PHP_EOL);
+                    print('<td data-content="'.$entry['trackLength'].'">' . $entry['trackLength'] . ' km</td>' . PHP_EOL);
                     print('<td>' . $entry['numY'] . '</td>' . PHP_EOL);
                     print('<td>' . $entry['numT'] . '</td>' . PHP_EOL);
                     print('<td>' . $entry['numLocs'] . '</td>' . PHP_EOL);

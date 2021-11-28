@@ -595,14 +595,19 @@ class Mapper {
                 if (vehicle['Type'].toLowerCase().indexOf('tender') !== -1) {
                     xl = xl / 3 * 2;
                 }
+                const path = document.createElementNS(this.svgNS, "path");
                 let fillColor = cartOptions[vehicle['Type']][1];
+                fillColor = cookies.get('ce_'+vehicle['Type']);
+                path.setAttribute("class", 'ce_'+vehicle['Type']);
                 if (
                     typeof vehicle['Freight'] !== 'undefined' &&
                     typeof vehicle['Freight']['Amount'] !== 'undefined' &&
                     vehicle['Freight']['Amount'] > 0 &&
                     cartOptions[vehicle['Type']][2] !== undefined
                 ) {
+                    path.setAttribute("class", 'cf_'+vehicle['Type']);
                     fillColor = cartOptions[vehicle['Type']][2];
+                    fillColor = cookies.get('cf_'+vehicle['Type']);
                 }
                 const title = document.createElementNS(this.svgNS, "title");
                 title.textContent = vehicle['Name'].replace(/<\/?[^>]+(>|$)/g, "") + " " + vehicle['Number'].replace(/<\/?[^>]+(>|$)/g, "");
@@ -616,13 +621,11 @@ class Mapper {
                         typeof vehicle['Freight']['Type'] !== 'undefined'
                     ) {
                         title.textContent += " (" + vehicle['Freight']['Type'] + " x" + vehicle['Freight']['Amount'] + ")";
-
                     }
                 }
                 var cc, cx, cy;
                 cc = this.thingy(vehicle['Rotation'][1], x, y);
                 cx=cc[0]; cy=cc[1];
-                const path = document.createElementNS(this.svgNS, "path");
                 path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-" + (xl / 2) + ",-" + (yl / 2) + " h" + (xl - 4) + " a2,2 0 0 1 2,2 v" + (yl - 4) + " a2,2 0 0 1 -2,2 h-" + (xl - 4) + " a2,2 0 0 1 -2,-2 v-" + (yl - 4) + " a2,2 0 0 1 2,-2 z");
                 path.setAttribute("fill", fillColor);
                 path.setAttribute("stroke", "black");
@@ -713,7 +716,7 @@ class Mapper {
             const nameValue = document.createElement("td");
             const nameTextInput = document.createElement("input");
             nameTextInput.size = 5;
-            nameTextInput.maxLength = 15;
+            nameTextInput.maxLength = 22;  // locos have 22 - carts 15
             nameTextInput.name = "name_" + index;
             nameTextInput.value = vehicle['Name'].replace(/<\/?[^>]+(>|$)/g, "").toUpperCase()
             nameValue.appendChild(nameTextInput);
@@ -722,7 +725,7 @@ class Mapper {
             const numberValue = document.createElement("td");
             const numberTextInput = document.createElement("input");
             numberTextInput.size = 5;
-            numberTextInput.maxLength = 15;
+            numberTextInput.maxLength = 4;
             numberTextInput.name = "number_" + index;
             numberTextInput.value = vehicle['Number'].replace(/<\/?[^>]+(>|$)/g, "");
             numberValue.appendChild(numberTextInput);

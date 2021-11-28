@@ -12,7 +12,7 @@ require_once 'utils/dtTextProperty.php';
 require_once 'utils/GVASParser.php';
 require_once 'utils/functions.php';
 
-while(!mkdir('lock')){
+while (!mkdir('lock')) {
 }
 file_put_contents('counter', $counter = file_get_contents('counter') + 1);
 rmdir('lock');
@@ -65,6 +65,90 @@ foreach ($textFiles as $textFile) {
     <link rel="stylesheet" href="/assets/css/reset.css?<?php echo filemtime('assets/css/reset.css'); ?>"/>
     <link rel="stylesheet" href="/assets/css/main.css?<?php echo filemtime('assets/css/reset.css'); ?>"/>
     <link rel="stylesheet" href="/assets/css/export.css?<?php echo filemtime('assets/css/reset.css'); ?>"/>
+    <script>
+        var ce_flatcar_logs;
+        var cf_flatcar_logs;
+        var ce_flatcar_stakes;
+        var cf_flatcar_stakes;
+        var defaultColor = "#0000ff";
+
+        window.addEventListener("load", startup, false);
+
+        function startup() {
+            ce_flatcar_logs = document.querySelector("#ce_flatcar_logs");
+            ce_flatcar_logs.value = cookies.get('ce_flatcar_logs');
+            ce_flatcar_logs.addEventListener("input", updateFirstcefl, false);
+            ce_flatcar_logs.addEventListener("change", updateAllcefl, false);
+            ce_flatcar_logs.select();
+            cf_flatcar_logs = document.querySelector("#cf_flatcar_logs");
+            cf_flatcar_logs.value = cookies.get('cf_flatcar_logs');
+            cf_flatcar_logs.addEventListener("input", updateFirstcffl, false);
+            cf_flatcar_logs.addEventListener("change", updateAllcffl, false);
+            cf_flatcar_logs.select();
+            ce_flatcar_stakes = document.querySelector("#ce_flatcar_stakes");
+            ce_flatcar_stakes.value = cookies.get('ce_flatcar_stakes');
+            ce_flatcar_stakes.addEventListener("input", updateFirstcest, false);
+            ce_flatcar_stakes.addEventListener("change", updateAllcest, false);
+            ce_flatcar_stakes.select();
+            cf_flatcar_stakes = document.querySelector("#cf_flatcar_stakes");
+            cf_flatcar_stakes.value = cookies.get('cf_flatcar_stakes');
+            cf_flatcar_stakes.addEventListener("input", updateFirstcfst, false);
+            cf_flatcar_stakes.addEventListener("change", updateAllcfst, false);
+            cf_flatcar_stakes.select();
+        }
+
+        function updateFirstcefl(event) {
+            var p = document.querySelector(".ce_flatcar_logs");
+            if (p) {
+                p.setAttribute("fill", event.target.value);
+            }
+        }
+        function updateAllcefl(event) {
+            document.querySelectorAll(".ce_flatcar_logs").forEach(function (p) {
+                p.setAttribute("fill", event.target.value);
+            });
+            cookies.set('ce_flatcar_logs', event.target.value);
+        }
+        function updateFirstcffl(event) {
+            var p = document.querySelector(".cf_flatcar_logs");
+
+            if (p) {
+                p.setAttribute("fill", event.target.value);
+            }
+        }
+        function updateAllcffl(event) {
+            document.querySelectorAll(".cf_flatcar_logs").forEach(function (p) {
+                p.setAttribute("fill", event.target.value);
+            });
+            cookies.set('cf_flatcar_logs', event.target.value);
+        }
+
+        function updateFirstcest(event) {
+            var p = document.querySelector(".ce_flatcar_stakes");
+            if (p) {
+                p.setAttribute("fill", event.target.value);
+            }
+        }
+        function updateAllcest(event) {
+            document.querySelectorAll(".ce_flatcar_stakes").forEach(function (p) {
+                p.setAttribute("fill", event.target.value);
+            });
+            cookies.set('ce_flatcar_logs', event.target.value);
+        }
+        function updateFirstcfst(event) {
+            var p = document.querySelector(".cf_flatcar_stakes");
+
+            if (p) {
+                p.setAttribute("fill", event.target.value);
+            }
+        }
+        function updateAllcfst(event) {
+            document.querySelectorAll(".cf_flatcar_stakes").forEach(function (p) {
+                p.setAttribute("fill", event.target.value);
+            });
+            cookies.set('cf_flatcar_stakes', event.target.value);
+        }
+    </script>
 </head>
 <body class="export">
 <main class="export__main">
@@ -194,7 +278,20 @@ foreach ($textFiles as $textFile) {
                 bridge on
                 top of Wood bridge
             </div>
-            <hr />
+            <h4>Cart coloring</h4>
+            <div>
+                <label for="ce_flatcar_logs">log_empty:</label>
+                <input type="color" value="#ff0000" id="ce_flatcar_logs">
+                <label for="cf_flatcar_logs">log_loaded:</label>
+                <input type="color" value="#ff0000" id="cf_flatcar_logs">
+            </div>
+            <div>
+                <label for="ce_flatcar_stakes">stakes_empty:</label>
+                <input type="color" value="#ff0000" id="ce_flatcar_stakes">
+                <label for="cf_flatcar_stakes">stakes_loaded:</label>
+                <input type="color" value="#ff0000" id="cf_flatcar_stakes">
+            </div>
+            <hr/>
             <h5>
                 The settings below will require a refresh of the page
             </h5>
@@ -274,13 +371,15 @@ foreach ($textFiles as $textFile) {
                         <option value="handcarts">only handcarts</option>
                     </select><br/>
                     <button class="button">Apply name schema</button>
-                </form><br>
+                </form>
+                <br>
 
                 <form method="POST" action="/converter.php">
                     <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
                     <input name="allBrakes" value="YES" type="hidden"/>
                     <button class="button">Apply all brakes</button>
-                </form><br>
+                </form>
+                <br>
 
                 <h4>Trees</h4>
                 <form method="POST" action="/converter.php">
@@ -289,15 +388,17 @@ foreach ($textFiles as $textFile) {
                     <span style="font-size: smaller">for reference:<br> 65 cm washing machine, <br> 91 cm gauge,<br> 170 cm bathtub,<br> 460 cm car,<br> 1880 cm switch<br>
                     measured to start, center and end of track-(segment) only, switches, crosses are not taken into calculation (yet)</span><br>
                     <button class="button">Replant Trees</button>
-                </form><br>
+                </form>
+                <br>
 
                 <h4>Curves</h4>
                 <form method="POST" action="/converter.php">
                     <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
                     from: <input name="from" value="0-0" size="6"><br>
                     to: <input name="to" value="0-0" size="6"><br>
-                    <button class="button">Create curve</button>
-                </form><br>
+                    <button class="button">DO NOT CLICK</button>
+                </form>
+                <br>
 
                 <h4>Players</h4>
                 <form method="POST" action="/converter.php">
@@ -312,7 +413,8 @@ foreach ($textFiles as $textFile) {
                         </tr>
                     </table>
                     <button class="button">Apply Player Changes</button>
-                </form><br>
+                </form>
+                <br>
 
                 <h4>Industries</h4>
                 <form method="POST" action="/converter.php">
@@ -327,7 +429,8 @@ foreach ($textFiles as $textFile) {
                         </tr>
                     </table>
                     <button class="button">Apply Industry Changes</button>
-                </form><br>
+                </form>
+                <br>
 
                 <h4>Carts</h4>
                 <form method="POST" action="/converter.php">

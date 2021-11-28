@@ -483,7 +483,7 @@ function getCurveCoordsBetweenSegments($segment1, $segment2)
     // debug SVG output
     $num_segments = 8;
     // 300
-    $num_segments = ceil($curveLength / 2000);
+    $num_segments = ceil($curveLength / 400);
 
 
     $alpha_per_segment = $arc_angle / $num_segments;
@@ -521,7 +521,7 @@ function getCurveCoordsBetweenSegments($segment1, $segment2)
 
     $traveledSoFar += $curveSegmentLength;
 
-    $straightSegments = ceil($straight/2000);
+    $straightSegments = ceil($straight/800);
     $straightLength = $straight/$straightSegments;
 
 
