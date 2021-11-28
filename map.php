@@ -63,8 +63,8 @@ foreach ($textFiles as $textFile) {
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <title>Railroads Online Map</title>
     <link rel="stylesheet" href="/assets/css/reset.css?<?php echo filemtime('assets/css/reset.css'); ?>"/>
-    <link rel="stylesheet" href="/assets/css/main.css?<?php echo filemtime('assets/css/reset.css'); ?>"/>
-    <link rel="stylesheet" href="/assets/css/export.css?<?php echo filemtime('assets/css/reset.css'); ?>"/>
+    <link rel="stylesheet" href="/assets/css/main.css?<?php echo filemtime('assets/css/main.css'); ?>"/>
+    <link rel="stylesheet" href="/assets/css/export.css?<?php echo filemtime('assets/css/export.css'); ?>"/>
 </head>
 <body class="export">
 <main class="export__main">
