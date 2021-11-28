@@ -216,20 +216,20 @@ foreach ($textFiles as $textFile) {
                 foreach (array('flatcar_logs', 'flatcar_stakes', 'flatcar_hopper', 'flatcar_cordwood', 'flatcar_tanker', 'boxcar') as $cartType) {
                     ?>
                     <label for="ce_<?= $cartType; ?>">
-                        <img src="/assets/images/<?= $images['ce_'.$cartType]; ?>" width="72" height="72"/>
+                        <img src="/assets/images/<?= $images['ce_' . $cartType]; ?>" width="72" height="72"/>
                     </label>
                     <input type="color" value="<?php color_cookie_or_default('ce_' . $cartType); ?>"
                            id="ce_<?= $cartType; ?>" onchange="updateColor(this)">
                     <label for="cf_<?= $cartType; ?>">
-                        <img src="/assets/images/<?= $images['cf_'.$cartType]; ?>" width="72" height="72"/>
+                        <img src="/assets/images/<?= $images['cf_' . $cartType]; ?>" width="72" height="72"/>
                     </label>
                     <input type="color" value="<?php color_cookie_or_default('cf_' . $cartType); ?>"
                            id="cf_<?= $cartType; ?>" onchange="updateColor(this)">
                 <?php } ?>
             </div>
             <button class="button" onclick="shareColors()">Share color scheme</button>
-            <button class="button" onclick="importColors()">Import color scheme</button>
-            <hr />
+            <button class="button" onclick="showImportModal()">Import color scheme</button>
+            <hr/>
             <h5>
                 The settings below will require a refresh of the page
             </h5>
@@ -395,7 +395,8 @@ foreach ($textFiles as $textFile) {
         <h3 id="shareCodeTitle">
             Give the following share code to your friends:
         </h3>
-        <textarea style="width: 100%" rows="6" id="shareCode"></textarea>
+        <input type="text" style="width: 100%" id="shareCode"/>
+        <span id="shareCodeError"></span>
         <button id="shareCodeSubmit" class="button">Apply</button>
     </div>
 </div>
@@ -413,6 +414,8 @@ if (!file_exists('assets/js/mapper.min.js') || filemtime('assets/js/mapper.js') 
 <script type="text/javascript"
         src="/assets/js/mapper.min.js?<?php echo filemtime('assets/js/mapper.min.js'); ?>"></script>
 <script type="text/javascript" src="/assets/js/js.cookie.min.js"></script>
+<script type="text/javascript"
+        src="/assets/js/colorshare.js?<?php echo filemtime('assets/js/colorshare.js'); ?>"></script>
 <script type="text/javascript">
     const backgrounds = {
         'bg': [8000, 8000, 0, 0, 8000, 8000, 'bg.jpg'],
@@ -499,53 +502,6 @@ if (!file_exists('assets/js/mapper.min.js') || filemtime('assets/js/mapper.js') 
         const labelSettings = document.getElementById('labelPrefix');
         cookies.set('labelPrefix', labelSettings.value);
         location.reload();
-    }
-
-    const span = document.getElementsByClassName("close")[0];
-    const modal = document.getElementById("shareCodeModal");
-    span.onclick = function () {
-        modal.style.display = "none";
-    }
-    window.onclick = function (event) {
-        if (event.target === modal) {
-            modal.style.display = "none";
-        }
-    }
-
-    document.getElementById("shareCodeSubmit").onclick = (function () {
-        const code_string = document.getElementById("shareCode").value;
-        if (code_string != null) {
-            const code = JSON.parse(atob(code_string));
-
-            for (const input of colorInputs) {
-                if (input.type === "color") {
-                    input.value = code[input.id];
-                    updateColor(input)
-                }
-            }
-        }
-        modal.style.display = "none";
-    })
-
-    function shareColors() {
-        let code = {};
-        for (const input of colorInputs) {
-            if (input.type === "color") {
-                code[input.id] = input.value;
-            }
-        }
-
-        document.getElementById("shareCodeTitle").textContent = "Give the following share code to your friends:";
-        document.getElementById("shareCodeSubmit").style.display = "none";
-        document.getElementById("shareCode").value = btoa(JSON.stringify(code));
-        modal.style.display = "block";
-    }
-
-    function importColors() {
-        document.getElementById("shareCodeTitle").textContent = "Enter a share code:";
-        document.getElementById("shareCodeSubmit").style.display = "block";
-        document.getElementById("shareCode").value = '';
-        modal.style.display = "block";
     }
 </script>
 </body>
