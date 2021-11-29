@@ -181,6 +181,22 @@ foreach ($textFiles as $textFile) {
                 brag with my slope using 6 decimals after the comma
             </div>
             <div>
+                <input id="slopeLabel5" type="checkbox"
+                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel5'); ?>/> Curve radius 0..40m
+            </div>
+            <div>
+                <input id="slopeLabel6" type="checkbox"
+                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel6'); ?>/> Curve radius 40..60m
+            </div>
+            <div>
+                <input id="slopeLabel7" type="checkbox"
+                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel7'); ?>/> Curve radius 60..120m
+            </div>
+            <div>
+                <input id="slopeLabel8" type="checkbox"
+                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel8'); ?>/> Curve radius 120..xm
+            </div>
+            <div>
                 <input id="maxSlopeLabel" type="checkbox"
                        onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('maxSlopeLabel'); ?>/> Show
                 max

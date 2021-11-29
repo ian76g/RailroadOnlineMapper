@@ -80,7 +80,7 @@ class ArithmeticHelper
                 $distance = sqrt(
                     pow($coords['X'] - $coords2['X'], 2) +
                     pow($coords['Y'] - $coords2['Y'], 2) +
-                    pow($coords['Z'] - $coords2['Y'], 2)
+                    pow($coords['Z'] - $coords2['Z'], 2)
                 );
             } else {
                 $distance = sqrt(

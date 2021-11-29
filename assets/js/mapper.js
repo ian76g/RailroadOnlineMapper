@@ -22,6 +22,7 @@ class Mapper {
         this.imy = this.y / 100 * this.scale;
         this.maxSlope = 0;
         this.allLabels = [[0, 0]];
+        this.allCurveLabels = [[[0, 0]],[[0, 0]],[[0, 0]],[[0, 0]]];
         this.initialTreesDown = 1750;
 
         this.config = {
@@ -139,6 +140,10 @@ class Mapper {
             document.createElementNS(this.svgNS, "g"),
             document.createElementNS(this.svgNS, "g"),
             document.createElementNS(this.svgNS, "g"),
+            document.createElementNS(this.svgNS, "g"),
+            document.createElementNS(this.svgNS, "g"),
+            document.createElementNS(this.svgNS, "g"),
+            document.createElementNS(this.svgNS, "g"),
             document.createElementNS(this.svgNS, "g")
         );
 
@@ -147,6 +152,10 @@ class Mapper {
         slopeLabelGroup[2].setAttribute("class", "slopeLabel2");
         slopeLabelGroup[3].setAttribute("class", "slopeLabel3");
         slopeLabelGroup[4].setAttribute("class", "slopeLabel4");
+        slopeLabelGroup[5].setAttribute("class", "slopeLabel5");
+        slopeLabelGroup[6].setAttribute("class", "slopeLabel6");
+        slopeLabelGroup[7].setAttribute("class", "slopeLabel7");
+        slopeLabelGroup[8].setAttribute("class", "slopeLabel8");
         const slopeLabelSilly = document.createElementNS(this.svgNS, "text");
         const textNodeSilly = document.createTextNode("");
         slopeLabelSilly.setAttribute("x", "0");
@@ -157,6 +166,10 @@ class Mapper {
         slopeLabelGroup[2].appendChild(slopeLabelSilly);
         slopeLabelGroup[3].appendChild(slopeLabelSilly);
         slopeLabelGroup[4].appendChild(slopeLabelSilly);
+        slopeLabelGroup[5].appendChild(slopeLabelSilly);
+        slopeLabelGroup[6].appendChild(slopeLabelSilly);
+        slopeLabelGroup[7].appendChild(slopeLabelSilly);
+        slopeLabelGroup[8].appendChild(slopeLabelSilly);
 
         const drawOrder = {}; // [type, stroke-width, stroke]
         drawOrder[1] = [1, 15, 'darkkhaki']; // variable bank
@@ -218,12 +231,93 @@ class Mapper {
                             continue
                         }
 
+                        let vOrto2 = [];
+                        let vOrto = [];
                         let xStart = (this.imx - ((segment['LocationStart']['X'] - this.minX) / 100 * this.scale));
                         let yStart = (this.imy - ((segment['LocationStart']['Y'] - this.minY) / 100 * this.scale));
                         let xEnd = (this.imx - ((segment['LocationEnd']['X'] - this.minX) / 100 * this.scale));
                         let yEnd = (this.imy - ((segment['LocationEnd']['Y'] - this.minY) / 100 * this.scale));
                         let xCenter = (this.imx - ((segment['LocationCenter']['X'] - this.minX) / 100 * this.scale));
                         let yCenter = (this.imy - ((segment['LocationCenter']['Y'] - this.minY) / 100 * this.scale));
+
+                        if (segments[segmentIndex + 1] !== undefined) {
+
+                            let xx = segment['LocationEnd']['X'] - segment['LocationStart']['X'];
+                            let yy = segment['LocationEnd']['Y'] - segment['LocationStart']['Y'];
+                            if (true) {
+                                vOrto[0] = -yy; // / ortoLength;
+                                vOrto[1] = xx; // / ortoLength;
+
+                                let nextSegment = segments[segmentIndex + 1];
+                                vOrto2[0] = -1*(nextSegment['LocationEnd']['Y'] - nextSegment['LocationStart']['Y']);
+                                vOrto2[1] = nextSegment['LocationEnd']['X'] - nextSegment['LocationStart']['X'];
+
+                                if (true) {
+
+                                    let O = this.checkLineIntersection(
+                                        segment['LocationStart']['X'],
+                                        segment['LocationStart']['Y'],
+                                        segment['LocationStart']['X']+vOrto[0],
+                                        segment['LocationStart']['Y']+vOrto[1],
+                                        nextSegment['LocationEnd']['X'],
+                                        nextSegment['LocationEnd']['Y'],
+                                        nextSegment['LocationEnd']['X']+vOrto2[0],
+                                        nextSegment['LocationEnd']['Y']+vOrto2[1],
+
+                                    )
+
+                                    if (O !== null) {
+                                        let OP = [];
+                                        OP['X']=O.x;
+                                        OP['Y']=O.y;
+                                        let radius = Math.round(this._dist(OP, segment['LocationStart'], true)/100);
+                                        let index = 8;
+                                        if(radius < 120){
+                                            index = 7;
+                                        }
+                                        if(radius < 60){
+                                            index = 6;
+                                        }
+                                        if(radius < 40){
+                                            index = 5;
+                                        }
+                                        if (this._getDistanceToNearestCurveLabel([xCenter, yCenter], (index-5)) > 20) {
+                                            this.allCurveLabels[(index-5)].push([xEnd, yEnd]);
+                                            if (radius < 500) {
+                                                // console.log('OOOO: ' +OP['X']+', '+OP['Y']+' R '+radius);
+                                                let degrees = null;
+                                                if (segment['LocationEnd']['X'] === segment['LocationStart']['X']) {
+                                                    degrees = 90;
+                                                }
+                                                const tanA = (
+                                                    (segment['LocationEnd']['Y'] - segment['LocationStart']['Y']) /
+                                                    (segment['LocationEnd']['X'] - segment['LocationStart']['X'])
+                                                );
+                                                degrees = this._rad2deg(Math.atan(tanA));
+                                                if (degrees > 0) {
+                                                    degrees -= 90;
+                                                } else {
+                                                    degrees += 90;
+                                                }
+                                                degrees += 180;
+
+                                                const radiusLabel = document.createElementNS(this.svgNS, "text");
+                                                const radiusText = document.createTextNode('__> ' + radius + 'm');
+                                                radiusLabel.setAttribute("x", Math.round(Math.round(xEnd).toString()).toString());
+                                                radiusLabel.setAttribute("y", Math.round(Math.round(yEnd).toString()).toString());
+                                                radiusLabel.setAttribute("transform",
+                                                    "rotate(" + Math.round(degrees) + "," +
+                                                    Math.round(xEnd) + "," +
+                                                    Math.round(yEnd) + ")");
+                                                radiusLabel.appendChild(radiusText);
+                                                slopeLabelGroup[index].appendChild(radiusLabel);
+
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
 
                         const trackSegment = document.createElementNS(this.svgNS, 'line');
                         trackSegment.setAttribute("x1", xStart.toString());
@@ -339,6 +433,10 @@ class Mapper {
         this.shapes.push(slopeLabelGroup[2]);
         this.shapes.push(slopeLabelGroup[3]);
         this.shapes.push(slopeLabelGroup[4]);
+        this.shapes.push(slopeLabelGroup[5]);
+        this.shapes.push(slopeLabelGroup[6]);
+        this.shapes.push(slopeLabelGroup[7]);
+        this.shapes.push(slopeLabelGroup[8]);
     }
 
     getSwitches() {
@@ -1074,6 +1172,19 @@ class Mapper {
 
         return minDistance;
     }
+    _getDistanceToNearestCurveLabel(newLabel, index) {
+        let minDistance = 8000;
+        for (const oldLabel of this.allCurveLabels[index]) {
+            minDistance = Math.min(
+                minDistance,
+                Math.sqrt(
+                    Math.pow(newLabel[0] - oldLabel[0], 2) +
+                    Math.pow(newLabel[1] - oldLabel[1], 2)
+                ));
+        }
+
+        return minDistance;
+    }
 
     _round(value, decimals) {
         // noinspection JSCheckFunctionSignatures
@@ -1187,4 +1298,43 @@ class Mapper {
 
         return distance;
     }
+
+    checkLineIntersection(line1StartX, line1StartY, line1EndX, line1EndY, line2StartX, line2StartY, line2EndX, line2EndY) {
+        // if the lines intersect, the result contains the x and y of the intersection (treating the lines as infinite) and booleans for whether line segment 1 or line segment 2 contain the point
+        var denominator, a, b, numerator1, numerator2, result = {
+            x: null,
+            y: null,
+            onLine1: false,
+            onLine2: false
+        };
+        denominator = ((line2EndY - line2StartY) * (line1EndX - line1StartX)) - ((line2EndX - line2StartX) * (line1EndY - line1StartY));
+        if (denominator === 0) {
+            return result;
+        }
+        a = line1StartY - line2StartY;
+        b = line1StartX - line2StartX;
+        numerator1 = ((line2EndX - line2StartX) * a) - ((line2EndY - line2StartY) * b);
+        numerator2 = ((line1EndX - line1StartX) * a) - ((line1EndY - line1StartY) * b);
+        a = numerator1 / denominator;
+        b = numerator2 / denominator;
+
+        // if we cast these lines infinitely in both directions, they intersect here:
+        result.x = line1StartX + (a * (line1EndX - line1StartX));
+        result.y = line1StartY + (a * (line1EndY - line1StartY));
+        /*
+                // it is worth noting that this should be the same as:
+                x = line2StartX + (b * (line2EndX - line2StartX));
+                y = line2StartX + (b * (line2EndY - line2StartY));
+                */
+        // if line1 is a segment and line2 is infinite, they intersect if:
+        if (a > 0 && a < 1) {
+            result.onLine1 = true;
+        }
+        // if line2 is a segment and line1 is infinite, they intersect if:
+        if (b > 0 && b < 1) {
+            result.onLine2 = true;
+        }
+        // if line1 and line2 are segments, they intersect if both of the above are true
+        return result;
+    };
 }

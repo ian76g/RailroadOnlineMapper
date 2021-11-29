@@ -86,6 +86,10 @@ function checked_if_true_or_default($name)
         "slopeLabel2" => true,
         "slopeLabel3" => true,
         "slopeLabel4" => false,
+        "slopeLabel5" => false,
+        "slopeLabel6" => false,
+        "slopeLabel7" => false,
+        "slopeLabel8" => false,
         "maxSlopeLabel" => true,
         "ironOverWood" => false
     );
