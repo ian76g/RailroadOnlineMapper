@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
     $postBody = json_decode(file_get_contents("php://input"), true);
     if (isset($postBody['colors']) && $postBody['colors'] != '') {
         if (isset($postBody['__code']) && $postBody['__code'] != '') {
-            $code = $postBody['__code'];
+            $code = $colorClass->store_color($postBody['colors'], $postBody['__code']);
         } else {
             $code = $colorClass->store_color($postBody['colors']);
         }
