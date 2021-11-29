@@ -17,14 +17,20 @@ class Colors {
         }
     }
 
-    public function store_color(array $colors): string {
-        foreach ($this->db as $key => $item) {
-            if ($item === $colors) {
-                return $key;
+    public function store_color(array $colors, string $code=null): string {
+        if (!$code) {
+            foreach ($this->db as $key => $item) {
+                if ($item === $colors) {
+                    return $key;
+                }
             }
         }
 
-        $key = $this->random_key();
+        if ($code) {
+            $key = $code;
+        } else {
+            $key = $this->random_key();
+        }
         $this->db[$key] = $colors;
         file_put_contents($this->db_file, serialize($this->db));
         return $key;
