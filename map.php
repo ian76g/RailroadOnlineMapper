@@ -85,7 +85,7 @@ foreach ($textFiles as $textFile) {
 
     <div class="export__panel info-panel">
         <div class="export__panel-scroll-content">
-            <h3>Player Info</h3>
+            <details><summary><h4>Player Info</h4></summary>
             <div class="export__panel--player-list">
                 <?php
                 foreach ($dataArray['Players'] as $index => $player) {
@@ -97,11 +97,14 @@ foreach ($textFiles as $textFile) {
                 }
                 ?>
             </div>
+            </details>
+
             <hr/>
             <div class="message--alert info">
                 All settings below are stored in cookies and will be applied on each map you visit.
             </div>
-            <h3>Change background</h3>
+
+            <details><summary><h4>Change background</h4></summary>
             <div class="export__panel--bg-grid">
                 <div class="box">
                     <img id="bg" src="/assets/images/bg_90x90.png" width="90" height="90" alt="Old background"
@@ -120,7 +123,9 @@ foreach ($textFiles as $textFile) {
                          alt="Psawhns background with kanados" onclick="changeBackground(this)">
                 </div>
             </div>
-            <h3>Display options</h3>
+            </details>
+
+            <details><summary><h4>Trees</h4></summary>
             <div>
                 <input id="trees_user" type="checkbox"
                        onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('trees_user'); ?>/> Show
@@ -132,7 +137,10 @@ foreach ($textFiles as $textFile) {
                        onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('trees_default'); ?>/> Show
                 trees cut down less than 90m of industry
             </div>
-            <div>
+            </details>
+
+            <details><summary><h4>Rails and beds</h4></summary>
+                <div>
                 <input id="beds" type="checkbox"
                        onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('beds'); ?>/> Show beds
             </div>
@@ -147,13 +155,62 @@ foreach ($textFiles as $textFile) {
                 and
                 crossings
             </div>
+                <div>
+                    <input id="ironOverWood" type="checkbox"
+                           onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('ironOverWood'); ?>/> Show
+                    Iron
+                    bridge on
+                    top of Wood bridge
+                </div>
+
+            </details>
+
+            <details><summary><h4>Locos and carts</h4></summary>
             <div>
                 <input id="rollingstock" type="checkbox"
                        onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('rollingstock'); ?>/> Show
                 rolling
                 stock
             </div>
-            <div>
+
+                <h4>Cart coloring</h4>
+                <div class="cart_colors">
+                    <?php
+                    $images = array(
+                        "ce_flatcar_logs" => "flatcar_logs.png",
+                        "cf_flatcar_logs" => "flatcar_logs_loaded.png",
+                        "ce_flatcar_stakes" => "flatcar_stakes.png",
+                        "cf_flatcar_stakes" => "flatcar_stakes_loaded.png",
+                        "ce_flatcar_hopper" => "flatcar_hopper_empty.png",
+                        "cf_flatcar_hopper" => "flatcar_hopper.png",
+                        "ce_flatcar_cordwood" => "flatcar_cordwood.png",
+                        "cf_flatcar_cordwood" => "flatcar_cordwood_loaded.png",
+                        "ce_flatcar_tanker" => "flatcar_tanker_empty.png",
+                        "cf_flatcar_tanker" => "flatcar_tanker.png",
+                        "ce_boxcar" => "boxcar_empty.png",
+                        "cf_boxcar" => "boxcar.png"
+                    );
+
+                    foreach (array('flatcar_logs', 'flatcar_stakes', 'flatcar_hopper', 'flatcar_cordwood', 'flatcar_tanker', 'boxcar') as $cartType) {
+                        ?>
+                        <label for="ce_<?= $cartType; ?>">
+                            <img src="/assets/images/<?= $images['ce_' . $cartType]; ?>" width="72" height="72"/>
+                        </label>
+                        <input type="color" value="<?php color_cookie_or_default('ce_' . $cartType); ?>"
+                               id="ce_<?= $cartType; ?>" onchange="updateColor(this)">
+                        <label for="cf_<?= $cartType; ?>">
+                            <img src="/assets/images/<?= $images['cf_' . $cartType]; ?>" width="72" height="72"/>
+                        </label>
+                        <input type="color" value="<?php color_cookie_or_default('cf_' . $cartType); ?>"
+                               id="cf_<?= $cartType; ?>" onchange="updateColor(this)">
+                    <?php } ?>
+                </div>
+                <button class="button" onclick="shareColors()">Share color scheme</button>
+                <button class="button" onclick="showImportModal()">Import color scheme</button>
+
+            </details>
+
+            <details><summary><h4>Slopes</h4></summary>            <div>
                 <input id="slopeLabel0" type="checkbox"
                        onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel0'); ?>/> Show
                 Slope
@@ -187,6 +244,16 @@ foreach ($textFiles as $textFile) {
                 to
                 brag with my slope using 6 decimals after the comma
             </div>
+                <div>
+                    <input id="maxSlopeLabel" type="checkbox"
+                           onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('maxSlopeLabel'); ?>/> Show
+                    max
+                    Slope
+                    Circle
+                </div>
+
+            </details>
+            <details><summary><h4>Curves</h4></summary>
             <div>
                 <input id="slopeLabel5" type="checkbox"
                        onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel5'); ?>/> Curve radius 0..40m
@@ -203,55 +270,8 @@ foreach ($textFiles as $textFile) {
                 <input id="slopeLabel8" type="checkbox"
                        onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel8'); ?>/> Curve radius 120..xm
             </div>
-            <div>
-                <input id="maxSlopeLabel" type="checkbox"
-                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('maxSlopeLabel'); ?>/> Show
-                max
-                Slope
-                Circle
-            </div>
-            <div>
-                <input id="ironOverWood" type="checkbox"
-                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('ironOverWood'); ?>/> Show
-                Iron
-                bridge on
-                top of Wood bridge
-            </div>
-            <hr/>
-            <h4>Cart coloring</h4>
-            <div class="cart_colors">
-                <?php
-                $images = array(
-                    "ce_flatcar_logs" => "flatcar_logs.png",
-                    "cf_flatcar_logs" => "flatcar_logs_loaded.png",
-                    "ce_flatcar_stakes" => "flatcar_stakes.png",
-                    "cf_flatcar_stakes" => "flatcar_stakes_loaded.png",
-                    "ce_flatcar_hopper" => "flatcar_hopper_empty.png",
-                    "cf_flatcar_hopper" => "flatcar_hopper.png",
-                    "ce_flatcar_cordwood" => "flatcar_cordwood.png",
-                    "cf_flatcar_cordwood" => "flatcar_cordwood_loaded.png",
-                    "ce_flatcar_tanker" => "flatcar_tanker_empty.png",
-                    "cf_flatcar_tanker" => "flatcar_tanker.png",
-                    "ce_boxcar" => "boxcar_empty.png",
-                    "cf_boxcar" => "boxcar.png"
-                );
+            </details>
 
-                foreach (array('flatcar_logs', 'flatcar_stakes', 'flatcar_hopper', 'flatcar_cordwood', 'flatcar_tanker', 'boxcar') as $cartType) {
-                    ?>
-                    <label for="ce_<?= $cartType; ?>">
-                        <img src="/assets/images/<?= $images['ce_' . $cartType]; ?>" width="72" height="72"/>
-                    </label>
-                    <input type="color" value="<?php color_cookie_or_default('ce_' . $cartType); ?>"
-                           id="ce_<?= $cartType; ?>" onchange="updateColor(this)">
-                    <label for="cf_<?= $cartType; ?>">
-                        <img src="/assets/images/<?= $images['cf_' . $cartType]; ?>" width="72" height="72"/>
-                    </label>
-                    <input type="color" value="<?php color_cookie_or_default('cf_' . $cartType); ?>"
-                           id="cf_<?= $cartType; ?>" onchange="updateColor(this)">
-                <?php } ?>
-            </div>
-            <button class="button" onclick="shareColors()">Share color scheme</button>
-            <button class="button" onclick="showImportModal()">Import color scheme</button>
             <hr/>
             <h5>
                 The settings below will require a refresh of the page
@@ -303,7 +323,7 @@ foreach ($textFiles as $textFile) {
         <div class="export__panel-scroll-content">
             <h3>Edit</h3><br/>
             <div class="edit-panel__extras">
-                <h4>Rolling Stock</h4>
+                <details><summary><h4>Rolling Stock</h4></summary>
                 <form method="POST" action="/converter.php">
                     <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
                     <table id="rollingStockTable" class="export__mapper">
@@ -340,9 +360,19 @@ foreach ($textFiles as $textFile) {
                     <input name="allBrakes" value="YES" type="hidden"/>
                     <button class="button">Apply all brakes</button>
                 </form>
+                    <br>
+
+                    <form method="POST" action="/converter.php">
+                        <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
+                        <table id="undergroundCartsTable" class="export__mapper"></table>
+                        <button class="button">Get Carts from Underground</button>
+                    </form>
+                    <br/>
+
+                </details>
                 <br>
 
-                <h4>Trees</h4>
+                <details><summary><h4>Trees</h4></summary>
                 <form method="POST" action="/converter.php">
                     <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
                     <input name="replant" value="700" size="4"> cm away from track!<br>
@@ -350,18 +380,20 @@ foreach ($textFiles as $textFile) {
                     measured to start, center and end of track-(segment) only, switches, crosses are not taken into calculation (yet)</span><br>
                     <button class="button">Replant Trees</button>
                 </form>
+                </details>
                 <br>
 
-                <h4>Curves</h4>
+                <details><summary><h4>Curves</h4></summary>
                 <form method="POST" action="/converter.php">
                     <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
                     from: <input name="from" value="0-0" size="6"><br>
                     to: <input name="to" value="0-0" size="6"><br>
                     <button class="button">DO NOT CLICK</button>
                 </form>
+                </details>
                 <br>
 
-                <h4>Players</h4>
+                <details><summary><h4>Players</h4></summary>
                 <form method="POST" action="/converter.php">
                     <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
                     <table id="editPlayersTable" class="export__mapper">
@@ -375,9 +407,10 @@ foreach ($textFiles as $textFile) {
                     </table>
                     <button class="button">Apply Player Changes</button>
                 </form>
+                </details>
                 <br>
 
-                <h4>Industries</h4>
+                <details><summary><h4>Industries</h4></summary>
                 <form method="POST" action="/converter.php">
                     <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
                     <table id="industriesTable" class="export__mapper">
@@ -391,15 +424,9 @@ foreach ($textFiles as $textFile) {
                     </table>
                     <button class="button">Apply Industry Changes</button>
                 </form>
+                </details>
                 <br>
 
-                <h4>Carts</h4>
-                <form method="POST" action="/converter.php">
-                    <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
-                    <table id="undergroundCartsTable" class="export__mapper"></table>
-                    <button class="button">Get Carts from Underground</button>
-                </form>
-                <br/>
                 <a class="button" href="download.php?map=<?php echo substr(basename($saveFile), 0, -4); ?>">Download
                     Save</a>
             </div>
