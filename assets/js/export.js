@@ -4,8 +4,26 @@ document.addEventListener("DOMContentLoaded", function () {
         controlIconsEnabled: false,
         fit: true,
         center: true,
+        maxZoom: 20
     });
-
+    // if(cookies !== undefined && cookies.get('zoomLevel') !== undefined && cookies.get('zoomX') !== undefined && cookies.get('zoomY')!==undefined) {
+    //     let point = {x:Math.round(cookies.get('zoomX')), y: Math.round(cookies.get('zoomY'))};
+    //     //panZoom.zoom(1);
+    //     panZoom.panBy(point);
+    //     // panZoom.zoomAtPoint(cookies.get('zoomLevel'), point);
+    //     panZoom.zoom(cookies.get('zoomLevel'));
+    //     console.log('setting pan to ' +point.x + ', '+point.y + ' zoom is '+cookies.get('zoomLevel'));
+    //
+    //     //panZoom.center();
+    // }
+    panZoom.setOnPan(function(point){
+        cookies.set('zoomX', point.x); cookies.set('zoomY', point.y);
+        // console.log('setting cookie for ' +point.x + ', '+point.y)
+    })
+    panZoom.setOnZoom(function(level){
+        cookies.set('zoomLevel', level);
+        // console.log('setting zoom to ' + level)
+    })
     document.getElementById("info-panel-toggle").addEventListener("click", function () {
         togglePanel('info-panel')
     });

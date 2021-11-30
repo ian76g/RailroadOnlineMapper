@@ -37,7 +37,7 @@ class Mapper {
 
     thingy(angle, x, y) {
         x += Math.cos(this.deg2rad(angle)) * 2;
-        y += Math.sin(this.deg2rad(angle)) * 2;
+        y += Math.sin(this.deg2rad(angle));
 
         return [x, y];
     }
@@ -178,8 +178,8 @@ class Mapper {
         drawOrder[6] = [6, 15, 'darkgrey'];  // constant wall
         drawOrder[3] = [3, 15, 'orange'];    // wooden bridge
         drawOrder[7] = [7, 15, 'lightblue']; // iron bridge
-        drawOrder[4] = [4, 3, 'black'];      // trendle track
-        drawOrder[0] = [0, 3, 'black'];      // track        darkkhaki, darkgrey, orange, blue, black
+        drawOrder[4] = [4, 2, 'black'];      // trendle track
+        drawOrder[0] = [0, 2, 'black'];      // track        darkkhaki, darkgrey, orange, blue, black
 
         let slopecoords = [0, 0];
 
@@ -647,24 +647,45 @@ class Mapper {
             'oilbarrel': 'Oil Barrels',
         }
 
+        /**
+         * flatcar: 7,856 m   aprox 25 ft 9 inch
+         boxcar: 8,2282 m aprox 26ft 8 inch
+         hadcart: 2,202 m   aprox 7 ft  7 inch
+         betsy: 3,912 m   aprox 12 ft 10 inch
+         porter: 4,6135 m   aprox 15 ft 2 inch
+         eureka: 8,0213 m  aprox 26 ft 4inch
+         eurekas tender: 4,9708 m   aprox 15 ft 4 inch
+         mogul: 8,3783 m  aprox 27 ft 6 inch
+         mogul tender: 6,4173 m aprox 21 ft 1 inch
+         class 70: 9,3890 maprox 30 ft 10 inch
+         class 70 tender: 6,7881 m aprox 22 ft 3 inch
+         cross - length: 3,8385 m aprox  12 ft 7 inch
+         climax: 8,4989 m aprox 27 ft 11 inch
+         heisler: 9,1373 m aprox 30 ft (0 inch)
+         max track length: 10,5 m  aprox 34 ft 5 inch
+         straight part of switch: 18,8 m aprox  61 ft 8 inch
+
+         width of flatcar: 1,9327 m aprox 6 ft 4 inch
+         * @type {number}
+         */
         const cartOptions = {
-            'handcar': [this.engineRadius, 'white'],
-            'porter_040': [this.engineRadius, 'black'],
-            'porter_042': [this.engineRadius, 'black'],
-            'eureka': [this.engineRadius, 'black'],
-            'eureka_tender': [this.engineRadius, 'black'],
-            'climax': [this.engineRadius, 'black'],
-            'heisler': [this.engineRadius, 'black'],
-            'class70': [this.engineRadius, 'black'],
-            'class70_tender': [this.engineRadius, 'black'],
-            'cooke260': [this.engineRadius, 'black'],
-            'cooke260_tender': [this.engineRadius, 'black'],
-            'flatcar_logs': [this.engineRadius / 3, 'indianred', 'red'],
-            'flatcar_cordwood': [this.engineRadius / 3 * 2, 'orange', 'orangered'],
-            'flatcar_stakes': [this.engineRadius / 3 * 2, 'greenyellow', 'green'],
-            'flatcar_hopper': [this.engineRadius / 3 * 2, 'rosybrown', 'brown'],
-            'boxcar': [this.engineRadius / 3 * 2, 'mediumpurple', 'purple'],
-            'flatcar_tanker': [this.engineRadius / 3 * 2, 'lightgray', 'dimgray'],
+            'handcar': [4.202, 'white'],
+            'porter_040': [3.912, 'black'],
+            'porter_042': [4.6135, 'black'],
+            'eureka': [8.0213, 'black'],
+            'eureka_tender': [4.9708, 'black'],
+            'climax': [8.4989, 'black'],
+            'heisler': [9.1373, 'black'],
+            'class70': [9.3890, 'black'],
+            'class70_tender': [6.7881, 'black'],
+            'cooke260': [8.3783, 'black'],
+            'cooke260_tender': [6.4173, 'black'],
+            'flatcar_logs': [7.856, 'indianred', 'red'],
+            'flatcar_cordwood': [7.856, 'orange', 'orangered'],
+            'flatcar_stakes': [7.856, 'greenyellow', 'green'],
+            'flatcar_hopper': [7.856, 'rosybrown', 'brown'],
+            'boxcar': [8.2282, 'mediumpurple', 'purple'],
+            'flatcar_tanker': [7.856, 'lightgray', 'dimgray'],
         }
 
         let index = 0;
@@ -672,25 +693,30 @@ class Mapper {
             const x = (this.imx - ((vehicle['Location'][0] - this.minX) / 100 * this.scale));
             const y = (this.imy - ((vehicle['Location'][1] - this.minY) / 100 * this.scale));
             if (['porter_040', 'porter_042', /*'handcar', */'eureka', 'climax', 'heisler', 'class70', 'cooke260'].indexOf(vehicle['Type']) >= 0) {
-                const yl = (this.engineRadius / 3) * 2;
-                const xl = (this.engineRadius / 2) * 2;
+                const yl = 1.9*3;
+                const xl = (cartOptions[vehicle['Type']][0]-0.6)*2;
                 const path = document.createElementNS(this.svgNS, "path");
                 path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + x + ", " + y + ")");
-                path.setAttribute("d", "M" + (x - (this.engineRadius / 2)) + "," + y + " l " + (xl / 3) + "," + (yl / 2) + " l " + (xl / 3 * 2) + ",0 l 0,-" + yl + " l -" + (xl / 3 * 2) + ",0 z");
+                path.setAttribute("d", "M" + (x - (xl / 2)) + "," + y + " l " + (xl / 3) + "," + (yl / 2) + " l " + (xl / 3 * 2) + ",0 l 0,-" + yl + " l -" + (xl / 3 * 2) + ",0 z");
                 path.setAttribute("fill", "purple");
                 path.setAttribute("stroke", "black");
-                path.setAttribute("stroke-width", "2");
+                path.setAttribute("stroke-width", "1");
                 rollingStockGroup.appendChild(path);
             } else {
-                const yl = (this.engineRadius / 3) * 2;
-                let xl = this.engineRadius;
+                // const yl = (this.engineRadius / 3) * 2;
+                // let xl = this.engineRadius;
+                const yl = 1.9*3;
+                const xl = (cartOptions[vehicle['Type']][0]-0.6)*2;
 
-                if (vehicle['Type'].toLowerCase().indexOf('tender') !== -1) {
-                    xl = xl / 3 * 2;
-                }
+                // if (vehicle['Type'].toLowerCase().indexOf('tender') !== -1) {
+                //     xl = xl / 3 * 2;
+                // }
                 const path = document.createElementNS(this.svgNS, "path");
                 let fillColor = cartOptions[vehicle['Type']][1];
                 fillColor = cookies.get('ce_' + vehicle['Type']);
+                if(vehicle['Type'] === 'handcar') {
+                    fillColor = 'white';
+                }
                 path.setAttribute("class", 'ce_' + vehicle['Type']);
                 if (
                     typeof vehicle['Freight'] !== 'undefined' &&
@@ -702,13 +728,14 @@ class Mapper {
                     fillColor = cartOptions[vehicle['Type']][2];
                     fillColor = cookies.get('cf_' + vehicle['Type']);
                 }
+
                 const title = document.createElementNS(this.svgNS, "title");
                 title.textContent = vehicle['Name'].replace(/<\/?[^>]+(>|$)/g, "") + " " + vehicle['Number'].replace(/<\/?[^>]+(>|$)/g, "");
                 if (
                     typeof vehicle['Freight'] !== 'undefined' &&
                     typeof vehicle['Freight']['Amount'] !== 'undefined' &&
                     vehicle['Freight']['Amount'] === 0) {
-                    title.textContent += " (empty)";
+                    title.textContent += " (empty "+vehicle['Freight']['Type']+")";
                 } else {
                     if (typeof vehicle['Freight'] !== 'undefined' &&
                         typeof vehicle['Freight']['Type'] !== 'undefined'
@@ -1145,7 +1172,7 @@ class Mapper {
                 treeCircle.setAttribute("r", "6");
                 treeCircle.setAttribute("stroke", "darkgreen");
                 treeCircle.setAttribute("stroke-width", "2");
-                if (i < this.initialTreesDown) {
+                if (9000 > this._nearestIndustryDistance(tree, this.json['Industries'])) {
                     treeCircle.setAttribute("fill", "green");
                     firstTreeGroup.appendChild(treeCircle);
                 } else {
@@ -1201,6 +1228,24 @@ class Mapper {
 
     _capitalize(string) {
         return String(string).charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+    }
+
+    _nearestIndustryDistance(coords, industryCoords) {
+        let minDist = 800000;
+        for (const i of industryCoords) {
+            if (i['Type'] < 10) {
+                const d = this._dist(i['Location'], coords, true);
+                if (d < minDist) {
+                    minDist = d;
+                }
+            }
+        }
+        const d = this._dist([-5000,-5000], coords, true);
+        if (d < 10000) {
+            return 0;
+        }
+
+        return minDist;
     }
 
     _nearestIndustry(coords, industryCoords) {

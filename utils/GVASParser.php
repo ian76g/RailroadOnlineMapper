@@ -344,13 +344,14 @@ class GVASParser
             $sevenHundred = $_POST['replant'];
         }
         $output = '';
+        $ah = new ArithmeticHelper();
+        $ah->industries = $this->goldenBucket['Industries'];
 
         if (isset($_POST['from']) && isset($_POST['to'])) {
             $one = explode('-', $_POST['from']);
             $two = explode('-', $_POST['to']);
             $segment1 = $this->goldenBucket['Splines'][$one[0]]['Segments'][$one[1]];
             $segment2 = $this->goldenBucket['Splines'][$two[0]]['Segments'][$two[1]];
-            $ah = new ArithmeticHelper();
             try {
                 $curvePoints = $ah->getCurveCoordsBetweenSegments($segment1, $segment2);
 //                array_shift($curvePoints);
@@ -367,7 +368,7 @@ class GVASParser
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $vector) {
                         $v++;
                         // found a new fallen tree
-                        if ($v < $this->initialTreesDown) continue;
+//                        if ($v < $this->initialTreesDown) continue;
                         $treeX = floor((200000 + $vector->content[0]) / 100000);
                         $treeY = floor((200000 + $vector->content[1]) / 100000);
 
@@ -397,7 +398,11 @@ class GVASParser
                             }
                         }
                         if ($minDistanceToSomething > $sevenHundred) {
-                            $toRemove[] = $index;
+                            if($ah->nearestIndustryDistance($vector) < 9000) {
+                                // too close to industry
+                            } else {
+                                $toRemove[] = $index;
+                            }
                         }
                         //echo round($minDistanceToSomething)." ";
                     }

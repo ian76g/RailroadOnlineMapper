@@ -18,6 +18,23 @@ class ArithmeticHelper
 
     var $industries;
 
+    function nearestIndustryDistance($coords, $industryCoords = null)
+    {
+        $minDist = 800000;
+        if (!$industryCoords) {
+            $industryCoords = $this->industries;
+        }
+        foreach ($industryCoords as $index => $industry) {
+            if ($industry['Type']) {
+                $d = $this->dist($industry['Location'], $coords, true);
+                if ($d < $minDist) {
+                    $minDist = $d;
+                }
+            }
+        }
+        return $minDist;
+    }
+
     function nearestIndustry($coords, $industryCoords = null)
     {
         $minDist = 800000;
@@ -394,7 +411,7 @@ function getCurveCoordsBetweenSegments($segment1, $segment2)
     //
     $arc_angle = pi() - $intersection_angle;
 
-    $curveLength = pi() * $arc_angle * $arc_radius;
+    $curveLength = $arc_angle * $arc_radius;
 
     // FIXME handle too tight of a radius of the bend.
     //       This depends on the material which is on the track,
@@ -483,7 +500,7 @@ function getCurveCoordsBetweenSegments($segment1, $segment2)
     // debug SVG output
     $num_segments = 8;
     // 300
-    $num_segments = ceil($curveLength / 400);
+    $num_segments = ceil($curveLength / 500);
 
 
     $alpha_per_segment = $arc_angle / $num_segments;
@@ -511,7 +528,7 @@ function getCurveCoordsBetweenSegments($segment1, $segment2)
         $tmp_vec_x += $arc_center_x;
         $tmp_vec_y += $arc_center_y;
         $z = $incline * $traveledSoFar / $totalTrackLength + $near_z; //need to add the height of the starting point
-        $curve[] = array($tmp_vec_x, $tmp_vec_y, $z);
+        $curve[] = array(round($tmp_vec_x), round($tmp_vec_y), round($z));
         $traveledSoFar += $curveSegmentLength;
 //        $svg_output .= " L " . round($tmp_vec_x * $scale) . "," . round($tmp_vec_y * $scale);
     }
@@ -521,7 +538,7 @@ function getCurveCoordsBetweenSegments($segment1, $segment2)
 
     $traveledSoFar += $curveSegmentLength;
 
-    $straightSegments = ceil($straight/800);
+    $straightSegments = ceil($straight/900);
     $straightLength = $straight/$straightSegments;
 
 
@@ -538,7 +555,7 @@ function getCurveCoordsBetweenSegments($segment1, $segment2)
         $z = $incline*$traveledSoFar/$totalTrackLength+$near_z;
 //        $svg_output .= " L " . round($xOnLine * $scale) . "," . round($yOnLine * $scale);
 
-        $curve[] = array($xOnLine, $yOnLine, $z);
+        $curve[] = array(round($xOnLine), round($yOnLine), round($z));
         $traveledSoFar+=$straightLength;
     }
 

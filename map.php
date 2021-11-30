@@ -65,6 +65,15 @@ foreach ($textFiles as $textFile) {
     <link rel="stylesheet" href="/assets/css/reset.css?<?php echo filemtime('assets/css/reset.css'); ?>"/>
     <link rel="stylesheet" href="/assets/css/main.css?<?php echo filemtime('assets/css/main.css'); ?>"/>
     <link rel="stylesheet" href="/assets/css/export.css?<?php echo filemtime('assets/css/export.css'); ?>"/>
+    <script type="text/javascript" src="/assets/js/js.cookie.min.js"></script>
+    <script>
+        const cookies = Cookies.withAttributes({
+            path: '/',
+            secure: true,
+            expires: 30
+        })
+    </script>
+
 </head>
 <body class="export">
 <main class="export__main">
@@ -116,14 +125,12 @@ foreach ($textFiles as $textFile) {
                 <input id="trees_user" type="checkbox"
                        onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('trees_user'); ?>/> Show
                 trees
-                cut down by
-                player
+                cut down more than 90m of industry (can be replanted)
             </div>
             <div>
                 <input id="trees_default" type="checkbox"
                        onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('trees_default'); ?>/> Show
-                trees cut down by
-                default
+                trees cut down less than 90m of industry
             </div>
             <div>
                 <input id="beds" type="checkbox"
@@ -417,7 +424,7 @@ foreach ($textFiles as $textFile) {
     </div>
 </div>
 <script type="text/javascript" src="/assets/js/svg-pan-zoom.js.min.js"></script>
-<script type="text/javascript" src="/assets/js/export.js"></script>
+<script type="text/javascript" src="/assets/js/export.js?<?php echo filemtime('assets/js/export.js'); ?>"></script>
 
 <?php
 require_once 'utils/Minifier.php';
@@ -429,7 +436,6 @@ if (!file_exists('assets/js/mapper.min.js') || filemtime('assets/js/mapper.js') 
 
 <script type="text/javascript"
         src="/assets/js/mapper.min.js?<?php echo filemtime('assets/js/mapper.min.js'); ?>"></script>
-<script type="text/javascript" src="/assets/js/js.cookie.min.js"></script>
 <script type="text/javascript"
         src="/assets/js/colorshare.js?<?php echo filemtime('assets/js/colorshare.js'); ?>"></script>
 <script type="text/javascript">
@@ -442,11 +448,6 @@ if (!file_exists('assets/js/mapper.min.js') || filemtime('assets/js/mapper.js') 
     const pattern = document.getElementsByTagName("pattern")[0];
     const image = document.getElementsByTagName("image")[0];
 
-    const cookies = Cookies.withAttributes({
-        path: '/',
-        secure: true,
-        expires: 30
-    })
 
     map = new Mapper(<?php echo $json; ?>, cookies);
     map.drawSVG('demo-tiger');
@@ -522,96 +523,3 @@ if (!file_exists('assets/js/mapper.min.js') || filemtime('assets/js/mapper.js') 
 </script>
 </body>
 </html>
-<!--
-
-
-
-                function getCurveCoordsBetweenSegments(segment1, segment2)
-                {
-                    // calculate formulas for segment 1 and segment 2
-                    // y = m*x+n     x,y given 2 times - can be solved
-                    length1 = segment1[1]['X']-segment1[0]['X'];
-                    height1 = segment1[1]['Y']-segment1[0]['Y'];
-                    if(length1 === 0){
-                        die('Edge case 1/3 not implemented');
-                    }
-                    m1 = height1/length1;
-                    n1 = segment1[0]['Y']-m1*segment1[0]['X'];
-
-                    length2 = segment2[1]['X']-segment2[0]['X'];
-                    height2 = segment2[1]['Y']-segment2[0]['Y'];
-                    if(length2 === 0){
-                        die('Edge case 2/3 not implemented');
-                    }
-                    m2 = height2/length2;
-                    n2 = segment2[0]['Y']-m2*segment2[0]['X'];
-
-                    // calculate intersecting point
-                    // y = m1*x+n1
-                    // y = m2*x+n2
-                    // m1*x+n1   = m2*x+n2
-                    // m1*x      = m2*x+n2-n1
-                    // m1*x-m2*x = n2-n1
-                    // x*(m1-m2) = n2-n1
-                    // x         = (n2-n1)/(m1-m2)
-                    if(m1 === m2){
-                        die('Edge case 3/3 not implemented');
-                    }
-                    xIntersect  = (n2-n1)/(m1-m2);
-                    yIntersect  = m1*xIntersect+n1;
-
-                    // calculate half m
-                    halfM = (m1+m2)/2;
-
-                    // y = m*x+n    (given is x,y,m - what is n)
-                    halfN = yIntersect-halfM*xIntersect;
-
-                    // calculate diffs between 4 given points and the intersection - find closest point
-                    distArray[1] = this->dist(segment1[0], array(xIntersect, yIntersect));
-                    distArray[2] = this->dist(segment1[1], array(xIntersect, yIntersect));
-                    distArray[3] = this->dist(segment2[0], array(xIntersect, yIntersect));
-                    distArray[4] = this->dist(segment2[1], array(xIntersect, yIntersect));
-
-                    ksort(distArray);
-                    keys = array_keys(distArray);
-                    key = array_shift(keys);
-
-                    // calculate orthogonal through point
-                    if(key === 1 || key === 2){
-                        orthoM = 1/m1;
-                    }
-                    if(key === 2 || key === 3){
-                        orthoM = 1/m2;
-                    }
-
-                    // y = m*x+n    (given is x,y,m - what is n)
-                    if(key === 1){
-                        orthoN = segment1[0]['Y']-orthoM*segment1[0]['X'];
-                        nearest = array(segment1[0]['X'], segment1[0]['Y']);
-                    }
-                    if(key == 2){
-                        orthoN = segment1[1]['Y']-orthoM*segment1[1]['X'];
-                        nearest = array(segment1[1]['X'], segment1[1]['Y']);
-                    }
-                    if(key == 3){
-                        orthoN = segment2[0]['Y']-orthoM*segment2[0]['X'];
-                        nearest = array(segment2[0]['X'], segment2[0]['Y']);
-                    }
-                    if(key == 4){
-                        orthoN = segment2[1]['Y']-orthoM*segment2[1]['X'];
-                        nearest = array(segment2[1]['X'], segment2[1]['Y']);
-                    }
-
-                    // calculate intersection of half and ortho
-                    // x         = (n2-n1)/(m1-m2)
-                    xCircle  = (orthoN-halfN)/(halfM-orthoM);
-                    yCircle  = halfM*xCircle+halfN;
-
-                    // radius = distance circle and nearest point
-                    radius = this->dist(array(xCircle, yCircle), nearest);
-
-                    return array(xCircle, yCircle, radius);
-
-                }
-
--->
