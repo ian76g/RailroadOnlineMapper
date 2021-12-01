@@ -246,10 +246,8 @@ foreach ($textFiles as $textFile) {
             </div>
                 <div>
                     <input id="maxSlopeLabel" type="checkbox"
-                           onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('maxSlopeLabel'); ?>/> Show
-                    max
-                    Slope
-                    Circle
+                           onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('maxSlopeLabel'); ?>/>
+                    Show orange max slope circles
                 </div>
 
             </details>

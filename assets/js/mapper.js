@@ -75,17 +75,17 @@ class Mapper {
         const editPlayersTable = document.getElementById("editPlayersTable");
 
         for (let index = 0; index < this.json['Players'].length; index++) {
-            const player = this.json['Players'][index];
+            let player = this.json['Players'][index];
 
-            const playerEditInfoRow = document.createElement("tr");
+            let playerEditInfoRow = document.createElement("tr");
 
-            const playerEditValue = document.createElement("td");
-            const playerEditTextNode = document.createTextNode(player['Name']);
+            let playerEditValue = document.createElement("td");
+            let playerEditTextNode = document.createTextNode(player['Name']);
             playerEditValue.appendChild(playerEditTextNode);
             playerEditInfoRow.appendChild(playerEditValue);
 
-            const playerEditXpValue = document.createElement("td");
-            const playerEditXpInput = document.createElement("input");
+            let playerEditXpValue = document.createElement("td");
+            let playerEditXpInput = document.createElement("input");
             playerEditXpInput.size = 5;
             playerEditXpInput.maxLength = 15;
             playerEditXpInput.name = "xp_" + index;
@@ -93,8 +93,8 @@ class Mapper {
             playerEditXpValue.appendChild(playerEditXpInput);
             playerEditInfoRow.appendChild(playerEditXpValue);
 
-            const playerEditMoneyValue = document.createElement("td");
-            const playerEditMoneyInput = document.createElement("input");
+            let playerEditMoneyValue = document.createElement("td");
+            let playerEditMoneyInput = document.createElement("input");
             playerEditMoneyInput.size = 5;
             playerEditMoneyInput.maxLength = 15;
             playerEditMoneyInput.name = "money_" + index;
@@ -102,16 +102,16 @@ class Mapper {
             playerEditMoneyValue.appendChild(playerEditMoneyInput);
             playerEditInfoRow.appendChild(playerEditMoneyValue);
 
-            const playerEditNearValue = document.createElement("td");
+            let playerEditNearValue = document.createElement("td");
             let playerEditNearTextNode = document.createTextNode("Unknown");
             if ('Industries' in this.json) {
-                playerEditNearTextNode = document.createTextNode(this._nearestIndustry(player['Location'], this.json['Industries']));
+                playerEditNearTextNode = document.createTextNode(this._nearestIndustry(player['Location'], this.json['Industries'], false));
             }
             playerEditNearValue.appendChild(playerEditNearTextNode);
             playerEditInfoRow.appendChild(playerEditNearValue);
 
-            const playerEditDeleteValue = document.createElement("td");
-            const playerEditDeleteInput = document.createElement("input");
+            let playerEditDeleteValue = document.createElement("td");
+            let playerEditDeleteInput = document.createElement("input");
             playerEditDeleteInput.type = "checkbox"
             playerEditDeleteInput.name = "deletePlayer_" + index;
             playerEditDeleteValue.appendChild(playerEditDeleteInput);
@@ -1299,12 +1299,17 @@ class Mapper {
         return minDist;
     }
 
-    _nearestIndustry(coords, industryCoords) {
+    _nearestIndustry(coords, industryCoords, log = false) {
         let minDist = 800000;
         let ind = 0;
         for (const i of industryCoords) {
             if (i['Type'] < 10) {
-                const d = this._dist(i['Location'], coords);
+                let d = this._dist(i['Location'], coords, true);
+                if(log) {
+                    // console.log(d);
+                    // console.log(coords);
+                    // console.log(i['Location']);
+                }
                 if (d < minDist) {
                     minDist = d;
                     ind = i['Type'];
@@ -1345,7 +1350,10 @@ class Mapper {
         return name;
     }
 
-    _dist(coords, coords2, flat = false) {
+    _dist(coordsIn, coords2In, flat = false) {
+
+        const coords = JSON.parse(JSON.stringify(coordsIn));
+        const coords2 = JSON.parse(JSON.stringify(coords2In));
         if (coords2 === undefined) {
             return 9999999999;
         }
@@ -1353,7 +1361,7 @@ class Mapper {
         if ('X' in coords) {
             if ('X' in coords2) {
                 if (flat === true) {
-                    coords['Z'] = coords2['Z'];
+                    coords['Z'] = coords2['Z'] = 0;
                 }
                 distance = Math.sqrt(
                     Math.pow(coords['X'] - coords2['X'], 2) +
@@ -1362,7 +1370,7 @@ class Mapper {
                 );
             } else {
                 if (flat === true) {
-                    coords['Z'] = coords2[2];
+                    coords['Z'] = coords2[2] = 0;
                 }
                 distance = Math.sqrt(
                     Math.pow(coords['X'] - coords2[0], 2) +
@@ -1373,7 +1381,7 @@ class Mapper {
         } else {
             if ('X' in coords2) {
                 if (flat === true) {
-                    coords[2] = coords2['Z'];
+                    coords[2] = coords2['Z'] = 0;
                 }
                 distance = Math.sqrt(
                     Math.pow(coords[0] - coords2['X'], 2) +
@@ -1382,7 +1390,7 @@ class Mapper {
                 );
             } else {
                 if (flat === true) {
-                    coords[2] = coords2[2];
+                    coords[2] = coords2[2] = 0;
                 }
                 distance = Math.sqrt(
                     Math.pow(coords[0] - coords2[0], 2) +
