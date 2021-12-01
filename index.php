@@ -15,6 +15,31 @@ if (!file_exists('counter')) {
     file_put_contents('counter', 0);
 }
 
+function getMarqueeTrain()
+{
+    $carts = array('boxcar50.png','boxcar2_50.png','boxcar3_50.png', 'tanker50.png', 'flatcar_logs50.png', 'rawmaterials50.png', 'hopper50.png');
+    shuffle($carts);
+    $length = rand(8, 24);
+    $out = '<marquee scrollamount="' . rand(3, 9) . '">';
+    if(rand(0,1)){
+        $out.= '<img src="assets/images/loco50.png" style="height:25px;display:inline">';
+
+    } else {
+        $out.= '<img src="assets/images/locoporter50.png" style="height:25px;display:inline">';
+    }
+    for ($i = 0; $i < $length; $i++) {
+        if (!rand(0, 3)) shuffle($carts);
+        $out .= '<img src="assets/images/' . $carts[0] . '" style="height:25px;display:inline;">';
+    }
+    if(rand(0,2)){
+        $out .= '<img src="assets/images/caboose50.png" style="height:25px;display:inline">';
+
+    }
+    $out .= '</marquee>' . "\n";
+
+    return $out;
+}
+
 ?>
 <body>
 <header class="header">
@@ -22,6 +47,7 @@ if (!file_exists('counter')) {
     <a class="button" id="uploadButton">Upload Savegame</a>
 </header>
 <main>
+    <?php echo getMarqueeTrain(); ?>
     <section class="uploads">
         <h2>Latest uploads (* = as download available)</h2>
         <div class="uploads__tables">

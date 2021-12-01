@@ -279,11 +279,8 @@ class GVASParser
          * HANDLE DATA MANIPULATION AND SAVE FILE
          */
 
-        $tmp = $this->handleEditAndSave();
         if ($edit) {
-            return $tmp;
-        }
-        if ($tmp == 'AGAIN') {
+            $tmp = $this->handleEditAndSave();
             return $tmp;
         }
 
@@ -398,7 +395,7 @@ class GVASParser
                             }
                         }
                         if ($minDistanceToSomething > $sevenHundred) {
-                            if($ah->nearestIndustryDistance($vector) < 9000) {
+                            if($ah->nearestIndustryDistance(array($vector->content[0], $vector->content[1])) < 9000) {
                                 // too close to industry
                             } else {
                                 $toRemove[] = $index;
@@ -671,22 +668,31 @@ class GVASParser
                 }
 
 
-                if (isset($curvePoints) && sizeof($curvePoints)) {
+                if (isset($curvePoints[0]) && sizeof($curvePoints[0])) {
 
                     if (trim($object->getName()) == 'SplineControlPointsArray') {
 
                         $beforeFuddeling = sizeof($object->CONTENTOBJECTS[3]->contentElements);
                         // add all curve points as Vector to the array
-                        foreach ($curvePoints as $point) {
+                        foreach ($curvePoints[0] as $point) {
                             $v = new dtVector($point);
                             $object->CONTENTOBJECTS[3]->addElement($v);
                         }
                         $afterFuddeling = sizeof($object->CONTENTOBJECTS[3]->contentElements) - 1;
+                        $beforeFuddelingBed = sizeof($object->CONTENTOBJECTS[3]->contentElements);
+                        // add all curve points as Vector to the array
+                        foreach ($curvePoints[1] as $point) {
+                            $v = new dtVector($point);
+                            $object->CONTENTOBJECTS[3]->addElement($v);
+                        }
+                        $afterFuddelingBed = sizeof($object->CONTENTOBJECTS[3]->contentElements) - 1;
                     }
 
                     if (trim($object->getName()) == 'SplineLocationArray') {
                         $beforeFuddelingSplines = sizeof($object->CONTENTOBJECTS[3]->contentElements);
-                        $v = new dtVector($curvePoints[0]);
+                        $v = new dtVector($curvePoints[0][0]);
+                        $object->CONTENTOBJECTS[3]->addElement($v);
+                        $v = new dtVector($curvePoints[0][1]);
                         $object->CONTENTOBJECTS[3]->addElement($v);
                         $afterFuddelingSplines = sizeof($object->CONTENTOBJECTS[3]->contentElements) - 1;
                     }
@@ -696,6 +702,10 @@ class GVASParser
                         $v->pack = 'V';
                         $v->setValue(0);
                         $object->CONTENTOBJECTS[3]->addElement($v);
+                        $v = new dtDynamic('IntProperty');
+                        $v->pack = 'V';
+                        $v->setValue(1);
+                        $object->CONTENTOBJECTS[3]->addElement($v);
                     }
 
                     if (trim($object->getName()) == 'SplineControlPointsIndexStartArray') {
@@ -703,12 +713,20 @@ class GVASParser
                         $v->pack = 'V';
                         $v->setValue($beforeFuddeling);
                         $object->CONTENTOBJECTS[3]->addElement($v);
+                        $v = new dtDynamic('IntProperty');
+                        $v->pack = 'V';
+                        $v->setValue($beforeFuddelingBed);
+                        $object->CONTENTOBJECTS[3]->addElement($v);
                     }
 
                     if (trim($object->getName()) == 'SplineControlPointsIndexEndArray') {
                         $v = new dtDynamic('IntProperty');
                         $v->pack = 'V';
                         $v->setValue($afterFuddeling);
+                        $object->CONTENTOBJECTS[3]->addElement($v);
+                        $v = new dtDynamic('IntProperty');
+                        $v->pack = 'V';
+                        $v->setValue($afterFuddelingBed);
                         $object->CONTENTOBJECTS[3]->addElement($v);
                     }
 
@@ -723,6 +741,12 @@ class GVASParser
                             }
                             $object->CONTENTOBJECTS[3]->addElement($v);
                         }
+                        for ($spex = $beforeFuddelingBed; $spex <= $afterFuddelingBed+1; $spex++) {
+                            $v = new dtDynamic('IntProperty');
+                            $v->pack = 'C';
+                            $v->setValue(1);
+                            $object->CONTENTOBJECTS[3]->addElement($v);
+                        }
                         $c=2;
                     }
                     if (trim($object->getName()) == 'SplineVisibilityStartArray') {
@@ -730,11 +754,19 @@ class GVASParser
                         $v->pack = 'V';
                         $v->setValue(1);
                         $object->CONTENTOBJECTS[3]->addElement($v);
+                        $v = new dtDynamic('IntProperty');
+                        $v->pack = 'V';
+                        $v->setValue(0);
+                        $object->CONTENTOBJECTS[3]->addElement($v);
                     }
                     if (trim($object->getName()) == 'SplineVisibilityEndArray') {
                         $v = new dtDynamic('IntProperty');
                         $v->pack = 'V';
-                        $v->setValue(sizeof($curvePoints)-1);
+                        $v->setValue(sizeof($curvePoints[0])-1);
+                        $object->CONTENTOBJECTS[3]->addElement($v);
+                        $v = new dtDynamic('IntProperty');
+                        $v->pack = 'V';
+                        $v->setValue(sizeof($curvePoints[1])-1);
                         $object->CONTENTOBJECTS[3]->addElement($v);
                     }
                 }

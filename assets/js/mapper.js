@@ -189,7 +189,16 @@ class Mapper {
                 splineIndex++;
                 let type = spline['Type'];
                 let entry = drawOrder[type];
-                const [, strokeWidth, stroke] = entry;
+                let [, strokeWidth, stroke] = entry;
+
+                let multiplier = 1;
+                if([1, 2, 5, 6].indexOf(type) > -1) {
+                    let x = this.getZDistanceToNearestTrack(spline['Segments'][0]);
+                    if(x>0){
+                        multiplier = Math.round(x/180);
+                    }
+                }
+                strokeWidth = strokeWidth * multiplier;
 
                 let segments = spline['Segments'];
                 if ([1, 2, 5, 6, 3, 7].indexOf(type) > -1) {
@@ -1115,6 +1124,48 @@ class Mapper {
             waterTowerCircle.setAttribute("fill", "blue");
             this.shapes.push(waterTowerCircle);
         }
+    }
+
+    getZDistanceToNearestTrack(segment)
+    {
+            const treeX = Math.floor((200000 + segment['LocationCenter']['X']) / 100000);
+            const treeY = Math.floor((200000 + segment['LocationCenter']['Y']) / 100000);
+            const tree = [segment['LocationCenter']['X'], segment['LocationCenter']['Y'], segment['LocationCenter']['Z']];
+
+            let minDistanceToSomething = undefined;
+            try {
+                for (const spline of this.json['Splines']) {
+                    if (spline['Type'] !== 0 && spline['Type'] !== 4) continue;
+
+                    for (const segment of spline['Segments']) {
+                        if (segment['CX'].indexOf(treeX) === -1) continue;
+                        if (segment['CY'].indexOf(treeY) === -1) continue;
+                        if (segment['LocationCenter']['X'] < tree[0] - 6000) {
+                            continue;
+                        }
+                        if (segment['LocationCenter']['X'] > tree[0] + 6000) {
+                            continue;
+                        }
+                        if (segment['LocationCenter']['Y'] < tree[1] - 6000) {
+                            continue;
+                        }
+                        if (segment['LocationCenter']['Y'] > tree[1] + 6000) {
+                            continue;
+                        }
+                        if(minDistanceToSomething === undefined){
+                            minDistanceToSomething = tree[2] - segment['LocationCenter']['Z'];
+                        }
+                        minDistanceToSomething =
+                            Math.min(minDistanceToSomething,
+                                tree[2] - segment['LocationCenter']['Z']
+                            );
+                    }
+                }
+            } catch
+                (err) {
+            }
+            if(minDistanceToSomething === undefined) return -1;
+            return minDistanceToSomething;
     }
 
     getReplantableTrees() {

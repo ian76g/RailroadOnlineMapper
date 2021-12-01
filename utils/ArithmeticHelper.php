@@ -505,9 +505,12 @@ function getCurveCoordsBetweenSegments($segment1, $segment2)
 
     $alpha_per_segment = $arc_angle / $num_segments;
     $curveSegmentLength = $curveLength/$num_segments;
-
+    $curve = array();
+    $curve2 = array();
     $curve[] = array($near_prev_x, $near_prev_y, $near_prev_z);
+    $curve2[] = array($near_prev_x, $near_prev_y, round($near_prev_z)-30);
     $curve[] = array($near_x, $near_y, $near_z);
+    $curve2[] = array($near_x, $near_y, round($near_z)-30);
 
 
     $straight = $this->vec_abs($far_x - $far_off_x, $far_y - $far_off_y);
@@ -528,6 +531,9 @@ function getCurveCoordsBetweenSegments($segment1, $segment2)
         $tmp_vec_x += $arc_center_x;
         $tmp_vec_y += $arc_center_y;
         $z = $incline * $traveledSoFar / $totalTrackLength + $near_z; //need to add the height of the starting point
+        if(!($i%2)){
+            $curve2[] = array(round($tmp_vec_x), round($tmp_vec_y), round($z)-30);
+        }
         $curve[] = array(round($tmp_vec_x), round($tmp_vec_y), round($z));
         $traveledSoFar += $curveSegmentLength;
 //        $svg_output .= " L " . round($tmp_vec_x * $scale) . "," . round($tmp_vec_y * $scale);
@@ -556,6 +562,9 @@ function getCurveCoordsBetweenSegments($segment1, $segment2)
 //        $svg_output .= " L " . round($xOnLine * $scale) . "," . round($yOnLine * $scale);
 
         $curve[] = array(round($xOnLine), round($yOnLine), round($z));
+        if(($i%2)){
+            $curve2[] = array(round($xOnLine), round($yOnLine), round($z)-30);
+        }
         $traveledSoFar+=$straightLength;
     }
 
@@ -564,7 +573,7 @@ function getCurveCoordsBetweenSegments($segment1, $segment2)
 //    $svg_output .= "</svg>\n";
 //    echo($svg_output);
     // report success
-    return $curve;
+    return array($curve, $curve2);
 }
 
 

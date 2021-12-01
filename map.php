@@ -384,11 +384,16 @@ foreach ($textFiles as $textFile) {
                 <br>
 
                 <details><summary><h4>Curves</h4></summary>
+                    1) Zoom into your map on the left, click a piece of track (not a switch or cross).<br>
+                    2) Read the numbers off the popup window - put them into the field below.<br>
+                    3) Click on another piece of track (not a switch or cross) - not too far away.<br>
+                    4) Read the numbers off the popup window - put them into the other field below.<br>
+                    5) Click the button and then download your save.<br>
                 <form method="POST" action="/converter.php">
                     <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
                     from: <input name="from" value="0-0" size="6"><br>
                     to: <input name="to" value="0-0" size="6"><br>
-                    <button class="button">DO NOT CLICK</button>
+                    <button class="button">Generate curve and bed between segments</button>
                 </form>
                 </details>
                 <br>
