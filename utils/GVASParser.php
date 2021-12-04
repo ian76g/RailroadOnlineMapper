@@ -38,7 +38,6 @@ class GVASParser
         while ($position < strlen($x)) {
             $myProperty = new dtProperty();
             $results = $myProperty->unserialize($x, $position);
-echo $myProperty->getName()."\n";
             if ($results['0'] != 'EOF') {
 
                 $original = substr($x, $position, $results[1] - $position);
