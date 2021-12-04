@@ -40,6 +40,10 @@ class dtStruct extends dtAbstractData
         $this->length = $length;
     }
 
+    public function updateLength($newLenth){
+        $this->length[1] = $newLenth;
+    }
+
     /**
      * @param mixed $subType
      */
@@ -66,5 +70,10 @@ class dtStruct extends dtAbstractData
         $output .= $this->seventeenBytes;
 
         return $output;
+    }
+
+    public function getSingleLenghtInBytes()
+    {
+        die('// TODO: Implement getSingleLenghtInBytes() method for dtStruct');
     }
 }

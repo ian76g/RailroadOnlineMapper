@@ -36,7 +36,7 @@ function getUserIpAddr()
     return $ip;
 }
 
-//$_POST['save'] = 'slot10.sav';
+//$_POST['save'] = 'slot9.sav';
 //$_POST['replant'] = 'NO';
 //$_POST['firstTree'] = 'A';
 //$_POST['userTree'] = 'A';

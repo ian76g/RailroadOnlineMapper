@@ -127,4 +127,9 @@ class dtString extends dtAbstractData
         return $data;
     }
 
+    public function getSingleLenghtInBytes()
+    {
+        die('// TODO: Implement getSingleLenghtInBytes() method for dtString');
+    }
+
 }

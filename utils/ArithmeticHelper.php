@@ -554,7 +554,7 @@ function getCurveCoordsBetweenSegments($segment1, $segment2, $bedDistance)
 
     //$xOut, $yOut
 
-    for($i=0; $i<$straightSegments; $i++){
+    for($i=0; $i<=$straightSegments; $i++){
         $xOnLine = $far_x + $i*$straightLength*$straight_vec_x;
         $yOnLine = $far_y + $i*$straightLength*$straight_vec_y;
 

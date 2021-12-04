@@ -527,4 +527,9 @@ class dtProperty extends dtAbstractData
     {
         return $this->NAME;
     }
+
+    public function getSingleLenghtInBytes()
+    {
+        die('// TODO: Implement getSingleLenghtInBytes() method for dtProperty');
+    }
 }

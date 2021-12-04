@@ -62,10 +62,23 @@ class dtArray extends dtAbstractData
         $this->COUNTER = $object;
     }
 
-    public function addElement($object)
+    /**
+     * @param dtAbstractData $object
+     * @param false $manual
+     */
+    public function addElement($object, $manual = false)
     {
         $this->contentElements[] = $object;
         $this->COUNTER->updateTo(sizeof($this->contentElements));
+        if($manual && $this->structObject) {
+            $this->structObject->updateLength(sizeof($this->contentElements)*$object->getSingleLenghtInBytes());
+        }
+    }
+
+    public function getSingleLenghtInBytes()
+    {
+        // TODO: Implement getSingleLenghtInBytes() method.
+        die('// TODO: Implement getSingleLenghtInBytes() method for dtArray');
     }
 
 }

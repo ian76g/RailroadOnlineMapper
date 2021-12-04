@@ -86,4 +86,9 @@ class dtHeader extends dtAbstractData
         return $this->content;
     }
 
+    public function getSingleLenghtInBytes()
+    {
+        die('// TODO: Implement getSingleLenghtInBytes() method for dtHeader');
+    }
+
 }

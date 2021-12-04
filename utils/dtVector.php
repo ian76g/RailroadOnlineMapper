@@ -58,4 +58,9 @@ class dtVector extends dtAbstractData
         return $content;
     }
 
+    public function getSingleLenghtInBytes()
+    {
+        return 12;
+    }
+
 }

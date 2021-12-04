@@ -205,5 +205,9 @@ class dtTextProperty extends dtAbstractData
         $this->secondFourHR = unpack('i', $secondFour)[1];
     }
 
+    public function getSingleLenghtInBytes()
+    {
+        die('// TODO: Implement getSingleLenghtInBytes() method for dtTextProperty');
+    }
 
 }

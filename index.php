@@ -114,7 +114,7 @@ function getMarqueeTrain()
 
                 <section>
                     <h3>Make it public</h3>
-                    <input type="checkbox" name="public" id="public"/>
+                    <input type="checkbox" name="public" id="public"/> YES - Others may download my save file
                 </section>
 
                 <input class="button" type="submit" value="Upload" name="submit">

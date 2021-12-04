@@ -162,6 +162,7 @@ class GVASParser
 
         if (isset($this->goldenBucket['Spline'])) {
 
+            $sillyCopy = $this->goldenBucket['Spline']['Segments']['Visibility'];
             for ($i = 0; $i < sizeof($this->goldenBucket['Spline']['Points']['Index']['Start']); $i++) {
                 $locArr = $this->goldenBucket['Spline']['Location'][$i];
 
@@ -199,7 +200,7 @@ class GVASParser
                             'Y' => round($startLocs[1] + ($endLocs[1] - $startLocs[1]) / 2),
                             'Z' => round($startLocs[2] + ($endLocs[2] - $startLocs[2]) / 2)
                         ),
-                        'Visible' => $this->goldenBucket['Spline']['Segments']['Visibility'][sizeof($segmentArray)],
+                        'Visible' => array_shift($sillyCopy),
 
                     );
                     $startPos++;
@@ -397,7 +398,7 @@ class GVASParser
                             }
                         }
                         if ($minDistanceToSomething > $sevenHundred) {
-                            if($ah->nearestIndustryDistance(array($vector->content[0], $vector->content[1])) < 9000) {
+                            if ($ah->nearestIndustryDistance(array($vector->content[0], $vector->content[1])) < 9000) {
                                 // too close to industry
                             } else {
                                 $toRemove[] = $index;
@@ -673,33 +674,32 @@ class GVASParser
                 if (isset($curvePoints[0]) && sizeof($curvePoints[0])) {
 
                     if (trim($object->getName()) == 'SplineControlPointsArray') {
-
+// 0.1.2.3.4.5.6   = 7     +5
+// 0.1.2.3.4.5.6.7.8.9.10.11   = 12
                         $controlPointStartTrackIndex = sizeof($object->CONTENTOBJECTS[3]->contentElements);
                         // add all curve points as Vector to the array
                         foreach ($curvePoints[0] as $point) {
                             $v = new dtVector($point);
-                            $object->CONTENTOBJECTS[3]->addElement($v);
+                            $object->CONTENTOBJECTS[3]->addElement($v, true);
                         }
                         $controlPointEndTrackIndex = sizeof($object->CONTENTOBJECTS[3]->contentElements) - 1;
                         $controlPointStartBedIndex = sizeof($object->CONTENTOBJECTS[3]->contentElements);
-                        if($_POST['curveBed']!= 'none'){
+                        if ($_POST['curveBed'] != 'none') {
                             // add all bed curve points as Vector to the array
                             foreach ($curvePoints[1] as $point) {
                                 $v = new dtVector($point);
-                                $object->CONTENTOBJECTS[3]->addElement($v);
+                                $object->CONTENTOBJECTS[3]->addElement($v, true);
                             }
                             $controlPointEndBedIndex = sizeof($object->CONTENTOBJECTS[3]->contentElements) - 1;
                         }
                     }
 
                     if (trim($object->getName()) == 'SplineLocationArray') {
-                        $beforeFuddelingSplines = sizeof($object->CONTENTOBJECTS[3]->contentElements);
                         $v = new dtVector($curvePoints[0][0]);
-                        $object->CONTENTOBJECTS[3]->addElement($v);
-                        if($_POST['curveBed']!= 'none') {
-                            $v = new dtVector($curvePoints[0][1]);
-                            $object->CONTENTOBJECTS[3]->addElement($v);
-                            $afterFuddelingSplines = sizeof($object->CONTENTOBJECTS[3]->contentElements) - 1;
+                        $object->CONTENTOBJECTS[3]->addElement($v, true);
+                        if ($_POST['curveBed'] != 'none') {
+                            $v = new dtVector($curvePoints[1][0]);
+                            $object->CONTENTOBJECTS[3]->addElement($v, true);
                         }
                     }
 
@@ -707,12 +707,12 @@ class GVASParser
                         $v = new dtDynamic('IntProperty');
                         $v->pack = 'V';
                         $v->setValue($_POST['curveTrack']);
-                        $object->CONTENTOBJECTS[3]->addElement($v);
-                        if($_POST['curveBed']!= 'none') {
+                        $object->CONTENTOBJECTS[3]->addElement($v, true);
+                        if ($_POST['curveBed'] != 'none') {
                             $v = new dtDynamic('IntProperty');
                             $v->pack = 'V';
                             $v->setValue($_POST['curveBed']);
-                            $object->CONTENTOBJECTS[3]->addElement($v);
+                            $object->CONTENTOBJECTS[3]->addElement($v, true);
                         }
                     }
 
@@ -720,12 +720,12 @@ class GVASParser
                         $v = new dtDynamic('IntProperty');
                         $v->pack = 'V';
                         $v->setValue($controlPointStartTrackIndex);
-                        $object->CONTENTOBJECTS[3]->addElement($v);
-                        if($_POST['curveBed']!= 'none') {
+                        $object->CONTENTOBJECTS[3]->addElement($v, true);
+                        if ($_POST['curveBed'] != 'none') {
                             $v = new dtDynamic('IntProperty');
                             $v->pack = 'V';
                             $v->setValue($controlPointStartBedIndex);
-                            $object->CONTENTOBJECTS[3]->addElement($v);
+                            $object->CONTENTOBJECTS[3]->addElement($v, true);
                         }
                     }
 
@@ -733,57 +733,59 @@ class GVASParser
                         $v = new dtDynamic('IntProperty');
                         $v->pack = 'V';
                         $v->setValue($controlPointEndTrackIndex);
-                        $object->CONTENTOBJECTS[3]->addElement($v);
-                        if($_POST['curveBed']!= 'none') {
+                        $object->CONTENTOBJECTS[3]->addElement($v, true);
+                        if ($_POST['curveBed'] != 'none') {
                             $v = new dtDynamic('IntProperty');
                             $v->pack = 'V';
                             $v->setValue($controlPointEndBedIndex);
-                            $object->CONTENTOBJECTS[3]->addElement($v);
+                            $object->CONTENTOBJECTS[3]->addElement($v, true);
                         }
                     }
 
                     if (trim($object->getName()) == 'SplineSegmentsVisibilityArray') {
                         // add all curve points as Vector to the array
+                        $beforeFuddeling = sizeof($object->CONTENTOBJECTS[3]->contentElements);
                         for ($spex = 0; $spex < sizeof($curvePoints[0]); $spex++) {
                             $v = new dtDynamic('BoolProperty');
                             $v->pack = 'C';
                             $v->setValue(1);
-                            if($spex == 0) {
+                            if ($spex == 0) {
                                 $v->setValue(0);
                             }
-                            $object->CONTENTOBJECTS[3]->addElement($v);
+                            $object->CONTENTOBJECTS[3]->addElement($v, true);
                         }
-                        if($_POST['curveBed']!= 'none') {
-                            for ($spex = 0; $spex <= sizeof($curvePoints[1]); $spex++) {
+                        if ($_POST['curveBed'] != 'none') {
+                            $beforeFuddelingBed = sizeof($object->CONTENTOBJECTS[3]->contentElements);
+                            for ($spex = 0; $spex < sizeof($curvePoints[1]); $spex++) {
                                 $v = new dtDynamic('BoolProperty');
                                 $v->pack = 'C';
                                 $v->setValue(1);
-                                $object->CONTENTOBJECTS[3]->addElement($v);
+                                $object->CONTENTOBJECTS[3]->addElement($v, true);
                             }
                         }
                     }
                     if (trim($object->getName()) == 'SplineVisibilityStartArray') {
                         $v = new dtDynamic('IntProperty');
                         $v->pack = 'V';
-                        $v->setValue($controlPointStartTrackIndex+1);
-                        $object->CONTENTOBJECTS[3]->addElement($v);
-                        if($_POST['curveBed']!= 'none') {
+                        $v->setValue($beforeFuddeling);
+                        $object->CONTENTOBJECTS[3]->addElement($v, true);
+                        if ($_POST['curveBed'] != 'none') {
                             $v = new dtDynamic('IntProperty');
                             $v->pack = 'V';
-                            $v->setValue($controlPointStartBedIndex);
-                            $object->CONTENTOBJECTS[3]->addElement($v);
+                            $v->setValue($beforeFuddelingBed);
+                            $object->CONTENTOBJECTS[3]->addElement($v, true);
                         }
                     }
                     if (trim($object->getName()) == 'SplineVisibilityEndArray') {
                         $v = new dtDynamic('IntProperty');
                         $v->pack = 'V';
-                        $v->setValue($controlPointEndTrackIndex);
-                        $object->CONTENTOBJECTS[3]->addElement($v);
-                        if($_POST['curveBed']!= 'none') {
+                        $v->setValue($beforeFuddeling + sizeof($curvePoints[0]) - 1);
+                        $object->CONTENTOBJECTS[3]->addElement($v, true);
+                        if ($_POST['curveBed'] != 'none') {
                             $v = new dtDynamic('IntProperty');
                             $v->pack = 'V';
-                            $v->setValue($controlPointEndBedIndex);
-                            $object->CONTENTOBJECTS[3]->addElement($v);
+                            $v->setValue($beforeFuddelingBed + sizeof($curvePoints[1]) - 1);
+                            $object->CONTENTOBJECTS[3]->addElement($v, true);
                         }
                     }
                 }
@@ -798,7 +800,7 @@ class GVASParser
 
         if (isset($_POST['save'])) {
             $db = unserialize(file_get_contents('db.db'));
-            if (getUserIpAddr()!='local' && (!isset($db[$this->owner][5]) || getUserIpAddr() != $db[$this->owner][5])) {
+            if (getUserIpAddr() != 'local' && (!isset($db[$this->owner][5]) || getUserIpAddr() != $db[$this->owner][5])) {
                 $secondParts = explode('.', $db[$this->owner][5]);
                 echo 'Your IP is: ' . getUserIpAddr() . ' but game was uploaded from: ' . $secondParts[0] . '.*.*.' . $secondParts[3] . " [" . $this->owner . "]\n";
                 die("This does not seem to be your save file.");
@@ -999,7 +1001,7 @@ class GVASParser
             unset($reduced['Players'][$index]['Rotation']);
         }
 
-        if(isset($reduced['Frames'])) {
+        if (isset($reduced['Frames'])) {
             // Carts don't need the same attributes as locomotives
             foreach ($reduced['Frames'] as $index => $frame) {
                 if (in_array($frame['Type'], $carts)) {
@@ -1038,7 +1040,7 @@ class GVASParser
         foreach ($reduced['Players'] as $index => $player) {
             unset($reduced['Players'][$index]['Location'][2]);
         }
-        if(isset($reduced['Frames'])) {
+        if (isset($reduced['Frames'])) {
             foreach ($reduced['Frames'] as $index => $frame) {
                 unset($reduced['Frames'][$index]['Rotation'][2]);
 //            unset($reduced['Frames'][$index]['Location'][2]);
@@ -1163,7 +1165,7 @@ class CountryNames
 
     public function __construct($type, $maxLength)
     {
-        $this->maxLength=$maxLength;
+        $this->maxLength = $maxLength;
         if (file_exists('includes/' . $type . '.txt')) {
             $data = file_get_contents('includes/' . $type . '.txt');
             $data = explode("\n", $data);

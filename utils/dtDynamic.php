@@ -38,4 +38,12 @@ class dtDynamic extends dtAbstractData
     {
         $this->value = $newValue;
     }
+
+    public function getSingleLenghtInBytes()
+    {
+        if($this->pack == 'C') return 1;
+        if($this->pack == 'V') return 4;
+
+        die('TODO - implement length for pack '.$this->pack);
+    }
 }

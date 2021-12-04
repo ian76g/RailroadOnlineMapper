@@ -12,8 +12,6 @@ require_once 'utils/dtTextProperty.php';
 require_once 'utils/GVASParser.php';
 require_once 'utils/functions.php';
 
-# https://code-with-me.jetbrains.com/Rw_Zh9Ak_gNBhqd__e2ldw#p=PS&fp=7AAA6BB9B8FD6E20E9A2CB186E280FB0D95A569762E8CF5446C0D57AE8255E77
-
 while (!mkdir('lock')) {
 }
 file_put_contents('counter', $counter = file_get_contents('counter') + 1);
