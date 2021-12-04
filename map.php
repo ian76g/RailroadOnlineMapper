@@ -85,18 +85,19 @@ foreach ($textFiles as $textFile) {
 
     <div class="export__panel info-panel">
         <div class="export__panel-scroll-content">
-            <details><summary><h4>Player Info</h4></summary>
-            <div class="export__panel--player-list">
-                <?php
-                foreach ($dataArray['Players'] as $index => $player) {
-                    ?>
-                    <div class="export__panel--player-list-item"><?= $player['Name']; ?></div>
-                    <div class="export__panel--player-list-item"><?= $player['Xp']; ?> XP</div>
-                    <div class="export__panel--player-list-item"><?= $player['Money']; ?> $</div>
+            <details>
+                <summary><h4>Player Info</h4></summary>
+                <div class="export__panel--player-list">
                     <?php
-                }
-                ?>
-            </div>
+                    foreach ($dataArray['Players'] as $index => $player) {
+                        ?>
+                        <div class="export__panel--player-list-item"><?= $player['Name']; ?></div>
+                        <div class="export__panel--player-list-item"><?= $player['Xp']; ?> XP</div>
+                        <div class="export__panel--player-list-item"><?= $player['Money']; ?> $</div>
+                        <?php
+                    }
+                    ?>
+                </div>
             </details>
 
             <hr/>
@@ -104,60 +105,67 @@ foreach ($textFiles as $textFile) {
                 All settings below are stored in cookies and will be applied on each map you visit.
             </div>
 
-            <details><summary><h4>Change background</h4></summary>
-            <div class="export__panel--bg-grid">
-                <div class="box">
-                    <img id="bg" src="/assets/images/bg_90x90.png" width="90" height="90" alt="Old background"
-                         onclick="changeBackground(this)">
+            <details>
+                <summary><h4>Change background</h4></summary>
+                <div class="export__panel--bg-grid">
+                    <div class="box">
+                        <img id="bg" src="/assets/images/bg_90x90.png" width="90" height="90" alt="Old background"
+                             onclick="changeBackground(this)">
+                    </div>
+                    <div class="box">
+                        <img id="bg3" src="/assets/images/bg3_90x90.png" width="90" height="90" alt="New background"
+                             onclick="changeBackground(this)">
+                    </div>
+                    <div class="box">
+                        <img id="bg4" src="/assets/images/bg4_90x90.png" width="90" height="90" alt="Psawhns background"
+                             onclick="changeBackground(this)">
+                    </div>
+                    <div class="box">
+                        <img id="bg5" src="/assets/images/bg5_90x90.png" width="90" height="90"
+                             alt="Psawhns background with kanados" onclick="changeBackground(this)">
+                    </div>
                 </div>
-                <div class="box">
-                    <img id="bg3" src="/assets/images/bg3_90x90.png" width="90" height="90" alt="New background"
-                         onclick="changeBackground(this)">
-                </div>
-                <div class="box">
-                    <img id="bg4" src="/assets/images/bg4_90x90.png" width="90" height="90" alt="Psawhns background"
-                         onclick="changeBackground(this)">
-                </div>
-                <div class="box">
-                    <img id="bg5" src="/assets/images/bg5_90x90.png" width="90" height="90"
-                         alt="Psawhns background with kanados" onclick="changeBackground(this)">
-                </div>
-            </div>
             </details>
 
-            <details><summary><h4>Trees</h4></summary>
-            <div>
-                <input id="trees_user" type="checkbox"
-                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('trees_user'); ?>/> Show
-                trees
-                cut down more than 90m of industry (can be replanted)
-            </div>
-            <div>
-                <input id="trees_default" type="checkbox"
-                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('trees_default'); ?>/> Show
-                trees cut down less than 90m of industry
-            </div>
-            </details>
-
-            <details><summary><h4>Rails and beds</h4></summary>
+            <details>
+                <summary><h4>Trees</h4></summary>
                 <div>
-                <input id="beds" type="checkbox"
-                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('beds'); ?>/> Show beds
-            </div>
-            <div>
-                <input id="tracks" type="checkbox"
-                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('tracks'); ?>/> Show tracks
-            </div>
-            <div>
-                <input id="switches" type="checkbox"
-                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('switches'); ?>/> Show
-                switches
-                and
-                crossings
-            </div>
+                    <input id="trees_user" type="checkbox"
+                           onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('trees_user'); ?>/>
+                    Show
+                    trees
+                    cut down more than 90m of industry (can be replanted)
+                </div>
+                <div>
+                    <input id="trees_default" type="checkbox"
+                           onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('trees_default'); ?>/>
+                    Show
+                    trees cut down less than 90m of industry
+                </div>
+            </details>
+
+            <details>
+                <summary><h4>Rails and beds</h4></summary>
+                <div>
+                    <input id="beds" type="checkbox"
+                           onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('beds'); ?>/> Show beds
+                </div>
+                <div>
+                    <input id="tracks" type="checkbox"
+                           onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('tracks'); ?>/> Show
+                    tracks
+                </div>
+                <div>
+                    <input id="switches" type="checkbox"
+                           onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('switches'); ?>/> Show
+                    switches
+                    and
+                    crossings
+                </div>
                 <div>
                     <input id="ironOverWood" type="checkbox"
-                           onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('ironOverWood'); ?>/> Show
+                           onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('ironOverWood'); ?>/>
+                    Show
                     Iron
                     bridge on
                     top of Wood bridge
@@ -165,13 +173,15 @@ foreach ($textFiles as $textFile) {
 
             </details>
 
-            <details><summary><h4>Locos and carts</h4></summary>
-            <div>
-                <input id="rollingstock" type="checkbox"
-                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('rollingstock'); ?>/> Show
-                rolling
-                stock
-            </div>
+            <details>
+                <summary><h4>Locos and carts</h4></summary>
+                <div>
+                    <input id="rollingstock" type="checkbox"
+                           onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('rollingstock'); ?>/>
+                    Show
+                    rolling
+                    stock
+                </div>
 
                 <h4>Cart coloring</h4>
                 <div class="cart_colors">
@@ -210,40 +220,47 @@ foreach ($textFiles as $textFile) {
 
             </details>
 
-            <details><summary><h4>Slopes</h4></summary>            <div>
-                <input id="slopeLabel0" type="checkbox"
-                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel0'); ?>/> Show
-                Slope
-                Labels 0% to
-                1%
-            </div>
-            <div>
-                <input id="slopeLabel1" type="checkbox"
-                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel1'); ?>/> Show
-                Slope
-                Labels 1% to
-                2%
-            </div>
-            <div>
-                <input id="slopeLabel2" type="checkbox"
-                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel2'); ?>/> Show
-                Slope
-                Labels
-                2% to 3%
-            </div>
-            <div>
-                <input id="slopeLabel3" type="checkbox"
-                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel3'); ?>/> Show
-                Slope
-                Labels
-                above 3%
-            </div>
-            <div>
-                <input id="slopeLabel4" type="checkbox"
-                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel4'); ?>/> I want
-                to
-                brag with my slope using 6 decimals after the comma
-            </div>
+            <details>
+                <summary><h4>Slopes</h4></summary>
+                <div>
+                    <input id="slopeLabel0" type="checkbox"
+                           onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel0'); ?>/>
+                    Show
+                    Slope
+                    Labels 0% to
+                    1%
+                </div>
+                <div>
+                    <input id="slopeLabel1" type="checkbox"
+                           onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel1'); ?>/>
+                    Show
+                    Slope
+                    Labels 1% to
+                    2%
+                </div>
+                <div>
+                    <input id="slopeLabel2" type="checkbox"
+                           onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel2'); ?>/>
+                    Show
+                    Slope
+                    Labels
+                    2% to 3%
+                </div>
+                <div>
+                    <input id="slopeLabel3" type="checkbox"
+                           onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel3'); ?>/>
+                    Show
+                    Slope
+                    Labels
+                    above 3%
+                </div>
+                <div>
+                    <input id="slopeLabel4" type="checkbox"
+                           onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel4'); ?>/> I
+                    want
+                    to
+                    brag with my slope using 6 decimals after the comma
+                </div>
                 <div>
                     <input id="maxSlopeLabel" type="checkbox"
                            onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('maxSlopeLabel'); ?>/>
@@ -251,23 +268,28 @@ foreach ($textFiles as $textFile) {
                 </div>
 
             </details>
-            <details><summary><h4>Curves</h4></summary>
-            <div>
-                <input id="slopeLabel5" type="checkbox"
-                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel5'); ?>/> Curve radius 0..40m
-            </div>
-            <div>
-                <input id="slopeLabel6" type="checkbox"
-                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel6'); ?>/> Curve radius 40..60m
-            </div>
-            <div>
-                <input id="slopeLabel7" type="checkbox"
-                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel7'); ?>/> Curve radius 60..120m
-            </div>
-            <div>
-                <input id="slopeLabel8" type="checkbox"
-                       onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel8'); ?>/> Curve radius 120..xm
-            </div>
+            <details>
+                <summary><h4>Curves</h4></summary>
+                <div>
+                    <input id="slopeLabel5" type="checkbox"
+                           onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel5'); ?>/>
+                    Curve radius 0..40m
+                </div>
+                <div>
+                    <input id="slopeLabel6" type="checkbox"
+                           onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel6'); ?>/>
+                    Curve radius 40..60m
+                </div>
+                <div>
+                    <input id="slopeLabel7" type="checkbox"
+                           onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel7'); ?>/>
+                    Curve radius 60..120m
+                </div>
+                <div>
+                    <input id="slopeLabel8" type="checkbox"
+                           onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('slopeLabel8'); ?>/>
+                    Curve radius 120..xm
+                </div>
             </details>
 
             <hr/>
@@ -288,21 +310,44 @@ foreach ($textFiles as $textFile) {
         <svg id="demo-tiger" class="export__map-viewer" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8000 8000">
             <script type="text/JavaScript">
                 <![CDATA[
+                let thingy = 0;
                 function my_function(spline, segment) {
                     svg = document.getElementById('demo-tiger');
-                    var children = svg.children[1].children[6].children;
-                    alert('You clicked on Segment ' + spline + '-' + segment);
-                    // for (var i = 0; i < children.length; i++) {
-                    //     var tableChild = children[i];
-                    //     // Do stuff
-                    //     if(''+tableChild.getAttribute('sp') === ''+spline){
-                    //         tableChild.setAttribute('stroke', 'lightblue');
-                    //         console.log('.');
-                    //     } else {
-                    //         console.log(tableChild.getAttribute('sp'));
-                    //     }
-                    //     //console.log(tableChild.sp);
-                    // }
+                    var children = svg.children[1].children[7].children;
+//                    alert('You clicked on Segment ' + spline + '-' + segment);
+                    for (var i = 0; i < children.length; i++) {
+                        var tableChild = children[i];
+                        if (
+                            '' + tableChild.getAttribute('sp') === '' + spline &&
+                            '' + tableChild.getAttribute('se') === '' + segment
+                        ) {
+                            if (tableChild.getAttribute('stroke') === 'lightblue') {
+                                tableChild.setAttribute('stroke', 'black');
+                                if(thingy === 1){
+                                    elem = document.getElementById('curveFrom');
+                                    elem.value = '0-0';
+                                    thingy = 0;
+                                }
+                                if(thingy === 2){
+                                    elem = document.getElementById('curveTo');
+                                    elem.value = '0-0';
+                                    thingy = 1;
+                                }
+                            } else {
+                                tableChild.setAttribute('stroke', 'lightblue');
+                                if(thingy === 1){
+                                    thingy = 2;
+                                    elem = document.getElementById('curveTo');
+                                    elem.value = spline+'-'+segment;
+                                }
+                                if(thingy === 0){
+                                    thingy = 1;
+                                    elem = document.getElementById('curveFrom');
+                                    elem.value = spline+'-'+segment;
+                                }
+                            }
+                        }
+                    }
 
                 }
 
@@ -321,43 +366,44 @@ foreach ($textFiles as $textFile) {
         <div class="export__panel-scroll-content">
             <h3>Edit</h3><br/>
             <div class="edit-panel__extras">
-                <details><summary><h4>Rolling Stock</h4></summary>
-                <form method="POST" action="/converter.php">
-                    <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
-                    <table id="rollingStockTable" class="export__mapper">
-                        <tr>
-                            <th>Type</th>
-                            <th>Name</th>
-                            <th>Number</th>
-                            <th>Near</th>
-                            <th>Cargo</th>
-                            <th>Amount</th>
-                        </tr>
-                    </table>
-                    <button class="button">Apply Rolling Stock changes</button>
-                </form>
+                <details>
+                    <summary><h4>Rolling Stock</h4></summary>
+                    <form method="POST" action="/converter.php">
+                        <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
+                        <table id="rollingStockTable" class="export__mapper">
+                            <tr>
+                                <th>Type</th>
+                                <th>Name</th>
+                                <th>Number</th>
+                                <th>Near</th>
+                                <th>Cargo</th>
+                                <th>Amount</th>
+                            </tr>
+                        </table>
+                        <button class="button">Apply Rolling Stock changes</button>
+                    </form>
 
-                <form method="POST" action="/converter.php"><input type="hidden" name="save"
-                                                                   value="<?php echo $saveFile; ?>">
-                    <?php echo $textOptions; ?>
+                    <form method="POST" action="/converter.php"><input type="hidden" name="save"
+                                                                       value="<?php echo $saveFile; ?>">
+                        <?php echo $textOptions; ?>
 
-                    <span style="font-size: smaller">Have another list? mail it to locolist@pordi.com</span><br>
-                    apply to <select name="renameWhat">
-                        <option value="everything">everything</option>
-                        <option value="locos">only locomotives</option>
-                        <option value="tenders">only tenders</option>
-                        <option value="carts">only carts</option>
-                        <option value="handcarts">only handcarts</option>
-                    </select><br/>
-                    <button class="button">Apply name schema</button>
-                </form>
-                <br>
+                        <span style="font-size: smaller">Have another list? mail it to locolist@pordi.com</span><br>
+                        apply to <select name="renameWhat">
+                            <option value="everything">everything</option>
+                            <option value="locos">only locomotives</option>
+                            <option value="tenders">only tenders</option>
+                            <option value="carts">only carts</option>
+                            <option value="handcarts">only handcarts</option>
+                        </select><br/>
+                        <button class="button">Apply name schema</button>
+                    </form>
+                    <br>
 
-                <form method="POST" action="/converter.php">
-                    <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
-                    <input name="allBrakes" value="YES" type="hidden"/>
-                    <button class="button">Apply all brakes</button>
-                </form>
+                    <form method="POST" action="/converter.php">
+                        <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
+                        <input name="allBrakes" value="YES" type="hidden"/>
+                        <button class="button">Apply all brakes</button>
+                    </form>
                     <br>
 
                     <form method="POST" action="/converter.php">
@@ -370,63 +416,82 @@ foreach ($textFiles as $textFile) {
                 </details>
                 <br>
 
-                <details><summary><h4>Trees</h4></summary>
-                <form method="POST" action="/converter.php">
-                    <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
-                    <input name="replant" value="700" size="4"> cm away from track!<br>
-                    <span style="font-size: smaller">for reference:<br> 65 cm washing machine, <br> 91 cm gauge,<br> 170 cm bathtub,<br> 460 cm car,<br> 1880 cm switch<br>
+                <details>
+                    <summary><h4>Trees</h4></summary>
+                    <form method="POST" action="/converter.php">
+                        <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
+                        <input name="replant" value="700" size="4"> cm away from track!<br>
+                        <span style="font-size: smaller">for reference:<br> 65 cm washing machine, <br> 91 cm gauge,<br> 170 cm bathtub,<br> 460 cm car,<br> 1880 cm switch<br>
                     measured to start, center and end of track-(segment) only, switches, crosses are not taken into calculation (yet)</span><br>
-                    <button class="button">Replant Trees</button>
-                </form>
+                        <button class="button">Replant Trees</button>
+                    </form>
                 </details>
                 <br>
 
-                <details><summary><h4>Curves</h4></summary>
+                <details>
+                    <summary><h4>Curves</h4></summary>
                     1) Zoom into your map on the left, click a piece of track (not a switch or cross).<br>
-                    2) Read the numbers off the popup window - put them into the field below.<br>
-                    3) Click on another piece of track (not a switch or cross) - not too far away.<br>
-                    4) Read the numbers off the popup window - put them into the other field below.<br>
-                    5) Click the button and then download your save.<br>
-                <form method="POST" action="/converter.php">
-                    <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
-                    from: <input name="from" value="0-0" size="6"><br>
-                    to: <input name="to" value="0-0" size="6"><br>
-                    <button class="button">Generate curve and bed between segments</button>
-                </form>
+                    2) Click on another piece of track (not a switch or cross) - not too far away.<br>
+                    3) Select options for type and height of bed.<br>
+                    4) Click the button and then download your save.<br>
+                    <form method="POST" action="/converter.php">
+                        <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
+                        from: <input name="from" id="curveFrom" value="0-0" size="6"><br>
+                        to: <input name="to" id="curveTo" value="0-0" size="6"><br>
+                        Track: <select name="curveTrack">
+                            <option value="0">rail</option>
+                            <option value="4">rail on wooden deck</option>
+                        </select><br>
+                        Bed: <select name="curveBed">
+                            <option value="1">gravel</option>
+                            <option value="5">stone wall</option>
+                            <option value="3">wooden bridge</option>
+                            <option value="7">steel bridge</option>
+                            <option value="none">No - bed! I want floating tracks</option>
+                        </select><br>
+                        sink tracks in bed?: <select name="sinkBed">
+                            <option value="30">no</option>
+                            <option value="15">yes</option>
+                            <option value="22">a little</option>
+                        </select><br>
+                        <button class="button">Generate curve and bed between segments</button>
+                    </form>
                 </details>
                 <br>
 
-                <details><summary><h4>Players</h4></summary>
-                <form method="POST" action="/converter.php">
-                    <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
-                    <table id="editPlayersTable" class="export__mapper">
-                        <tr>
-                            <th>Player</th>
-                            <th>XP</th>
-                            <th>Money</th>
-                            <th>near</th>
-                            <th>Delete</th>
-                        </tr>
-                    </table>
-                    <button class="button">Apply Player Changes</button>
-                </form>
+                <details>
+                    <summary><h4>Players</h4></summary>
+                    <form method="POST" action="/converter.php">
+                        <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
+                        <table id="editPlayersTable" class="export__mapper">
+                            <tr>
+                                <th>Player</th>
+                                <th>XP</th>
+                                <th>Money</th>
+                                <th>near</th>
+                                <th>Delete</th>
+                            </tr>
+                        </table>
+                        <button class="button">Apply Player Changes</button>
+                    </form>
                 </details>
                 <br>
 
-                <details><summary><h4>Industries</h4></summary>
-                <form method="POST" action="/converter.php">
-                    <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
-                    <table id="industriesTable" class="export__mapper">
-                        <tr>
-                            <th>Industry</th>
-                            <th>Item 1</th>
-                            <th>Item 2</th>
-                            <th>Item 3</th>
-                            <th>Item 4</th>
-                        </tr>
-                    </table>
-                    <button class="button">Apply Industry Changes</button>
-                </form>
+                <details>
+                    <summary><h4>Industries</h4></summary>
+                    <form method="POST" action="/converter.php">
+                        <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
+                        <table id="industriesTable" class="export__mapper">
+                            <tr>
+                                <th>Industry</th>
+                                <th>Item 1</th>
+                                <th>Item 2</th>
+                                <th>Item 3</th>
+                                <th>Item 4</th>
+                            </tr>
+                        </table>
+                        <button class="button">Apply Industry Changes</button>
+                    </form>
                 </details>
                 <br>
 

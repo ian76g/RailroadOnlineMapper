@@ -276,9 +276,9 @@ class Mapper {
                                     )
 
                                     if (O !== null) {
-                                        let OP = [];
-                                        OP['X']=O.x;
-                                        OP['Y']=O.y;
+                                        let OP = {}
+                                        OP.X=O.x;
+                                        OP.Y=O.y;
                                         let radius = Math.round(this._dist(OP, segment['LocationStart'], true)/100);
                                         let index = 8;
                                         if(radius < 120){
@@ -969,7 +969,6 @@ class Mapper {
                     industry['EductsStored'].pop();
                     industry['ProductsStored'].pop();
                     industry['ProductsStored'].pop();
-                    industry['ProductsStored'].pop();
                     pis = ['oil_p.svg', 'pipes_p.svg', 'lumber_p.svg'];
                     pos = ['barrels_p.svg', 'barrels_p.svg'];
                     rotation = 0;
@@ -1045,7 +1044,7 @@ class Mapper {
             const eductRow = document.createElement("tr");
             eductRow.setAttribute("class", "export__educts");
             const eductnameColumn = document.createElement("td");
-            const eductnameColumnText = document.createTextNode(name + " Educts");
+            const eductnameColumnText = document.createTextNode(name + " Input");
             eductnameColumn.appendChild(eductnameColumnText);
             eductRow.appendChild(eductnameColumn);
             for (let i = 0; i < industry['EductsStored'].length; i++) {
@@ -1072,7 +1071,7 @@ class Mapper {
             const productRow = document.createElement("tr");
             productRow.setAttribute("class", "export__products");
             const productNameColumn = document.createElement("td");
-            const productNameColumnText = document.createTextNode(name + " Products");
+            const productNameColumnText = document.createTextNode(name + " Output");
             productNameColumn.appendChild(productNameColumnText);
             productRow.appendChild(productNameColumn);
             for (let i = 0; i < industry['ProductsStored'].length; i++) {
