@@ -199,7 +199,7 @@ class GVASParser
                             'Y' => round($startLocs[1] + ($endLocs[1] - $startLocs[1]) / 2),
                             'Z' => round($startLocs[2] + ($endLocs[2] - $startLocs[2]) / 2)
                         ),
-                        'Visible' => array_shift($this->goldenBucket['Spline']['Segments']['Visibility']),
+                        'Visible' => $this->goldenBucket['Spline']['Segments']['Visibility'][sizeof($segmentArray)],
 
                     );
                     $startPos++;
@@ -271,7 +271,7 @@ class GVASParser
             }
         }
         unset($this->goldenBucket['Turntable']);
-        unset($this->goldenBucket['Spline']);
+//        unset($this->goldenBucket['Spline']);
         unset($this->goldenBucket['Save']);
         unset($this->goldenBucket['Industry']);
 
@@ -279,10 +279,6 @@ class GVASParser
          * HANDLE DATA MANIPULATION AND SAVE FILE
          */
 
-        if ($edit) {
-            $tmp = $this->handleEditAndSave();
-            return $tmp;
-        }
 
         $this->goldenBucket = $this->convert_from_latin1_to_utf8_recursively($this->goldenBucket);
 
@@ -291,6 +287,12 @@ class GVASParser
 
         file_put_contents('xx.json', $json);
         file_put_contents('xx.min.json', $json_min);
+
+        if ($edit) {
+            $tmp = $this->handleEditAndSave();
+            return $tmp;
+        }
+
 
         return $json_min;
     }
@@ -672,21 +674,21 @@ class GVASParser
 
                     if (trim($object->getName()) == 'SplineControlPointsArray') {
 
-                        $splineControlPointsBeforeEdit = sizeof($object->CONTENTOBJECTS[3]->contentElements);
+                        $controlPointStartTrackIndex = sizeof($object->CONTENTOBJECTS[3]->contentElements);
                         // add all curve points as Vector to the array
                         foreach ($curvePoints[0] as $point) {
                             $v = new dtVector($point);
                             $object->CONTENTOBJECTS[3]->addElement($v);
                         }
-                        $splineControlPointsAfterEdit = sizeof($object->CONTENTOBJECTS[3]->contentElements) - 1;
-                        $beforeFuddelingBed = sizeof($object->CONTENTOBJECTS[3]->contentElements);
+                        $controlPointEndTrackIndex = sizeof($object->CONTENTOBJECTS[3]->contentElements) - 1;
+                        $controlPointStartBedIndex = sizeof($object->CONTENTOBJECTS[3]->contentElements);
                         if($_POST['curveBed']!= 'none'){
                             // add all bed curve points as Vector to the array
                             foreach ($curvePoints[1] as $point) {
                                 $v = new dtVector($point);
                                 $object->CONTENTOBJECTS[3]->addElement($v);
                             }
-                            $afterFuddelingBed = sizeof($object->CONTENTOBJECTS[3]->contentElements) - 1;
+                            $controlPointEndBedIndex = sizeof($object->CONTENTOBJECTS[3]->contentElements) - 1;
                         }
                     }
 
@@ -717,12 +719,12 @@ class GVASParser
                     if (trim($object->getName()) == 'SplineControlPointsIndexStartArray') {
                         $v = new dtDynamic('IntProperty');
                         $v->pack = 'V';
-                        $v->setValue($splineControlPointsBeforeEdit);
+                        $v->setValue($controlPointStartTrackIndex);
                         $object->CONTENTOBJECTS[3]->addElement($v);
                         if($_POST['curveBed']!= 'none') {
                             $v = new dtDynamic('IntProperty');
                             $v->pack = 'V';
-                            $v->setValue($beforeFuddelingBed);
+                            $v->setValue($controlPointStartBedIndex);
                             $object->CONTENTOBJECTS[3]->addElement($v);
                         }
                     }
@@ -730,58 +732,57 @@ class GVASParser
                     if (trim($object->getName()) == 'SplineControlPointsIndexEndArray') {
                         $v = new dtDynamic('IntProperty');
                         $v->pack = 'V';
-                        $v->setValue($splineControlPointsAfterEdit);
+                        $v->setValue($controlPointEndTrackIndex);
                         $object->CONTENTOBJECTS[3]->addElement($v);
                         if($_POST['curveBed']!= 'none') {
                             $v = new dtDynamic('IntProperty');
                             $v->pack = 'V';
-                            $v->setValue($afterFuddelingBed);
+                            $v->setValue($controlPointEndBedIndex);
                             $object->CONTENTOBJECTS[3]->addElement($v);
                         }
                     }
 
                     if (trim($object->getName()) == 'SplineSegmentsVisibilityArray') {
                         // add all curve points as Vector to the array
-                        for ($spex = $splineControlPointsBeforeEdit; $spex <= $splineControlPointsAfterEdit+1; $spex++) {
-                            $v = new dtDynamic('IntProperty');
+                        for ($spex = 0; $spex < sizeof($curvePoints[0]); $spex++) {
+                            $v = new dtDynamic('BoolProperty');
                             $v->pack = 'C';
                             $v->setValue(1);
-//                            if($spex == $splineControlPointsBeforeEdit) {
-//                                $v->setValue(0);
-//                            }
+                            if($spex == 0) {
+                                $v->setValue(0);
+                            }
                             $object->CONTENTOBJECTS[3]->addElement($v);
                         }
                         if($_POST['curveBed']!= 'none') {
-                            for ($spex = $beforeFuddelingBed; $spex <= $afterFuddelingBed + 1; $spex++) {
-                                $v = new dtDynamic('IntProperty');
+                            for ($spex = 0; $spex <= sizeof($curvePoints[1]); $spex++) {
+                                $v = new dtDynamic('BoolProperty');
                                 $v->pack = 'C';
                                 $v->setValue(1);
                                 $object->CONTENTOBJECTS[3]->addElement($v);
                             }
                         }
-                        $c=2;
                     }
                     if (trim($object->getName()) == 'SplineVisibilityStartArray') {
                         $v = new dtDynamic('IntProperty');
                         $v->pack = 'V';
-                        $v->setValue(1);
+                        $v->setValue($controlPointStartTrackIndex+1);
                         $object->CONTENTOBJECTS[3]->addElement($v);
                         if($_POST['curveBed']!= 'none') {
                             $v = new dtDynamic('IntProperty');
                             $v->pack = 'V';
-                            $v->setValue(0);
+                            $v->setValue($controlPointStartBedIndex);
                             $object->CONTENTOBJECTS[3]->addElement($v);
                         }
                     }
                     if (trim($object->getName()) == 'SplineVisibilityEndArray') {
                         $v = new dtDynamic('IntProperty');
                         $v->pack = 'V';
-                        $v->setValue(sizeof($curvePoints[0])-1);
+                        $v->setValue($controlPointEndTrackIndex);
                         $object->CONTENTOBJECTS[3]->addElement($v);
                         if($_POST['curveBed']!= 'none') {
                             $v = new dtDynamic('IntProperty');
                             $v->pack = 'V';
-                            $v->setValue(sizeof($curvePoints[1]) - 1);
+                            $v->setValue($controlPointEndBedIndex);
                             $object->CONTENTOBJECTS[3]->addElement($v);
                         }
                     }
