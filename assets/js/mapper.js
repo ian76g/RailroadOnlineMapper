@@ -1357,12 +1357,13 @@ class Mapper {
     }
 
     _dist(coordsIn, coords2In, flat = false) {
+        if (coords2In === undefined) {
+            return 9999999999;
+        }
 
         const coords = JSON.parse(JSON.stringify(coordsIn));
         const coords2 = JSON.parse(JSON.stringify(coords2In));
-        if (coords2 === undefined) {
-            return 9999999999;
-        }
+
         let distance;
         if ('X' in coords) {
             if ('X' in coords2) {
