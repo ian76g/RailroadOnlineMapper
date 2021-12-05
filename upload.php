@@ -42,7 +42,12 @@ if (isset($_POST) && !empty($_POST)) {
         if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
             $saveReadr = new SaveReader($myParser->goldenBucket);
             $saveReadr->addDatabaseEntry($newFilename, isset($_POST['public']));
-            header('Location: /map.php?name=' . $newFilename);
+            if(!isset($_POST['headless'])){
+                header('Location: /map.php?name=' . $newFilename);
+            } else {
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode($newFilename);
+            }
             die();
         } else {
             echo "Sorry, there was an error uploading your file.";

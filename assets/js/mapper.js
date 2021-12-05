@@ -111,10 +111,17 @@ class Mapper {
             playerEditInfoRow.appendChild(playerEditNearValue);
 
             let playerEditDeleteValue = document.createElement("td");
-            let playerEditDeleteInput = document.createElement("input");
-            playerEditDeleteInput.type = "checkbox"
-            playerEditDeleteInput.name = "deletePlayer_" + index;
-            playerEditDeleteValue.appendChild(playerEditDeleteInput);
+
+            if(index === 0){
+                let playerEditDeleteInput = document.createTextNode("Unknown");
+                playerEditDeleteValue.appendChild(playerEditDeleteInput);
+            } else {
+                let playerEditDeleteInput = document.createElement("input");
+                playerEditDeleteInput.type = "checkbox"
+                playerEditDeleteInput.name = "deletePlayer_" + index;
+                playerEditDeleteValue.appendChild(playerEditDeleteInput);
+            }
+
             playerEditInfoRow.appendChild(playerEditDeleteValue);
 
             editPlayersTable.appendChild(playerEditInfoRow);

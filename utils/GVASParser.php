@@ -272,7 +272,7 @@ class GVASParser
             }
         }
         unset($this->goldenBucket['Turntable']);
-//        unset($this->goldenBucket['Spline']);
+        unset($this->goldenBucket['Spline']);
         unset($this->goldenBucket['Save']);
         unset($this->goldenBucket['Industry']);
 
