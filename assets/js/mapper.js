@@ -905,6 +905,8 @@ class Mapper {
         if (!('Industries' in this.json)) {
             return
         }
+        const industryLabelGroup = document.createElementNS(this.svgNS, "g");
+        industryLabelGroup.setAttribute("class", "industryLabel");
 
         const industriesTable = document.getElementById("industriesTable");
         let index = 0;
@@ -1032,8 +1034,11 @@ class Mapper {
                     path.setAttribute("d", "M" + x + "," + y + " m-18,-15 l10,0 l0,30 l-10,0 z");
                     path.setAttribute("fill", "orange");
                     path.setAttribute("stroke", "brown");
-                    this.shapes.push(path);
-                    xoff = -20;
+                    industryLabelGroup.appendChild(path);
+
+                    xoff = -50 + Math.cos(industry['Rotation'][1]*Math.PI/180)*50;
+                    yoff = -25 + Math.sin(industry['Rotation'][1]*Math.PI/180)*25;
+                    xoff = 0;
                     yoff = 0;
                     break;
                 default:
@@ -1046,7 +1051,7 @@ class Mapper {
             industryLabel.setAttribute("y", (this.imy - ((industry['Location'][1] - this.minY) / 100 * this.scale)).toString());
             industryLabel.setAttribute("transform", "rotate(" + rotation + ", " + (this.imx - ((industry['Location'][0] - this.minX) / 100 * this.scale) + xoff) + ", " + (this.imy - ((industry['Location'][1] - this.minY) / 100 * this.scale) + yoff) + ")");
             industryLabel.appendChild(textNode);
-            this.shapes.push(industryLabel);
+            industryLabelGroup.appendChild(industryLabel);
 
             const eductRow = document.createElement("tr");
             eductRow.setAttribute("class", "export__educts");
@@ -1104,9 +1109,6 @@ class Mapper {
 
             index += 1;
         }
-    }
-
-    getWaterTowers() {
         if (!('Watertowers' in this.json)) {
             return
         }
@@ -1121,15 +1123,21 @@ class Mapper {
             waterTower.setAttribute("fill", "lightblue");
             waterTower.setAttribute("stroke", "black");
             waterTower.setAttribute("stroke-width", "1");
-            this.shapes.push(waterTower);
+            industryLabelGroup.appendChild(waterTower);
 
             const waterTowerCircle = document.createElementNS(this.svgNS, "circle");
             waterTowerCircle.setAttribute("cx", x.toString());
             waterTowerCircle.setAttribute("cy", y.toString());
             waterTowerCircle.setAttribute("r", "3");
             waterTowerCircle.setAttribute("fill", "blue");
-            this.shapes.push(waterTowerCircle);
+            industryLabelGroup.appendChild(waterTowerCircle);
         }
+
+        this.shapes.push(industryLabelGroup);
+    }
+
+    getWaterTowers() {
+        // handled in industries
     }
 
     getZDistanceToNearestTrack(segment)

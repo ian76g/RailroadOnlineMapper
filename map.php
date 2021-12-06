@@ -29,6 +29,7 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
 
         $parser = new GVASParser();
         $json = $parser->parseData(file_get_contents($saveFile), false, $slotExtension);
+        $tasks = generateTasks($parser->goldenBucket['Industries']);
     }
 }
 
@@ -98,6 +99,16 @@ foreach ($textFiles as $textFile) {
                     }
                     ?>
                 </div>
+            </details>
+            <details>
+                <summary><h4>Available Tasks</h4></summary>
+                <ul>
+                    <?php
+                    foreach($tasks as $task){
+                        echo '<li>'.$task.'</li>';
+                    }
+                    ?>
+                </ul>
             </details>
 
             <hr/>
@@ -217,6 +228,14 @@ foreach ($textFiles as $textFile) {
                 </div>
                 <button class="button" onclick="shareColors()">Share color scheme</button>
                 <button class="button" onclick="showImportModal()">Import color scheme</button>
+            </details>
+            <details>
+                <summary><h4>Industries</h4></summary>
+                <div>
+                    <input id="industryLabel" type="checkbox"
+                           onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('industryLabel'); ?>/>
+                    Show Industry Labels
+                </div>
 
             </details>
 
@@ -311,6 +330,7 @@ foreach ($textFiles as $textFile) {
             <script type="text/JavaScript">
                 <![CDATA[
                 let thingy = 0;
+
                 function my_function(spline, segment) {
                     svg = document.getElementById('demo-tiger');
                     var children = svg.children[1].children[7].children;
@@ -323,27 +343,27 @@ foreach ($textFiles as $textFile) {
                         ) {
                             if (tableChild.getAttribute('stroke') === 'lightblue') {
                                 tableChild.setAttribute('stroke', 'black');
-                                if(thingy === 1){
+                                if (thingy === 1) {
                                     elem = document.getElementById('curveFrom');
                                     elem.value = '0-0';
                                     thingy = 0;
                                 }
-                                if(thingy === 2){
+                                if (thingy === 2) {
                                     elem = document.getElementById('curveTo');
                                     elem.value = '0-0';
                                     thingy = 1;
                                 }
                             } else {
                                 tableChild.setAttribute('stroke', 'lightblue');
-                                if(thingy === 1){
+                                if (thingy === 1) {
                                     thingy = 2;
                                     elem = document.getElementById('curveTo');
-                                    elem.value = spline+'-'+segment;
+                                    elem.value = spline + '-' + segment;
                                 }
-                                if(thingy === 0){
+                                if (thingy === 0) {
                                     thingy = 1;
                                     elem = document.getElementById('curveFrom');
-                                    elem.value = spline+'-'+segment;
+                                    elem.value = spline + '-' + segment;
                                 }
                             }
                         }
@@ -446,7 +466,7 @@ foreach ($textFiles as $textFile) {
                             <option value="1">gravel</option>
                             <option value="5">stone wall</option>
                             <option value="3">wooden bridge</option>
-                            <option value="7">steel bridge</option>
+                            <!--option value="7">steel bridge</option-->
                             <option value="none">No - bed! I want floating tracks</option>
                         </select><br>
                         sink tracks in bed?: <select name="sinkBed">
@@ -469,7 +489,7 @@ foreach ($textFiles as $textFile) {
                                 <th>XP</th>
                                 <th>Money</th>
                                 <th>near</th>
-                                <th>Delete</th>
+                                <th>DO NOT CLICK</th>
                             </tr>
                         </table>
                         <button class="button">Apply Player Changes</button>

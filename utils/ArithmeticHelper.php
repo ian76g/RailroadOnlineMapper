@@ -32,6 +32,11 @@ class ArithmeticHelper
                 }
             }
         }
+        $d = $this->dist([-5000,-5000], $coords, true);
+        if ($d < 10000) {
+            return 0;
+        }
+
         return $minDist;
     }
 
