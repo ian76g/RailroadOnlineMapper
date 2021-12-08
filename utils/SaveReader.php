@@ -8,7 +8,7 @@ class SaveReader
     private int $totalSwitches = 0;
     private int $totalLocos = 0;
     private int $totalCarts = 0;
-    private int $initialsTreeDown = 1750;
+    private int $initialsTreeDown = 1500;
 
     /**
      * Mapper constructor.
@@ -38,14 +38,19 @@ class SaveReader
 
     /**
      * @param $filename
+     * @param bool $public
+     * @param array $tasks
      * @return void
      */
-    function addDatabaseEntry($filename, $public = false)
+    function addDatabaseEntry($filename, $public = false, array $tasks)
     {
         $this->getTrackLength();
         $this->getSwitchesCount();
         $this->getRollingStockCount();
-
+        $sum=0;
+        foreach($tasks[0] as $task){
+            $sum+=$task[1];
+        }
         // create a "database" and store some infos about this file for the websies index page
         $db = @unserialize(@file_get_contents('db.db'));
         $db[$filename] = array(
@@ -57,6 +62,34 @@ class SaveReader
             $this->getUserIpAddr(),
             (count($this->data['Removed']['Vegetation']) - $this->initialsTreeDown),
             $public,
+            sizeof($tasks[0]),
+            $sum
+        );
+        file_put_contents('db.db', serialize($db));
+    }
+
+    function updateDatabaseEntry($filename, array $tasks)
+    {
+        $this->getTrackLength();
+        $this->getSwitchesCount();
+        $this->getRollingStockCount();
+        $sum=0;
+        foreach($tasks[0] as $task){
+            $sum+=$task[1];
+        }
+        // create a "database" and store some infos about this file for the websies index page
+        $db = @unserialize(@file_get_contents('db.db'));
+        $db[$filename] = array(
+            $this->totalTrackLength,
+            $this->totalSwitches,
+            $this->totalLocos,
+            $this->totalCarts,
+            $this->maxSlope,
+            $this->getUserIpAddr(),
+            (count($this->data['Removed']['Vegetation']) - $this->initialsTreeDown),
+            $db[$filename][7],
+            sizeof($tasks[0]),
+            $sum
         );
         file_put_contents('db.db', serialize($db));
     }

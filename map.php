@@ -1,4 +1,5 @@
 <?php
+//error_reporting(E_ALL);
 require_once 'utils/ArithmeticHelper.php';
 require_once 'utils/dtAbstractData.php';
 require_once 'utils/dtDynamic.php';
@@ -11,13 +12,14 @@ require_once 'utils/dtStruct.php';
 require_once 'utils/dtTextProperty.php';
 require_once 'utils/GVASParser.php';
 require_once 'utils/functions.php';
+require_once 'utils/SaveReader.php';
 
 while (!mkdir('lock')) {
 }
 file_put_contents('counter', $counter = file_get_contents('counter') + 1);
 rmdir('lock');
 
-
+//$_GET['name']='test';
 $saveFile = null;
 $json = null;
 
@@ -26,10 +28,20 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
     if (file_exists($saveFile)) {
         $slotExtension = explode('-', substr($saveFile, 0, -4));
         $slotExtension = '-' . $slotExtension[sizeof($slotExtension) - 1];
-
+        $ah = new ArithmeticHelper();
         $parser = new GVASParser();
         $json = $parser->parseData(file_get_contents($saveFile), false, $slotExtension);
-        $tasks = generateTasks($parser->goldenBucket['Industries']);
+        $parser->buildGraph();
+        $tasks = generateTasks($parser->goldenBucket, $ah,
+            array(
+                $parser->industryTracks,
+                $parser->cartTracks
+            )
+        );
+        $sh = new SaveReader($parser->goldenBucket);
+        $sh->updateDatabaseEntry($_GET['name'], $tasks);
+    } else {
+        die('Map does not exist');
     }
 }
 
@@ -101,14 +113,96 @@ foreach ($textFiles as $textFile) {
                 </div>
             </details>
             <details>
-                <summary><h4>Available Tasks</h4></summary>
+                <summary><h4><?php
+                        echo sizeof($tasks[0]);
+                        $sum = 0;
+                        foreach ($tasks[0] as $task) {
+                            $sum += $task[1];
+                        } ?> Delivery Task<?php echo plural($sum); ?> ($<?php echo $sum; ?>)</h4></summary>
                 <ul>
                     <?php
-                    foreach($tasks as $task){
-                        echo '<li>'.$task.'</li>';
+                    foreach ($tasks[0] as $task) {
+                        echo '<li>' . $task[0] . '</li>';
                     }
                     ?>
                 </ul>
+
+            </details>
+            <details>
+                <summary><h4><?php
+                        $sum = 0;
+                        foreach ($tasks[1] as $industry => $tasksInner) {
+                            foreach ($tasksInner as $t) {
+                                $sum += $t[1];
+                            }
+                        }
+                        echo sizeof($tasks[1]); ?> Construction Task<?php echo plural(sizeof($tasks[1])); ?>
+                        ($<?php echo $sum; ?>)</h4></summary>
+                <ul>
+                    <?php
+                    foreach ($tasks[1] as $industry => $tasksInner) {
+                        $subAmount = 0;
+                        foreach ($tasksInner as $i => $t) {
+                            $subAmount += $t[1];
+                        }
+                        echo '<li>Build a track to ' . $industry . ' (potential $' . $subAmount . ')</li>';
+                    }
+                    ?>
+                </ul>
+            </details>
+            <details>
+                <summary><h4><?php
+                        echo sizeof($tasks[2]);
+                        $sum = 0;
+                        foreach ($tasks[2] as $task) {
+                            $sum += $task[1];
+                        } ?> Expansion Task<?php echo plural(sizeof($tasks[2])); ?> (-$<?php echo $sum; ?>)</h4>
+                </summary>
+                <ul>
+                    <?php
+                    foreach ($tasks[2] as $task) {
+                        echo '<li>' . $task[0] . '</li>';
+                    }
+                    ?>
+                </ul>
+
+            </details>
+            <details>
+                <script>
+                    function zoomTo(x,y) {
+                        panZoom = svgPanZoom("#demo-tiger", {
+                            zoomEnabled: true,
+                            controlIconsEnabled: false,
+                            fit: true,
+                            center: true,
+                            maxZoom: 20
+                        });
+                        x = Math.round(-5 * x * screen.availWidth + (screen.availWidth/2));
+                        y = Math.round(-5 * y * screen.availWidth + (screen.availHeight/2));
+                        let point = {x: x, y: y};
+                        panZoom.zoom(5);
+                        panZoom.center();
+                        panZoom.pan(point);
+
+                    }
+                </script>
+                <summary><h4><?php
+                        echo sizeof($tasks[3]);
+                        $sum = 0;
+                        foreach ($tasks[3] as $task) {
+                        } ?> Find and Recover Task<?php echo plural(sizeof($tasks[3])); ?></h4>
+                </summary>
+                <ul>
+                    <?php
+                    foreach ($tasks[3] as $task) {
+                        echo '<li><span onclick="zoomTo('.
+                            (((400000-($task[1]['x']+200000))/400000)).', '.
+                            (((400000-($task[1]['y']+200000))/400000)).
+                            ')">[?] </span>' . $task[0] . '</li>';
+                    }
+                    ?>
+                </ul>
+
             </details>
 
             <hr/>
@@ -550,7 +644,7 @@ if (!file_exists('assets/js/mapper.min.js') || filemtime('assets/js/mapper.js') 
 ?>
 
 <script type="text/javascript"
-        src="/assets/js/mapper.min.js?<?php echo filemtime('assets/js/mapper.min.js'); ?>"></script>
+        src="/assets/js/mapper.js?<?php echo filemtime('assets/js/mapper.js'); ?>"></script>
 <script type="text/javascript"
         src="/assets/js/colorshare.js?<?php echo filemtime('assets/js/colorshare.js'); ?>"></script>
 <script type="text/javascript">

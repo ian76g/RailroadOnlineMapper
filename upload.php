@@ -26,6 +26,8 @@ if (isset($_POST) && !empty($_POST)) {
         require_once 'utils/dtTextProperty.php';
         require_once 'utils/GVASParser.php';
         require_once 'utils/SaveReader.php';
+        require_once 'utils/functions.php';
+        require_once 'utils/ArithmeticHelper.php';
 
         $x = str_replace(array('slot', '.sav'), '', $_FILES['fileToUpload']['name']);
         if($x == ''.intval($x)){
@@ -36,12 +38,24 @@ if (isset($_POST) && !empty($_POST)) {
 
         $myParser = new GVASParser();
         $myParser->parseData(file_get_contents($_FILES["fileToUpload"]["tmp_name"]), false, $slotNumber);
+        $myParser->buildGraph();
         $newFilename = $myParser->owner;
         $target_file = $target_dir . $newFilename . '.sav';
 
         if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
+            $ah = new ArithmeticHelper();
+            $tasks = generateTasks($myParser->goldenBucket, $ah,
+                array(
+                    $myParser->industryTracks,
+                    $myParser->cartTracks
+                )
+            );
             $saveReadr = new SaveReader($myParser->goldenBucket);
-            $saveReadr->addDatabaseEntry($newFilename, isset($_POST['public']));
+            $saveReadr->addDatabaseEntry(
+                $newFilename,
+                isset($_POST['public']),
+                $tasks
+            );
             if(!isset($_POST['headless'])){
                 header('Location: /map.php?name=' . $newFilename);
             } else {

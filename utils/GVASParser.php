@@ -12,6 +12,9 @@ class GVASParser
     public array $goldenBucket = array();
     public string $owner;
 
+    public array $industryTracks;
+    public array $cartTracks;
+
     /**
      * @param string $x
      * @param bool $edit
@@ -809,13 +812,13 @@ class GVASParser
         return $output;
     }
 
-    private function buildGraph()
+    public function buildGraph()
     {
-        global $industryTracks;
         $ah = new ArithmeticHelper();
         $ah->industries = $this->goldenBucket['Industries'];
 
-        $industryTracks = array();
+        $this->industryTracks = array();
+        $this->cartTracks = array();
 
         $segments = array();
         foreach ($this->goldenBucket['Splines'] as $spIndex => $spline) {
@@ -839,15 +842,30 @@ class GVASParser
 
                 foreach ($this->goldenBucket['Industries'] as $i => $industry) {
                     $d = $ah->dist($industry['Location'], $segment['LocationCenter']);
-                    if (!isset($industryTracks[$i]) || $industryTracks[$i]['d'] > $d) {
-                        $industryTracks[$i]['d'] = $d;
-                        $industryTracks[$i]['trackNode'] = $segments[$divisionS][$id];
+                    if ($d < 9000) {
+                        if ($industry['Type'] == 8) {
+                            $x = 0;
+                        }
+                        if (!isset($this->industryTracks[$industry['Type']]) || $this->industryTracks[$industry['Type']]['d'] > $d) {
+                            $this->industryTracks[$industry['Type']]['d'] = $d;
+                            $this->industryTracks[$industry['Type']]['trackNode'] = $segments[$divisionS][$id];
+                        }
+                    }
+                }
+                foreach ($this->goldenBucket['Frames'] as $i => $frame) {
+                    $dC = $ah->dist($frame['Location'], $segment['LocationCenter']);
+                    $dS = $ah->dist($frame['Location'], $segment['LocationStart']);
+                    $dE = $ah->dist($frame['Location'], $segment['LocationEnd']);
+                    $d = min($dC, $dS, $dE);
+                    if (!isset($this->cartTracks[$i]) || $this->cartTracks[$i]['d'] > $d) {
+                        $this->cartTracks[$i]['d'] = $d;
+                        $this->cartTracks[$i]['trackNode'] = $segments[$divisionS][$id];
                     }
                 }
 
             }
         }
-
+        return;
         foreach ($this->goldenBucket['Switchs'] as $swIndex => $switch) {
             $ses = $this->findSwitchEndpoints($switch);
             $divisionS = floor($ses[0]['X'] / 10000) . '-' . floor($ses[0]['Y'] / 10000);
@@ -883,18 +901,18 @@ class GVASParser
             }
         }
 
-        foreach ($industryTracks as $i => $industryTrack) {
-            $trackNode = $industryTrack['trackNode'];
-            /** @var Node $trackNode */
-            echo $trackNode->near . " :";
-            $this->driveAlongTrack($i, $trackNode);
-
-
-            echo "\n##############################################\n";
-        }
-
-
-        echo "1";
+//        foreach ($industryTracks as $i => $industryTrack) {
+//            $trackNode = $industryTrack['trackNode'];
+//            /** @var Node $trackNode */
+//            echo $trackNode->near . " :";
+//            $this->driveAlongTrack($i, $trackNode);
+//
+//
+//            echo "\n##############################################\n";
+//        }
+//
+//
+//        echo "1";
 //        ksort($segments);
 //        print_r($segments);
 //        die();

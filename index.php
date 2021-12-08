@@ -75,6 +75,12 @@ function getMarqueeTrain()
                     <th>
                         <img height="28" width="40" src="/assets/images/slope.svg" alt="Biggest slope">
                     </th>
+                    <th>
+                        <img height="28" width="40" src="/assets/images/tasks.png" alt="Tasks">
+                    </th>
+                    <th>
+                        <img height="28" width="40" src="/assets/images/reward.png" alt="Reward">
+                    </th>
                 </tr>
                 </thead>
                 <?php
@@ -91,6 +97,8 @@ function getMarqueeTrain()
                     print('<td>' . $entry['numLocs'] . '</td>' . PHP_EOL);
                     print('<td>' . $entry['numCarts'] . '</td>' . PHP_EOL);
                     print('<td>' . $entry['slope'] . '%</td>' . PHP_EOL);
+                    print('<td>' . $entry['tasks'] . '</td>' . PHP_EOL);
+                    print('<td>' . $entry['reward'] . '</td>' . PHP_EOL);
                     print('</tr>' . PHP_EOL);
                 }
                 echo '</table>';
