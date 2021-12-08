@@ -114,8 +114,22 @@ function checked_if_true_or_default($name)
 
 function color_cookie_or_default($name)
 {
+
+    $default['ce_boxcar'] = '#66f081';
+    $default['ce_flatcar_cordwood'] = '#fbf9bc';
+    $default['ce_flatcar_hopper'] = '#a7a7a9';
+    $default['ce_flatcar_logs'] = '#f99a9a';
+    $default['ce_flatcar_stakes'] = '#fdbf77';
+    $default['ce_flatcar_tanker'] = '#9090f9';
+    $default['cf_boxcar'] = '#36cc00';
+    $default['cf_flatcar_cordwood'] = '#ffeb0f';
+    $default['cf_flatcar_hopper'] = '#000000';
+    $default['cf_flatcar_logs'] = '#ff0000';
+    $default['cf_flatcar_stakes'] = '#f38a12';
+    $default['cf_flatcar_tanker'] = '#0000ff';
+
     if (!isset($_COOKIE[$name])) {
-        print("#0000ff");
+        echo $default[$name];
     }
 
     if (isset($_COOKIE[$name])) {
