@@ -482,9 +482,25 @@ foreach ($textFiles as $textFile) {
             <div class="edit-panel__extras">
                 <details>
                     <summary><h4>Rolling Stock</h4></summary>
+                    <h5>Locos</h5>
                     <form method="POST" action="/converter.php">
                         <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
                         <table id="rollingStockTable" class="export__mapper">
+                            <tr>
+                                <th>Type</th>
+                                <th>Name</th>
+                                <th>Number</th>
+                                <th>Near</th>
+                                <th>Cargo</th>
+                                <th>Amount</th>
+                            </tr>
+                        </table>
+                        <button class="button">Apply Rolling Stock changes</button>
+                    </form>
+                    <h5>Carts</h5>
+                    <form method="POST" action="/converter.php">
+                        <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
+                        <table id="rollingStockTable2" class="export__mapper">
                             <tr>
                                 <th>Type</th>
                                 <th>Name</th>

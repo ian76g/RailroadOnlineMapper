@@ -639,6 +639,7 @@ class Mapper {
 
         const undergroundCartsTable = document.getElementById("undergroundCartsTable");
         const rollingStockTable = document.getElementById("rollingStockTable");
+        const rollingStockTable2 = document.getElementById("rollingStockTable2");
         const possibleCargos = {
             'flatcar_logs': ['log', 'steelpipe'],
             'flatcar_stakes': ['rail', 'lumber', 'beam', 'rawiron'],
@@ -834,11 +835,23 @@ class Mapper {
             }
 
             const rollingStockInfoRow = document.createElement("tr");
+/*
+      var a = document.createElement('a');
+      var linkText = document.createTextNode("my title text");
+      a.appendChild(linkText);
+      a.title = "my title text";
+      a.href = "http://example.com";
+      document.body.appendChild(a);
 
+ */
             const typeValue = document.createElement("td");
+            const a = document.createElement('a');
             const typeImage = document.createElement("img");
             typeImage.src = "/assets/images/" + vehicle['Type'] + ".png";
-            typeValue.appendChild(typeImage);
+            a.appendChild(typeImage);
+            // (((400000-($task[1]['x']+200000))/400000))
+            a.href = "javascript:zoomTo("+(400000-(vehicle['Location'][0]+200000))/400000+","+(400000-(vehicle['Location'][1]+200000))/400000+")";
+            typeValue.appendChild(a);
             rollingStockInfoRow.appendChild(typeValue);
 
             const nameValue = document.createElement("td");
@@ -893,8 +906,22 @@ class Mapper {
             amountTextInput.maxLength = 4;
             amountValue.appendChild(amountTextInput);
             rollingStockInfoRow.appendChild(amountValue);
-
-            rollingStockTable.appendChild(rollingStockInfoRow);
+            if (['porter_040',
+                'porter_042',
+                /*'handcar',*/
+                'eureka',
+                'eureka_tender',
+                'climax',
+                'heisler',
+                'class70',
+                'class70_tender',
+                'cooke260',
+                'cooke260_tender'
+            ].indexOf(vehicle['Type']) >= 0) {
+                rollingStockTable.appendChild(rollingStockInfoRow);
+            } else {
+                rollingStockTable2.appendChild(rollingStockInfoRow);
+            }
 
             index++;
         }
