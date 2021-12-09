@@ -70,8 +70,8 @@ function map_entries($sortby = null, $sortorder = null): Generator
                 "numCarts" => ($db[$user][3] == null ? '0' : $db[$user][3]),
                 "slope" => round(($db[$user][4] == null ? '0' : $db[$user][4])),
                 "public" => $db[$user][7],
-                "tasks" => $db[$user][8],
-                "reward" => $db[$user][9],
+                "tasks" => ($db[$user][8] ?? 0),
+                "reward" => ($db[$user][9] ?? 0),
             );
             $i++;
         }
@@ -97,7 +97,8 @@ function checked_if_true_or_default($name)
         "slopeLabel7" => false,
         "slopeLabel8" => false,
         "maxSlopeLabel" => true,
-        "ironOverWood" => false
+        "ironOverWood" => false,
+        "industryLabel" => true
     );
 
     if (!isset($_COOKIE[$name])) {
