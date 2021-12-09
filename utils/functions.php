@@ -484,6 +484,9 @@ function generateTasks(&$industryData, ArithmeticHelper $ah, $industryTracks)
         if($frame['Type']=='boxcar'){
             $cartsBox--;
         }
+        if($frame['Type']=='flatcar_hopper'){
+            $cartsHopper--;
+        }
         if(isset($cartTracks[$i]) && $cartTracks[$i]['d']>425){
             $Rtasks[] = array(
                 'Recover rolling stock '.$frame['Type'].' '.strip_tags($frame['Name'].' '.$frame['Number']).'. It is '.
