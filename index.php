@@ -84,7 +84,7 @@ function getMarqueeTrain()
                 </tr>
                 </thead>
                 <?php
-                foreach (map_entries(($_GET['sortby'] ?? null), $_GET['sortorder']) as $entry) {
+                foreach (map_entries(($_GET['sortby'] ?? null), $_GET['sortorder'] ?? null) as $entry) {
                     $asterix = '';
                     if ($entry['public']) {
                         $asterix = '*';

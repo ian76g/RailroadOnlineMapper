@@ -1109,7 +1109,7 @@ class Node
 {
     var array $endpoints = array();
     var array $nextNodes = array();
-    var int $id;
+    var string $id;
     var ArithmeticHelper $ah;
     var string $near;
 
