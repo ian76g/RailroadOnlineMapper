@@ -25,6 +25,16 @@ class GVASParser
         $this->goldenBucket = array();
         $position = 0;
 
+        if(!$edit && file_exists('gzjson/'.$_GET['name'])){
+            // no edit is needed - so maybe this was parsed already before?
+            // check if we just can resend the old data - since nothing changed.
+            $jsonMin = @gzdecode(file_get_contents('gzjson/'.$_GET['name']));
+            if($jsonMin){
+                $this->goldenBucket = json_decode($jsonMin, true);
+                return $jsonMin;
+            }
+        }
+
         $myHeader = new dtHeader();
         $position = $myHeader->unserialize($x, $position);
         $headerTotal = substr($x, 0, $position);
@@ -291,6 +301,9 @@ class GVASParser
 
         file_put_contents('xx.json', $json);
         file_put_contents('xx.min.json', $json_min);
+
+        // why not saving a compressed verion of the minified json?
+        file_put_contents('gzjson/'.$this->owner, gzencode($json_min));
 
         if ($edit) {
             $tmp = $this->handleEditAndSave();
@@ -805,8 +818,8 @@ class GVASParser
 
         if (isset($_POST['save'])) {
 //            $db = unserialize(file_get_contents('db.db'));
-            connect();
-            $ip = query('select ip, unused from stats where name="'.mysqli_real_escape_string($dbh, $this->owner).'"');
+            $this->connect();
+            $ip = $this->query('select ip, unused from stats where name="' . mysqli_real_escape_string($dbh, $this->owner) . '"');
 
             if (getUserIpAddr() != 'local' && (getUserIpAddr() != $ip[0]['ip'])) {
                 $secondParts = explode('.', $ip[0]['ip']);
@@ -826,48 +839,51 @@ class GVASParser
         $this->cartTracks = array();
 
         $segments = array();
-        foreach ($this->goldenBucket['Splines'] as $spIndex => $spline) {
-            if (!in_array($spline['Type'], array(0, 4))) {
-                continue;
-            }
-            foreach ($spline['Segments'] as $seIndex => $segment) {
-                if ($segment['Visible'] != 1) {
+        if (isset($this->goldenBucket['Splines'])) {
+
+            foreach ($this->goldenBucket['Splines'] as $spIndex => $spline) {
+                if (!in_array($spline['Type'], array(0, 4))) {
                     continue;
                 }
+                foreach ($spline['Segments'] as $seIndex => $segment) {
+                    if ($segment['Visible'] != 1) {
+                        continue;
+                    }
 
-                $id = $spIndex . '-' . $seIndex;
+                    $id = $spIndex . '-' . $seIndex;
 
-                $divisionS = floor($segment['LocationStart']['X'] / 10000) . '-' . floor($segment['LocationStart']['Y'] / 10000);
-                $divisionE = floor($segment['LocationEnd']['X'] / 10000) . '-' . floor($segment['LocationEnd']['Y'] / 10000);
+                    $divisionS = floor($segment['LocationStart']['X'] / 10000) . '-' . floor($segment['LocationStart']['Y'] / 10000);
+                    $divisionE = floor($segment['LocationEnd']['X'] / 10000) . '-' . floor($segment['LocationEnd']['Y'] / 10000);
 
-                $newNode = new Node($id, array($segment['LocationStart'], $segment['LocationEnd']), $ah);
+                    $newNode = new Node($id, array($segment['LocationStart'], $segment['LocationEnd']), $ah);
 
-                $segments[$divisionS][$id] = $newNode;
-                $segments[$divisionE][$id] = $newNode;
+                    $segments[$divisionS][$id] = $newNode;
+                    $segments[$divisionE][$id] = $newNode;
 
-                foreach ($this->goldenBucket['Industries'] as $i => $industry) {
-                    $d = $ah->dist($industry['Location'], $segment['LocationCenter']);
-                    if ($d < 9000) {
-                        if ($industry['Type'] == 8) {
-                            $x = 0;
-                        }
-                        if (!isset($this->industryTracks[$industry['Type']]) || $this->industryTracks[$industry['Type']]['d'] > $d) {
-                            $this->industryTracks[$industry['Type']]['d'] = $d;
-                            $this->industryTracks[$industry['Type']]['trackNode'] = $segments[$divisionS][$id];
+                    foreach ($this->goldenBucket['Industries'] as $i => $industry) {
+                        $d = $ah->dist($industry['Location'], $segment['LocationCenter']);
+                        if ($d < 9000) {
+                            if ($industry['Type'] == 8) {
+                                $x = 0;
+                            }
+                            if (!isset($this->industryTracks[$industry['Type']]) || $this->industryTracks[$industry['Type']]['d'] > $d) {
+                                $this->industryTracks[$industry['Type']]['d'] = $d;
+                                $this->industryTracks[$industry['Type']]['trackNode'] = $segments[$divisionS][$id];
+                            }
                         }
                     }
-                }
-                foreach ($this->goldenBucket['Frames'] as $i => $frame) {
-                    $dC = $ah->dist($frame['Location'], $segment['LocationCenter']);
-                    $dS = $ah->dist($frame['Location'], $segment['LocationStart']);
-                    $dE = $ah->dist($frame['Location'], $segment['LocationEnd']);
-                    $d = min($dC, $dS, $dE);
-                    if (!isset($this->cartTracks[$i]) || $this->cartTracks[$i]['d'] > $d) {
-                        $this->cartTracks[$i]['d'] = $d;
-                        $this->cartTracks[$i]['trackNode'] = $segments[$divisionS][$id];
+                    foreach ($this->goldenBucket['Frames'] as $i => $frame) {
+                        $dC = $ah->dist($frame['Location'], $segment['LocationCenter']);
+                        $dS = $ah->dist($frame['Location'], $segment['LocationStart']);
+                        $dE = $ah->dist($frame['Location'], $segment['LocationEnd']);
+                        $d = min($dC, $dS, $dE);
+                        if (!isset($this->cartTracks[$i]) || $this->cartTracks[$i]['d'] > $d) {
+                            $this->cartTracks[$i]['d'] = $d;
+                            $this->cartTracks[$i]['trackNode'] = $segments[$divisionS][$id];
+                        }
                     }
-                }
 
+                }
             }
         }
         return;
@@ -1098,6 +1114,37 @@ class GVASParser
 //        }
 
         return $reduced;
+    }
+
+    function query($sql)
+    {
+        global $dbh;
+        if (!$dbh) {
+            $this->connect();
+        }
+
+        $result = array();
+        $rh = mysqli_query($dbh, $sql);
+        if(!$rh){
+//        var_dump($sql);
+        }
+        while ($result[] = @mysqli_fetch_assoc($rh)) ;
+        array_pop($result);
+
+        return $result;
+    }
+
+    function connect()
+    {
+        global $dbh;
+        if (file_exists('../dbaccess.php'))
+            require '../dbaccess.php';
+        if (file_exists('dbaccess.php'))
+            require 'dbaccess.php';
+
+        $dbh = mysqli_connect($dbhost, $dbuser, $dbpassword);
+        mysqli_query($dbh, 'use ' . $dbdatabase);
+
     }
 }
 

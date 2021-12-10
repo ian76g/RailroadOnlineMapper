@@ -1,33 +1,134 @@
 DNRG Locomotive Names
-Lake Fork
-Little Fork
-Ohio Creek
-Elk Creek
-Navajo
-Crested Buttes
-Animas Forks
-Hillerton
-Mt. Holy Cross
-Tennessee Pass
-Home Stake
-Silver Heel
-Kirber Creek
-Antelope
-Galena Mountain
-West Cliff
-Mt. Shavano
-Red Cliff
-Grape Creek
-Antonito
-Nevada
 Alamosa
-Grand Canyon
-Mersereau
-Lake City
+Anglo Saxon
+Animas Forks
+Antelope
+Antonito
+Arkansas
+Arroya Honda
+Badger
+Badito
 Barranca
-Coxo
-Rico
-Frying Pan
-Otterbees
-Pawnee
+Bill Williams
+Bristol Head
+Buffalo Peaks
+Chalk Creek
+Chama
+Chico
+Chicosa
+Cochetope
+Colo-Chiquito
+Colonel Boone
 Comanche
+Copper Gulch
+Cortez
+Cottonwood
+Coxo
+Crested Buttes
+Crestones
+Cucharas
+Culebra
+Current Creek
+Del Norte
+Dolores
+Eagle River
+Elk Creek
+Elk Mountain
+Embuda
+Fort de Remer
+Fryer Hill
+Frying Pan
+Galena Mountain
+Gold Town
+Grand Canyon
+Grape Creek
+Greenhorn
+Gunnison
+Hardscrabble
+Hermano
+Hesperis
+Hillerton
+Home Stake
+Hoosier
+Huerfano
+Kirber Creek
+Kit Carson
+Kokomo
+La Jara
+La Plata
+Lake City
+Lake Fork
+Las Animas
+Little Fork
+Mancos
+Mersereau
+Mogollon
+Mojanda
+Monte Cristo
+Montezuma
+Morena
+Mosca
+Mosquito Gulch
+Mountaineer
+Mt. Agassiz
+Mt. Holy Cross
+Mt. Shavano
+Music Pass
+Navajo
+Nepesta
+Nevada
+Ohio Creek
+Old Baldy
+Otterbees
+Ouray
+Pacific Slope
+Pawnee
+Piedra
+Pike
+Poncha
+Ptarmigan
+Puerco
+Raton
+Red Cliff
+Rico
+Rinconida
+Rio Bravo
+Rito Alto
+Roaring Forks
+Royal Gorge
+Ruby Camp
+San Antonio
+San Carlos
+San Cristoval
+San Juan
+San Miguel
+Sandia
+Santa Clara
+Sera La Sal
+Shou-wa-no
+Sierra Madre
+Silver Cliff
+Silver Heel
+Sneffels
+South Arkansas
+Spanish Peaks
+Tabiwachi
+Ten Mile
+Tennessee Pass
+Texas Creek
+Tomichi
+Tres Piedras
+Trinchera
+US Mountain
+Uncompahgre
+Ute
+Vermejo
+Wahsatch
+Weminuche
+West Cliff
+W.S. Stratton
+Elkton
+Strong
+Florence
+Goldfield
+Alta Vista

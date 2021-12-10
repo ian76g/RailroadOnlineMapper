@@ -1,4 +1,6 @@
 <?php
+require_once 'utils/functions.php';
+
 function getUserIpAddr()
 {
     global $argv;

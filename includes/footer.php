@@ -2,7 +2,7 @@
     <p class="footer__visitors">
         <?php
 
-        while(!mkdir('lock')){
+        while(!@mkdir('lock')){
         }
         file_put_contents('counter', $counter = file_get_contents('counter') + 1);
         rmdir('lock');
