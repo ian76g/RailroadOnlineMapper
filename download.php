@@ -16,8 +16,10 @@ function getUserIpAddr()
     return $ip;
 }
 $mapName = $_GET['map'];
-$db = unserialize(file_get_contents('db.db'));
-if (getUserIpAddr() != $db[$mapName][5] && $db[$mapName][7]!=true) {
+connect();
+$ip = query('select ip, unused from stats where name="'.mysqli_real_escape_string($dbh, $mapName).'"');
+
+if (getUserIpAddr() != $ip[0]['ip'] && $ip[0]['unsused']!=true) {
     die('This is nor your save game!');
 }
 header('Content-Disposition: attachment; filename="'.$mapName.'.sav"');

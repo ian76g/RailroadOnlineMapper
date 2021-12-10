@@ -342,6 +342,8 @@ class GVASParser
      */
     function handleEditAndSave(): string
     {
+        global $dbh;
+
         $sevenHundred = 700;
         if (isset($_POST['replant'])) {
             $sevenHundred = $_POST['replant'];
@@ -802,9 +804,12 @@ class GVASParser
         $output .= hex2bin('050000004e6f6e650000000000');
 
         if (isset($_POST['save'])) {
-            $db = unserialize(file_get_contents('db.db'));
-            if (getUserIpAddr() != 'local' && (!isset($db[$this->owner][5]) || getUserIpAddr() != $db[$this->owner][5])) {
-                $secondParts = explode('.', $db[$this->owner][5]);
+//            $db = unserialize(file_get_contents('db.db'));
+            connect();
+            $ip = query('select ip, unused from stats where name="'.mysqli_real_escape_string($dbh, $this->owner).'"');
+
+            if (getUserIpAddr() != 'local' && (getUserIpAddr() != $ip[0]['ip'])) {
+                $secondParts = explode('.', $ip[0]['ip']);
                 echo 'Your IP is: ' . getUserIpAddr() . ' but game was uploaded from: ' . $secondParts[0] . '.*.*.' . $secondParts[3] . " [" . $this->owner . "]\n";
                 die("This does not seem to be your save file.");
             }

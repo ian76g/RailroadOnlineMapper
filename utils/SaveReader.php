@@ -44,6 +44,7 @@ class SaveReader
      */
     function addDatabaseEntry($filename, $public = false, array $tasks)
     {
+        global $dbh;
         $this->getTrackLength();
         $this->getSwitchesCount();
         $this->getRollingStockCount();
@@ -52,24 +53,35 @@ class SaveReader
             $sum+=$task[1];
         }
         // create a "database" and store some infos about this file for the websies index page
-        $db = @unserialize(@file_get_contents('db.db'));
-        $db[$filename] = array(
+//        $db = @unserialize(@file_get_contents('db.db'));
+        connect();
+
+        $vaues = array(
+            mysqli_real_escape_string($dbh, $filename),
             $this->totalTrackLength,
             $this->totalSwitches,
             $this->totalLocos,
             $this->totalCarts,
             $this->maxSlope,
             $this->getUserIpAddr(),
-            (count($this->data['Removed']['Vegetation']) - $this->initialsTreeDown),
-            $public,
-            sizeof($tasks[0]),
-            $sum
+            sizeof($this->data['Removed']['Vegetation'])
         );
-        file_put_contents('db.db', serialize($db));
+        $row = query('select unused, tasksA, tasksAreward from stats where name="'.mysqli_real_escape_string($dbh, $filename).'"');
+        if(isset($row[0]) && isset($row[0]['unsused'])){
+            $values[]=$row[0]['unused'];
+            $values[]=$row[0]['tasksA'];
+            $values[]=$row[0]['tasksAreward'];
+            query('insert into stats (name, length, switches, locos, carts, slope, ip, trees, unused, tasksA, tasksAreward)
+    VALUES("'.implode('","', $vaues) .'")');
+        } else {
+            query('insert into stats (name, length, switches, locos, carts, slope, ip, trees)
+    VALUES("'.implode('","', $vaues) .'")');
+        }
     }
 
     function updateDatabaseEntry($filename, array $tasks)
     {
+        global $dbh;
         $this->getTrackLength();
         $this->getSwitchesCount();
         $this->getRollingStockCount();
@@ -78,20 +90,29 @@ class SaveReader
             $sum+=$task[1];
         }
         // create a "database" and store some infos about this file for the websies index page
-        $db = @unserialize(@file_get_contents('db.db'));
-        $db[$filename] = array(
+        connect();
+
+        $vaues = array(
+            mysqli_real_escape_string($dbh, $filename),
             $this->totalTrackLength,
             $this->totalSwitches,
             $this->totalLocos,
             $this->totalCarts,
             $this->maxSlope,
             $this->getUserIpAddr(),
-            (count($this->data['Removed']['Vegetation']) - $this->initialsTreeDown),
-            $db[$filename][7],
-            sizeof($tasks[0]),
-            $sum
+            sizeof($this->data['Removed']['Vegetation'])
         );
-        file_put_contents('db.db', serialize($db));
+        $row = query('select unused, tasksA, tasksAreward from stats where name="'.mysqli_real_escape_string($dbh, $filename).'"');
+        if(isset($row[0]) && isset($row[0]['unsused'])){
+            $values[]=$row[0]['unused'];
+            $values[]=$row[0]['tasksA'];
+            $values[]=$row[0]['tasksAreward'];
+            query('insert into stats (name, length, switches, locos, carts, slope, ip, trees, unused, tasksA, tasksAreward)
+    VALUES("'.implode('","', $vaues) .'")');
+        } else {
+            query('insert into stats (name, length, switches, locos, carts, slope, ip, trees)
+    VALUES("'.implode('","', $vaues) .'")');
+        }
     }
 
     /**

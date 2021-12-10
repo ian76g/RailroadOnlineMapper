@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <?php
+//error_reporting(E_ALL);
 $PageTitle = "RailroadsOnlineMapper";
 include_once('includes/head.php');
 include_once('utils/functions.php');

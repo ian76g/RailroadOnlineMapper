@@ -45,6 +45,25 @@ The save in nice readable JSON
 `db.db`
 A database used for hosting with filename, user, switches, trains, etc.
 
+CREATE TABLE `stats` (
+`name` varchar(255) NOT NULL,
+`length` varchar(255) NOT NULL,
+`switches` varchar(255) NOT NULL,
+`trees` varchar(255) NOT NULL,
+`locos` varchar(255) NOT NULL,
+`carts` varchar(255) NOT NULL,
+`slope` varchar(255) NOT NULL,
+`tasksA` varchar(255) NOT NULL,
+`tasksAreward` varchar(255) NOT NULL,
+`tasksB` varchar(255) NOT NULL,
+`tasksBreward` varchar(255) NOT NULL,
+`tasksC` varchar(255) NOT NULL,
+`tasksD` varchar(255) NOT NULL,
+`ip` varchar(255) NOT NULL,
+`unused` varchar(255) NOT NULL,
+PRIMARY KEY (`name`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8
+
 ## Contributers
 
 [@JKD#0205](https://discordapp.com/users/905751614357372938)  
