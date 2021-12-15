@@ -42,12 +42,25 @@ function getMarqueeTrain()
 }
 
 ?>
-<body>
+<body bgcolor="black">
 <header class="header">
     <h1 class="logo">RailroadsOnlineMapper</h1>
     <a class="button" id="uploadButton">Upload Savegame</a>
 </header>
 <main>
+    <table><tr><td>
+                <h4><A href="https://tom-90.github.io/RROx/"><img width="30" src="assets/images/appIcon.ico">_tom()s Minimap-Tool</A></h4>
+            </td>
+            <td style="width:200px;">&nbsp;</td>
+            <td>
+                <h4><A href="http://www.sharidan.dk/railroads-online/rowb/"><img width="30" src="assets/images/sharidan.png">Sharidans World Backup Tool</A></h4>
+            </td>
+            <td style="width:200px;">&nbsp;</td>
+            <td>
+                <h4><A href="https://rail-road-not-found.vercel.app/"><img width="30" src="assets/images/al.png">Albundys 3D Map Tool</A></h4>
+            </td>
+        </tr></table>
+
     <?php echo getMarqueeTrain(); ?>
     <section class="uploads">
         <h2>Latest uploads (* = as download available)</h2>
@@ -82,6 +95,9 @@ function getMarqueeTrain()
                     <th>
                         <img height="28" width="40" src="/assets/images/reward.png" alt="Reward">
                     </th>
+                    <th>
+                        <img height="28" width="40" src="/assets/images/downloads.png" alt="Downloads">
+                    </th>
                 </tr>
                 </thead>
                 <?php
@@ -100,6 +116,7 @@ function getMarqueeTrain()
                     print('<td>' . $entry['slope'] . '%</td>' . PHP_EOL);
                     print('<td>' . $entry['tasks'] . '</td>' . PHP_EOL);
                     print('<td>' . $entry['reward'] . '</td>' . PHP_EOL);
+                    print('<td>' . $entry['downloads'] . '</td>' . PHP_EOL);
                     print('</tr>' . PHP_EOL);
                 }
                 echo '</table>';

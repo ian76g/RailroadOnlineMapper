@@ -42,7 +42,7 @@ class SaveReader
      * @param array $tasks
      * @return void
      */
-    function addDatabaseEntry($filename, $public = false, array $tasks)
+    function addDatabaseEntry($filename, $public = false, array $tasks, $returnSQL = false)
     {
         global $dbh;
         $this->getTrackLength();
@@ -56,7 +56,7 @@ class SaveReader
 //        $db = @unserialize(@file_get_contents('db.db'));
         connect();
 
-        $vaues = array(
+        $values = array(
             mysqli_real_escape_string($dbh, $filename),
             $this->totalTrackLength,
             $this->totalSwitches,
@@ -64,19 +64,13 @@ class SaveReader
             $this->totalCarts,
             $this->maxSlope,
             $this->getUserIpAddr(),
-            sizeof($this->data['Removed']['Vegetation'])
+            sizeof($this->data['Removed']['Vegetation']),
+            $public
         );
-        $row = query('select unused, tasksA, tasksAreward from stats where name="'.mysqli_real_escape_string($dbh, $filename).'"');
-        if(isset($row[0]) && isset($row[0]['unsused'])){
-            $values[]=$row[0]['unused'];
-            $values[]=$row[0]['tasksA'];
-            $values[]=$row[0]['tasksAreward'];
-            query('insert into stats (name, length, switches, locos, carts, slope, ip, trees, unused, tasksA, tasksAreward)
-    VALUES("'.implode('","', $vaues) .'")');
-        } else {
-            query('insert into stats (name, length, switches, locos, carts, slope, ip, trees)
-    VALUES("'.implode('","', $vaues) .'")');
-        }
+        $sql = 'replace into stats (name, length, switches, locos, carts, slope, ip, trees, unused)
+    VALUES("'.implode('","', $values) .'")';
+        if($returnSQL) return $sql;
+        query($sql);
     }
 
     function updateDatabaseEntry($filename, array $tasks)
@@ -92,26 +86,30 @@ class SaveReader
         // create a "database" and store some infos about this file for the websies index page
         connect();
 
-        $vaues = array(
+        $values = array(
             mysqli_real_escape_string($dbh, $filename),
             $this->totalTrackLength,
             $this->totalSwitches,
             $this->totalLocos,
             $this->totalCarts,
             $this->maxSlope,
-            $this->getUserIpAddr(),
-            sizeof($this->data['Removed']['Vegetation'])
+//            $this->getUserIpAddr(),
+//            sizeof($this->data['Removed']['Vegetation'])
         );
-        $row = query('select unused, tasksA, tasksAreward from stats where name="'.mysqli_real_escape_string($dbh, $filename).'"');
-        if(isset($row[0]) && isset($row[0]['unsused'])){
+        $row = query('select ip, trees, unused, tasksA, tasksAreward from stats where name="'.mysqli_real_escape_string($dbh, $filename).'"');
+        if(isset($row[0])){
+            $values[]=$row[0]['ip'];
+            $values[]=$row[0]['trees'];
             $values[]=$row[0]['unused'];
-            $values[]=$row[0]['tasksA'];
-            $values[]=$row[0]['tasksAreward'];
-            query('insert into stats (name, length, switches, locos, carts, slope, ip, trees, unused, tasksA, tasksAreward)
-    VALUES("'.implode('","', $vaues) .'")');
+            $values[]=sizeof($tasks[0]);
+            $values[]=$sum;
+            query('replace into stats (name, length, switches, locos, carts, slope, ip, trees, unused, tasksA, tasksAreward)
+    VALUES("'.implode('","', $values) .'")');
         } else {
+            $values[]=$this->getUserIpAddr();
+            $values[]=sizeof($this->data['Removed']['Vegetation']);
             query('insert into stats (name, length, switches, locos, carts, slope, ip, trees)
-    VALUES("'.implode('","', $vaues) .'")');
+    VALUES("'.implode('","', $values) .'")');
         }
     }
 

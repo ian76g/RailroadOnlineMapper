@@ -21,8 +21,14 @@ $mapName = $_GET['map'];
 connect();
 $ip = query('select ip, unused from stats where name="'.mysqli_real_escape_string($dbh, $mapName).'"');
 
-if (getUserIpAddr() != $ip[0]['ip'] && $ip[0]['unsused']!=true) {
+if (getUserIpAddr() != $ip[0]['ip'] && $ip[0]['unused']!='on') {
     die('This is nor your save game!');
+}
+$x= query('select * from downloads where name="'.mysqli_real_escape_string($dbh, $mapName).'"');
+if(!isset($x[0])){
+    query('insert into downloads values("'.mysqli_real_escape_string($dbh, $mapName).'", 1)');
+} else {
+    query('update downloads set downloads=downloads+1 where name="'.mysqli_real_escape_string($dbh, $mapName).'"');
 }
 header('Content-Disposition: attachment; filename="'.$mapName.'.sav"');
 readfile('saves/'.$mapName.'.sav');

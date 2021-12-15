@@ -88,7 +88,7 @@ foreach ($textFiles as $textFile) {
     </script>
 
 </head>
-<body class="export">
+<body class="export" bgcolor="black">
 <main class="export__main">
 
     <div class="export__nav">
@@ -104,13 +104,21 @@ foreach ($textFiles as $textFile) {
                     <?php
                     foreach ($dataArray['Players'] as $index => $player) {
                         ?>
-                        <div class="export__panel--player-list-item"><?= $player['Name']; ?></div>
+                        <div class="export__panel--player-list-item" style="text-decoration: underline" onclick="zoomTo(<?php echo
+                        (((400000-($player['Location'][0]+200000))/400000)).','.(((400000-($player['Location'][1]+200000))/400000));
+                        ?>)"><?= $player['Name']; ?></div>
                         <div class="export__panel--player-list-item"><?= $player['Xp']; ?> XP</div>
                         <div class="export__panel--player-list-item"><?= $player['Money']; ?> $</div>
                         <?php
                     }
                     ?>
                 </div>
+                <div>
+                    <input id="players_default" type="checkbox"
+                           onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('players_default'); ?>/>
+                    Show players
+                </div>
+
             </details>
             <details>
                 <summary><h4><?php
@@ -227,6 +235,10 @@ foreach ($textFiles as $textFile) {
                     </div>
                     <div class="box">
                         <img id="bg5" src="/assets/images/bg5_90x90.png" width="90" height="90"
+                             alt="Psawhns background with kanados" onclick="changeBackground(this)">
+                    </div>
+                    <div class="box">
+                        <img id="bg6" src="/assets/images/bg6_90x90.jpg" width="90" height="90"
                              alt="Psawhns background with kanados" onclick="changeBackground(this)">
                     </div>
                 </div>
@@ -668,7 +680,8 @@ if (!file_exists('assets/js/mapper.min.js') || filemtime('assets/js/mapper.js') 
         'bg': [8000, 8000, 0, 0, 8000, 8000, 'bg.jpg'],
         'bg3': [8000, 8000, 0, 0, 8000, 8000, 'bg3.jpg'],
         'bg4': [8000, 8000, 0, 0, 8000, 8000, 'bg4.jpg'],
-        'bg5': [8000, 8000, 0, 0, 8000, 8000, 'bg5.jpg']
+        'bg5': [8000, 8000, 0, 0, 8000, 8000, 'bg5.jpg'],
+        'bg6': [8000, 8000, 0, 0, 8000, 8000, 'bg6.jpg']
     }
     const pattern = document.getElementsByTagName("pattern")[0];
     const image = document.getElementsByTagName("image")[0];
@@ -712,6 +725,13 @@ if (!file_exists('assets/js/mapper.min.js') || filemtime('assets/js/mapper.js') 
             image.setAttribute("height", backgrounds[bg][5].toString());
             image.setAttribute("href", "/assets/images/" + backgrounds[bg][6]);
             cookies.set("bg", bg);
+        }
+        if(bg === 'bg6'){
+            var highlightedItems = document.querySelectorAll(".export__panel");
+            highlightedItems.forEach(function(userItem) {
+                userItem.style.setProperty('background', '#404040');
+            });
+            document.body.style.background = '#000000';
         }
     }
 

@@ -66,10 +66,17 @@ function map_entries($sortby = null, $sortorder = null): Generator
        locos as numLocs, carts as numCarts, round(slope) as slope, unused as public, tasksA as tasks, tasksAreward as reward
             from stats where name="' . mysqli_real_escape_string($dbh, $user) . '"');
             if(!isset($row[0])){
+                continue;
                 $row[0] = array('file' => $file,'name'=>$user, 'trackLength'=>'?',
                     'numLocs' =>'?', 'numCarts' =>'?', 'slope' =>'?', 'public' =>'', 'tasks' =>'?', 'reward' =>'?',
                     'numY' =>'?','numT' =>'?');
 
+            }
+            $x=query('select * from downloads where name="' . mysqli_real_escape_string($dbh, $user) . '"');
+            if(!isset($x[0])){
+                $row[0]['downloads']=0;
+            } else {
+                $row[0]['downloads']=$x[0]['downloads'];
             }
             yield $row[0];
             $i++;

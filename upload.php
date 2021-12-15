@@ -53,7 +53,7 @@ if (isset($_POST) && !empty($_POST)) {
             $saveReadr = new SaveReader($myParser->goldenBucket);
             $saveReadr->addDatabaseEntry(
                 $newFilename,
-                isset($_POST['public']),
+                $_POST['public'],
                 $tasks
             );
             if(!isset($_POST['headless'])){

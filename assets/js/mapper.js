@@ -22,7 +22,7 @@ class Mapper {
         this.imy = this.y / 100 * this.scale;
         this.maxSlope = 0;
         this.allLabels = [[0, 0]];
-        this.allCurveLabels = [[[0, 0]],[[0, 0]],[[0, 0]],[[0, 0]]];
+        this.allCurveLabels = [[[0, 0]], [[0, 0]], [[0, 0]], [[0, 0]]];
         this.initialTreesDown = 1750;
 
         this.config = {
@@ -49,8 +49,8 @@ class Mapper {
         this.getSwitches();
         this.getTurntables();
         this.getIndustries();
-        this.getRollingStock();
         this.getWaterTowers();
+        this.getRollingStock();
 
         this.populatePlayerTable();
 
@@ -71,6 +71,8 @@ class Mapper {
         if (!('Players' in this.json)) {
             return null
         }
+        const playerGroup = document.createElementNS(this.svgNS, "g");
+        playerGroup.setAttribute("class", "players_default");
 
         const editPlayersTable = document.getElementById("editPlayersTable");
 
@@ -112,7 +114,7 @@ class Mapper {
 
             let playerEditDeleteValue = document.createElement("td");
 
-            if(index === 0){
+            if (index === 0) {
                 let playerEditDeleteInput = document.createTextNode("Unknown");
                 playerEditDeleteValue.appendChild(playerEditDeleteInput);
             } else {
@@ -122,10 +124,50 @@ class Mapper {
                 playerEditDeleteValue.appendChild(playerEditDeleteInput);
             }
 
+            /*
+            Radius der x-Achse der Ellipse
+Radius der y-Achse der Ellipse
+Rotation der x-Achse der Ellipse in Grad (0: keine Rotation)
+large-arc-flag:
+kurzer Weg um die Ellipse: 0
+langer Weg um die Ellipse: 1
+sweep-flag:
+Zeichnung entgegen den Uhrzeigersinn: 0
+Zeichnung mit dem Uhrzeigersinn: 1
+(x y)-Koordinaten des Endpunktes
+<path d="M 674 79 A 150 180 45 1 0 582 350" stroke="red" fill="none"/>
+             start = 10 Grad
+             ende = 250 Grad
+             */
+            if(player['Location'] === undefined || player['Location'][0] === undefined){
+                player['Location'] = [];
+                player['Location'][0] = 0;
+                player['Location'][1] = 0;
+            }
+            let px = (this.imx - ((player['Location'][0] - this.minX) / 100 * this.scale));
+            let py = (this.imy - ((player['Location'][1] - this.minY) / 100 * this.scale));
+            let ps = this.polarToCartesian(px, py, 3, 20+player['Rotation']);
+            let pe = this.polarToCartesian(px, py, 3, 340+player['Rotation']);
+            let playerCircle = document.createElementNS(this.svgNS, "path");
+            let path = 'M '+ps.x+' '+ps.y+' A 3 3 0 1 0 '+pe.x+' '+pe.y;
+            path+= ' A 1 1 0 1 0 '+ps.x+' '+ps.y;
+            playerCircle.setAttribute("d", path);
+            playerCircle.setAttribute("fill", "pink");
+            playerCircle.setAttribute("stroke", "black");
+            playerCircle.setAttribute("stroke-width", "1");
+
+            let title = document.createElementNS(this.svgNS, "title");
+            title.textContent = player['Name'].replace(/<\/?[^>]+(>|$)/g, "");
+            playerCircle.appendChild(title);
+
+            playerGroup.appendChild(playerCircle);
+
             playerEditInfoRow.appendChild(playerEditDeleteValue);
 
             editPlayersTable.appendChild(playerEditInfoRow);
         }
+        this.shapes.push(playerGroup);
+
     }
 
     /**
@@ -199,10 +241,10 @@ class Mapper {
                 let [, strokeWidth, stroke] = entry;
 
                 let multiplier = 1;
-                if([1, 2, 5, 6].indexOf(type) > -1) {
+                if ([1, 2, 5, 6].indexOf(type) > -1) {
                     let x = this.getZDistanceToNearestTrack(spline['Segments'][0]);
-                    if(x>0){
-                        multiplier = Math.round(x/180);
+                    if (x > 0) {
+                        multiplier = Math.round(x / 180);
                     }
                 }
                 strokeWidth = strokeWidth * multiplier;
@@ -265,7 +307,7 @@ class Mapper {
                                 vOrto[1] = xx; // / ortoLength;
 
                                 let nextSegment = segments[segmentIndex + 1];
-                                vOrto2[0] = -1*(nextSegment['LocationEnd']['Y'] - nextSegment['LocationStart']['Y']);
+                                vOrto2[0] = -1 * (nextSegment['LocationEnd']['Y'] - nextSegment['LocationStart']['Y']);
                                 vOrto2[1] = nextSegment['LocationEnd']['X'] - nextSegment['LocationStart']['X'];
 
                                 if (true) {
@@ -273,32 +315,31 @@ class Mapper {
                                     let O = this.checkLineIntersection(
                                         segment['LocationStart']['X'],
                                         segment['LocationStart']['Y'],
-                                        segment['LocationStart']['X']+vOrto[0],
-                                        segment['LocationStart']['Y']+vOrto[1],
+                                        segment['LocationStart']['X'] + vOrto[0],
+                                        segment['LocationStart']['Y'] + vOrto[1],
                                         nextSegment['LocationEnd']['X'],
                                         nextSegment['LocationEnd']['Y'],
-                                        nextSegment['LocationEnd']['X']+vOrto2[0],
-                                        nextSegment['LocationEnd']['Y']+vOrto2[1],
-
+                                        nextSegment['LocationEnd']['X'] + vOrto2[0],
+                                        nextSegment['LocationEnd']['Y'] + vOrto2[1],
                                     )
 
                                     if (O !== null) {
                                         let OP = {}
-                                        OP.X=O.x;
-                                        OP.Y=O.y;
-                                        let radius = Math.round(this._dist(OP, segment['LocationStart'], true)/100);
+                                        OP.X = O.x;
+                                        OP.Y = O.y;
+                                        let radius = Math.round(this._dist(OP, segment['LocationStart'], true) / 100);
                                         let index = 8;
-                                        if(radius < 120){
+                                        if (radius < 120) {
                                             index = 7;
                                         }
-                                        if(radius < 60){
+                                        if (radius < 60) {
                                             index = 6;
                                         }
-                                        if(radius < 40){
+                                        if (radius < 40) {
                                             index = 5;
                                         }
-                                        if (this._getDistanceToNearestCurveLabel([xCenter, yCenter], (index-5)) > 20) {
-                                            this.allCurveLabels[(index-5)].push([xEnd, yEnd]);
+                                        if (this._getDistanceToNearestCurveLabel([xCenter, yCenter], (index - 5)) > 20) {
+                                            this.allCurveLabels[(index - 5)].push([xEnd, yEnd]);
                                             if (radius < 500) {
                                                 // console.log('OOOO: ' +OP['X']+', '+OP['Y']+' R '+radius);
                                                 let degrees = null;
@@ -707,23 +748,33 @@ class Mapper {
 
         let index = 0;
         for (const vehicle of this.json['Frames']) {
+            let stroke = 'black';
+            if(vehicle['Brake'] > 0.2){
+                stroke = 'orange';
+            }
+            if(vehicle['Brake'] > 0.5){
+                stroke = 'red';
+            }
+            if(vehicle['Brake'] === 0){
+                stroke = 'black';
+            }
             const x = (this.imx - ((vehicle['Location'][0] - this.minX) / 100 * this.scale));
             const y = (this.imy - ((vehicle['Location'][1] - this.minY) / 100 * this.scale));
             if (['porter_040', 'porter_042', /*'handcar', */'eureka', 'climax', 'heisler', 'class70', 'cooke260'].indexOf(vehicle['Type']) >= 0) {
-                const yl = 1.9*3;
-                const xl = (cartOptions[vehicle['Type']][0]-0.6)*2;
+                const yl = 1.9 * 3;
+                const xl = (cartOptions[vehicle['Type']][0] - 0.6) * 2;
                 const path = document.createElementNS(this.svgNS, "path");
                 path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + x + ", " + y + ")");
                 path.setAttribute("d", "M" + (x - (xl / 2)) + "," + y + " l " + (xl / 3) + "," + (yl / 2) + " l " + (xl / 3 * 2) + ",0 l 0,-" + yl + " l -" + (xl / 3 * 2) + ",0 z");
                 path.setAttribute("fill", "purple");
-                path.setAttribute("stroke", "black");
+                path.setAttribute("stroke", stroke);
                 path.setAttribute("stroke-width", "1");
                 rollingStockGroup.appendChild(path);
             } else {
                 // const yl = (this.engineRadius / 3) * 2;
                 // let xl = this.engineRadius;
-                const yl = 1.9*3;
-                const xl = (cartOptions[vehicle['Type']][0]-0.6)*2;
+                const yl = 1.9 * 3;
+                const xl = (cartOptions[vehicle['Type']][0] - 0.6) * 2;
 
                 // if (vehicle['Type'].toLowerCase().indexOf('tender') !== -1) {
                 //     xl = xl / 3 * 2;
@@ -731,7 +782,7 @@ class Mapper {
                 const path = document.createElementNS(this.svgNS, "path");
                 let fillColor = cartOptions[vehicle['Type']][1];
                 fillColor = cookies.get('ce_' + vehicle['Type']);
-                if(vehicle['Type'] === 'handcar') {
+                if (vehicle['Type'] === 'handcar') {
                     fillColor = 'white';
                 }
                 path.setAttribute("class", 'ce_' + vehicle['Type']);
@@ -752,7 +803,7 @@ class Mapper {
                     typeof vehicle['Freight'] !== 'undefined' &&
                     typeof vehicle['Freight']['Amount'] !== 'undefined' &&
                     vehicle['Freight']['Amount'] === 0) {
-                    title.textContent += " (empty "+vehicle['Freight']['Type']+")";
+                    title.textContent += " (empty " + vehicle['Freight']['Type'] + ")";
                 } else {
                     if (typeof vehicle['Freight'] !== 'undefined' &&
                         typeof vehicle['Freight']['Type'] !== 'undefined'
@@ -766,7 +817,7 @@ class Mapper {
                 cy = cc[1];
                 path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-" + (xl / 2) + ",-" + (yl / 2) + " h" + (xl - 4) + " a2,2 0 0 1 2,2 v" + (yl - 4) + " a2,2 0 0 1 -2,2 h-" + (xl - 4) + " a2,2 0 0 1 -2,-2 v-" + (yl - 4) + " a2,2 0 0 1 2,-2 z");
                 path.setAttribute("fill", fillColor);
-                path.setAttribute("stroke", "black");
+                path.setAttribute("stroke", stroke);
                 path.setAttribute("stroke-width", "1");
                 path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(cx) + ", " + Math.round(cy) + ")");
                 path.appendChild(title);
@@ -835,22 +886,22 @@ class Mapper {
             }
 
             const rollingStockInfoRow = document.createElement("tr");
-/*
-      var a = document.createElement('a');
-      var linkText = document.createTextNode("my title text");
-      a.appendChild(linkText);
-      a.title = "my title text";
-      a.href = "http://example.com";
-      document.body.appendChild(a);
+            /*
+                  var a = document.createElement('a');
+                  var linkText = document.createTextNode("my title text");
+                  a.appendChild(linkText);
+                  a.title = "my title text";
+                  a.href = "http://example.com";
+                  document.body.appendChild(a);
 
- */
+             */
             const typeValue = document.createElement("td");
             const a = document.createElement('a');
             const typeImage = document.createElement("img");
             typeImage.src = "/assets/images/" + vehicle['Type'] + ".png";
             a.appendChild(typeImage);
             // (((400000-($task[1]['x']+200000))/400000))
-            a.href = "javascript:zoomTo("+(400000-(vehicle['Location'][0]+200000))/400000+","+(400000-(vehicle['Location'][1]+200000))/400000+")";
+            a.href = "javascript:zoomTo(" + (400000 - (vehicle['Location'][0] + 200000)) / 400000 + "," + (400000 - (vehicle['Location'][1] + 200000)) / 400000 + ")";
             typeValue.appendChild(a);
             rollingStockInfoRow.appendChild(typeValue);
 
@@ -1063,8 +1114,8 @@ class Mapper {
                     path.setAttribute("stroke", "brown");
                     industryLabelGroup.appendChild(path);
 
-                    xoff = -50 + Math.cos(industry['Rotation'][1]*Math.PI/180)*50;
-                    yoff = -25 + Math.sin(industry['Rotation'][1]*Math.PI/180)*25;
+                    xoff = -50 + Math.cos(industry['Rotation'][1] * Math.PI / 180) * 50;
+                    yoff = -25 + Math.sin(industry['Rotation'][1] * Math.PI / 180) * 25;
                     xoff = 0;
                     yoff = 0;
                     break;
@@ -1136,28 +1187,27 @@ class Mapper {
 
             index += 1;
         }
-        if (!('Watertowers' in this.json)) {
-            return
-        }
+        if (('Watertowers' in this.json)) {
 
-        for (const tower of this.json['Watertowers']) {
-            const x = this.imx - ((tower['Location'][0] - this.minX) / 100 * this.scale);
-            const y = this.imy - ((tower['Location'][1] - this.minY) / 100 * this.scale);
+            for (const tower of this.json['Watertowers']) {
+                const x = this.imx - ((tower['Location'][0] - this.minX) / 100 * this.scale);
+                const y = this.imy - ((tower['Location'][1] - this.minY) / 100 * this.scale);
 
-            const waterTower = document.createElementNS(this.svgNS, "path");
-            waterTower.setAttribute("transform", "rotate(" + Math.round(tower['Rotation'][1]) + ", " + x + ", " + y + ")");
-            waterTower.setAttribute("d", "M" + x + "," + y + " m -5,-5 l10,0 l0,3 l3,0 l0,4 l-3,0 l0,3 l-10,0 z");
-            waterTower.setAttribute("fill", "lightblue");
-            waterTower.setAttribute("stroke", "black");
-            waterTower.setAttribute("stroke-width", "1");
-            industryLabelGroup.appendChild(waterTower);
+                const waterTower = document.createElementNS(this.svgNS, "path");
+                waterTower.setAttribute("transform", "rotate(" + Math.round(tower['Rotation'][1]) + ", " + x + ", " + y + ")");
+                waterTower.setAttribute("d", "M" + x + "," + y + " m -5,-5 l10,0 l0,3 l3,0 l0,4 l-3,0 l0,3 l-10,0 z");
+                waterTower.setAttribute("fill", "lightblue");
+                waterTower.setAttribute("stroke", "black");
+                waterTower.setAttribute("stroke-width", "1");
+                industryLabelGroup.appendChild(waterTower);
 
-            const waterTowerCircle = document.createElementNS(this.svgNS, "circle");
-            waterTowerCircle.setAttribute("cx", x.toString());
-            waterTowerCircle.setAttribute("cy", y.toString());
-            waterTowerCircle.setAttribute("r", "3");
-            waterTowerCircle.setAttribute("fill", "blue");
-            industryLabelGroup.appendChild(waterTowerCircle);
+                const waterTowerCircle = document.createElementNS(this.svgNS, "circle");
+                waterTowerCircle.setAttribute("cx", x.toString());
+                waterTowerCircle.setAttribute("cy", y.toString());
+                waterTowerCircle.setAttribute("r", "3");
+                waterTowerCircle.setAttribute("fill", "blue");
+                industryLabelGroup.appendChild(waterTowerCircle);
+            }
         }
 
         this.shapes.push(industryLabelGroup);
@@ -1167,46 +1217,45 @@ class Mapper {
         // handled in industries
     }
 
-    getZDistanceToNearestTrack(segment)
-    {
-            const treeX = Math.floor((200000 + segment['LocationCenter']['X']) / 100000);
-            const treeY = Math.floor((200000 + segment['LocationCenter']['Y']) / 100000);
-            const tree = [segment['LocationCenter']['X'], segment['LocationCenter']['Y'], segment['LocationCenter']['Z']];
+    getZDistanceToNearestTrack(segment) {
+        const treeX = Math.floor((200000 + segment['LocationCenter']['X']) / 100000);
+        const treeY = Math.floor((200000 + segment['LocationCenter']['Y']) / 100000);
+        const tree = [segment['LocationCenter']['X'], segment['LocationCenter']['Y'], segment['LocationCenter']['Z']];
 
-            let minDistanceToSomething = undefined;
-            try {
-                for (const spline of this.json['Splines']) {
-                    if (spline['Type'] !== 0 && spline['Type'] !== 4) continue;
+        let minDistanceToSomething = undefined;
+        try {
+            for (const spline of this.json['Splines']) {
+                if (spline['Type'] !== 0 && spline['Type'] !== 4) continue;
 
-                    for (const segment of spline['Segments']) {
-                        if (segment['CX'].indexOf(treeX) === -1) continue;
-                        if (segment['CY'].indexOf(treeY) === -1) continue;
-                        if (segment['LocationCenter']['X'] < tree[0] - 6000) {
-                            continue;
-                        }
-                        if (segment['LocationCenter']['X'] > tree[0] + 6000) {
-                            continue;
-                        }
-                        if (segment['LocationCenter']['Y'] < tree[1] - 6000) {
-                            continue;
-                        }
-                        if (segment['LocationCenter']['Y'] > tree[1] + 6000) {
-                            continue;
-                        }
-                        if(minDistanceToSomething === undefined){
-                            minDistanceToSomething = tree[2] - segment['LocationCenter']['Z'];
-                        }
-                        minDistanceToSomething =
-                            Math.min(minDistanceToSomething,
-                                tree[2] - segment['LocationCenter']['Z']
-                            );
+                for (const segment of spline['Segments']) {
+                    if (segment['CX'].indexOf(treeX) === -1) continue;
+                    if (segment['CY'].indexOf(treeY) === -1) continue;
+                    if (segment['LocationCenter']['X'] < tree[0] - 6000) {
+                        continue;
                     }
+                    if (segment['LocationCenter']['X'] > tree[0] + 6000) {
+                        continue;
+                    }
+                    if (segment['LocationCenter']['Y'] < tree[1] - 6000) {
+                        continue;
+                    }
+                    if (segment['LocationCenter']['Y'] > tree[1] + 6000) {
+                        continue;
+                    }
+                    if (minDistanceToSomething === undefined) {
+                        minDistanceToSomething = tree[2] - segment['LocationCenter']['Z'];
+                    }
+                    minDistanceToSomething =
+                        Math.min(minDistanceToSomething,
+                            tree[2] - segment['LocationCenter']['Z']
+                        );
                 }
-            } catch
-                (err) {
             }
-            if(minDistanceToSomething === undefined) return -1;
-            return minDistanceToSomething;
+        } catch
+            (err) {
+        }
+        if (minDistanceToSomething === undefined) return -1;
+        return minDistanceToSomething;
     }
 
     getReplantableTrees() {
@@ -1291,6 +1340,7 @@ class Mapper {
 
         return minDistance;
     }
+
     _getDistanceToNearestCurveLabel(newLabel, index) {
         let minDistance = 8000;
         for (const oldLabel of this.allCurveLabels[index]) {
@@ -1332,7 +1382,7 @@ class Mapper {
                 }
             }
         }
-        const d = this._dist([-5000,-5000], coords, true);
+        const d = this._dist([-5000, -5000], coords, true);
         if (d < 10000) {
             return 0;
         }
@@ -1346,7 +1396,7 @@ class Mapper {
         for (const i of industryCoords) {
             if (i['Type'] < 10) {
                 let d = this._dist(i['Location'], coords, true);
-                if(log) {
+                if (log) {
                     // console.log(d);
                     // console.log(coords);
                     // console.log(i['Location']);
@@ -1483,4 +1533,13 @@ class Mapper {
         // if line1 and line2 are segments, they intersect if both of the above are true
         return result;
     };
+
+    polarToCartesian(centerX, centerY, radius, angleInDegrees) {
+        var angleInRadians = (angleInDegrees-90) * Math.PI / 180.0;
+
+        return {
+            x: centerX + (radius * Math.cos(angleInRadians)),
+            y: centerY + (radius * Math.sin(angleInRadians))
+        };
+    }
 }

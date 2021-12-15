@@ -25,13 +25,14 @@ class GVASParser
         $this->goldenBucket = array();
         $position = 0;
 
-        if(!$edit && file_exists('gzjson/'.$_GET['name'])){
+        if(!isset($_GET['remap']) && !$edit && file_exists('gzjson/'.$_GET['name'])){
             // no edit is needed - so maybe this was parsed already before?
             // check if we just can resend the old data - since nothing changed.
             $jsonMin = @gzdecode(file_get_contents('gzjson/'.$_GET['name']));
             if($jsonMin){
                 $this->goldenBucket = json_decode($jsonMin, true);
-                return $jsonMin;
+                $json_min = json_encode($this->reduce_bucket(), JSON_UNESCAPED_UNICODE);
+                return $json_min;
             }
         }
 
@@ -216,6 +217,9 @@ class GVASParser
                         'Visible' => array_shift($sillyCopy),
 
                     );
+                    if(false && in_array($splineType, array(1,2,5,6))){
+                        /// store index of point for anti-flicker randomization
+                    }
                     $startPos++;
 
                     $cX = floor((200000 + $segmentArray[sizeof($segmentArray) - 1]['LocationCenter']['X']) / 100000);
@@ -303,7 +307,7 @@ class GVASParser
         file_put_contents('xx.min.json', $json_min);
 
         // why not saving a compressed verion of the minified json?
-        file_put_contents('gzjson/'.$this->owner, gzencode($json_min));
+        file_put_contents('gzjson/'.$this->owner, gzencode($json));
 
         if ($edit) {
             $tmp = $this->handleEditAndSave();
@@ -577,6 +581,8 @@ class GVASParser
                 //PlayerRotationArray
 
                 if (trim($object->getName()) == 'PlayerXPArray') {
+//                    unset($this->saveObject['objects'][$saveObjectIndex]);
+//                    continue;
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['xp_' . $index]) && trim($_POST['xp_' . $index])) {
                             $object->CONTENTOBJECTS[3]->contentElements[$index]->setValue(trim($_POST['xp_' . $index]));
@@ -588,6 +594,8 @@ class GVASParser
                     }
                 }
                 if (trim($object->getName()) == 'PlayerMoneyArray') {
+//                    unset($this->saveObject['objects'][$saveObjectIndex]);
+//                    continue;
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['money_' . $index]) && trim($_POST['money_' . $index])) {
                             $object->CONTENTOBJECTS[3]->contentElements[$index]->setValue(trim($_POST['money_' . $index]));
@@ -599,6 +607,8 @@ class GVASParser
                     }
                 }
                 if (trim($object->getName()) == 'PlayerNameArray') {
+//                    unset($this->saveObject['objects'][$saveObjectIndex]);
+//                    continue;
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['deletePlayer_' . $index])) {
                             unset($object->CONTENTOBJECTS[3]->contentElements[$index]);
@@ -607,6 +617,8 @@ class GVASParser
                     }
                 }
                 if (trim($object->getName()) == 'PlayerRotationArray') {
+//                    unset($this->saveObject['objects'][$saveObjectIndex]);
+//                    continue;
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['deletePlayer_' . $index])) {
                             unset($object->CONTENTOBJECTS[3]->contentElements[$index]);
@@ -615,6 +627,8 @@ class GVASParser
                     }
                 }
                 if (trim($object->getName()) == 'PlayerLocationArray') {
+//                    unset($this->saveObject['objects'][$saveObjectIndex]);
+//                    continue;
                     foreach ($object->CONTENTOBJECTS[3]->contentElements as $index => $textProp) {
                         if (isset($_POST['deletePlayer_' . $index])) {
                             unset($object->CONTENTOBJECTS[3]->contentElements[$index]);
@@ -688,6 +702,14 @@ class GVASParser
                     }
                 }
 
+                if(isset($_POST['antiflicker'])){
+                    if (trim($object->getName()) == 'SplineControlPointsArray') {
+                        foreach($object->CONTENTOBJECTS[3]->contentElements as $pi => $point){
+                            $point->content[2]=$point->content[2]-2+rand(0,4);
+                        }
+
+                    }
+                }
 
                 if (isset($curvePoints[0]) && sizeof($curvePoints[0])) {
 
@@ -819,7 +841,7 @@ class GVASParser
         if (isset($_POST['save'])) {
 //            $db = unserialize(file_get_contents('db.db'));
             $this->connect();
-            $ip = $this->query('select ip, unused from stats where name="' . mysqli_real_escape_string($dbh, $this->owner) . '"');
+            $ip = $this->query('select ip, unused from stats where name="' . @mysqli_real_escape_string($dbh, $this->owner) . '"');
 
             if (getUserIpAddr() != 'local' && (getUserIpAddr() != $ip[0]['ip'])) {
                 $secondParts = explode('.', $ip[0]['ip']);
@@ -1036,9 +1058,9 @@ class GVASParser
         $carts = array('flatcar_logs', 'flatcar_cordwood', 'flatcar_stakes', 'flatcar_hopper', 'boxcar', 'flatcar_tanker');
 
         // We don't use player rotation
-        foreach ($reduced['Players'] as $index => $player) {
-            unset($reduced['Players'][$index]['Rotation']);
-        }
+//        foreach ($reduced['Players'] as $index => $player) {
+////            unset($reduced['Players'][$index]['Rotation']);
+//        }
 
         if (isset($reduced['Frames'])) {
             // Carts don't need the same attributes as locomotives
@@ -1076,9 +1098,9 @@ class GVASParser
         foreach ($reduced['Removed']['Vegetation'] as $index => $tree) {
             unset($reduced['Removed']['Vegetation'][$index][2]);
         }
-        foreach ($reduced['Players'] as $index => $player) {
-            unset($reduced['Players'][$index]['Location'][2]);
-        }
+//        foreach ($reduced['Players'] as $index => $player) {
+//            unset($reduced['Players'][$index]['Location'][2]);
+//        }
         if (isset($reduced['Frames'])) {
             foreach ($reduced['Frames'] as $index => $frame) {
                 unset($reduced['Frames'][$index]['Rotation'][2]);
@@ -1120,7 +1142,7 @@ class GVASParser
     {
         global $dbh;
         if (!$dbh) {
-            $this->connect();
+            if(!$this->connect()) return array();
         }
 
         $result = array();
@@ -1142,9 +1164,12 @@ class GVASParser
         if (file_exists('dbaccess.php'))
             require 'dbaccess.php';
 
-        $dbh = mysqli_connect($dbhost, $dbuser, $dbpassword);
+        $dbh = @mysqli_connect($dbhost, $dbuser, $dbpassword);
+        if(!$dbh){
+            return false;
+        }
         mysqli_query($dbh, 'use ' . $dbdatabase);
-
+        return $dbh;
     }
 }
 
