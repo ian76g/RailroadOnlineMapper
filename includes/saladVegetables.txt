@@ -1,10 +1,10 @@
 Salad Vegetables
 Amaranth
 Arugula
-Beet (greens)
+Beet
 Bok choy
 Borage greens
-Broccoli (leaves / stalks)
+Broccoli
 Brooklime
 Brussels sprouts
 Cabbage
@@ -28,7 +28,7 @@ Fiddlehead
 Fluted pumpkin
 Golden samphire
 Good King Henry
-Grape (leaves)
+Grape leaves
 Greater plantain
 Kai-lan
 Kale
@@ -43,7 +43,7 @@ Lizard’s tail
 Malabar spinach
 Mallow
 Melokhia
-Miner’s lettuce (Winter purslane)
+Miner’s lettuce
 Mizuna greens
 Mustard
 Napa cabbage
@@ -51,12 +51,14 @@ New Zealand Spinach
 Orache
 Pak choy
 Paracress
-Pea (sprouts / leaves)
+Pea sprouts
+Pea leaves
 Poke
 Radicchio
-Rapini (broccoli rabe)
+Rapini
 Samphire
-Sculpit / Stridolo
+Sculpit
+Stridolo
 Sea beet
 Sea kale
 Shepherd’s purse

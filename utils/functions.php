@@ -65,18 +65,18 @@ function map_entries($sortby = null, $sortorder = null): Generator
             round(length/100000,2) as trackLength, switches as numY, trees as numT, 
        locos as numLocs, carts as numCarts, round(slope) as slope, unused as public, tasksA as tasks, tasksAreward as reward
             from stats where name="' . mysqli_real_escape_string($dbh, $user) . '"');
-            if(!isset($row[0])){
+            if (!isset($row[0])) {
                 continue;
-                $row[0] = array('file' => $file,'name'=>$user, 'trackLength'=>'?',
-                    'numLocs' =>'?', 'numCarts' =>'?', 'slope' =>'?', 'public' =>'', 'tasks' =>'?', 'reward' =>'?',
-                    'numY' =>'?','numT' =>'?');
+                $row[0] = array('file' => $file, 'name' => $user, 'trackLength' => '?',
+                    'numLocs' => '?', 'numCarts' => '?', 'slope' => '?', 'public' => '', 'tasks' => '?', 'reward' => '?',
+                    'numY' => '?', 'numT' => '?');
 
             }
-            $x=query('select * from downloads where name="' . mysqli_real_escape_string($dbh, $user) . '"');
-            if(!isset($x[0])){
-                $row[0]['downloads']=0;
+            $x = query('select * from downloads where name="' . mysqli_real_escape_string($dbh, $user) . '"');
+            if (!isset($x[0])) {
+                $row[0]['downloads'] = 0;
             } else {
-                $row[0]['downloads']=$x[0]['downloads'];
+                $row[0]['downloads'] = $x[0]['downloads'];
             }
             yield $row[0];
             $i++;
@@ -269,8 +269,8 @@ function generateTasks(&$industryData, ArithmeticHelper $ah, $industryTracks)
             $cartsCordwood += $x;
         }
     }
-    if ((24 - $REFlumberNeeded) <= $lumber) {
-        $x = min($REFpipesNeeded, $REFoilNeeded) + (24 - $REFlumberNeeded);
+    if (min(6, (24 - $REFlumberNeeded)) <= $lumber) {
+        $x = min($lumber, min($REFpipesNeeded, $REFoilNeeded) + (24 - $REFlumberNeeded));
         if (floor($x / 6)) {
             $reward = 72 * floor($x / 6);
             if ($refinery) {
@@ -282,8 +282,8 @@ function generateTasks(&$industryData, ArithmeticHelper $ah, $industryTracks)
             }
         }
     }
-    if ((100 - min(100, $REFoilNeeded)) <= $oilR) {
-        $x = min($REFpipesNeeded, $REFlumberNeeded) + (100 - min(100, $REFoilNeeded));
+    if (min(12, (100 - min(100, $REFoilNeeded))) <= $oilR) {
+        $x = min($oilR, min($REFpipesNeeded, $REFlumberNeeded) + (100 - min(100, $REFoilNeeded)));
         if (floor($x / 12)) {
             $reward = 192 * floor($x / 12);
             if ($refinery) {
@@ -294,8 +294,8 @@ function generateTasks(&$industryData, ArithmeticHelper $ah, $industryTracks)
             }
         }
     }
-    if ((100 - $REFpipesNeeded) <= $pipes) {
-        $x = min($REFoilNeeded, $REFlumberNeeded) + (100 - $REFpipesNeeded);
+    if (min(9, (100 - $REFpipesNeeded)) <= $pipes) {
+        $x = min($pipes, min($REFoilNeeded, $REFlumberNeeded) + (100 - $REFpipesNeeded));
         if (floor($x / 9)) {
             $reward = 180 * floor($x / 9);
             if ($refinery) {
@@ -307,8 +307,8 @@ function generateTasks(&$industryData, ArithmeticHelper $ah, $industryTracks)
             }
         }
     }
-    if ((18 - $OFpipesNeeded) <= $pipes) {
-        $x = min($OFbeamsNeeded, $OFtoolsNeeded) + (18 - $OFpipesNeeded);
+    if (min(9, (18 - $OFpipesNeeded)) <= $pipes) {
+        $x = min($pipes, min($OFbeamsNeeded, $OFtoolsNeeded) + (18 - $OFpipesNeeded));
         if (floor($x / 9)) {
             $reward = 180 * floor($x / 9);
             if ($oilfield) {
@@ -320,8 +320,8 @@ function generateTasks(&$industryData, ArithmeticHelper $ah, $industryTracks)
             }
         }
     }
-    if ((20 - $OFbeamsNeeded) <= $beams) {
-        $x = min($OFpipesNeeded, $OFtoolsNeeded) + (20 - $OFbeamsNeeded);
+    if (min(3, (20 - $OFbeamsNeeded)) <= $beams) {
+        $x = min($beams, min($OFpipesNeeded, $OFtoolsNeeded) + (20 - $OFbeamsNeeded));
         if (floor($x / 3)) {
             $reward = 36 * floor($x / 3);
             if ($oilfield) {
@@ -333,8 +333,8 @@ function generateTasks(&$industryData, ArithmeticHelper $ah, $industryTracks)
             }
         }
     }
-    if ((100 - $OFtoolsNeeded) <= $tools) {
-        $x = min($OFbeamsNeeded, $OFpipesNeeded) + (100 - $OFtoolsNeeded);
+    if (min(32, (100 - $OFtoolsNeeded)) <= $tools) {
+        $x = min($tools, min($OFbeamsNeeded, $OFpipesNeeded) + (100 - $OFtoolsNeeded));
         if (floor($x / 32)) {
             $reward = 640 * floor($x / 32);
             if ($oilfield) {
@@ -346,8 +346,8 @@ function generateTasks(&$industryData, ArithmeticHelper $ah, $industryTracks)
             }
         }
     }
-    if ((100 - min(100, $IWcoalNeeded)) <= $coal) {
-        $x = $IWironNeeded + (100 - min(100, $IWcoalNeeded));
+    if (min(10, (100 - min(100, $IWcoalNeeded))) <= $coal) {
+        $x = min($IWironNeeded + (100 - min(100, $IWcoalNeeded)), $coal);
         if (floor($x / 10)) {
             $reward = 150 * floor($x / 10);
             if ($ironworks) {
@@ -358,8 +358,8 @@ function generateTasks(&$industryData, ArithmeticHelper $ah, $industryTracks)
             }
         }
     }
-    if ((100 - $IWironNeeded) <= $iron) {
-        $x = $IWcoalNeeded + (100 - $IWironNeeded);
+    if (min(10, (100 - $IWironNeeded)) <= $iron) {
+        $x = min($iron, $IWcoalNeeded + (100 - $IWironNeeded));
         if (floor($x / 10)) {
             $reward = 54 * floor($x / 10);
             if ($ironworks) {
@@ -370,8 +370,8 @@ function generateTasks(&$industryData, ArithmeticHelper $ah, $industryTracks)
             }
         }
     }
-    if ((100 - $SMcordwoodNeeded) >= 8) {
-        $x = floor((100 - $SMcordwoodNeeded) / 8);
+    if (min(8, (100 - $SMcordwoodNeeded)) >= 8) {
+        $x = floor(min(8, (100 - $SMcordwoodNeeded)) / 8);
         if ($x) {
             $reward = 80 * $x;
             if ($smelter) {
@@ -382,8 +382,8 @@ function generateTasks(&$industryData, ArithmeticHelper $ah, $industryTracks)
             }
         }
     }
-    if ((100 - min(100, $SMironOreNeeded)) <= $ironOre) {
-        $x = $SMcordwoodNeeded + (100 - min(100, $SMironOreNeeded));
+    if (min(10, (100 - min(100, $SMironOreNeeded))) <= $ironOre) {
+        $x = min($ironOre, $SMcordwoodNeeded + (100 - min(100, $SMironOreNeeded)));
         if (floor($x / 10)) {
             $reward = 140 * floor($x / 10);
             if ($smelter) {
@@ -394,8 +394,8 @@ function generateTasks(&$industryData, ArithmeticHelper $ah, $industryTracks)
             }
         }
     }
-    if ((20 - $IMbeamsNeeded) <= $beams) {
-        $x = $IMlumberNeeded + (20 - $IMbeamsNeeded);
+    if (min(3, (20 - $IMbeamsNeeded)) <= $beams) {
+        $x = min($beams, $IMlumberNeeded + (20 - $IMbeamsNeeded));
         if (floor($x / 3)) {
             $reward = 36 * floor($x / 3);
             if ($ironmine) {
@@ -407,8 +407,8 @@ function generateTasks(&$industryData, ArithmeticHelper $ah, $industryTracks)
             }
         }
     }
-    if ((24 - $IMlumberNeeded) <= $lumber) {
-        $x = $IMbeamsNeeded + (24 - $IMlumberNeeded);
+    if (min(6, (24 - $IMlumberNeeded)) <= $lumber) {
+        $x = min($lumber, $IMbeamsNeeded + (24 - $IMlumberNeeded));
         if (floor($x / 6)) {
             $reward = 72 * floor($x / 6);
             if ($ironmine) {
@@ -420,8 +420,8 @@ function generateTasks(&$industryData, ArithmeticHelper $ah, $industryTracks)
             }
         }
     }
-    if ((20 - $CMbeamsNeeded) <= $beams) {
-        $x = $CMrailsNeeded + (20 - $CMbeamsNeeded);
+    if (min(3, (20 - $CMbeamsNeeded)) <= $beams) {
+        $x = min($beams, $CMrailsNeeded + (20 - $CMbeamsNeeded));
         if (floor($x / 3)) {
             $reward = 36 * floor($x / 3);
             if ($coalmine) {
@@ -433,8 +433,8 @@ function generateTasks(&$industryData, ArithmeticHelper $ah, $industryTracks)
             }
         }
     }
-    if ((50 - $CMrailsNeeded) <= $rails) {
-        $x = $CMbeamsNeeded + (50 - $CMrailsNeeded);
+    if (min(10, (50 - $CMrailsNeeded)) <= $rails) {
+        $x = min($rails, $CMbeamsNeeded + (50 - $CMrailsNeeded));
         if (floor($x / 10)) {
             $reward = 180 * floor($x / 10);
             if ($coalmine) {
@@ -494,15 +494,17 @@ function generateTasks(&$industryData, ArithmeticHelper $ah, $industryTracks)
             $cartsHopper--;
         }
         if (isset($cartTracks[$i]) && $cartTracks[$i]['d'] > 425) {
-            $Rtasks[] = array(
-                'Recover rolling stock ' . $frame['Type'] . ' ' . strip_tags($frame['Name'] . ' ' . $frame['Number']) . '. It is ' .
-                ceil($cartTracks[$i]['d'] / 100) . 'm off regular track near ' .
-                $ah->nearestIndustry($frame['Location'], $industryData['Industries']),
-                array(
-                    'x' => $frame['Location'][0],
-                    'y' => $frame['Location'][1],
-                )
-            );
+            if (!isInShed($frame, $industryData['Industries'], $ah)) {
+                $Rtasks[] = array(
+                    'Recover rolling stock ' . $frame['Type'] . ' ' . strip_tags($frame['Name'] . ' ' . $frame['Number']) . '. It is ' .
+                    ceil($cartTracks[$i]['d'] / 100) . 'm off regular track near ' .
+                    $ah->nearestIndustry($frame['Location'], $industryData['Industries']),
+                    array(
+                        'x' => $frame['Location'][0],
+                        'y' => $frame['Location'][1],
+                    )
+                );
+            }
         }
     }
     if ($cartsTanker > 0) {
@@ -621,6 +623,26 @@ function taskText($carts, $cargo, $from, $to)
 //    name = 'F#' + index;
 //            pis = ['cordwood_p.svg'];
 
+
+function isInShed($vehicle, $industries, ArithmeticHelper $ah)
+{
+    $shedLength = 2500;
+    $shedWidth = 800;
+    foreach ($industries as $industry) {
+        if (in_array($industry['Type'], [11, 12, 13, 14])) {
+            $exitPointX = $industry['Location'][0] + cos(deg2rad($industry['Rotation'][1])) * $shedLength;
+            $exitPointY = $industry['Location'][1] + sin(deg2rad($industry['Rotation'][1])) * $shedLength;
+        }
+        if (
+            $ah->dist($industry['Location'], $vehicle['Location'], true) +
+            $ah->dist([$exitPointX, $exitPointY], $vehicle['Location'], true)
+            < $shedLength + ($shedWidth / 2)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function query($sql)
 {
     global $dbh;
@@ -630,7 +652,7 @@ function query($sql)
 
     $result = array();
     $rh = mysqli_query($dbh, $sql);
-    if(!$rh){
+    if (!$rh) {
 //        var_dump($sql);
     }
     while ($result[] = @mysqli_fetch_assoc($rh)) ;

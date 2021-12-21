@@ -25,11 +25,11 @@ class GVASParser
         $this->goldenBucket = array();
         $position = 0;
 
-        if(!isset($_GET['remap']) && !$edit && file_exists('gzjson/'.$_GET['name'])){
+        if (!isset($_GET['remap']) && !$edit && file_exists('gzjson/' . $_GET['name'])) {
             // no edit is needed - so maybe this was parsed already before?
             // check if we just can resend the old data - since nothing changed.
-            $jsonMin = @gzdecode(file_get_contents('gzjson/'.$_GET['name']));
-            if($jsonMin){
+            $jsonMin = @gzdecode(file_get_contents('gzjson/' . $_GET['name']));
+            if ($jsonMin) {
                 $this->goldenBucket = json_decode($jsonMin, true);
                 $json_min = json_encode($this->reduce_bucket(), JSON_UNESCAPED_UNICODE);
                 return $json_min;
@@ -101,34 +101,32 @@ class GVASParser
 
         if (isset($this->goldenBucket['Frames'])) {
             foreach ($this->goldenBucket['Frames'] as $i => $frame) {
-                if (false && in_array($frame['Type'], $carts)) {
-
-                } else {
-                    if (isset($this->goldenBucket['Boilers'][$i]))
-                        $this->goldenBucket['Frames'][$i]['Boiler'] = $this->goldenBucket['Boilers'][$i];
-                    if (isset($this->goldenBucket['Headlights'][$i]))
-                        $this->goldenBucket['Frames'][$i]['Headlights'] = $this->goldenBucket['Headlights'][$i];
-                    if (isset($this->goldenBucket['Compressors'][$i]))
-                        $this->goldenBucket['Frames'][$i]['Compressor'] = $this->goldenBucket['Compressors'][$i];
-                    if (isset($this->goldenBucket['Regulatorvalue'][$i]))
-                        $this->goldenBucket['Frames'][$i]['Regulator'] = $this->goldenBucket['Regulatorvalue'][$i];
-                    if (isset($this->goldenBucket['Smokestacktype'][$i]))
-                        $this->goldenBucket['Frames'][$i]['Smokestack'] = $this->goldenBucket['Smokestacktype'][$i];
-                    if (isset($this->goldenBucket['Generatorvalvevalue'][$i]))
-                        $this->goldenBucket['Frames'][$i]['Generatorvalvevalue'] = $this->goldenBucket['Generatorvalvevalue'][$i];
-                    if (isset($this->goldenBucket['Reverservalue'][$i]))
-                        $this->goldenBucket['Frames'][$i]['Reverser'] = $this->goldenBucket['Reverservalue'][$i];
-                    if (isset($this->goldenBucket['Tenders'][$i]))
-                        $this->goldenBucket['Frames'][$i]['Tender'] = $this->goldenBucket['Tenders'][$i];
-                    if (isset($this->goldenBucket['Marker'][$i]))
-                        $this->goldenBucket['Frames'][$i]['Marker']['Front']['Right'] = $this->goldenBucket['Marker']['Lights']['Front']['Right'][$i];
-                    if (isset($this->goldenBucket['Marker'][$i]))
-                        $this->goldenBucket['Frames'][$i]['Marker']['Front']['Left'] = $this->goldenBucket['Marker']['Lights']['Front']['Left'][$i];
-                    if (isset($this->goldenBucket['Marker'][$i]))
-                        $this->goldenBucket['Frames'][$i]['Marker']['Rear']['Right'] = $this->goldenBucket['Marker']['Lights']['Rear']['Right'][$i];
-                    if (isset($this->goldenBucket['Marker'][$i]))
-                        $this->goldenBucket['Frames'][$i]['Marker']['Rear']['Left'] = $this->goldenBucket['Marker']['Lights']['Rear']['Left'][$i];
-                }
+                if (isset($this->goldenBucket['Boilers'][$i]))
+                    $this->goldenBucket['Frames'][$i]['Boiler'] = $this->goldenBucket['Boilers'][$i];
+                if (isset($this->goldenBucket['Headlights'][$i]))
+                    $this->goldenBucket['Frames'][$i]['Headlights'] = $this->goldenBucket['Headlights'][$i];
+                if (isset($this->goldenBucket['Compressors'][$i]))
+                    $this->goldenBucket['Frames'][$i]['Compressor'] = $this->goldenBucket['Compressors'][$i];
+                if (isset($this->goldenBucket['Regulatorvalue'][$i]))
+                    $this->goldenBucket['Frames'][$i]['Regulator'] = $this->goldenBucket['Regulatorvalue'][$i];
+                if (isset($this->goldenBucket['Smokestacktype'][$i]))
+                    $this->goldenBucket['Frames'][$i]['Smokestack'] = $this->goldenBucket['Smokestacktype'][$i];
+                if (isset($this->goldenBucket['Generatorvalvevalue'][$i]))
+                    $this->goldenBucket['Frames'][$i]['Generatorvalvevalue'] = $this->goldenBucket['Generatorvalvevalue'][$i];
+                if (isset($this->goldenBucket['Reverservalue'][$i]))
+                    $this->goldenBucket['Frames'][$i]['Reverser'] = $this->goldenBucket['Reverservalue'][$i];
+                if (isset($this->goldenBucket['Tenders'][$i]))
+                    $this->goldenBucket['Frames'][$i]['Tender'] = $this->goldenBucket['Tenders'][$i];
+                if (isset($this->goldenBucket['Marker']['Lights']['Front']['Right'][$i]))
+                    $this->goldenBucket['Frames'][$i]['Marker']['Front']['Right'] = $this->goldenBucket['Marker']['Lights']['Front']['Right'][$i];
+                if (isset($this->goldenBucket['Marker']['Lights']['Front']['Left'][$i]))
+                    $this->goldenBucket['Frames'][$i]['Marker']['Front']['Left']  = $this->goldenBucket['Marker']['Lights']['Front']['Left'][$i];
+                if (isset($this->goldenBucket['Marker']['Lights']['Rear']['Right'][$i]))
+                    $this->goldenBucket['Frames'][$i]['Marker']['Rear']['Right']  = $this->goldenBucket['Marker']['Lights']['Rear']['Right'][$i];
+                if (isset($this->goldenBucket['Marker']['Lights']['Rear']['Left'][$i]))
+                    $this->goldenBucket['Frames'][$i]['Marker']['Rear']['Left']   = $this->goldenBucket['Marker']['Lights']['Rear']['Left'][$i];
+                if (isset($this->goldenBucket['Marker']['Lights']['Center'][$i]))
+                    $this->goldenBucket['Frames'][$i]['Marker']['Center']         = $this->goldenBucket['Marker']['Lights']['Center'][$i];
 
                 if (isset($this->goldenBucket['Freights'][$i]))
                     $this->goldenBucket['Frames'][$i]['Freight'] = $this->goldenBucket['Freights'][$i];
@@ -217,7 +215,7 @@ class GVASParser
                         'Visible' => array_shift($sillyCopy),
 
                     );
-                    if(false && in_array($splineType, array(1,2,5,6))){
+                    if (false && in_array($splineType, array(1, 2, 5, 6))) {
                         /// store index of point for anti-flicker randomization
                     }
                     $startPos++;
@@ -307,7 +305,7 @@ class GVASParser
         file_put_contents('xx.min.json', $json_min);
 
         // why not saving a compressed verion of the minified json?
-        file_put_contents('gzjson/'.$this->owner, gzencode($json));
+        file_put_contents('gzjson/' . $this->owner, gzencode($json));
 
         if ($edit) {
             $tmp = $this->handleEditAndSave();
@@ -365,6 +363,9 @@ class GVASParser
         if (isset($_POST['replant'])) {
             $sevenHundred = $_POST['replant'];
         }
+        if (isset($_POST['replant90'])) {
+            $nintyHundred = $_POST['replant90'];
+        }
         $output = '';
         $ah = new ArithmeticHelper();
         $ah->industries = $this->goldenBucket['Industries'];
@@ -420,7 +421,7 @@ class GVASParser
                             }
                         }
                         if ($minDistanceToSomething > $sevenHundred) {
-                            if ($ah->nearestIndustryDistance(array($vector->content[0], $vector->content[1])) < 9000) {
+                            if ($ah->nearestIndustryDistance(array($vector->content[0], $vector->content[1])) < $nintyHundred) {
                                 // too close to industry
                             } else {
                                 $toRemove[] = $index;
@@ -702,10 +703,10 @@ class GVASParser
                     }
                 }
 
-                if(isset($_POST['antiflicker'])){
+                if (isset($_POST['antiflicker'])) {
                     if (trim($object->getName()) == 'SplineControlPointsArray') {
-                        foreach($object->CONTENTOBJECTS[3]->contentElements as $pi => $point){
-                            $point->content[2]=$point->content[2]-2+rand(0,4);
+                        foreach ($object->CONTENTOBJECTS[3]->contentElements as $pi => $point) {
+                            $point->content[2] = $point->content[2] - 2 + rand(0, 4);
                         }
 
                     }
@@ -789,7 +790,7 @@ class GVASParser
                             $v = new dtDynamic('BoolProperty');
                             $v->pack = 'C';
                             $v->setValue(1);
-                            if ($spex == 0) {
+                            if ($spex == 0 && $_POST['invisFirst']=='yes') {
                                 $v->setValue(0);
                             }
                             $object->CONTENTOBJECTS[3]->addElement($v, true);
@@ -1074,7 +1075,7 @@ class GVASParser
                     unset($reduced['Frames'][$index]['Generatorvalvevalue']);
                     unset($reduced['Frames'][$index]['Reverser']);
                     unset($reduced['Frames'][$index]['Tender']);
-                    unset($reduced['Frames'][$index]['Marker']);
+                    //unset($reduced['Frames'][$index]['Marker']);
                 } else {
                     unset($reduced['Frames'][$index]['Freight']);
                 }
@@ -1142,12 +1143,12 @@ class GVASParser
     {
         global $dbh;
         if (!$dbh) {
-            if(!$this->connect()) return array();
+            if (!$this->connect()) return array();
         }
 
         $result = array();
         $rh = mysqli_query($dbh, $sql);
-        if(!$rh){
+        if (!$rh) {
 //        var_dump($sql);
         }
         while ($result[] = @mysqli_fetch_assoc($rh)) ;
@@ -1165,7 +1166,7 @@ class GVASParser
             require 'dbaccess.php';
 
         $dbh = @mysqli_connect($dbhost, $dbuser, $dbpassword);
-        if(!$dbh){
+        if (!$dbh) {
             return false;
         }
         mysqli_query($dbh, 'use ' . $dbdatabase);

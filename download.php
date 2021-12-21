@@ -19,9 +19,11 @@ function getUserIpAddr()
 }
 $mapName = $_GET['map'];
 connect();
-$ip = query('select ip, unused from stats where name="'.mysqli_real_escape_string($dbh, $mapName).'"');
+$sql = 'select ip, unused from stats where name="'.mysqli_real_escape_string($dbh, $mapName).'"';
+$ip = query($sql);
 
-if (getUserIpAddr() != $ip[0]['ip'] && $ip[0]['unused']!='on') {
+if (getUserIpAddr() != $ip[0]['ip'] && ($ip[0]['unused']!='on' && $ip[0]['unused']!='YES')) {
+//    echo $sql;
     die('This is nor your save game!');
 }
 $x= query('select * from downloads where name="'.mysqli_real_escape_string($dbh, $mapName).'"');

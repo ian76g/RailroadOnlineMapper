@@ -744,6 +744,7 @@ Zeichnung mit dem Uhrzeigersinn: 1
             'flatcar_hopper': [7.856, 'rosybrown', 'brown'],
             'boxcar': [8.2282, 'mediumpurple', 'purple'],
             'flatcar_tanker': [7.856, 'lightgray', 'dimgray'],
+            'caboose': [6.096, 'red', 'red'],
         }
 
         let index = 0;
@@ -760,7 +761,13 @@ Zeichnung mit dem Uhrzeigersinn: 1
             }
             const x = (this.imx - ((vehicle['Location'][0] - this.minX) / 100 * this.scale));
             const y = (this.imy - ((vehicle['Location'][1] - this.minY) / 100 * this.scale));
-            if (['porter_040', 'porter_042', /*'handcar', */'eureka', 'climax', 'heisler', 'class70', 'cooke260'].indexOf(vehicle['Type']) >= 0) {
+            if (['porter_040',
+                'porter_042', /*'handcar', */
+                'eureka',
+                'climax',
+                'heisler',
+                'class70',
+                'cooke260'].indexOf(vehicle['Type']) >= 0) {
                 const yl = 1.9 * 3;
                 const xl = (cartOptions[vehicle['Type']][0] - 0.6) * 2;
                 const path = document.createElementNS(this.svgNS, "path");
@@ -774,6 +781,7 @@ Zeichnung mit dem Uhrzeigersinn: 1
                 // const yl = (this.engineRadius / 3) * 2;
                 // let xl = this.engineRadius;
                 const yl = 1.9 * 3;
+//                console.log(vehicle['Type']);
                 const xl = (cartOptions[vehicle['Type']][0] - 0.6) * 2;
 
                 // if (vehicle['Type'].toLowerCase().indexOf('tender') !== -1) {
@@ -848,7 +856,13 @@ Zeichnung mit dem Uhrzeigersinn: 1
                 undergroundCartsTable.appendChild(cartInput);
             }
 
-            if (['porter_040', 'porter_042', /*'handcar', */'eureka', 'climax', 'heisler', 'class70', 'cooke260'].indexOf(vehicle['Type']) >= 0) {
+            if (['porter_040',
+                'porter_042', /*'handcar', */
+                'eureka',
+                'climax',
+                'heisler',
+                'class70',
+                'cooke260'].indexOf(vehicle['Type']) >= 0) {
                 let name = vehicle['Name'].replace(/(<([^>]+)>)/gi, "").toUpperCase();
                 if (!name) {
                     name = this._capitalize(vehicle['Type']);
@@ -910,7 +924,7 @@ Zeichnung mit dem Uhrzeigersinn: 1
             nameTextInput.size = 5;
             nameTextInput.maxLength = 22;  // locos have 22 - carts 15
             nameTextInput.name = "name_" + index;
-            nameTextInput.value = vehicle['Name'].replace(/<\/?[^>]+(>|$)/g, "").toUpperCase()
+            nameTextInput.value = vehicle['Name'].replace(/<\/?[^>]+(>|$)/g, "");
             nameValue.appendChild(nameTextInput);
             rollingStockInfoRow.appendChild(nameValue);
 
@@ -983,6 +997,7 @@ Zeichnung mit dem Uhrzeigersinn: 1
         if (!('Industries' in this.json)) {
             return
         }
+        let x; let y; let path;
         const industryLabelGroup = document.createElementNS(this.svgNS, "g");
         industryLabelGroup.setAttribute("class", "industryLabel");
 
@@ -995,6 +1010,8 @@ Zeichnung mit dem Uhrzeigersinn: 1
             let yoff = 0;
             let pis = [];
             let pos = [];
+            x = (this.imx - ((industry['Location'][0] - this.minX) / 100 * this.scale));
+            y = (this.imy - ((industry['Location'][1] - this.minY) / 100 * this.scale));
 
             switch (industry['Type']) {
                 case 1:
@@ -1104,20 +1121,42 @@ Zeichnung mit dem Uhrzeigersinn: 1
                     industry['EductsStored'].pop();
                     pis = ['cordwood_p.svg'];
                     name = 'F#' + index;
-                    rotation = (industry['Rotation'][1] > 0) ? (industry['Rotation'][1] - 90) : (industry['Rotation'][1] + 90);
-                    const x = (this.imx - ((industry['Location'][0] - this.minX) / 100 * this.scale));
-                    const y = (this.imy - ((industry['Location'][1] - this.minY) / 100 * this.scale));
-                    const path = document.createElementNS(this.svgNS, "path");
+                    rotation = industry['Rotation'][1]+90;
+                    path = document.createElementNS(this.svgNS, "path");
                     path.setAttribute("transform", "rotate(" + Math.round(industry['Rotation'][1]) + ", " + x + ", " + y + ")");
                     path.setAttribute("d", "M" + x + "," + y + " m-18,-15 l10,0 l0,30 l-10,0 z");
                     path.setAttribute("fill", "orange");
                     path.setAttribute("stroke", "brown");
                     industryLabelGroup.appendChild(path);
 
-                    xoff = -50 + Math.cos(industry['Rotation'][1] * Math.PI / 180) * 50;
-                    yoff = -25 + Math.sin(industry['Rotation'][1] * Math.PI / 180) * 25;
-                    xoff = 0;
-                    yoff = 0;
+                    xoff = -20;
+                    yoff = +18;
+                    break;
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                    let fill = [];
+                    fill[11] = 'lightblue';
+                    fill[12] = 'gold';
+                    fill[13] = 'red';
+                    fill[14] = 'brown';
+                    industry['EductsStored'].pop();
+                    industry['EductsStored'].pop();
+                    industry['EductsStored'].pop();
+                    industry['EductsStored'].pop();
+                    name = 'H#' + index;
+                    rotation = industry['Rotation'][1];
+                    path = document.createElementNS(this.svgNS, "path");
+                    path.setAttribute("transform", "rotate(" + Math.round(industry['Rotation'][1]) + ", " + x + ", " + y + ")");
+                    path.setAttribute("d", "M" + x + "," + y + " m-45,-12 l45,0 l0,24 l-45,0 z");
+                    path.setAttribute("fill", fill[industry['Type']]);
+                    path.setAttribute("stroke", "brown");
+                    industryLabelGroup.appendChild(path);
+
+
+                    xoff = -45;
+                    yoff = +6;
                     break;
                 default:
                     console.log("Unknown industry: " + JSON.stringify(industry));
@@ -1125,11 +1164,28 @@ Zeichnung mit dem Uhrzeigersinn: 1
 
             const industryLabel = document.createElementNS(this.svgNS, "text");
             const textNode = document.createTextNode(name);
-            industryLabel.setAttribute("x", (this.imx - ((industry['Location'][0] - this.minX) / 100 * this.scale)).toString());
-            industryLabel.setAttribute("y", (this.imy - ((industry['Location'][1] - this.minY) / 100 * this.scale)).toString());
-            industryLabel.setAttribute("transform", "rotate(" + rotation + ", " + (this.imx - ((industry['Location'][0] - this.minX) / 100 * this.scale) + xoff) + ", " + (this.imy - ((industry['Location'][1] - this.minY) / 100 * this.scale) + yoff) + ")");
+            industryLabel.setAttribute("x", x + xoff);
+            industryLabel.setAttribute("y", y + yoff);
+            industryLabel.setAttribute("transform", "rotate(" + rotation + ", " + x + ", " + y + ")");
             industryLabel.appendChild(textNode);
             industryLabelGroup.appendChild(industryLabel);
+
+            // let c= document.createElementNS(this.svgNS, "circle");
+            // c.setAttribute("cx", x);
+            // c.setAttribute("cy", y);
+            // c.setAttribute("r", "2");
+            // c.setAttribute("stroke", "red");
+            // c.setAttribute("stroke-width", "1");
+            // c.setAttribute("fill", "none");
+            // industryLabelGroup.appendChild(c);
+            // let c2= document.createElementNS(this.svgNS, "circle");
+            // c2.setAttribute("cx", x+xoff);
+            // c2.setAttribute("cy", y+yoff);
+            // c2.setAttribute("r", "2");
+            // c2.setAttribute("stroke", "green");
+            // c2.setAttribute("stroke-width", "1");
+            // c2.setAttribute("fill", "none");
+            // industryLabelGroup.appendChild(c2);
 
             const eductRow = document.createElement("tr");
             eductRow.setAttribute("class", "export__educts");
@@ -1304,7 +1360,7 @@ Zeichnung mit dem Uhrzeigersinn: 1
             } catch
                 (err) {
             }
-            if (minDistanceToSomething > 700) {
+            if (minDistanceToSomething > cookies.get('treeMap7')) {
                 const x = (this.imx - ((tree[0] - this.minX) / 100 * this.scale));
                 const y = (this.imy - ((tree[1] - this.minY) / 100 * this.scale));
                 const treeCircle = document.createElementNS(this.svgNS, "circle");
@@ -1313,7 +1369,7 @@ Zeichnung mit dem Uhrzeigersinn: 1
                 treeCircle.setAttribute("r", "6");
                 treeCircle.setAttribute("stroke", "darkgreen");
                 treeCircle.setAttribute("stroke-width", "2");
-                if (9000 > this._nearestIndustryDistance(tree, this.json['Industries'])) {
+                if (cookies.get('treeMap90') > this._nearestIndustryDistance(tree, this.json['Industries'])) {
                     treeCircle.setAttribute("fill", "green");
                     firstTreeGroup.appendChild(treeCircle);
                 } else {

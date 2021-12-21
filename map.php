@@ -251,13 +251,13 @@ foreach ($textFiles as $textFile) {
                            onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('trees_user'); ?>/>
                     Show
                     trees
-                    cut down more than 90m of industry (can be replanted)
+                    cut down more than <?php echo (int)($_COOKIE['treeMap90']/100);?>m of industry (can be replanted)
                 </div>
                 <div>
                     <input id="trees_default" type="checkbox"
                            onclick="toggleDisplayOptions(this)" <?php checked_if_true_or_default('trees_default'); ?>/>
                     Show
-                    trees cut down less than 90m of industry
+                    trees cut down less than <?php echo (int)($_COOKIE['treeMap90']/100);?>m of industry
                 </div>
             </details>
 
@@ -315,10 +315,12 @@ foreach ($textFiles as $textFile) {
                         "ce_flatcar_tanker" => "flatcar_tanker_empty.png",
                         "cf_flatcar_tanker" => "flatcar_tanker.png",
                         "ce_boxcar" => "boxcar_empty.png",
-                        "cf_boxcar" => "boxcar.png"
+                        "cf_boxcar" => "boxcar.png",
+                        "ce_caboose" => "caboose.png",
+                        "cf_caboose" => "caboose.png",
                     );
 
-                    foreach (array('flatcar_logs', 'flatcar_stakes', 'flatcar_hopper', 'flatcar_cordwood', 'flatcar_tanker', 'boxcar') as $cartType) {
+                    foreach (array('flatcar_logs', 'flatcar_stakes', 'flatcar_hopper', 'flatcar_cordwood', 'flatcar_tanker', 'boxcar', 'caboose') as $cartType) {
                         ?>
                         <label for="ce_<?= $cartType; ?>">
                             <img src="/assets/images/<?= $images['ce_' . $cartType]; ?>" width="72" height="72"/>
@@ -426,6 +428,16 @@ foreach ($textFiles as $textFile) {
                 <label for="labelPrefix">Text label prefix: </label>
                 <input id="labelPrefix" placeholder=".."
                        value="<?php (isset($_COOKIE['labelPrefix']) && $_COOKIE['labelPrefix'] != '') ? print($_COOKIE['labelPrefix']) : print('..'); ?>"/>
+            </div>
+            <div>
+                <label for="treeMap90">Tree to industry min distance (cm): </label>
+                <input id="treeMap90" placeholder="9000" size="4"
+                       value="<?php (isset($_COOKIE['treeMap90']) && $_COOKIE['treeMap90'] != '') ? print($_COOKIE['treeMap90']) : print('9000'); ?>"/>
+            </div>
+            <div>
+                <label for="treeMap7">Tree to track min distance (cm): </label>
+                <input id="treeMap7" placeholder="700" size="4"
+                       value="<?php (isset($_COOKIE['treeMap7']) && $_COOKIE['treeMap7'] != '') ? print($_COOKIE['treeMap7']) : print('700'); ?>"/>
             </div>
             <button class="button" onclick="applySettings()">Apply and refresh</button>
         </div>
@@ -563,6 +575,7 @@ foreach ($textFiles as $textFile) {
                     <form method="POST" action="/converter.php">
                         <input type="hidden" name="save" value="<?php echo $saveFile; ?>">
                         <input name="replant" value="700" size="4"> cm away from track!<br>
+                        <input name="replant90" value="9000" size="4"> cm away from industries!<br>
                         <span style="font-size: smaller">for reference:<br> 65 cm washing machine, <br> 91 cm gauge,<br> 170 cm bathtub,<br> 460 cm car,<br> 1880 cm switch<br>
                     measured to start, center and end of track-(segment) only, switches, crosses are not taken into calculation (yet)</span><br>
                         <button class="button">Replant Trees</button>
@@ -595,6 +608,10 @@ foreach ($textFiles as $textFile) {
                             <option value="30">no</option>
                             <option value="15">yes</option>
                             <option value="22">a little</option>
+                        </select><br>
+                        The curve duplicates the start segment. Should the duplicate be visible?: <select name="invisFirst">
+                            <option value="no">No, cornery start is ok for me.</option>
+                            <option value="yes">Yes, I want to delete the duplicate track I dont like.</option>
                         </select><br>
                         <button class="button">Generate curve and bed between segments</button>
                     </form>
@@ -763,6 +780,10 @@ if (!file_exists('assets/js/mapper.min.js') || filemtime('assets/js/mapper.js') 
     function applySettings() {
         const labelSettings = document.getElementById('labelPrefix');
         cookies.set('labelPrefix', labelSettings.value);
+        const treeMap7Settings = document.getElementById('treeMap7');
+        cookies.set('treeMap7', treeMap7Settings.value);
+        const treeMap90Settings = document.getElementById('treeMap90');
+        cookies.set('treeMap90', treeMap90Settings.value);
         location.reload();
     }
 </script>

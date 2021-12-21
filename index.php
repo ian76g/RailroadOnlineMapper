@@ -48,7 +48,12 @@ function getMarqueeTrain()
     <a class="button" id="uploadButton">Upload Savegame</a>
 </header>
 <main>
-    <table><tr><td>
+    <table><tr>
+            <td>
+                <h4><A href="https://wiki.minizwerg.online/"><img width="30" src="assets/images/wiki.png">Wiki</A></h4>
+            </td>
+            <td style="width:200px;">&nbsp;</td>
+            <td>
                 <h4><A href="https://tom-90.github.io/RROx/"><img width="30" src="assets/images/appIcon.ico">_tom()s Minimap-Tool</A></h4>
             </td>
             <td style="width:200px;">&nbsp;</td>
