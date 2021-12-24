@@ -1089,11 +1089,11 @@ class GVASParser
         }
 
         // Industries 1-9 have a fixed rotation
-        foreach ($reduced['Industries'] as $index => $watertower) {
-            if (in_array($reduced['Industries'][$index]['Type'], range(1, 9))) {
-                unset($reduced['Industries'][$index]['Rotation']);
-            }
-        }
+//        foreach ($reduced['Industries'] as $index => $watertower) {
+//            if (in_array($reduced['Industries'][$index]['Type'], range(1, 9))) {
+//                unset($reduced['Industries'][$index]['Rotation']);
+//            }
+//        }
 
         // Remove the Z-axis
         foreach ($reduced['Removed']['Vegetation'] as $index => $tree) {

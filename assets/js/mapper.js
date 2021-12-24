@@ -139,18 +139,18 @@ Zeichnung mit dem Uhrzeigersinn: 1
              start = 10 Grad
              ende = 250 Grad
              */
-            if(player['Location'] === undefined || player['Location'][0] === undefined){
+            if (player['Location'] === undefined || player['Location'][0] === undefined) {
                 player['Location'] = [];
                 player['Location'][0] = 0;
                 player['Location'][1] = 0;
             }
             let px = (this.imx - ((player['Location'][0] - this.minX) / 100 * this.scale));
             let py = (this.imy - ((player['Location'][1] - this.minY) / 100 * this.scale));
-            let ps = this.polarToCartesian(px, py, 3, 20+player['Rotation']);
-            let pe = this.polarToCartesian(px, py, 3, 340+player['Rotation']);
+            let ps = this.polarToCartesian(px, py, 3, 20 + player['Rotation']);
+            let pe = this.polarToCartesian(px, py, 3, 340 + player['Rotation']);
             let playerCircle = document.createElementNS(this.svgNS, "path");
-            let path = 'M '+ps.x+' '+ps.y+' A 3 3 0 1 0 '+pe.x+' '+pe.y;
-            path+= ' A 1 1 0 1 0 '+ps.x+' '+ps.y;
+            let path = 'M ' + ps.x + ' ' + ps.y + ' A 3 3 0 1 0 ' + pe.x + ' ' + pe.y;
+            path += ' A 1 1 0 1 0 ' + ps.x + ' ' + ps.y;
             playerCircle.setAttribute("d", path);
             playerCircle.setAttribute("fill", "pink");
             playerCircle.setAttribute("stroke", "black");
@@ -750,13 +750,13 @@ Zeichnung mit dem Uhrzeigersinn: 1
         let index = 0;
         for (const vehicle of this.json['Frames']) {
             let stroke = 'black';
-            if(vehicle['Brake'] > 0.2){
+            if (vehicle['Brake'] > 0.2) {
                 stroke = 'orange';
             }
-            if(vehicle['Brake'] > 0.5){
+            if (vehicle['Brake'] > 0.5) {
                 stroke = 'red';
             }
-            if(vehicle['Brake'] === 0){
+            if (vehicle['Brake'] === 0) {
                 stroke = 'black';
             }
             const x = (this.imx - ((vehicle['Location'][0] - this.minX) / 100 * this.scale));
@@ -997,7 +997,9 @@ Zeichnung mit dem Uhrzeigersinn: 1
         if (!('Industries' in this.json)) {
             return
         }
-        let x; let y; let path;
+        let x;
+        let y;
+        let path;
         const industryLabelGroup = document.createElementNS(this.svgNS, "g");
         industryLabelGroup.setAttribute("class", "industryLabel");
 
@@ -1010,6 +1012,8 @@ Zeichnung mit dem Uhrzeigersinn: 1
             let yoff = 0;
             let pis = [];
             let pos = [];
+            let indLength;
+            let indWidth;
             x = (this.imx - ((industry['Location'][0] - this.minX) / 100 * this.scale));
             y = (this.imy - ((industry['Location'][1] - this.minY) / 100 * this.scale));
 
@@ -1024,6 +1028,7 @@ Zeichnung mit dem Uhrzeigersinn: 1
                     rotation = 0;
                     xoff = -70;
                     yoff = -30;
+
                     break;
                 case 2:
                     name = 'Sawmill';
@@ -1056,7 +1061,8 @@ Zeichnung mit dem Uhrzeigersinn: 1
                     industry['ProductsStored'].pop();
                     pos = ['pipes_p.svg', 'tools_p.svg'];
                     pis = ['iron_p.svg', 'coal_p.svg'];
-                    rotation = 90;
+                    rotation = industry['Rotation'][1];
+                    xoff = -50;
                     break;
                 case 5:
                     name = 'Oilfield';
@@ -1086,9 +1092,9 @@ Zeichnung mit dem Uhrzeigersinn: 1
                     industry['ProductsStored'].pop();
                     pis = ['beams_p.svg', 'rails_p.svg'];
                     pos = ['coal_p.svg'];
-                    rotation = -20;
-                    xoff = -20;
-                    yoff = 20;
+                    rotation = industry['Rotation'][1]-90;
+                    xoff = -60;
+                    yoff = -30;
                     break;
                 case 8:
                     name = 'Iron Mine';
@@ -1099,9 +1105,9 @@ Zeichnung mit dem Uhrzeigersinn: 1
                     industry['ProductsStored'].pop();
                     pis = ['lumber_p.svg', 'beams_p.svg'];
                     pos = ['ironore_p.svg'];
-                    rotation = 45;
-                    yoff = +50;
-                    xoff = -20;
+                    rotation = industry['Rotation'][1]+90;
+                    yoff = +20;
+                    xoff = -90;
                     break;
                 case 9:
                     name = 'Freight Depot';
@@ -1113,7 +1119,9 @@ Zeichnung mit dem Uhrzeigersinn: 1
                     industry['ProductsStored'].pop();
                     industry['ProductsStored'].pop();
                     industry['ProductsStored'].pop();
-                    rotation = 90;
+                    rotation = industry['Rotation'][1];
+                    xoff = -50;
+                    rotation = industry['Rotation'][1];
                     break;
                 case 10:
                     industry['EductsStored'].pop();
@@ -1121,7 +1129,7 @@ Zeichnung mit dem Uhrzeigersinn: 1
                     industry['EductsStored'].pop();
                     pis = ['cordwood_p.svg'];
                     name = 'F#' + index;
-                    rotation = industry['Rotation'][1]+90;
+                    rotation = industry['Rotation'][1] + 90;
                     path = document.createElementNS(this.svgNS, "path");
                     path.setAttribute("transform", "rotate(" + Math.round(industry['Rotation'][1]) + ", " + x + ", " + y + ")");
                     path.setAttribute("d", "M" + x + "," + y + " m-18,-15 l10,0 l0,30 l-10,0 z");
@@ -1170,14 +1178,14 @@ Zeichnung mit dem Uhrzeigersinn: 1
             industryLabel.appendChild(textNode);
             industryLabelGroup.appendChild(industryLabel);
 
-            // let c= document.createElementNS(this.svgNS, "circle");
-            // c.setAttribute("cx", x);
-            // c.setAttribute("cy", y);
-            // c.setAttribute("r", "2");
-            // c.setAttribute("stroke", "red");
-            // c.setAttribute("stroke-width", "1");
-            // c.setAttribute("fill", "none");
-            // industryLabelGroup.appendChild(c);
+            let c= document.createElementNS(this.svgNS, "circle");
+            c.setAttribute("cx", x);
+            c.setAttribute("cy", y);
+            c.setAttribute("r", "2");
+            c.setAttribute("stroke", "red");
+            c.setAttribute("stroke-width", "1");
+            c.setAttribute("fill", "none");
+            industryLabelGroup.appendChild(c);
             // let c2= document.createElementNS(this.svgNS, "circle");
             // c2.setAttribute("cx", x+xoff);
             // c2.setAttribute("cy", y+yoff);
@@ -1591,7 +1599,7 @@ Zeichnung mit dem Uhrzeigersinn: 1
     };
 
     polarToCartesian(centerX, centerY, radius, angleInDegrees) {
-        var angleInRadians = (angleInDegrees-90) * Math.PI / 180.0;
+        var angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
 
         return {
             x: centerX + (radius * Math.cos(angleInRadians)),

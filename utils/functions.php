@@ -51,6 +51,7 @@ function map_entries($sortby = null, $sortorder = null): Generator
             usort($files, 'mysort');
         }
 
+        $files = array_merge(array('MINIZWERG-MAP.sav'), $files);
         $i = 0;
         foreach ($files as $file) {
             if (!$file) break;
