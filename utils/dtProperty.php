@@ -170,7 +170,12 @@ class dtProperty extends dtAbstractData
                         for ($i = 0; $i < $toGo; $i++) {
                             $myString = new dtString();
                             $myString->skipNullByteStrings = false;
-                            $results = $myString->unserialize($this->x, $this->position);
+                            if(isset($_POST['public']) && $_POST['public'] && $name == 'PlayerName'){
+                                $deletePlayerNames = true;
+                            } else {
+                                $deletePlayerNames = false;
+                            }
+                            $results = $myString->unserialize($this->x, $this->position, $deletePlayerNames);
                             $str = trim($results[0]);
                             $this->position = $results[1];
                             $myString->ARRCOUNTER = $i;

@@ -42,13 +42,13 @@ class Mapper {
         return [x, y];
     }
 
-    drawSVG(htmlElement) {
+    drawSVG(htmlElement, industryHtml) {
         this.svgTag = document.getElementById(htmlElement);
         this.getReplantableTrees();
         this.getTracksAndBeds();
         this.getSwitches();
         this.getTurntables();
-        this.getIndustries();
+        this.getIndustries(industryHtml);
         this.getWaterTowers();
         this.getRollingStock();
 
@@ -993,7 +993,7 @@ Zeichnung mit dem Uhrzeigersinn: 1
         this.shapes.push(rollingStockGroup);
     }
 
-    getIndustries() {
+    getIndustries(industryHtml) {
         if (!('Industries' in this.json)) {
             return
         }
@@ -1274,6 +1274,7 @@ Zeichnung mit dem Uhrzeigersinn: 1
             }
         }
 
+        industryLabelGroup.insertAdjacentHTML("beforeend",  industryHtml);
         this.shapes.push(industryLabelGroup);
     }
 

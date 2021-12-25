@@ -41,11 +41,11 @@ class dtString extends dtAbstractData
      * @param $position
      * @return array
      */
-    function unserialize($fromX, $position)
+    function unserialize($fromX, $position, $deleteString=false)
     {
         $this->x = $fromX;
         $this->position = $position;
-        $this->readUEString();
+        $this->readUEString($deleteString);
         $this->x = '';
         return array($this->string, $this->position);
     }
@@ -53,7 +53,7 @@ class dtString extends dtAbstractData
     /**
      *
      */
-    function readUEString()
+    function readUEString($deleteString=false)
     {
 
         if (substr($this->x, $this->position, 1) == NULL) {
@@ -66,6 +66,9 @@ class dtString extends dtAbstractData
         $value = substr($this->x, $this->position, 4);
         $this->position += 4;
         $this->content = $value;
+        if($deleteString){
+
+        }
         $value = unpack('i', $value)[1];
 
         if ($value == 0) {

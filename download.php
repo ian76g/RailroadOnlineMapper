@@ -24,7 +24,7 @@ $ip = query($sql);
 
 if (getUserIpAddr() != $ip[0]['ip'] && ($ip[0]['unused']!='on' && $ip[0]['unused']!='YES')) {
 //    echo $sql;
-    die('This is nor your save game!');
+    die('This is not your save game!');
 }
 $x= query('select * from downloads where name="'.mysqli_real_escape_string($dbh, $mapName).'"');
 if(!isset($x[0])){
