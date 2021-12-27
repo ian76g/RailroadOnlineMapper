@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <?php
@@ -45,7 +48,20 @@ function getMarqueeTrain()
 <body bgcolor="black">
 <header class="header">
     <h1 class="logo">RailroadsOnlineMapper</h1>
-    <a class="button" id="uploadButton">Upload Savegame</a>
+    <?php
+    if(isset($_SESSION['steam_personaname'])) {
+        echo '<img src="'.$_SESSION['steam_avatarmedium'].'">';
+        echo '<A href="utils/Steam/steamauth.php?logout">Logout</A>';
+        echo '<a class="button" id="uploadButton">Upload Savegame</a>';
+    } else {
+        if(isset($_SESSION['steamid'])&&!isset($_SESSION['steam_personaname'])){
+            echo '<A href="utils/Steam/steamauth.php?update">fetch Steam username</A>';
+        } else {
+            echo '<A href="utils/Steam/steamauth.php?login">To upload your save - you have to login with your Steam account</A>';
+        }
+    }
+    ?>
+
 </header>
 <main>
     <table><tr>
@@ -158,8 +174,10 @@ function getMarqueeTrain()
     const modal = document.getElementById("uploadForm");
     const btn = document.getElementById("uploadButton");
     const span = document.getElementsByClassName("close")[0];
-    btn.onclick = function () {
-        modal.style.display = "block";
+    if(btn !== null){
+        btn.onclick = function () {
+            modal.style.display = "block";
+        }
     }
     span.onclick = function () {
         modal.style.display = "none";

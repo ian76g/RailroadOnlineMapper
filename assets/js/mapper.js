@@ -1004,6 +1004,7 @@ Zeichnung mit dem Uhrzeigersinn: 1
         industryLabelGroup.setAttribute("class", "industryLabel");
 
         const industriesTable = document.getElementById("industriesTable");
+        industryLabelGroup.insertAdjacentHTML("beforeend",  industryHtml);
         let index = 0;
         for (const industry of this.json['Industries']) {
             let name = '';
@@ -1149,6 +1150,10 @@ Zeichnung mit dem Uhrzeigersinn: 1
                     fill[12] = 'gold';
                     fill[13] = 'red';
                     fill[14] = 'brown';
+                    industry['ProductsStored'].pop();
+                    industry['ProductsStored'].pop();
+                    industry['ProductsStored'].pop();
+                    industry['ProductsStored'].pop();
                     industry['EductsStored'].pop();
                     industry['EductsStored'].pop();
                     industry['EductsStored'].pop();
@@ -1274,7 +1279,6 @@ Zeichnung mit dem Uhrzeigersinn: 1
             }
         }
 
-        industryLabelGroup.insertAdjacentHTML("beforeend",  industryHtml);
         this.shapes.push(industryLabelGroup);
     }
 

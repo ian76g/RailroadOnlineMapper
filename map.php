@@ -1,4 +1,5 @@
 <?php
+session_start();
 //error_reporting(E_ALL);
 require_once 'utils/ArithmeticHelper.php';
 require_once 'utils/dtAbstractData.php';
@@ -48,143 +49,116 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
 $dataArray = json_decode($json, true);
 
 
-
 $gID = array(
-    1=> array(
+    1 => array(
         'iname' => 'loggingcamp',
         'width' => 190,
         'height' => 190,
+        'xoff' => -10,
+        'yoff' => -45,
+        'rotOff' => 180,
     ),
-    2=> array(
+    2 => array(
         'iname' => 'sawmill',
         'width' => 220,
         'height' => 220,
+        'xoff' => -0,
+        'yoff' => -0,
+        'rotOff' => 180,
     ),
-    3=> array(
+    3 => array(
         'iname' => 'smelter',
         'width' => 155,
         'height' => 155,
+        'xoff' => -2,
+        'yoff' => 25,
+        'rotOff' => 0,
     ),
-    4=> array(
+    4 => array(
         'iname' => 'ironworks',
         'width' => 170,
         'height' => 170,
+        'xoff' => 20,
+        'yoff' => -10,
+        'rotOff' => 0,
     ),
-    5=> array(
+    5 => array(
         'iname' => 'oilfield',
         'width' => 350,
         'height' => 350,
+        'xoff' => -50,
+        'yoff' => -15,
+        'rotOff' => 0,
     ),
-    6=> array(
+    6 => array(
         'iname' => 'refinery',
         'width' => 200,
         'height' => 200,
+        'xoff' => -5,
+        'yoff' => 15,
+        'rotOff' => 90,
     ),
-    7=> array(
+    7 => array(
         'iname' => 'coalmine',
-        'width' => 120,
-        'height' => 120,
+        'width' => 113.39,
+        'height' => 113.39,
+        'xoff' => 35,
+        'yoff' => -10,
+        'rotOff' => -90,
     ),
-    8=> array(
+    8 => array(
         'iname' => 'ironmine',
-        'width' => 120,
-        'height' => 120,
+        'width' => 113.39,
+        'height' => 113.39,
+        'xoff' => -15,
+        'yoff' => 35,
+        'rotOff' => -90,
     ),
-    9=> array(
+    9 => array(
         'iname' => 'freightdepot',
         'width' => 200,
         'height' => 200,
+        'xoff' => 0,
+        'yoff' => 0,
+        'rotOff' => -90,
     ),
 );
 
-$genericIndustry = '<image href="assets/images/###INAME###.svg" id="###ID###" transform="translate(###X###,###Y###) rotate(###ROT###)" width="###W###" height="###H###" class="industryLabel" />';
+$genericIndustry = '<image href="assets/images/###INAME###.svg" id="###ID###" transform="translate(###X###,###Y###) rotate(###ROT###,###X2###,###Y2###)" width="###W###" height="###H###" class="industryLabel" />';
 
 $industryHtml = '';
-foreach ($parser->goldenBucket['Industries'] as $iKey=>$industry) {
+foreach ($parser->goldenBucket['Industries'] as $iKey => $industry) {
     $coordinateX = round(8000 - ($industry['Location'][0] + 200000) / 50);
     $coordinateY = round(8000 - ($industry['Location'][1] + 200000) / 50);
     switch ($industry['Type']) {
         case 1:
-            $industryHtml .= str_replace(
-                array('###X###', '###Y###', '###ROT###', '###ID###', '###W###', '###H###', '###INAME###'),
-                array($coordinateX - 100, $coordinateY + 45, $industry['Rotation'][1] + 180,
-                    'iid-'.$iKey, $gID[$industry['Type']]['width'], $gID[$industry['Type']]['height'], $gID[$industry['Type']]['iname']),
-                $genericIndustry
-            );
-            break;
         case 2:
-            $industryHtml .= str_replace(
-                array('###X###', '###Y###', '###ROT###', '###ID###', '###W###', '###H###', '###INAME###'),
-                array($coordinateX - 30, $coordinateY - 152, $industry['Rotation'][1] + 180,
-                    'iid-'.$iKey, $gID[$industry['Type']]['width'], $gID[$industry['Type']]['height'], $gID[$industry['Type']]['iname']),
-                $genericIndustry
-            );
-            break;
         case 3:
-            $industryHtml .= str_replace(
-                array('###X###', '###Y###', '###ROT###', '###ID###', '###W###', '###H###', '###INAME###'),
-                array($coordinateX - 80, $coordinateY - 50, $industry['Rotation'][1],
-                    'iid-'.$iKey, $gID[$industry['Type']]['width'], $gID[$industry['Type']]['height'], $gID[$industry['Type']]['iname']),
-                $genericIndustry
-            );
-            break;
         case 4:
-            $industryHtml .= str_replace(
-                array('###X###', '###Y###', '###ROT###', '###ID###', '###W###', '###H###', '###INAME###'),
-                array($coordinateX - 65, $coordinateY + 70, $industry['Rotation'][1],
-                    'iid-'.$iKey, $gID[$industry['Type']]['width'], $gID[$industry['Type']]['height'], $gID[$industry['Type']]['iname']),
-                $genericIndustry
-            );
-            break;
         case 5:
-            $industryHtml .= str_replace(
-                array('###X###', '###Y###', '###ROT###', '###ID###', '###W###', '###H###', '###INAME###'),
-                array($coordinateX - 230, $coordinateY - 190, $industry['Rotation'][1],
-                    'iid-'.$iKey, $gID[$industry['Type']]['width'], $gID[$industry['Type']]['height'], $gID[$industry['Type']]['iname']),
-
-                $genericIndustry
-            );
-            break;
         case 6:
-            $industryHtml .= str_replace(
-                array('###X###', '###Y###', '###ROT###', '###ID###', '###W###', '###H###', '###INAME###'),
-                array($coordinateX - 120, $coordinateY + 100, $industry['Rotation'][1] + 90,
-                    'iid-'.$iKey, $gID[$industry['Type']]['width'], $gID[$industry['Type']]['height'], $gID[$industry['Type']]['iname']),
-
-                $genericIndustry
-            );
-            break;
         case 7:
-            $industryHtml .= str_replace(
-                array('###X###', '###Y###', '###ROT###', '###ID###', '###W###', '###H###', '###INAME###'),
-                array($coordinateX + 95, $coordinateY - 70, $industry['Rotation'][1] - 90,
-                    'iid-'.$iKey, $gID[$industry['Type']]['width'], $gID[$industry['Type']]['height'], $gID[$industry['Type']]['iname']),
-
-                $genericIndustry
-            );
-            break;
         case 8:
-            $industryHtml .= str_replace(
-                array('###X###', '###Y###', '###ROT###', '###ID###', '###W###', '###H###', '###INAME###'),
-                array($coordinateX + 65, $coordinateY + 35, $industry['Rotation'][1] - 90,
-                    'iid-'.$iKey, $gID[$industry['Type']]['width'], $gID[$industry['Type']]['height'], $gID[$industry['Type']]['iname']),
-
-                $genericIndustry
-            );
-            break;
         case 9:
             $industryHtml .= str_replace(
-                array('###X###', '###Y###', '###ROT###', '###ID###', '###W###', '###H###', '###INAME###'),
-                array($coordinateX - 150, $coordinateY - 100, $industry['Rotation'][1] - 90,
-                    'iid-'.$iKey, $gID[$industry['Type']]['width'], $gID[$industry['Type']]['height'], $gID[$industry['Type']]['iname']),
-
+                array('###X###', '###Y###', '###ROT###', '###ID###', '###W###', '###H###', '###INAME###', '###X2###', '###Y2###'),
+                array(
+                    $coordinateX - $gID[$industry['Type']]['width'] / 2 + $gID[$industry['Type']]['xoff'],
+                    $coordinateY - $gID[$industry['Type']]['height'] / 2 + $gID[$industry['Type']]['yoff'],
+                    $industry['Rotation'][1] + $gID[$industry['Type']]['rotOff'],
+                    'iid-' . $iKey, $gID[$industry['Type']]['width'],
+                    $gID[$industry['Type']]['height'],
+                    $gID[$industry['Type']]['iname'],
+                    $gID[$industry['Type']]['width'] / 2,
+                    $gID[$industry['Type']]['height'] / 2
+                ),
                 $genericIndustry
             );
             break;
         default:
     }
 }
-$industryHtml = str_replace(array("\n","\r"), "", $industryHtml);
+$industryHtml = str_replace(array("\n", "\r"), "", $industryHtml);
 //$industryHtml = json_encode($industryHtml);
 
 $dh = opendir('includes');
@@ -591,7 +565,7 @@ foreach ($textFiles as $textFile) {
 
                 function my_function(spline, segment) {
                     svg = document.getElementById('demo-tiger');
-                    var children = svg.children[1].children[16].children;
+                    var children = svg.children[1].children[7].children;
 //                    alert('You clicked on Segment ' + spline + '-' + segment);
                     for (var i = 0; i < children.length; i++) {
                         var tableChild = children[i];
@@ -681,7 +655,6 @@ foreach ($textFiles as $textFile) {
                     <form method="POST" action="/converter.php"><input type="hidden" name="save"
                                                                        value="<?php echo $saveFile; ?>">
                         <?php echo $textOptions; ?>
-
                         <span style="font-size: smaller">Have another list? mail it to locolist@pordi.com</span><br>
                         apply to <select name="renameWhat">
                             <option value="everything">everything</option>
