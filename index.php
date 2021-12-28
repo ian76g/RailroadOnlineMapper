@@ -1,4 +1,8 @@
 <?php
+// server should keep session data for AT LEAST 100 hour
+ini_set('session.gc_maxlifetime', 360000);
+// each client should remember their session id for EXACTLY 100 hour
+session_set_cookie_params(360000);
 session_start();
 ?>
 <!DOCTYPE html>
@@ -55,9 +59,9 @@ function getMarqueeTrain()
         echo '<a class="button" id="uploadButton">Upload Savegame</a>';
     } else {
         if(isset($_SESSION['steamid'])&&!isset($_SESSION['steam_personaname'])){
-            echo '<A href="utils/Steam/steamauth.php?update">fetch Steam username</A>';
+            echo '<A href="utils/Steam/steamauth.php?update">2nd) fetch your Steam username before you can upload in next step</A>';
         } else {
-            echo '<A href="utils/Steam/steamauth.php?login">To upload your save - you have to login with your Steam account</A>';
+            echo '<A href="utils/Steam/steamauth.php?login">To upload your save (in step 3) - you have to login at the Steam site first</A>';
         }
     }
     ?>
@@ -66,7 +70,7 @@ function getMarqueeTrain()
 <main>
     <table><tr>
             <td>
-                <h4><A href="https://wiki.minizwerg.online/"><img width="30" src="assets/images/wiki.png">Wiki</A></h4>
+                <h4><A href="https://wiki.minizwerg.online/"><img width="30" src="assets/images/wiki.png">Wiki<br>closed due to player abuse</A></h4>
             </td>
             <td style="width:200px;">&nbsp;</td>
             <td>

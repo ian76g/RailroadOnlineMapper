@@ -156,7 +156,7 @@ class ArithmeticHelper
 // the 4 points (each segment has 2), the one closest to the crossing
 // point defines the size of the arc and is used as the starting
 // point for it.
-    function getCurveCoordsBetweenSegments($segment1, $segment2, $bedDistance)
+    function getCurveCoordsBetweenSegments($segment1, $segment2, $bedDistance, $skipCurve = false)
     {
         // replacements (i.e. remove/replace accordingly)
         $s1_end_x = $segment1['LocationEnd']['X'];
@@ -174,80 +174,88 @@ class ArithmeticHelper
         $s2_start_z = $segment2['LocationStart']['Z'];
         // replacement end
 
-        // 1) calculate crossing point between the extended segments
-        //    For that they are made into linear equations y = m*x + n
-        //    which are then solved. Note that vertical lines have an
-        //    infinite m, so these are handled specifically
-        $s1_diff_x = $s1_end_x - $s1_start_x;
-        $s1_diff_y = $s1_end_y - $s1_start_y;
+        if ($skipCurve) {
 
-        $s2_diff_x = $s2_end_x - $s2_start_x;
-        $s2_diff_y = $s2_end_y - $s2_start_y;
+            $intersect_x = ($s1_end_x + $s1_start_x + $s2_end_x + $s2_start_x) / 4;
+            $intersect_y = ($s1_end_y + $s1_start_y + $s2_end_y + $s2_start_y) / 4;
+        } else {
 
-        $intersect_x = 0;
-        $intersect_y = 0;
-        $lines_are_parallel = false;
-        $intersect_y_2 = 0;
-        // make sure they are not both vertical, which also means
-        // they are parallel
-        if ($s1_diff_x == 0 && $s2_diff_x == 0) {
-            $lines_are_parallel = true;
-        }
-        // first segment is vertical, which means we just project
-        // along the Y axis on segment2
-        elseif ($s1_diff_x == 0) {
-            // determine segment2 m and n and solve it then for
-            // X = s1_start_x
-            $s2_m = $s2_diff_y / $s2_diff_x;
-            $s2_n = $s2_start_y - $s2_m * $s2_start_x;
-            $intersect_x = $s1_start_x;
-            $intersect_y = $s2_m * $s1_start_x + $s2_n;
-        }
-        // and same thing if segment2 is vertical: project along
-        // the Y axis on segment1
-        elseif ($s2_diff_x == 0) {
-            $s1_m = $s1_diff_y / $s1_diff_x;
-            $s1_n = $s1_start_y - $s1_m * $s1_start_x;
-            $intersect_x = $s2_start_x;
-            $intersect_y = $s1_m * $s2_start_x + $s1_n;
-        }
-        // normal case, both m can be calculated "safely" (within
-        // resolution of what a float value supports)
-        else {
-            // solve m and n for both segments
-            $s1_m = $s1_diff_y / $s1_diff_x;
-            $s1_n = $s1_start_y - $s1_m * $s1_start_x;
-            $s2_m = $s2_diff_y / $s2_diff_x;
-            $s2_n = $s2_start_y - $s2_m * $s2_start_x;
-            // if m is the same, the lines are parallel.
-            if ($s1_m == $s2_m) {
+            // 1) calculate crossing point between the extended segments
+            //    For that they are made into linear equations y = m*x + n
+            //    which are then solved. Note that vertical lines have an
+            //    infinite m, so these are handled specifically
+            $s1_diff_x = $s1_end_x - $s1_start_x;
+            $s1_diff_y = $s1_end_y - $s1_start_y;
+
+            $s2_diff_x = $s2_end_x - $s2_start_x;
+            $s2_diff_y = $s2_end_y - $s2_start_y;
+
+            $intersect_x = 0;
+            $intersect_y = 0;
+            $lines_are_parallel = false;
+            $intersect_y_2 = 0;
+            // make sure they are not both vertical, which also means
+            // they are parallel
+            if ($s1_diff_x == 0 && $s2_diff_x == 0) {
                 $lines_are_parallel = true;
-            } else {
-                // calculate intersecting point
-                // (1) y1 = m1*x+n1
-                // (2) y2 = m2*x+n2
-                // intersection has y1 = y2, resolve to x:
-                // (3) m1*x+n1   = m2*x+n2
-                //     m1*x      = m2*x+n2-n1
-                //     m1*x-m2*x = n2-n1
-                //     x*(m1-m2) = n2-n1
-                //     x         = (n2-n1)/(m1-m2)
-                $intersect_x = ($s2_n - $s1_n) / ($s1_m - $s2_m);
-                // and y can be found by filling it in either
-                // one of the line equations.
-                $intersect_y = $s1_m * $intersect_x + $s1_n;
-                $intersect_y_2 = $s2_m * $intersect_x + $s2_n;
             }
-        }
+            // first segment is vertical, which means we just project
+            // along the Y axis on segment2
+            elseif ($s1_diff_x == 0) {
+                // determine segment2 m and n and solve it then for
+                // X = s1_start_x
+                $s2_m = $s2_diff_y / $s2_diff_x;
+                $s2_n = $s2_start_y - $s2_m * $s2_start_x;
+                $intersect_x = $s1_start_x;
+                $intersect_y = $s2_m * $s1_start_x + $s2_n;
+            }
+            // and same thing if segment2 is vertical: project along
+            // the Y axis on segment1
+            elseif ($s2_diff_x == 0) {
+                $s1_m = $s1_diff_y / $s1_diff_x;
+                $s1_n = $s1_start_y - $s1_m * $s1_start_x;
+                $intersect_x = $s2_start_x;
+                $intersect_y = $s1_m * $s2_start_x + $s1_n;
+            }
+            // normal case, both m can be calculated "safely" (within
+            // resolution of what a float value supports)
+            else {
+                // solve m and n for both segments
+                $s1_m = $s1_diff_y / $s1_diff_x;
+                $s1_n = $s1_start_y - $s1_m * $s1_start_x;
+                $s2_m = $s2_diff_y / $s2_diff_x;
+                $s2_n = $s2_start_y - $s2_m * $s2_start_x;
+                // if m is the same, the lines are parallel.
+                if ($s1_m == $s2_m) {
+                    $lines_are_parallel = true;
+                } else {
+                    // calculate intersecting point
+                    // (1) y1 = m1*x+n1
+                    // (2) y2 = m2*x+n2
+                    // intersection has y1 = y2, resolve to x:
+                    // (3) m1*x+n1   = m2*x+n2
+                    //     m1*x      = m2*x+n2-n1
+                    //     m1*x-m2*x = n2-n1
+                    //     x*(m1-m2) = n2-n1
+                    //     x         = (n2-n1)/(m1-m2)
+                    $intersect_x = ($s2_n - $s1_n) / ($s1_m - $s2_m);
+                    // and y can be found by filling it in either
+                    // one of the line equations.
+                    $intersect_y = $s1_m * $intersect_x + $s1_n;
+                    $intersect_y_2 = $s2_m * $intersect_x + $s2_n;
+                }
+            }
 
-        // FIXME handle parallel case
-        // Two line segments define 2 corners of a rectangle, which
-        // means the arc can be on either end of the rectangle.
-        // until someone can figure out how to decide that ... leave
-        // it as an unsupported corner case
-        if ($lines_are_parallel) {
-            deal_with_error(CurveCalcErrorCond::LinesAreParallel, "Edge case 3/3 not implemented (segments are parallel)");
-            return false;
+            // FIXME handle parallel case
+            // Two line segments define 2 corners of a rectangle, which
+            // means the arc can be on either end of the rectangle.
+            // until someone can figure out how to decide that ... leave
+            // it as an unsupported corner case
+            if ($lines_are_parallel) {
+                deal_with_error(CurveCalcErrorCond::LinesAreParallel, "Edge case 3/3 not implemented (segments are parallel)");
+                return false;
+            }
+
         }
 
         // now that we have the intersection we have to determine
@@ -422,7 +430,7 @@ class ArithmeticHelper
         // FIXME handle too tight of a radius of the bend.
         //       This depends on the material which is on the track,
         //       some can take tighter bends, others less so ...
-        if ($arc_radius < CurveCalcLimits::MinimumRadius) {
+        if (!$skipCurve && $arc_radius < CurveCalcLimits::MinimumRadius) {
             $this->deal_with_error(CurveCalcErrorCond::ArcTooTight, "The curve is bending too tight to make a viable bend.");
             return false;
         }
@@ -504,22 +512,27 @@ class ArithmeticHelper
 
 
         // debug SVG output
-        $num_segments = 8;
+        $num_segments = 0;
         // 300
-        $num_segments = ceil($curveLength / 500);
-
-
-        $alpha_per_segment = $arc_angle / $num_segments;
-        $curveSegmentLength = $curveLength / $num_segments;
-        $curve = array();
         $curve2 = array();
-        $curve[] = array($near_prev_x, $near_prev_y, $near_prev_z);
         $curve2[] = array($near_prev_x, $near_prev_y, round($near_prev_z) - $bedDistance);
-        $curve[] = array($near_x, $near_y, $near_z);
+
+        if (!$skipCurve) {
+            $num_segments = ceil($curveLength / 500);
+            $alpha_per_segment = $arc_angle / $num_segments;
+            $curveSegmentLength = $curveLength / $num_segments;
+            $curve = array();
+            $curve[] = array($near_prev_x, $near_prev_y, $near_prev_z);
+            $curve[] = array($near_x, $near_y, $near_z);
+            $straight = $this->vec_abs($far_x - $far_off_x, $far_y - $far_off_y);
+        } else {
+            $curve[] = array($near_prev_x, $near_prev_y, $near_prev_z);
+            $straight = $this->vec_abs($far_x - $far_off_x, $far_y - $far_off_y);
+        }
+
+
 //    $curve2[] = array($near_x, $near_y, round($near_z)-$bedDistance);
 
-
-        $straight = $this->vec_abs($far_x - $far_off_x, $far_y - $far_off_y);
 
         $totalTrackLength = $straight + $curveLength;
 
@@ -532,23 +545,26 @@ class ArithmeticHelper
 
         $traveledSoFar = 0;
 
-        for ($i = 1; $i < $num_segments; $i++) {
-            [$tmp_vec_x, $tmp_vec_y] = $this->vec_rotate($near_x - $arc_center_x, $near_y - $arc_center_y, $alpha_per_segment * $i);
-            $tmp_vec_x += $arc_center_x;
-            $tmp_vec_y += $arc_center_y;
-            $z = $incline * $traveledSoFar / $totalTrackLength + $near_z; //need to add the height of the starting point
-            if (!($i % 3)) {
-                $curve2[] = array(round($tmp_vec_x), round($tmp_vec_y), round($z) - $bedDistance);
-            }
-            $curve[] = array(round($tmp_vec_x), round($tmp_vec_y), round($z));
-            $traveledSoFar += $curveSegmentLength;
+        if (!$skipCurve) {
+
+            for ($i = 1; $i < $num_segments; $i++) {
+                [$tmp_vec_x, $tmp_vec_y] = $this->vec_rotate($near_x - $arc_center_x, $near_y - $arc_center_y, $alpha_per_segment * $i);
+                $tmp_vec_x += $arc_center_x;
+                $tmp_vec_y += $arc_center_y;
+                $z = $incline * $traveledSoFar / $totalTrackLength + $near_z; //need to add the height of the starting point
+                if (!($i % 3)) {
+                    $curve2[] = array(round($tmp_vec_x), round($tmp_vec_y), round($z) - $bedDistance);
+                }
+                $curve[] = array(round($tmp_vec_x), round($tmp_vec_y), round($z));
+                $traveledSoFar += $curveSegmentLength;
 //        $svg_output .= " L " . round($tmp_vec_x * $scale) . "," . round($tmp_vec_y * $scale);
-        }
-        $z = $incline * $traveledSoFar / $totalTrackLength + $near_z;
+            }
+            $z = $incline * $traveledSoFar / $totalTrackLength + $near_z;
 //    $curve[] = array($far_x, $far_y, $z);
 //    $svg_output .= " L " . $far_x * $scale . "," . $far_y * $scale;
 
-        $traveledSoFar += $curveSegmentLength;
+            $traveledSoFar += $curveSegmentLength;
+        }
 
         $straightSegments = ceil($straight / 900);
         $straightLength = $straight / $straightSegments;

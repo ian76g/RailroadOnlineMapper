@@ -38,12 +38,13 @@ if (isset($_POST) && !empty($_POST)) {
         }
 
         $myParser = new GVASParser();
+        $myParser->owner = preg_replace('/[[:^alnum:]]/', "", $_SESSION['steam_personaname']) . $slotNumber;
         $myParser->parseData(file_get_contents($_FILES["fileToUpload"]["tmp_name"]), false, $slotNumber);
         $myParser->buildGraph();
         if(isset($_POST['steam_personaname'])) {
             $_SESSION['steam_personaname'] = $_POST['steam_personaname'];
         }
-        $myParser->owner = $_SESSION['steam_personaname'].$slotNumber;
+//        $myParser->owner = $_SESSION['steam_personaname'].$slotNumber;
         $newFilename = $myParser->owner;
         $target_file = $target_dir . $newFilename . '.sav';
 

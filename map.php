@@ -31,6 +31,7 @@ if (isset($_GET['name']) && $_GET['name'] != '') {
         $slotExtension = '-' . $slotExtension[sizeof($slotExtension) - 1];
         $ah = new ArithmeticHelper();
         $parser = new GVASParser();
+        $parser->owner = $_GET['name'];
         $json = $parser->parseData(file_get_contents($saveFile), false, $slotExtension);
         $parser->buildGraph();
         $tasks = generateTasks($parser->goldenBucket, $ah,
@@ -50,6 +51,14 @@ $dataArray = json_decode($json, true);
 
 
 $gID = array(
+    0 => array(
+        'iname' => 'sandhouse',
+        'width' => 25,
+        'height' => 25,
+        'xoff' => 5,
+        'yoff' => 5,
+        'rotOff' => -90,
+    ),
     1 => array(
         'iname' => 'loggingcamp',
         'width' => 190,
@@ -156,6 +165,32 @@ foreach ($parser->goldenBucket['Industries'] as $iKey => $industry) {
             );
             break;
         default:
+    }
+}
+if (isset($parser->goldenBucket['Sandhouses'])) {
+
+    foreach ($parser->goldenBucket['Sandhouses'] as $iKey => $industry) {
+        $coordinateX = round(8000 - ($industry['Location'][0] + 200000) / 50);
+        $coordinateY = round(8000 - ($industry['Location'][1] + 200000) / 50);
+        switch ($industry['Type']) {
+            case 0:
+                $industryHtml .= str_replace(
+                    array('###X###', '###Y###', '###ROT###', '###ID###', '###W###', '###H###', '###INAME###', '###X2###', '###Y2###'),
+                    array(
+                        $coordinateX - $gID[$industry['Type']]['width'] / 2 + $gID[$industry['Type']]['xoff'],
+                        $coordinateY - $gID[$industry['Type']]['height'] / 2 + $gID[$industry['Type']]['yoff'],
+                        $industry['Rotation'][1] + $gID[$industry['Type']]['rotOff'],
+                        'iid-' . $iKey, $gID[$industry['Type']]['width'],
+                        $gID[$industry['Type']]['height'],
+                        $gID[$industry['Type']]['iname'],
+                        $gID[$industry['Type']]['width'] / 2,
+                        $gID[$industry['Type']]['height'] / 2
+                    ),
+                    $genericIndustry
+                );
+                break;
+            default:
+        }
     }
 }
 $industryHtml = str_replace(array("\n", "\r"), "", $industryHtml);
@@ -698,7 +733,7 @@ foreach ($textFiles as $textFile) {
                 <br>
 
                 <details>
-                    <summary><h4>Curves</h4></summary>
+                    <summary><h4>Curves and Straights</h4></summary>
                     1) Zoom into your map on the left, click a piece of track (not a switch or cross).<br>
                     2) Click on another piece of track (not a switch or cross) - not too far away.<br>
                     3) Select options for type and height of bed.<br>
@@ -725,9 +760,10 @@ foreach ($textFiles as $textFile) {
                         </select><br>
                         The curve duplicates the start segment. Should the duplicate be visible?: <select
                                 name="invisFirst">
-                            <option value="no">No, cornery start is ok for me.</option>
+                            <option value="no">No, cornery start is ok for me. (Or I want a straight)</option>
                             <option value="yes">Yes, I want to delete the duplicate track I dont like.</option>
                         </select><br>
+                        ignore the whole curve things - just draw a straight line: <input type="checkbox" name="skipCurve" name="skipCurve" /><br>
                         <button class="button">Generate curve and bed between segments</button>
                     </form>
                 </details>

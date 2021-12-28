@@ -81,7 +81,7 @@ class GVASParser
 
         $silverPlate = array();
 
-        $keys = array('Player', 'Freight', 'Compressor', 'Tender', 'Coupler', 'Boiler', 'Headlight', 'Frame', 'Watertower', 'Switch');
+        $keys = array('Player', 'Freight', 'Compressor', 'Tender', 'Coupler', 'Boiler', 'Headlight', 'Frame', 'Watertower', 'Switch', 'Sandhouse');
         foreach ($keys as $key) {
             $silverPlate[$key . 's'] = array();
             if (isset($this->goldenBucket[$key])) {
@@ -95,7 +95,7 @@ class GVASParser
             }
         }
 
-        $this->owner = preg_replace('/[[:^alnum:]]/', "", $this->goldenBucket['Players'][0]['Name']) . $slotExtension;
+        //$this->owner = preg_replace('/[[:^alnum:]]/', "", $this->goldenBucket['Players'][0]['Name']) . $slotExtension;
 
         $carts = array('flatcar_logs', 'flatcar_cordwood', 'flatcar_stakes', 'flatcar_hopper', 'boxcar', 'flatcar_tanker');
 
@@ -376,7 +376,7 @@ class GVASParser
             $segment1 = $this->goldenBucket['Splines'][$one[0]]['Segments'][$one[1]];
             $segment2 = $this->goldenBucket['Splines'][$two[0]]['Segments'][$two[1]];
             try {
-                $curvePoints = $ah->getCurveCoordsBetweenSegments($segment1, $segment2, $_POST['sinkBed']);
+                $curvePoints = $ah->getCurveCoordsBetweenSegments($segment1, $segment2, $_POST['sinkBed'], (isset($_POST['skipCurve'])));
 //                array_shift($curvePoints);
             } catch (Exception $e) {
                 $i = 9;

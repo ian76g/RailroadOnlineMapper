@@ -88,6 +88,7 @@ foreach ($files as $file) {
     }
 
     $myParser = new GVASParser();
+    $myParser->owner = str_replace(array('.sav'),'', basename($fileName));
     $newSaveFileContents = $myParser->parseData(file_get_contents($fileName), true, $slotNumber);
     unset($myParser);
 
