@@ -48,9 +48,9 @@ class SaveReader
         $this->getTrackLength();
         $this->getSwitchesCount();
         $this->getRollingStockCount();
-        $sum=0;
-        foreach($tasks[0] as $task){
-            $sum+=$task[1];
+        $sum = 0;
+        foreach ($tasks[0] as $task) {
+            $sum += $task[1];
         }
         // create a "database" and store some infos about this file for the websies index page
 //        $db = @unserialize(@file_get_contents('db.db'));
@@ -68,8 +68,8 @@ class SaveReader
             $public
         );
         $sql = 'replace into stats (name, length, switches, locos, carts, slope, ip, trees, unused)
-    VALUES("'.implode('","', $values) .'")';
-        if($returnSQL) return $sql;
+    VALUES("' . implode('","', $values) . '")';
+        if ($returnSQL) return $sql;
         query($sql);
     }
 
@@ -79,9 +79,9 @@ class SaveReader
         $this->getTrackLength();
         $this->getSwitchesCount();
         $this->getRollingStockCount();
-        $sum=0;
-        foreach($tasks[0] as $task){
-            $sum+=$task[1];
+        $sum = 0;
+        foreach ($tasks[0] as $task) {
+            $sum += $task[1];
         }
         // create a "database" and store some infos about this file for the websies index page
         connect();
@@ -96,20 +96,20 @@ class SaveReader
 //            $this->getUserIpAddr(),
 //            sizeof($this->data['Removed']['Vegetation'])
         );
-        $row = query('select ip, trees, unused, tasksA, tasksAreward from stats where name="'.mysqli_real_escape_string($dbh, $filename).'"');
-        if(isset($row[0])){
-            $values[]=$row[0]['ip'];
-            $values[]=$row[0]['trees'];
-            $values[]=$row[0]['unused'];
-            $values[]=sizeof($tasks[0]);
-            $values[]=$sum;
+        $row = query('select ip, trees, unused, tasksA, tasksAreward from stats where name="' . mysqli_real_escape_string($dbh, $filename) . '"');
+        if (isset($row[0])) {
+            $values[] = $row[0]['ip'];
+            $values[] = $row[0]['trees'];
+            $values[] = $row[0]['unused'];
+            $values[] = sizeof($tasks[0]);
+            $values[] = $sum;
             query('replace into stats (name, length, switches, locos, carts, slope, ip, trees, unused, tasksA, tasksAreward)
-    VALUES("'.implode('","', $values) .'")');
+    VALUES("' . implode('","', $values) . '")');
         } else {
-            $values[]=$this->getUserIpAddr();
-            $values[]=sizeof($this->data['Removed']['Vegetation']);
+            $values[] = $this->getUserIpAddr();
+            $values[] = sizeof($this->data['Removed']['Vegetation']);
             query('insert into stats (name, length, switches, locos, carts, slope, ip, trees)
-    VALUES("'.implode('","', $values) .'")');
+    VALUES("' . implode('","', $values) . '")');
         }
     }
 
@@ -166,6 +166,9 @@ class SaveReader
      */
     private function getRollingStockCount()
     {
+        if (!isset($this->data['Frames'])) {
+            return 0;
+        }
         $vehicles = array_values($this->data['Frames']);
         foreach ($vehicles as $vehicle) {
             if (

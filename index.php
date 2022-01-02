@@ -1,8 +1,8 @@
 <?php
-// server should keep session data for AT LEAST 100 hour
-ini_set('session.gc_maxlifetime', 360000);
-// each client should remember their session id for EXACTLY 100 hour
-session_set_cookie_params(360000);
+// server should keep session data for AT LEAST 10 hour
+ini_set('session.gc_maxlifetime', 36000);
+// each client should remember their session id for EXACTLY 10 hour
+session_set_cookie_params(36000);
 session_start();
 ?>
 <!DOCTYPE html>
@@ -70,7 +70,7 @@ function getMarqueeTrain()
 <main>
     <table><tr>
             <td>
-                <h4><A href="https://wiki.minizwerg.online/"><img width="30" src="assets/images/wiki.png">Wiki<br>closed due to player abuse</A></h4>
+                <h4><A href="https://wiki.minizwerg.online/"><img width="30" src="assets/images/wiki.png">Wiki</A></h4>
             </td>
             <td style="width:200px;">&nbsp;</td>
             <td>

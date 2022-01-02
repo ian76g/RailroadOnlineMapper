@@ -1,4 +1,8 @@
 <?php
+// server should keep session data for AT LEAST 1 hour
+ini_set('session.gc_maxlifetime', 36000);
+// each client should remember their session id for EXACTLY 1 hour
+session_set_cookie_params(36000);
 session_start();
 //error_reporting(E_ALL);
 require_once 'utils/ArithmeticHelper.php';
@@ -136,35 +140,37 @@ $gID = array(
 $genericIndustry = '<image href="assets/images/###INAME###.svg" id="###ID###" transform="translate(###X###,###Y###) rotate(###ROT###,###X2###,###Y2###)" width="###W###" height="###H###" class="industryLabel" />';
 
 $industryHtml = '';
-foreach ($parser->goldenBucket['Industries'] as $iKey => $industry) {
-    $coordinateX = round(8000 - ($industry['Location'][0] + 200000) / 50);
-    $coordinateY = round(8000 - ($industry['Location'][1] + 200000) / 50);
-    switch ($industry['Type']) {
-        case 1:
-        case 2:
-        case 3:
-        case 4:
-        case 5:
-        case 6:
-        case 7:
-        case 8:
-        case 9:
-            $industryHtml .= str_replace(
-                array('###X###', '###Y###', '###ROT###', '###ID###', '###W###', '###H###', '###INAME###', '###X2###', '###Y2###'),
-                array(
-                    $coordinateX - $gID[$industry['Type']]['width'] / 2 + $gID[$industry['Type']]['xoff'],
-                    $coordinateY - $gID[$industry['Type']]['height'] / 2 + $gID[$industry['Type']]['yoff'],
-                    $industry['Rotation'][1] + $gID[$industry['Type']]['rotOff'],
-                    'iid-' . $iKey, $gID[$industry['Type']]['width'],
-                    $gID[$industry['Type']]['height'],
-                    $gID[$industry['Type']]['iname'],
-                    $gID[$industry['Type']]['width'] / 2,
-                    $gID[$industry['Type']]['height'] / 2
-                ),
-                $genericIndustry
-            );
-            break;
-        default:
+if (isset($parser->goldenBucket['Industries'])) {
+    foreach ($parser->goldenBucket['Industries'] as $iKey => $industry) {
+        $coordinateX = round(8000 - ($industry['Location'][0] + 200000) / 50);
+        $coordinateY = round(8000 - ($industry['Location'][1] + 200000) / 50);
+        switch ($industry['Type']) {
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+                $industryHtml .= str_replace(
+                    array('###X###', '###Y###', '###ROT###', '###ID###', '###W###', '###H###', '###INAME###', '###X2###', '###Y2###'),
+                    array(
+                        $coordinateX - $gID[$industry['Type']]['width'] / 2 + $gID[$industry['Type']]['xoff'],
+                        $coordinateY - $gID[$industry['Type']]['height'] / 2 + $gID[$industry['Type']]['yoff'],
+                        $industry['Rotation'][1] + $gID[$industry['Type']]['rotOff'],
+                        'iid-' . $iKey, $gID[$industry['Type']]['width'],
+                        $gID[$industry['Type']]['height'],
+                        $gID[$industry['Type']]['iname'],
+                        $gID[$industry['Type']]['width'] / 2,
+                        $gID[$industry['Type']]['height'] / 2
+                    ),
+                    $genericIndustry
+                );
+                break;
+            default:
+        }
     }
 }
 if (isset($parser->goldenBucket['Sandhouses'])) {
@@ -591,9 +597,10 @@ foreach ($textFiles as $textFile) {
             <button class="button" onclick="applySettings()">Apply and refresh</button>
         </div>
     </div>
-
     <div id="container" class="export__map">
-        <svg id="demo-tiger" class="export__map-viewer" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8000 8000">
+        <svg id="demo-tiger" class="export__map-viewer" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8000 8000"
+             onclick="alert_coords(evt)"
+        >
             <script type="text/JavaScript">
                 <![CDATA[
                 let thingy = 0;
@@ -649,6 +656,20 @@ foreach ($textFiles as $textFile) {
 
         </svg>
     </div>
+
+    <script>
+        var svg = document.getElementById('demo-tiger');
+        var pt = svg.createSVGPoint();  // Created once for document
+
+        function alert_coords(evt) {
+            pt.x = evt.clientX;
+            pt.y = evt.clientY;
+
+            // The cursor point, translated into svg coordinates
+            var cursorpt =  pt.matrixTransform(svg.getScreenCTM().inverse());
+            console.log("(" + cursorpt.x + ", " + cursorpt.y + ")");
+        }
+    </script>
 
     <div class="export__panel edit-panel">
         <div class="export__panel-scroll-content">
@@ -763,7 +784,9 @@ foreach ($textFiles as $textFile) {
                             <option value="no">No, cornery start is ok for me. (Or I want a straight)</option>
                             <option value="yes">Yes, I want to delete the duplicate track I dont like.</option>
                         </select><br>
-                        ignore the whole curve things - just draw a straight line: <input type="checkbox" name="skipCurve" name="skipCurve" /><br>
+                        ignore the whole curve things - just draw a straight line: <input type="checkbox"
+                                                                                          name="skipCurve"
+                                                                                          name="skipCurve"/><br>
                         <button class="button">Generate curve and bed between segments</button>
                     </form>
                 </details>

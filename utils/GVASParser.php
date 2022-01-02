@@ -120,13 +120,13 @@ class GVASParser
                 if (isset($this->goldenBucket['Marker']['Lights']['Front']['Right'][$i]))
                     $this->goldenBucket['Frames'][$i]['Marker']['Front']['Right'] = $this->goldenBucket['Marker']['Lights']['Front']['Right'][$i];
                 if (isset($this->goldenBucket['Marker']['Lights']['Front']['Left'][$i]))
-                    $this->goldenBucket['Frames'][$i]['Marker']['Front']['Left']  = $this->goldenBucket['Marker']['Lights']['Front']['Left'][$i];
+                    $this->goldenBucket['Frames'][$i]['Marker']['Front']['Left'] = $this->goldenBucket['Marker']['Lights']['Front']['Left'][$i];
                 if (isset($this->goldenBucket['Marker']['Lights']['Rear']['Right'][$i]))
-                    $this->goldenBucket['Frames'][$i]['Marker']['Rear']['Right']  = $this->goldenBucket['Marker']['Lights']['Rear']['Right'][$i];
+                    $this->goldenBucket['Frames'][$i]['Marker']['Rear']['Right'] = $this->goldenBucket['Marker']['Lights']['Rear']['Right'][$i];
                 if (isset($this->goldenBucket['Marker']['Lights']['Rear']['Left'][$i]))
-                    $this->goldenBucket['Frames'][$i]['Marker']['Rear']['Left']   = $this->goldenBucket['Marker']['Lights']['Rear']['Left'][$i];
+                    $this->goldenBucket['Frames'][$i]['Marker']['Rear']['Left'] = $this->goldenBucket['Marker']['Lights']['Rear']['Left'][$i];
                 if (isset($this->goldenBucket['Marker']['Lights']['Center'][$i]))
-                    $this->goldenBucket['Frames'][$i]['Marker']['Center']         = $this->goldenBucket['Marker']['Lights']['Center'][$i];
+                    $this->goldenBucket['Frames'][$i]['Marker']['Center'] = $this->goldenBucket['Marker']['Lights']['Center'][$i];
 
                 if (isset($this->goldenBucket['Freights'][$i]))
                     $this->goldenBucket['Frames'][$i]['Freight'] = $this->goldenBucket['Freights'][$i];
@@ -282,7 +282,7 @@ class GVASParser
                     'Type' => $this->goldenBucket['Turntable']['Type'][$i],
                     'Location' => $this->goldenBucket['Turntable']['Location'][$i],
                     'Rotator' => $this->goldenBucket['Turntable']['Rotator'][$i],
-                    'Deck' => $this->goldenBucket['Turntable']['Deck']['Rotation'][$i]
+//                    'Deck' => $this->goldenBucket['Turntable']['Deck']['Rotation'][$i]
                 );
             }
         }
@@ -371,10 +371,40 @@ class GVASParser
         $ah->industries = $this->goldenBucket['Industries'];
 
         if (isset($_POST['from']) && isset($_POST['to'])) {
-            $one = explode('-', $_POST['from']);
-            $two = explode('-', $_POST['to']);
-            $segment1 = $this->goldenBucket['Splines'][$one[0]]['Segments'][$one[1]];
-            $segment2 = $this->goldenBucket['Splines'][$two[0]]['Segments'][$two[1]];
+            if (strpos($_POST['from'], '-') !== false) {
+                $one = explode('-', $_POST['from']);
+                $segment1 = $this->goldenBucket['Splines'][$one[0]]['Segments'][$one[1]];
+            } elseif (strpos($_POST['from'], ',') !== false) {
+                $one = explode(',', $_POST['from']);
+                $x = (int)($one[0]*50-200000);
+                $y = (int)($one[1]*50-200000);
+                $segment1['LocationStart']['X'] = $x;
+                $segment1['LocationStart']['Y'] = $y;
+                $sql = 'SELECT *, SQRT((x-@x)*(x-@x)+(y-@y)*(y-@y)) as dist FROM `trees` WHERE x-1200<@x and x+1200>@x and y-1200<@y and y+1200>@y order by dist asc limit 1';
+                $sql = str_replace(array('@x', '@y'), array($x, $y) , $sql);
+                $result = $this->query($sql);
+                $segment1['LocationStart']['Z'] = $result[0]['z']+40;
+                $segment1['LocationEnd']['X'] =$segment1['LocationStart']['X'];
+                $segment1['LocationEnd']['Y'] =$segment1['LocationStart']['Y'];
+                $segment1['LocationEnd']['Z'] =$segment1['LocationStart']['Z'];
+            }
+            if (strpos($_POST['to'], '-') !== false) {
+                $two = explode('-', $_POST['to']);
+                $segment2 = $this->goldenBucket['Splines'][$two[0]]['Segments'][$two[1]];
+            } elseif (strpos($_POST['to'], ',') !== false) {
+                $one = explode(',', $_POST['to']);
+                $x = (int)($one[0]*50-200000);
+                $y = (int)($one[1]*50-200000);
+                $segment2['LocationStart']['X'] = $x;
+                $segment2['LocationStart']['Y'] = $y;
+                $sql = 'SELECT *, SQRT((x-@x)*(x-@x)+(y-@y)*(y-@y)) as dist FROM `trees` WHERE x-1200<@x and x+1200>@x and y-1200<@y and y+1200>@y order by dist asc limit 1';
+                $sql = str_replace(array('@x', '@y'), array($x, $y) , $sql);
+                $result = $this->query($sql);
+                $segment2['LocationStart']['Z'] = $result[0]['z']+40;
+                $segment2['LocationEnd']['X'] =$segment2['LocationStart']['X'];
+                $segment2['LocationEnd']['Y'] =$segment2['LocationStart']['Y'];
+                $segment2['LocationEnd']['Z'] =$segment2['LocationStart']['Z'];
+            }
             try {
                 $curvePoints = $ah->getCurveCoordsBetweenSegments($segment1, $segment2, $_POST['sinkBed'], (isset($_POST['skipCurve'])));
 //                array_shift($curvePoints);
@@ -418,6 +448,8 @@ class GVASParser
                                     continue;
                                 }
                                 $minDistanceToSomething = min($minDistanceToSomething, $this->distance($vector->content, $segment['LocationCenter']));
+                                $minDistanceToSomething = min($minDistanceToSomething, $this->distance($vector->content, $segment['LocationStart']));
+                                $minDistanceToSomething = min($minDistanceToSomething, $this->distance($vector->content, $segment['LocationEnd']));
                             }
                         }
                         if ($minDistanceToSomething > $sevenHundred) {
@@ -790,7 +822,7 @@ class GVASParser
                             $v = new dtDynamic('BoolProperty');
                             $v->pack = 'C';
                             $v->setValue(1);
-                            if ($spex == 0 && $_POST['invisFirst']=='yes') {
+                            if ($spex == 0 && $_POST['invisFirst'] == 'yes') {
                                 $v->setValue(0);
                             }
                             $object->CONTENTOBJECTS[3]->addElement($v, true);
@@ -1096,8 +1128,10 @@ class GVASParser
 //        }
 
         // Remove the Z-axis
-        foreach ($reduced['Removed']['Vegetation'] as $index => $tree) {
-            unset($reduced['Removed']['Vegetation'][$index][2]);
+        if (isset($reduced['Removed']['Vegetation'])) {
+            foreach ($reduced['Removed']['Vegetation'] as $index => $tree) {
+                unset($reduced['Removed']['Vegetation'][$index][2]);
+            }
         }
 //        foreach ($reduced['Players'] as $index => $player) {
 //            unset($reduced['Players'][$index]['Location'][2]);
@@ -1120,9 +1154,11 @@ class GVASParser
                 unset($reduced['Switchs'][$index]['Location'][2]);
             }
         }
-        foreach ($reduced['Industries'] as $index => $industry) {
-            unset($reduced['Industries'][$index]['Rotation'][2]);
-            unset($reduced['Industries'][$index]['Location'][2]);
+        if (isset($reduced['Industries'])) {
+            foreach ($reduced['Industries'] as $index => $industry) {
+                unset($reduced['Industries'][$index]['Rotation'][2]);
+                unset($reduced['Industries'][$index]['Location'][2]);
+            }
         }
 
         // Remove invisible segments
@@ -1142,16 +1178,14 @@ class GVASParser
     function query($sql)
     {
         global $dbh;
-        if (!$dbh) {
-            if (!$this->connect()) return array();
-        }
+        $this->connect();
 
         $result = array();
         $rh = mysqli_query($dbh, $sql);
         if (!$rh) {
 //        var_dump($sql);
         }
-        while ($result[] = @mysqli_fetch_assoc($rh)) ;
+        while ($result[] = mysqli_fetch_assoc($rh)) ;
         array_pop($result);
 
         return $result;
@@ -1271,5 +1305,36 @@ class CountryNames
             $this->NAMEs = array('ERROR');
         }
         shuffle($this->NAMEs);
+    }
+
+    function query($sql)
+    {
+        global $dbh;
+        if (!$dbh) {
+            $this->connect();
+        }
+
+        $result = array();
+        $rh = mysqli_query($dbh, $sql);
+        if (!$rh) {
+//        var_dump($sql);
+        }
+        while ($result[] = @mysqli_fetch_assoc($rh)) ;
+        array_pop($result);
+
+        return $result;
+    }
+
+    function connect()
+    {
+        global $dbh;
+        if (file_exists('../dbaccess.php'))
+            require '../dbaccess.php';
+        if (file_exists('dbaccess.php'))
+            require 'dbaccess.php';
+
+        $dbh = mysqli_connect($dbhost, $dbuser, $dbpassword);
+        mysqli_query($dbh, 'use ' . $dbdatabase);
+
     }
 }

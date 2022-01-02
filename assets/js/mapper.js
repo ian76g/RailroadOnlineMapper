@@ -36,6 +36,7 @@ class Mapper {
     }
 
     thingy(angle, x, y) {
+        return [x, y];
         x += Math.cos(this.deg2rad(angle)) * 2;
         y += Math.sin(this.deg2rad(angle));
 
@@ -639,7 +640,8 @@ Zeichnung mit dem Uhrzeigersinn: 1
              * 1 = light and nice
              */
             const rotation = this._deg2rad(turntable['Rotator'][1] + 90);
-            const rotation2 = this._deg2rad(turntable['Rotator'][1] + 90 - turntable['Deck'][1]);
+            // const rotation2 = this._deg2rad(turntable['Rotator'][1] + 90 - turntable['Deck'][1]);
+            const rotation2 = rotation;
             this.turnTableRadius = 25;
 
             const x = (this.imx - ((turntable['Location'][0] - this.minX) / 100 * this.scale));
@@ -780,14 +782,14 @@ Zeichnung mit dem Uhrzeigersinn: 1
             } else {
                 // const yl = (this.engineRadius / 3) * 2;
                 // let xl = this.engineRadius;
-                const yl = 1.9 * 3;
+                const yl = 1.9327 * 3;
 //                console.log(vehicle['Type']);
                 const xl = (cartOptions[vehicle['Type']][0] - 0.6) * 2;
 
                 // if (vehicle['Type'].toLowerCase().indexOf('tender') !== -1) {
                 //     xl = xl / 3 * 2;
                 // }
-                const path = document.createElementNS(this.svgNS, "path");
+                const path = document.createElementNS(this.svgNS, "rect");
                 let fillColor = cartOptions[vehicle['Type']][1];
                 fillColor = cookies.get('ce_' + vehicle['Type']);
                 if (vehicle['Type'] === 'handcar') {
@@ -823,11 +825,20 @@ Zeichnung mit dem Uhrzeigersinn: 1
                 cc = this.thingy(vehicle['Rotation'][1], x, y);
                 cx = cc[0];
                 cy = cc[1];
-                path.setAttribute("d", "M" + Math.round(x) + "," + Math.round(y) + " m-" + (xl / 2) + ",-" + (yl / 2) + " h" + (xl - 4) + " a2,2 0 0 1 2,2 v" + (yl - 4) + " a2,2 0 0 1 -2,2 h-" + (xl - 4) + " a2,2 0 0 1 -2,-2 v-" + (yl - 4) + " a2,2 0 0 1 2,-2 z");
+                // path.setAttribute("d", "M" + x + "," + y + " m-" + (xl / 2) + ",-" + (yl / 2) + " h" + (xl - 4) + " a2,2 0 0 1 2,2 v" + (yl - 4) + " a2,2 0 0 1 -2,2 h-" + (xl - 4) + " a2,2 0 0 1 -2,-2 v-" + (yl - 4) + " a2,2 0 0 1 2,-2 z");
+                const width = 1.9327;
+                const length = cartOptions[vehicle['Type']][0];
+                path.setAttribute("width", length * 1.8); // make car bigger
+                path.setAttribute("height", width * 3);
+                path.setAttribute("x", x - (path.getAttribute("width")  / 2)); // pass x center point
+                path.setAttribute("y", y - (path.getAttribute("height") / 2));
+                path.setAttribute("rx", 1.5) // corner radius
+                path.setAttribute("ry", 1.5)
                 path.setAttribute("fill", fillColor);
                 path.setAttribute("stroke", stroke);
                 path.setAttribute("stroke-width", "1");
-                path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + Math.round(cx) + ", " + Math.round(cy) + ")");
+                path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + x + ", " + y + ")");                path.setAttribute("fill", fillColor);
+                // path.setAttribute("transform", "rotate(" + vehicle['Rotation'][1] + ", " + (cx-1) + ", " + cy + ")");
                 path.appendChild(title);
                 rollingStockGroup.appendChild(path);
             }

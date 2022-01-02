@@ -349,83 +349,86 @@ class ArithmeticHelper
         // dist_near as the distance from the intersection,
         // as well as far_off (x,y) as a point and dist_far_off
         // as the distance from the intersection
+            ///////////////////////////////////////////////////////////////
+            // NOTE: we drop reference to s1 and s2 here, but this should be
+            //       kept tracked probably. Technically "near" and "far_off"
+            //       can be references to segment1/2 start/end instead.
+            //       This becomes paramount the moment a Z coordinate needs
+            //       to be handled (which can either be interpolated as
+            //       well or intersected with whatever is "ground").
+            ///////////////////////////////////////////////////////////////
 
-        ///////////////////////////////////////////////////////////////
-        // NOTE: we drop reference to s1 and s2 here, but this should be
-        //       kept tracked probably. Technically "near" and "far_off"
-        //       can be references to segment1/2 start/end instead.
-        //       This becomes paramount the moment a Z coordinate needs
-        //       to be handled (which can either be interpolated as
-        //       well or intersected with whatever is "ground").
-        ///////////////////////////////////////////////////////////////
+            // to determine the center of the circle which defines the arc:
+            // - "near" distance is a circle around the intersection which
+            //   crosses the intersecting lines, through the "near" point
+            //   on one and through the "far" point which lies on the same
+            //   line as the "far_off" point
+            // - this circle also goes through the center of the circle
+            //   which defines the arc
+            // - drawing a line from the intersection through the center of
+            //   the arc/bend circle, it will also cut a line from "near"
+            //   to "far" (not "far_off"!) in half, which we can use
+            //   as a helper to determine the center of the arc/bend circle
 
-        // to determine the center of the circle which defines the arc:
-        // - "near" distance is a circle around the intersection which
-        //   crosses the intersecting lines, through the "near" point
-        //   on one and through the "far" point which lies on the same
-        //   line as the "far_off" point
-        // - this circle also goes through the center of the circle
-        //   which defines the arc
-        // - drawing a line from the intersection through the center of
-        //   the arc/bend circle, it will also cut a line from "near"
-        //   to "far" (not "far_off"!) in half, which we can use
-        //   as a helper to determine the center of the arc/bend circle
+            $far_x = ($far_off_x - $intersect_x) / $dist_far_off * $dist_near + $intersect_x;
+            $far_y = ($far_off_y - $intersect_y) / $dist_far_off * $dist_near + $intersect_y;
 
-        $far_x = ($far_off_x - $intersect_x) / $dist_far_off * $dist_near + $intersect_x;
-        $far_y = ($far_off_y - $intersect_y) / $dist_far_off * $dist_near + $intersect_y;
+            // calculate temporary center which is halfway on the line between
+            // "near" and "far" point. The real center is outside of the circle
+            // drawn around the intersection with the radius of "dist_near" (distance
+            // between near and intersection). The amount can be calculated using
+            // a² + b² = c² where c = a + k and b as the far end is defined by
+            // the angle between a and c: b = sin(angle) * (a+k). With that we get
+            // a² + sin(angle)² * (a+k)² = (a+k)² where only one variable (k) is
+            // unknown and can be solved. a is the radius of the circle around
+            // the intersection, k is the "addon" to the actual arc/bend center,
+            // both being distance values. angle is half the angle between
+            // the two vectors which span the triangle to contain the circle
+            // (near and far together with intersection).
+        if (!$skipCurve) {
 
-        // calculate temporary center which is halfway on the line between
-        // "near" and "far" point. The real center is outside of the circle
-        // drawn around the intersection with the radius of "dist_near" (distance
-        // between near and intersection). The amount can be calculated using
-        // a² + b² = c² where c = a + k and b as the far end is defined by
-        // the angle between a and c: b = sin(angle) * (a+k). With that we get
-        // a² + sin(angle)² * (a+k)² = (a+k)² where only one variable (k) is
-        // unknown and can be solved. a is the radius of the circle around
-        // the intersection, k is the "addon" to the actual arc/bend center,
-        // both being distance values. angle is half the angle between
-        // the two vectors which span the triangle to contain the circle
-        // (near and far together with intersection).
-
-        // pointer from intersection to potential center of the arc/bend
-        // center. These are vector coords, i.e. relative, not absolute
-        $vec_near_far_half_x = ($far_x - $near_x) / 2 + $near_x - $intersect_x;
-        $vec_near_far_half_y = ($far_y - $near_y) / 2 + $near_y - $intersect_y;
-        // distance of the vector so it can be normalized
-        $dist_tmp_center = $this->vec_abs($vec_near_far_half_x, $vec_near_far_half_y);
+            // pointer from intersection to potential center of the arc/bend
+            // center. These are vector coords, i.e. relative, not absolute
+            $vec_near_far_half_x = ($far_x - $near_x) / 2 + $near_x - $intersect_x;
+            $vec_near_far_half_y = ($far_y - $near_y) / 2 + $near_y - $intersect_y;
+            // distance of the vector so it can be normalized
+            $dist_tmp_center = $this->vec_abs($vec_near_far_half_x, $vec_near_far_half_y);
 //    echo("half(far-near) = (" . $vec_near_far_half_x . ", " . $vec_near_far_half_y . "), distance/len = " . $dist_tmp_center . "\n");
 
-        // The angle between two vectors can be determined via
-        //   cos a = (vec1 * vec2) / (abs(vec1) * abs(vec2))
-        // but there is no direction with that angle. See down
-        // below how this is being handled.
-        $vec_to_near_x = $near_x - $intersect_x;
-        $vec_to_near_y = $near_y - $intersect_y;
-        $vec_to_far_x = $far_x - $intersect_x;
-        $vec_to_far_y = $far_y - $intersect_y;
-        $cos_a_orig = ($vec_to_near_x * $vec_to_far_x + $vec_to_near_y * $vec_to_far_y) /
-            ($this->vec_abs($vec_to_near_x, $vec_to_near_y) *
-                $this->vec_abs($vec_to_far_x, $vec_to_far_y));
-        $intersection_angle = acos($cos_a_orig);
+            // The angle between two vectors can be determined via
+            //   cos a = (vec1 * vec2) / (abs(vec1) * abs(vec2))
+            // but there is no direction with that angle. See down
+            // below how this is being handled.
+            $vec_to_near_x = $near_x - $intersect_x;
+            $vec_to_near_y = $near_y - $intersect_y;
+            $vec_to_far_x = $far_x - $intersect_x;
+            $vec_to_far_y = $far_y - $intersect_y;
+            $cos_a_orig = ($vec_to_near_x * $vec_to_far_x + $vec_to_near_y * $vec_to_far_y) /
+                ($this->vec_abs($vec_to_near_x, $vec_to_near_y) *
+                    $this->vec_abs($vec_to_far_x, $vec_to_far_y));
+            $intersection_angle = acos($cos_a_orig);
 
-        // now that we have the full angle we can calculate the center
-        // of the actual arc as outlined above
-        $dist_to_arc_center = sqrt($dist_near * $dist_near / (1 - pow(sin($intersection_angle / 2), 2)));
+            // now that we have the full angle we can calculate the center
+            // of the actual arc as outlined above
+            $dist_to_arc_center = sqrt($dist_near * $dist_near / (1 - pow(sin($intersection_angle / 2), 2)));
 //    echo("dist_to_arc_center = " . $dist_to_arc_center . "\n");
 
-        $arc_center_x = $vec_near_far_half_x / $dist_tmp_center * $dist_to_arc_center + $intersect_x;
-        $arc_center_y = $vec_near_far_half_y / $dist_tmp_center * $dist_to_arc_center + $intersect_y;
+            $arc_center_x = $vec_near_far_half_x / $dist_tmp_center * $dist_to_arc_center + $intersect_x;
+            $arc_center_y = $vec_near_far_half_y / $dist_tmp_center * $dist_to_arc_center + $intersect_y;
 
-        // arc/bend radius
-        $arc_radius = $this->vec_abs($near_x - $arc_center_x, $near_y - $arc_center_y);
-        // sum of angles in a triangle = 180°. One is 90°, one is half of the
-        // angle between the two lines crossing at the intersection. Both
-        // 90° = pi/2, the other is angle/2, the final angle we are interested
-        // in is *2, so we skip the /2 for the parts.
-        //
-        $arc_angle = pi() - $intersection_angle;
+            // arc/bend radius
+            $arc_radius = $this->vec_abs($near_x - $arc_center_x, $near_y - $arc_center_y);
+            // sum of angles in a triangle = 180°. One is 90°, one is half of the
+            // angle between the two lines crossing at the intersection. Both
+            // 90° = pi/2, the other is angle/2, the final angle we are interested
+            // in is *2, so we skip the /2 for the parts.
+            //
+            $arc_angle = pi() - $intersection_angle;
 
-        $curveLength = $arc_angle * $arc_radius;
+            $curveLength = $arc_angle * $arc_radius;
+        } else {
+            $curveLength = 0;
+        }
 
         // FIXME handle too tight of a radius of the bend.
         //       This depends on the material which is on the track,
@@ -435,52 +438,53 @@ class ArithmeticHelper
             return false;
         }
 
+        if(!$skipCurve) {
 
-        // As noted above, $alpha is direction less. Instead of acos()
-        // atan2() can be used, which sorts things into quadrants and an
-        // icky set of if-then-else checks. To shortcut this mess, having
-        // the absolute angle, there are only 2 ways to go, and we check
-        // which one gets close from the near to the far point.
+            // As noted above, $alpha is direction less. Instead of acos()
+            // atan2() can be used, which sorts things into quadrants and an
+            // icky set of if-then-else checks. To shortcut this mess, having
+            // the absolute angle, there are only 2 ways to go, and we check
+            // which one gets close from the near to the far point.
 
-        // rotation of a vector (technically turning coordinate system):
-        // rot_x = x * cos(a) + y * sin(a)
-        // rot_y = -x * sin(a) + y * cos(a)
-        // we will vary between a and -a and see which ones "hits" the
-        // far point and use that as direction (a -> 1, -a -> -1)
-        $vec_arc_near_x = $near_x - $arc_center_x;
-        $vec_arc_near_y = $near_y - $arc_center_y;
+            // rotation of a vector (technically turning coordinate system):
+            // rot_x = x * cos(a) + y * sin(a)
+            // rot_y = -x * sin(a) + y * cos(a)
+            // we will vary between a and -a and see which ones "hits" the
+            // far point and use that as direction (a -> 1, -a -> -1)
+            $vec_arc_near_x = $near_x - $arc_center_x;
+            $vec_arc_near_y = $near_y - $arc_center_y;
 
-        [$test_vec_x, $test_vec_y] = $this->vec_rotate($vec_arc_near_x, $vec_arc_near_y, $arc_angle);
-        $epsilon = $this->vec_abs($test_vec_x + $arc_center_x - $far_x, $test_vec_y + $arc_center_y - $far_y);
+            [$test_vec_x, $test_vec_y] = $this->vec_rotate($vec_arc_near_x, $vec_arc_near_y, $arc_angle);
+            $epsilon = $this->vec_abs($test_vec_x + $arc_center_x - $far_x, $test_vec_y + $arc_center_y - $far_y);
 
-        [$test_vec_x, $test_vec_y] = $this->vec_rotate($vec_arc_near_x, $vec_arc_near_y, -$arc_angle);
-        $epsilon_n = $this->vec_abs($test_vec_x + $arc_center_x - $far_x, $test_vec_y + $arc_center_y - $far_y);
+            [$test_vec_x, $test_vec_y] = $this->vec_rotate($vec_arc_near_x, $vec_arc_near_y, -$arc_angle);
+            $epsilon_n = $this->vec_abs($test_vec_x + $arc_center_x - $far_x, $test_vec_y + $arc_center_y - $far_y);
 
 //    echo("epsilon = " . $epsilon . ", epsilon_n = " . $epsilon_n . "\n");
 
-        // negative is closer than positive? change direction.
-        // FIXME in theory this could be used for validation of the results, i.e.
-        //       if both results are too far off, something in the calculation
-        //       went off. The epsilon here depends a bit on the input coords,
-        //       which means the larger the input coord numbers, the higher both
-        //       epsilon values go, even the one which should ideally be 0.
-        if ($epsilon_n < $epsilon) {
-            $arc_angle = -$arc_angle;
-        }
+            // negative is closer than positive? change direction.
+            // FIXME in theory this could be used for validation of the results, i.e.
+            //       if both results are too far off, something in the calculation
+            //       went off. The epsilon here depends a bit on the input coords,
+            //       which means the larger the input coord numbers, the higher both
+            //       epsilon values go, even the one which should ideally be 0.
+            if ($epsilon_n < $epsilon) {
+                $arc_angle = -$arc_angle;
+            }
 
-        // at this point we have:
-        // - "near_[x|y]"            point where we start
-        // - "far_[x|y]"             point where we end up with the arc/bend
-        // - "far_off_[x|y]"         point of the "off" segment, needs a straight
-        //                           section of track segment(s) from "far" to
-        //                           that point
-        // - "arc_center_[x|y]"      center of the arc/bend circle
-        // - "arc_radius"            radius of the arc/bend
-        // - "vec_to_near_[x|y]"     vector from "near" to "arc_center"
-        // - "alpha"                 angle with a direction sign for rotation.
-        //                           Rotation is centered at "arc_center(x,y)",
-        //                           i.e. using "vec_to_near" and this directional
-        //                           angle for rotation to determine segments.
+            // at this point we have:
+            // - "near_[x|y]"            point where we start
+            // - "far_[x|y]"             point where we end up with the arc/bend
+            // - "far_off_[x|y]"         point of the "off" segment, needs a straight
+            //                           section of track segment(s) from "far" to
+            //                           that point
+            // - "arc_center_[x|y]"      center of the arc/bend circle
+            // - "arc_radius"            radius of the arc/bend
+            // - "vec_to_near_[x|y]"     vector from "near" to "arc_center"
+            // - "alpha"                 angle with a direction sign for rotation.
+            //                           Rotation is centered at "arc_center(x,y)",
+            //                           i.e. using "vec_to_near" and this directional
+            //                           angle for rotation to determine segments.
 
 //    echo("<pre>\n");
 //    echo("intersect = (" . $intersect_x . ", " . $intersect_y . "), intersect_y_2 = " . $intersect_y_2 . "\n");
@@ -504,13 +508,13 @@ class ArithmeticHelper
 //
 //echo '</pre>';
 //echo "\n-->\n";
-        // NOTE: calcs will cause errors of all sorts, especially such
-        //       more sophisticated stuff. floats are by no means sufficient
-        //       for things like this. The very least which should be done:
-        //       Connect the last circle segment to "far" point (instead of
-        //       calculating it), and then make the line to "far_off".
+            // NOTE: calcs will cause errors of all sorts, especially such
+            //       more sophisticated stuff. floats are by no means sufficient
+            //       for things like this. The very least which should be done:
+            //       Connect the last circle segment to "far" point (instead of
+            //       calculating it), and then make the line to "far_off".
 
-
+        }
         // debug SVG output
         $num_segments = 0;
         // 300

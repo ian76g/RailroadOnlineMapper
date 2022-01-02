@@ -160,100 +160,103 @@ function generateTasks(&$industryData, ArithmeticHelper $ah, $industryTracks)
     $Rtasks = array();
     $fireDepots = array();
     $indWithoutFDs = array();
-    foreach ($industryData['Industries'] as $industry) {
-        if ($industry['Type'] == 1) {
-            $coords['logging camp'] = array($industry['Location'][0], $industry['Location'][1]);
-        }
-        if ($industry['Type'] == 2) {
-            $sawmill = false;
-            $lumber = $industry['ProductsStored'][0];
-            $beams = $industry['ProductsStored'][1];
-            $SMlogsNeeded = $industry['EductsStored'][0];
-            $indWithoutFDs[] = $industry;
-            if (isset($industryTracks[$industry['Type']])) {
-                $sawmill = true;
+    if ($industryData['Industries']) {
+
+        foreach ($industryData['Industries'] as $industry) {
+            if ($industry['Type'] == 1) {
+                $coords['logging camp'] = array($industry['Location'][0], $industry['Location'][1]);
             }
-            $coords['sawmill'] = array($industry['Location'][0], $industry['Location'][1]);
-        }
-        if ($industry['Type'] == 3) {
-            $smelter = false;
-            $iron = $industry['ProductsStored'][0];
-            $rails = $industry['ProductsStored'][1];
-            $SMcordwoodNeeded = $industry['EductsStored'][0];
-            $SMironOreNeeded = $industry['EductsStored'][1];
-            $indWithoutFDs[] = $industry;
-            if (isset($industryTracks[$industry['Type']])) {
-                $smelter = true;
+            if ($industry['Type'] == 2) {
+                $sawmill = false;
+                $lumber = $industry['ProductsStored'][0];
+                $beams = $industry['ProductsStored'][1];
+                $SMlogsNeeded = $industry['EductsStored'][0];
+                $indWithoutFDs[] = $industry;
+                if (isset($industryTracks[$industry['Type']])) {
+                    $sawmill = true;
+                }
+                $coords['sawmill'] = array($industry['Location'][0], $industry['Location'][1]);
             }
-            $coords['smelter'] = array($industry['Location'][0], $industry['Location'][1]);
-        }
-        if ($industry['Type'] == 4) {
-            $ironworks = false;
-            $pipes = $industry['ProductsStored'][0];
-            $tools = $industry['ProductsStored'][1];
-            $IWcoalNeeded = $industry['EductsStored'][1];
-            $IWironNeeded = $industry['EductsStored'][0];
-            $indWithoutFDs[] = $industry;
-            if (isset($industryTracks[$industry['Type']])) {
-                $ironworks = true;
+            if ($industry['Type'] == 3) {
+                $smelter = false;
+                $iron = $industry['ProductsStored'][0];
+                $rails = $industry['ProductsStored'][1];
+                $SMcordwoodNeeded = $industry['EductsStored'][0];
+                $SMironOreNeeded = $industry['EductsStored'][1];
+                $indWithoutFDs[] = $industry;
+                if (isset($industryTracks[$industry['Type']])) {
+                    $smelter = true;
+                }
+                $coords['smelter'] = array($industry['Location'][0], $industry['Location'][1]);
             }
-            $coords['iron works'] = array($industry['Location'][0], $industry['Location'][1]);
-        }
-        if ($industry['Type'] == 5) {
-            $oilfield = false;
-            $oilR = $industry['ProductsStored'][0];
-            $OFpipesNeeded = $industry['EductsStored'][0];
-            $OFbeamsNeeded = $industry['EductsStored'][1];
-            $OFtoolsNeeded = $industry['EductsStored'][2];
-            $indWithoutFDs[] = $industry;
-            if (isset($industryTracks[$industry['Type']])) {
-                $oilfield = true;
+            if ($industry['Type'] == 4) {
+                $ironworks = false;
+                $pipes = $industry['ProductsStored'][0];
+                $tools = $industry['ProductsStored'][1];
+                $IWcoalNeeded = $industry['EductsStored'][1];
+                $IWironNeeded = $industry['EductsStored'][0];
+                $indWithoutFDs[] = $industry;
+                if (isset($industryTracks[$industry['Type']])) {
+                    $ironworks = true;
+                }
+                $coords['iron works'] = array($industry['Location'][0], $industry['Location'][1]);
             }
-            $coords['oil field'] = array($industry['Location'][0], $industry['Location'][1]);
-        }
-        if ($industry['Type'] == 6) {
-            $refinery = false;
-            $oilB = $industry['ProductsStored'][0] + $industry['ProductsStored'][1];
-            $REFlumberNeeded = $industry['EductsStored'][2];
-            $REFpipesNeeded = $industry['EductsStored'][1];
-            $REFoilNeeded = $industry['EductsStored'][0];
-            $indWithoutFDs[] = $industry;
-            if (isset($industryTracks[$industry['Type']])) {
-                $refinery = true;
+            if ($industry['Type'] == 5) {
+                $oilfield = false;
+                $oilR = $industry['ProductsStored'][0];
+                $OFpipesNeeded = $industry['EductsStored'][0];
+                $OFbeamsNeeded = $industry['EductsStored'][1];
+                $OFtoolsNeeded = $industry['EductsStored'][2];
+                $indWithoutFDs[] = $industry;
+                if (isset($industryTracks[$industry['Type']])) {
+                    $oilfield = true;
+                }
+                $coords['oil field'] = array($industry['Location'][0], $industry['Location'][1]);
             }
-            $coords['refinery'] = array($industry['Location'][0], $industry['Location'][1]);
-        }
-        if ($industry['Type'] == 8) {
-            $ironmine = false;
-            $ironOre = $industry['ProductsStored'][0];
-            $IMlumberNeeded = $industry['EductsStored'][0];
-            $IMbeamsNeeded = $industry['EductsStored'][1];
-            $indWithoutFDs[] = $industry;
-            if (isset($industryTracks[$industry['Type']])) {
-                $ironmine = true;
+            if ($industry['Type'] == 6) {
+                $refinery = false;
+                $oilB = $industry['ProductsStored'][0] + $industry['ProductsStored'][1];
+                $REFlumberNeeded = $industry['EductsStored'][2];
+                $REFpipesNeeded = $industry['EductsStored'][1];
+                $REFoilNeeded = $industry['EductsStored'][0];
+                $indWithoutFDs[] = $industry;
+                if (isset($industryTracks[$industry['Type']])) {
+                    $refinery = true;
+                }
+                $coords['refinery'] = array($industry['Location'][0], $industry['Location'][1]);
             }
-            $coords['iron mine'] = array($industry['Location'][0], $industry['Location'][1]);
-        }
-        if ($industry['Type'] == 7) {
-            $coalmine = false;
-            $coal = $industry['ProductsStored'][0];
-            $CMbeamsNeeded = $industry['EductsStored'][0];
-            $CMrailsNeeded = $industry['EductsStored'][1];
-            $indWithoutFDs[] = $industry;
-            if (isset($industryTracks[$industry['Type']])) {
-                $coalmine = true;
+            if ($industry['Type'] == 8) {
+                $ironmine = false;
+                $ironOre = $industry['ProductsStored'][0];
+                $IMlumberNeeded = $industry['EductsStored'][0];
+                $IMbeamsNeeded = $industry['EductsStored'][1];
+                $indWithoutFDs[] = $industry;
+                if (isset($industryTracks[$industry['Type']])) {
+                    $ironmine = true;
+                }
+                $coords['iron mine'] = array($industry['Location'][0], $industry['Location'][1]);
             }
-            $coords['coal mine'] = array($industry['Location'][0], $industry['Location'][1]);
-        }
-        if ($industry['Type'] == 9) {
-            $indWithoutFDs[] = $industry;
-            $coords['freight depot'] = array($industry['Location'][0], $industry['Location'][1]);
-        }
-        if ($industry['Type'] == 10) {
-            $FDbeamsNeeded = $industry['EductsStored'][0];
-            $near = $ah->nearestIndustry($industry['Location'], $indWithoutFDs);
-            $fireDepots[] = array($FDbeamsNeeded, $near);
-            $coords['firewood depot #' . (sizeof($fireDepots) + 8)] = array($industry['Location'][0], $industry['Location'][1]);
+            if ($industry['Type'] == 7) {
+                $coalmine = false;
+                $coal = $industry['ProductsStored'][0];
+                $CMbeamsNeeded = $industry['EductsStored'][0];
+                $CMrailsNeeded = $industry['EductsStored'][1];
+                $indWithoutFDs[] = $industry;
+                if (isset($industryTracks[$industry['Type']])) {
+                    $coalmine = true;
+                }
+                $coords['coal mine'] = array($industry['Location'][0], $industry['Location'][1]);
+            }
+            if ($industry['Type'] == 9) {
+                $indWithoutFDs[] = $industry;
+                $coords['freight depot'] = array($industry['Location'][0], $industry['Location'][1]);
+            }
+            if ($industry['Type'] == 10) {
+                $FDbeamsNeeded = $industry['EductsStored'][0];
+                $near = $ah->nearestIndustry($industry['Location'], $indWithoutFDs);
+                $fireDepots[] = array($FDbeamsNeeded, $near);
+                $coords['firewood depot #' . (sizeof($fireDepots) + 8)] = array($industry['Location'][0], $industry['Location'][1]);
+            }
         }
     }
     $cartsCordwood = 0;
@@ -475,36 +478,38 @@ function generateTasks(&$industryData, ArithmeticHelper $ah, $industryTracks)
         $tasks[] = taskText($x, 'cordwood', 'logging camp', 'firewood depot #' . ($index + 9));
     }
 
-    foreach ($industryData['Frames'] as $i => $frame) {
-        if ($frame['Type'] == 'flatcar_cordwood') {
-            $cartsCordwood--;
-        }
-        if ($frame['Type'] == 'flatcar_logs') {
-            $cartsFlat--;
-        }
-        if ($frame['Type'] == 'flatcar_stakes') {
-            $cartsStakes--;
-        }
-        if ($frame['Type'] == 'flatcar_tanker') {
-            $cartsTanker--;
-        }
-        if ($frame['Type'] == 'boxcar') {
-            $cartsBox--;
-        }
-        if ($frame['Type'] == 'flatcar_hopper') {
-            $cartsHopper--;
-        }
-        if (isset($cartTracks[$i]) && $cartTracks[$i]['d'] > 425) {
-            if (!isInShed($frame, $industryData['Industries'], $ah)) {
-                $Rtasks[] = array(
-                    'Recover rolling stock ' . $frame['Type'] . ' ' . strip_tags($frame['Name'] . ' ' . $frame['Number']) . '. It is ' .
-                    ceil($cartTracks[$i]['d'] / 100) . 'm off regular track near ' .
-                    $ah->nearestIndustry($frame['Location'], $industryData['Industries']),
-                    array(
-                        'x' => $frame['Location'][0],
-                        'y' => $frame['Location'][1],
-                    )
-                );
+    if (isset($industryData['Frames'])) {
+        foreach ($industryData['Frames'] as $i => $frame) {
+            if ($frame['Type'] == 'flatcar_cordwood') {
+                $cartsCordwood--;
+            }
+            if ($frame['Type'] == 'flatcar_logs') {
+                $cartsFlat--;
+            }
+            if ($frame['Type'] == 'flatcar_stakes') {
+                $cartsStakes--;
+            }
+            if ($frame['Type'] == 'flatcar_tanker') {
+                $cartsTanker--;
+            }
+            if ($frame['Type'] == 'boxcar') {
+                $cartsBox--;
+            }
+            if ($frame['Type'] == 'flatcar_hopper') {
+                $cartsHopper--;
+            }
+            if (isset($cartTracks[$i]) && $cartTracks[$i]['d'] > 425) {
+                if (!isInShed($frame, $industryData['Industries'], $ah)) {
+                    $Rtasks[] = array(
+                        'Recover rolling stock ' . $frame['Type'] . ' ' . strip_tags($frame['Name'] . ' ' . $frame['Number']) . '. It is ' .
+                        ceil($cartTracks[$i]['d'] / 100) . 'm off regular track near ' .
+                        $ah->nearestIndustry($frame['Location'], $industryData['Industries']),
+                        array(
+                            'x' => $frame['Location'][0],
+                            'y' => $frame['Location'][1],
+                        )
+                    );
+                }
             }
         }
     }
