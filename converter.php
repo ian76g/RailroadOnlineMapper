@@ -1,4 +1,5 @@
 <?php
+session_start();
 error_reporting(E_ALL);
 ini_set('memory_limit', -1);  // just in case - previous versions had 8000x8000 px truecolor images JPEG
 set_time_limit(90);                // just in case something wents really bad -- kill script after 10 seconds
@@ -54,6 +55,7 @@ function getUserIpAddr()
 //$_POST['from'] = '852-2';
 //$_POST['to'] = '864-0';
 //$_POST['antiflicker'] = true;
+//$_POST['RISEALL'] = true;
 
 if (!isset($NEWUPLOADEDFILE)) {
     if (isset($_POST['save']) && $_POST['save']) {
@@ -92,6 +94,7 @@ foreach ($files as $file) {
     $newSaveFileContents = $myParser->parseData(file_get_contents($fileName), true, $slotNumber);
     unset($myParser);
 
+    $fileName = str_replace(array('-modified.', '.sav'), array('.', '-modified.sav'), $fileName);
     $file = fopen($fileName, 'wb');
     if ($file === false) {
         die('Unable to write file.');

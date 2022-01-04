@@ -210,7 +210,7 @@ foreach ($textFiles as $textFile) {
     if (substr($textFile, -4) == '.txt') {
         $data = file_get_contents('includes/' . $textFile);
         $data = explode("\n", $data);
-        $header = array_shift($data) . ' (' . sizeof($data) . ')';
+        $header = array_shift($data) . ' (' . sizeof($data) . ') <A href="includes/'.$textFile.'" target="_preview">preview list</A>';
         $value = substr($textFile, 0, -4);
 
         if (!$textOptions) {
@@ -787,6 +787,7 @@ foreach ($textFiles as $textFile) {
                         ignore the whole curve things - just draw a straight line: <input type="checkbox"
                                                                                           name="skipCurve"
                                                                                           name="skipCurve"/><br>
+                        minimum height over ground (0 ignores terrain): <input name="minimumZ" id="minimumZ" value="0" size="6"><br>
                         <button class="button">Generate curve and bed between segments</button>
                     </form>
                 </details>
@@ -823,6 +824,8 @@ foreach ($textFiles as $textFile) {
                                 <th>Item 4</th>
                             </tr>
                         </table>
+                        <input type="checkbox" name="RAISEALL"> Raise all industries (DO NOT USE)<br>
+                        <input type="checkbox" name="LOWERALL"> Lower all industries (DO NOT USE)<br>
                         <button class="button">Apply Industry Changes</button>
                     </form>
                 </details>

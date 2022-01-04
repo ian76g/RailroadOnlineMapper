@@ -233,241 +233,248 @@ Zeichnung mit dem Uhrzeigersinn: 1
 
         let slopecoords = [0, 0];
 
-        if ('Splines' in this.json) {
-            let splineIndex = -1;
-            for (const spline of this.json['Splines']) {
-                splineIndex++;
-                let type = spline['Type'];
-                let entry = drawOrder[type];
-                let [, strokeWidth, stroke] = entry;
+        let order = [1, 2, 5, 6, 3, 7, 4, 0];
+        var oi;
 
-                let multiplier = 1;
-                if ([1, 2, 5, 6].indexOf(type) > -1) {
-                    let x = this.getZDistanceToNearestTrack(spline['Segments'][0]);
-                    if (x > 0) {
-                        multiplier = Math.round(x / 180);
-                    }
-                }
-                strokeWidth = strokeWidth * multiplier;
+        for (oi = 0; oi < 8; oi++) {
+            if ('Splines' in this.json) {
+                let splineIndex = -1;
+                for (const spline of this.json['Splines']) {
+                    splineIndex++;
+                    let type = spline['Type'];
+                    if(type !== order[oi]) continue;
+                    let entry = drawOrder[type];
+                    let [, strokeWidth, stroke] = entry;
 
-                let segments = spline['Segments'];
-                if ([1, 2, 5, 6, 3, 7].indexOf(type) > -1) {
-                    const bedSegment = document.createElementNS(this.svgNS, 'path');
-                    let path = '';
-                    let tool = '';
-                    for (const segment of segments) {
-                        //'<path d="M 100 100 L 300 100 L 200 300 z" fill="red" stroke="blue" stroke-width="3" />'
-                        if (segment['Visible'] !== 1) {
-                            tool = 'M';
-                        } else {
-                            tool = 'L';
-                        }
-                        let xStart = (this.imx - ((segment['LocationStart']['X'] - this.minX) / 100 * this.scale));
-                        let yStart = (this.imy - ((segment['LocationStart']['Y'] - this.minY) / 100 * this.scale));
-                        let xEnd = (this.imx - ((segment['LocationEnd']['X'] - this.minX) / 100 * this.scale));
-                        let yEnd = (this.imy - ((segment['LocationEnd']['Y'] - this.minY) / 100 * this.scale));
-                        if (path === '') {
-                            path = 'M ' + xStart + ',' + yStart + ' ';
-                            path += tool + ' ' + xEnd + ',' + yEnd + ' ';
-                        } else {
-                            path += tool + ' ' + xEnd + ',' + yEnd + ' ';
+                    let multiplier = 1;
+                    if ([1, 2, 5, 6].indexOf(type) > -1) {
+                        let x = this.getZDistanceToNearestTrack(spline['Segments'][0]);
+                        if (x > 0) {
+                            multiplier = Math.round(x / 180);
                         }
                     }
-                    bedSegment.setAttribute("d", path);
-                    bedSegment.setAttribute("fill", 'none');
-                    bedSegment.setAttribute("stroke", stroke);
-                    bedSegment.setAttribute("stroke-width", strokeWidth.toString());
-                    bedsGroup.appendChild(bedSegment);
-                    if (type === 7) {
-                        ironBridgeGroup.appendChild(bedSegment.cloneNode(true));
-                    }
-                } else {
-                    // tracks..
-                    let segmentIndex = -1;
-                    for (const segment of segments) {
-                        segmentIndex++;
-                        if (segment['Visible'] !== 1) {
-                            continue
+                    strokeWidth = strokeWidth * multiplier;
+
+                    let segments = spline['Segments'];
+                    if ([1, 2, 5, 6, 3, 7].indexOf(type) > -1) {
+                        const bedSegment = document.createElementNS(this.svgNS, 'path');
+                        let path = '';
+                        let tool = '';
+                        for (const segment of segments) {
+                            //'<path d="M 100 100 L 300 100 L 200 300 z" fill="red" stroke="blue" stroke-width="3" />'
+                            if (segment['Visible'] !== 1) {
+                                tool = 'M';
+                            } else {
+                                tool = 'L';
+                            }
+                            let xStart = (this.imx - ((segment['LocationStart']['X'] - this.minX) / 100 * this.scale));
+                            let yStart = (this.imy - ((segment['LocationStart']['Y'] - this.minY) / 100 * this.scale));
+                            let xEnd = (this.imx - ((segment['LocationEnd']['X'] - this.minX) / 100 * this.scale));
+                            let yEnd = (this.imy - ((segment['LocationEnd']['Y'] - this.minY) / 100 * this.scale));
+                            if (path === '') {
+                                path = 'M ' + xStart + ',' + yStart + ' ';
+                                path += tool + ' ' + xEnd + ',' + yEnd + ' ';
+                            } else {
+                                path += tool + ' ' + xEnd + ',' + yEnd + ' ';
+                            }
                         }
+                        bedSegment.setAttribute("d", path);
+                        bedSegment.setAttribute("fill", 'none');
+                        bedSegment.setAttribute("stroke", stroke);
+                        bedSegment.setAttribute("stroke-width", strokeWidth.toString());
+                        bedsGroup.appendChild(bedSegment);
+                        if (type === 7) {
+                            ironBridgeGroup.appendChild(bedSegment.cloneNode(true));
+                        }
+                    } else {
+                        // tracks..
+                        let segmentIndex = -1;
+                        for (const segment of segments) {
+                            segmentIndex++;
+                            if (segment['Visible'] !== 1) {
+                                continue
+                            }
 
-                        let vOrto2 = [];
-                        let vOrto = [];
-                        let xStart = (this.imx - ((segment['LocationStart']['X'] - this.minX) / 100 * this.scale));
-                        let yStart = (this.imy - ((segment['LocationStart']['Y'] - this.minY) / 100 * this.scale));
-                        let xEnd = (this.imx - ((segment['LocationEnd']['X'] - this.minX) / 100 * this.scale));
-                        let yEnd = (this.imy - ((segment['LocationEnd']['Y'] - this.minY) / 100 * this.scale));
-                        let xCenter = (this.imx - ((segment['LocationCenter']['X'] - this.minX) / 100 * this.scale));
-                        let yCenter = (this.imy - ((segment['LocationCenter']['Y'] - this.minY) / 100 * this.scale));
+                            let vOrto2 = [];
+                            let vOrto = [];
+                            let xStart = (this.imx - ((segment['LocationStart']['X'] - this.minX) / 100 * this.scale));
+                            let yStart = (this.imy - ((segment['LocationStart']['Y'] - this.minY) / 100 * this.scale));
+                            let xEnd = (this.imx - ((segment['LocationEnd']['X'] - this.minX) / 100 * this.scale));
+                            let yEnd = (this.imy - ((segment['LocationEnd']['Y'] - this.minY) / 100 * this.scale));
+                            let xCenter = (this.imx - ((segment['LocationCenter']['X'] - this.minX) / 100 * this.scale));
+                            let yCenter = (this.imy - ((segment['LocationCenter']['Y'] - this.minY) / 100 * this.scale));
 
-                        if (segments[segmentIndex + 1] !== undefined) {
+                            if (segments[segmentIndex + 1] !== undefined) {
 
-                            let xx = segment['LocationEnd']['X'] - segment['LocationStart']['X'];
-                            let yy = segment['LocationEnd']['Y'] - segment['LocationStart']['Y'];
-                            if (true) {
-                                vOrto[0] = -yy; // / ortoLength;
-                                vOrto[1] = xx; // / ortoLength;
-
-                                let nextSegment = segments[segmentIndex + 1];
-                                vOrto2[0] = -1 * (nextSegment['LocationEnd']['Y'] - nextSegment['LocationStart']['Y']);
-                                vOrto2[1] = nextSegment['LocationEnd']['X'] - nextSegment['LocationStart']['X'];
-
+                                let xx = segment['LocationEnd']['X'] - segment['LocationStart']['X'];
+                                let yy = segment['LocationEnd']['Y'] - segment['LocationStart']['Y'];
                                 if (true) {
+                                    vOrto[0] = -yy; // / ortoLength;
+                                    vOrto[1] = xx; // / ortoLength;
 
-                                    let O = this.checkLineIntersection(
-                                        segment['LocationStart']['X'],
-                                        segment['LocationStart']['Y'],
-                                        segment['LocationStart']['X'] + vOrto[0],
-                                        segment['LocationStart']['Y'] + vOrto[1],
-                                        nextSegment['LocationEnd']['X'],
-                                        nextSegment['LocationEnd']['Y'],
-                                        nextSegment['LocationEnd']['X'] + vOrto2[0],
-                                        nextSegment['LocationEnd']['Y'] + vOrto2[1],
-                                    )
+                                    let nextSegment = segments[segmentIndex + 1];
+                                    vOrto2[0] = -1 * (nextSegment['LocationEnd']['Y'] - nextSegment['LocationStart']['Y']);
+                                    vOrto2[1] = nextSegment['LocationEnd']['X'] - nextSegment['LocationStart']['X'];
 
-                                    if (O !== null) {
-                                        let OP = {}
-                                        OP.X = O.x;
-                                        OP.Y = O.y;
-                                        let radius = Math.round(this._dist(OP, segment['LocationStart'], true) / 100);
-                                        let index = 8;
-                                        if (radius < 120) {
-                                            index = 7;
-                                        }
-                                        if (radius < 60) {
-                                            index = 6;
-                                        }
-                                        if (radius < 40) {
-                                            index = 5;
-                                        }
-                                        if (this._getDistanceToNearestCurveLabel([xCenter, yCenter], (index - 5)) > 20) {
-                                            this.allCurveLabels[(index - 5)].push([xEnd, yEnd]);
-                                            if (radius < 500) {
-                                                // console.log('OOOO: ' +OP['X']+', '+OP['Y']+' R '+radius);
-                                                let degrees = null;
-                                                if (segment['LocationEnd']['X'] === segment['LocationStart']['X']) {
-                                                    degrees = 90;
+                                    if (true) {
+
+                                        let O = this.checkLineIntersection(
+                                            segment['LocationStart']['X'],
+                                            segment['LocationStart']['Y'],
+                                            segment['LocationStart']['X'] + vOrto[0],
+                                            segment['LocationStart']['Y'] + vOrto[1],
+                                            nextSegment['LocationEnd']['X'],
+                                            nextSegment['LocationEnd']['Y'],
+                                            nextSegment['LocationEnd']['X'] + vOrto2[0],
+                                            nextSegment['LocationEnd']['Y'] + vOrto2[1],
+                                        )
+
+                                        if (O !== null) {
+                                            let OP = {}
+                                            OP.X = O.x;
+                                            OP.Y = O.y;
+                                            let radius = Math.round(this._dist(OP, segment['LocationStart'], true) / 100);
+                                            let index = 8;
+                                            if (radius < 120) {
+                                                index = 7;
+                                            }
+                                            if (radius < 60) {
+                                                index = 6;
+                                            }
+                                            if (radius < 40) {
+                                                index = 5;
+                                            }
+                                            if (this._getDistanceToNearestCurveLabel([xCenter, yCenter], (index - 5)) > 20) {
+                                                this.allCurveLabels[(index - 5)].push([xEnd, yEnd]);
+                                                if (radius < 500) {
+                                                    // console.log('OOOO: ' +OP['X']+', '+OP['Y']+' R '+radius);
+                                                    let degrees = null;
+                                                    if (segment['LocationEnd']['X'] === segment['LocationStart']['X']) {
+                                                        degrees = 90;
+                                                    }
+                                                    const tanA = (
+                                                        (segment['LocationEnd']['Y'] - segment['LocationStart']['Y']) /
+                                                        (segment['LocationEnd']['X'] - segment['LocationStart']['X'])
+                                                    );
+                                                    degrees = this._rad2deg(Math.atan(tanA));
+                                                    if (degrees > 0) {
+                                                        degrees -= 90;
+                                                    } else {
+                                                        degrees += 90;
+                                                    }
+                                                    degrees += 180;
+
+                                                    const radiusLabel = document.createElementNS(this.svgNS, "text");
+                                                    const radiusText = document.createTextNode('__> ' + radius + 'm');
+                                                    radiusLabel.setAttribute("x", Math.round(Math.round(xEnd).toString()).toString());
+                                                    radiusLabel.setAttribute("y", Math.round(Math.round(yEnd).toString()).toString());
+                                                    radiusLabel.setAttribute("transform",
+                                                        "rotate(" + Math.round(degrees) + "," +
+                                                        Math.round(xEnd) + "," +
+                                                        Math.round(yEnd) + ")");
+                                                    radiusLabel.appendChild(radiusText);
+                                                    slopeLabelGroup[index].appendChild(radiusLabel);
+
                                                 }
-                                                const tanA = (
-                                                    (segment['LocationEnd']['Y'] - segment['LocationStart']['Y']) /
-                                                    (segment['LocationEnd']['X'] - segment['LocationStart']['X'])
-                                                );
-                                                degrees = this._rad2deg(Math.atan(tanA));
-                                                if (degrees > 0) {
-                                                    degrees -= 90;
-                                                } else {
-                                                    degrees += 90;
-                                                }
-                                                degrees += 180;
-
-                                                const radiusLabel = document.createElementNS(this.svgNS, "text");
-                                                const radiusText = document.createTextNode('__> ' + radius + 'm');
-                                                radiusLabel.setAttribute("x", Math.round(Math.round(xEnd).toString()).toString());
-                                                radiusLabel.setAttribute("y", Math.round(Math.round(yEnd).toString()).toString());
-                                                radiusLabel.setAttribute("transform",
-                                                    "rotate(" + Math.round(degrees) + "," +
-                                                    Math.round(xEnd) + "," +
-                                                    Math.round(yEnd) + ")");
-                                                radiusLabel.appendChild(radiusText);
-                                                slopeLabelGroup[index].appendChild(radiusLabel);
-
                                             }
                                         }
                                     }
                                 }
                             }
-                        }
 
-                        const trackSegment = document.createElementNS(this.svgNS, 'line');
-                        trackSegment.setAttribute("x1", xStart.toString());
-                        trackSegment.setAttribute("y1", yStart.toString());
-                        trackSegment.setAttribute("x2", xEnd.toString());
-                        trackSegment.setAttribute("y2", yEnd.toString());
-                        trackSegment.setAttribute("sp", splineIndex.toString());
-                        trackSegment.setAttribute("se", segmentIndex.toString());
-                        trackSegment.setAttribute("stroke", stroke);
-                        trackSegment.setAttribute('onclick',
-                            'my_function(' + splineIndex + ',' + segmentIndex + ')');
-                        trackSegment.setAttribute("stroke-width", strokeWidth.toString());
-                        tracksGroup.appendChild(trackSegment);
+                            const trackSegment = document.createElementNS(this.svgNS, 'line');
+                            trackSegment.setAttribute("x1", xStart.toString());
+                            trackSegment.setAttribute("y1", yStart.toString());
+                            trackSegment.setAttribute("x2", xEnd.toString());
+                            trackSegment.setAttribute("y2", yEnd.toString());
+                            trackSegment.setAttribute("sp", splineIndex.toString());
+                            trackSegment.setAttribute("se", segmentIndex.toString());
+                            trackSegment.setAttribute("stroke", stroke);
+                            trackSegment.setAttribute('onclick',
+                                'my_function(' + splineIndex + ',' + segmentIndex + ')');
+                            trackSegment.setAttribute("stroke-width", strokeWidth.toString());
+                            tracksGroup.appendChild(trackSegment);
 
-                        let distance = Math.sqrt(
-                            Math.pow(segment['LocationEnd']['X'] - segment['LocationStart']['X'], 2) +
-                            Math.pow(segment['LocationEnd']['Y'] - segment['LocationStart']['Y'], 2) +
-                            Math.pow(segment['LocationEnd']['Z'] - segment['LocationStart']['Z'], 2)
-                        )
+                            let distance = Math.sqrt(
+                                Math.pow(segment['LocationEnd']['X'] - segment['LocationStart']['X'], 2) +
+                                Math.pow(segment['LocationEnd']['Y'] - segment['LocationStart']['Y'], 2) +
+                                Math.pow(segment['LocationEnd']['Z'] - segment['LocationStart']['Z'], 2)
+                            )
 
-                        let slope = 0;
-                        const height = Math.abs(segment['LocationEnd']['Z'] - segment['LocationStart']['Z']);
-                        const length = Math.sqrt(
-                            Math.pow(segment['LocationEnd']['X'] - segment['LocationStart']['X'], 2) +
-                            Math.pow(segment['LocationEnd']['Y'] - segment['LocationStart']['Y'], 2));
+                            let slope = 0;
+                            const height = Math.abs(segment['LocationEnd']['Z'] - segment['LocationStart']['Z']);
+                            const length = Math.sqrt(
+                                Math.pow(segment['LocationEnd']['X'] - segment['LocationStart']['X'], 2) +
+                                Math.pow(segment['LocationEnd']['Y'] - segment['LocationStart']['Y'], 2));
 
-                        if (length === null || length === undefined || length === 0 || length === 0.0) {
-                            const emptyLengthTrack = document.createElementNS(this.svgNS, "circle");
-                            emptyLengthTrack.setAttribute("cx", xCenter.toString());
-                            emptyLengthTrack.setAttribute("cy", yCenter.toString());
-                            emptyLengthTrack.setAttribute("r", "10");
-                            emptyLengthTrack.setAttribute("stroke", "red");
-                            emptyLengthTrack.setAttribute("stroke-width", "2");
-                            emptyLengthTrack.setAttribute("fill", "red");
-                            tracksGroup.appendChild(emptyLengthTrack);
+                            if (length === null || length === undefined || length === 0 || length === 0.0) {
+                                const emptyLengthTrack = document.createElementNS(this.svgNS, "circle");
+                                emptyLengthTrack.setAttribute("cx", xCenter.toString());
+                                emptyLengthTrack.setAttribute("cy", yCenter.toString());
+                                emptyLengthTrack.setAttribute("r", "10");
+                                emptyLengthTrack.setAttribute("stroke", "red");
+                                emptyLengthTrack.setAttribute("stroke-width", "2");
+                                emptyLengthTrack.setAttribute("fill", "red");
+                                tracksGroup.appendChild(emptyLengthTrack);
 
-                            continue; //This may cause issues down the road. We may need to stop at this point and return the errors segment.
-                        } else {
-                            slope = (height * 100 / length);
-                            if (slope > this.maxSlope) {
-                                slopecoords = [xCenter, yCenter];
-                            }
-                            this.maxSlope = Math.max(this.maxSlope, slope);
-                        }
-
-                        const slopeTriggerDecimals = 1;
-                        if (distance > 0) {
-                            let degrees = null;
-                            if (segment['LocationEnd']['X'] === segment['LocationStart']['X']) {
-                                degrees = 90;
-                            }
-                            const tanA = (
-                                (segment['LocationEnd']['Y'] - segment['LocationStart']['Y']) /
-                                (segment['LocationEnd']['X'] - segment['LocationStart']['X'])
-                            );
-                            degrees = this._rad2deg(Math.atan(tanA));
-                            if (degrees > 0) {
-                                degrees -= 90;
+                                continue; //This may cause issues down the road. We may need to stop at this point and return the errors segment.
                             } else {
-                                degrees += 90;
+                                slope = (height * 100 / length);
+                                if (slope > this.maxSlope) {
+                                    slopecoords = [xCenter, yCenter];
+                                }
+                                this.maxSlope = Math.max(this.maxSlope, slope);
                             }
 
-                            if (this._getDistanceToNearestLabel([xCenter, yCenter]) > 20) {
+                            const slopeTriggerDecimals = 1;
+                            if (distance > 0) {
+                                let degrees = null;
+                                if (segment['LocationEnd']['X'] === segment['LocationStart']['X']) {
+                                    degrees = 90;
+                                }
+                                const tanA = (
+                                    (segment['LocationEnd']['Y'] - segment['LocationStart']['Y']) /
+                                    (segment['LocationEnd']['X'] - segment['LocationStart']['X'])
+                                );
+                                degrees = this._rad2deg(Math.atan(tanA));
+                                if (degrees > 0) {
+                                    degrees -= 90;
+                                } else {
+                                    degrees += 90;
+                                }
 
-                                let percentage = this._round(slope, slopeTriggerDecimals);
-                                let percentageSilly = this._round(slope, 6);
+                                if (this._getDistanceToNearestLabel([xCenter, yCenter]) > 20) {
 
-                                let numberX = Math.min(3, Math.floor(slope));
+                                    let percentage = this._round(slope, slopeTriggerDecimals);
+                                    let percentageSilly = this._round(slope, 6);
 
-                                this.allLabels.push([xCenter, yCenter]);
+                                    let numberX = Math.min(3, Math.floor(slope));
 
-                                const slopeLabelSilly = document.createElementNS(this.svgNS, "text");
-                                const textNodeSilly = document.createTextNode(this.config.labelPrefix + percentageSilly + "%");
-                                slopeLabelSilly.setAttribute("x", Math.round(xCenter).toString());
-                                slopeLabelSilly.setAttribute("y", Math.round(yCenter).toString());
-                                slopeLabelSilly.setAttribute("transform", "rotate(" + Math.round(degrees) + "," + Math.round(xCenter) + "," + Math.round(yCenter) + ")");
-                                slopeLabelSilly.appendChild(textNodeSilly);
-                                slopeLabelGroup[4].appendChild(slopeLabelSilly);
+                                    this.allLabels.push([xCenter, yCenter]);
+
+                                    const slopeLabelSilly = document.createElementNS(this.svgNS, "text");
+                                    const textNodeSilly = document.createTextNode(this.config.labelPrefix + percentageSilly + "%");
+                                    slopeLabelSilly.setAttribute("x", Math.round(xCenter).toString());
+                                    slopeLabelSilly.setAttribute("y", Math.round(yCenter).toString());
+                                    slopeLabelSilly.setAttribute("transform", "rotate(" + Math.round(degrees) + "," + Math.round(xCenter) + "," + Math.round(yCenter) + ")");
+                                    slopeLabelSilly.appendChild(textNodeSilly);
+                                    slopeLabelGroup[4].appendChild(slopeLabelSilly);
 //console.log(slopeLabelSilly);
-                                const slopeLabel = document.createElementNS(this.svgNS, "text");
-                                const textNode = document.createTextNode(this.config.labelPrefix + percentage + "%");
-                                slopeLabel.setAttribute("x", Math.round(xCenter).toString());
-                                slopeLabel.setAttribute("y", Math.round(yCenter).toString());
-                                slopeLabel.setAttribute("transform", "rotate(" + Math.round(degrees) + "," + Math.round(xCenter) + "," + Math.round(yCenter) + ")");
-                                slopeLabel.appendChild(textNode);
-                                slopeLabelGroup[numberX].appendChild(slopeLabel);
+                                    const slopeLabel = document.createElementNS(this.svgNS, "text");
+                                    const textNode = document.createTextNode(this.config.labelPrefix + percentage + "%");
+                                    slopeLabel.setAttribute("x", Math.round(xCenter).toString());
+                                    slopeLabel.setAttribute("y", Math.round(yCenter).toString());
+                                    slopeLabel.setAttribute("transform", "rotate(" + Math.round(degrees) + "," + Math.round(xCenter) + "," + Math.round(yCenter) + ")");
+                                    slopeLabel.appendChild(textNode);
+                                    slopeLabelGroup[numberX].appendChild(slopeLabel);
+                                }
                             }
                         }
                     }
                 }
             }
         }
+
         // }
 
         if (this.drawMaxSlope) {
@@ -830,14 +837,15 @@ Zeichnung mit dem Uhrzeigersinn: 1
                 const length = cartOptions[vehicle['Type']][0];
                 path.setAttribute("width", length * 1.8); // make car bigger
                 path.setAttribute("height", width * 3);
-                path.setAttribute("x", x - (path.getAttribute("width")  / 2)); // pass x center point
+                path.setAttribute("x", x - (path.getAttribute("width") / 2)); // pass x center point
                 path.setAttribute("y", y - (path.getAttribute("height") / 2));
                 path.setAttribute("rx", 1.5) // corner radius
                 path.setAttribute("ry", 1.5)
                 path.setAttribute("fill", fillColor);
                 path.setAttribute("stroke", stroke);
                 path.setAttribute("stroke-width", "1");
-                path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + x + ", " + y + ")");                path.setAttribute("fill", fillColor);
+                path.setAttribute("transform", "rotate(" + Math.round(vehicle['Rotation'][1]) + ", " + x + ", " + y + ")");
+                path.setAttribute("fill", fillColor);
                 // path.setAttribute("transform", "rotate(" + vehicle['Rotation'][1] + ", " + (cx-1) + ", " + cy + ")");
                 path.appendChild(title);
                 rollingStockGroup.appendChild(path);
@@ -1015,7 +1023,7 @@ Zeichnung mit dem Uhrzeigersinn: 1
         industryLabelGroup.setAttribute("class", "industryLabel");
 
         const industriesTable = document.getElementById("industriesTable");
-        industryLabelGroup.insertAdjacentHTML("beforeend",  industryHtml);
+        industryLabelGroup.insertAdjacentHTML("beforeend", industryHtml);
         let index = 0;
         for (const industry of this.json['Industries']) {
             let name = '';
@@ -1104,7 +1112,7 @@ Zeichnung mit dem Uhrzeigersinn: 1
                     industry['ProductsStored'].pop();
                     pis = ['beams_p.svg', 'rails_p.svg'];
                     pos = ['coal_p.svg'];
-                    rotation = industry['Rotation'][1]-90;
+                    rotation = industry['Rotation'][1] - 90;
                     xoff = -60;
                     yoff = -30;
                     break;
@@ -1117,7 +1125,7 @@ Zeichnung mit dem Uhrzeigersinn: 1
                     industry['ProductsStored'].pop();
                     pis = ['lumber_p.svg', 'beams_p.svg'];
                     pos = ['ironore_p.svg'];
-                    rotation = industry['Rotation'][1]+90;
+                    rotation = industry['Rotation'][1] + 90;
                     yoff = +20;
                     xoff = -90;
                     break;
@@ -1194,7 +1202,7 @@ Zeichnung mit dem Uhrzeigersinn: 1
             industryLabel.appendChild(textNode);
             industryLabelGroup.appendChild(industryLabel);
 
-            let c= document.createElementNS(this.svgNS, "circle");
+            let c = document.createElementNS(this.svgNS, "circle");
             c.setAttribute("cx", x);
             c.setAttribute("cy", y);
             c.setAttribute("r", "2");

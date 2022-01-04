@@ -349,42 +349,42 @@ class ArithmeticHelper
         // dist_near as the distance from the intersection,
         // as well as far_off (x,y) as a point and dist_far_off
         // as the distance from the intersection
-            ///////////////////////////////////////////////////////////////
-            // NOTE: we drop reference to s1 and s2 here, but this should be
-            //       kept tracked probably. Technically "near" and "far_off"
-            //       can be references to segment1/2 start/end instead.
-            //       This becomes paramount the moment a Z coordinate needs
-            //       to be handled (which can either be interpolated as
-            //       well or intersected with whatever is "ground").
-            ///////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////
+        // NOTE: we drop reference to s1 and s2 here, but this should be
+        //       kept tracked probably. Technically "near" and "far_off"
+        //       can be references to segment1/2 start/end instead.
+        //       This becomes paramount the moment a Z coordinate needs
+        //       to be handled (which can either be interpolated as
+        //       well or intersected with whatever is "ground").
+        ///////////////////////////////////////////////////////////////
 
-            // to determine the center of the circle which defines the arc:
-            // - "near" distance is a circle around the intersection which
-            //   crosses the intersecting lines, through the "near" point
-            //   on one and through the "far" point which lies on the same
-            //   line as the "far_off" point
-            // - this circle also goes through the center of the circle
-            //   which defines the arc
-            // - drawing a line from the intersection through the center of
-            //   the arc/bend circle, it will also cut a line from "near"
-            //   to "far" (not "far_off"!) in half, which we can use
-            //   as a helper to determine the center of the arc/bend circle
+        // to determine the center of the circle which defines the arc:
+        // - "near" distance is a circle around the intersection which
+        //   crosses the intersecting lines, through the "near" point
+        //   on one and through the "far" point which lies on the same
+        //   line as the "far_off" point
+        // - this circle also goes through the center of the circle
+        //   which defines the arc
+        // - drawing a line from the intersection through the center of
+        //   the arc/bend circle, it will also cut a line from "near"
+        //   to "far" (not "far_off"!) in half, which we can use
+        //   as a helper to determine the center of the arc/bend circle
 
-            $far_x = ($far_off_x - $intersect_x) / $dist_far_off * $dist_near + $intersect_x;
-            $far_y = ($far_off_y - $intersect_y) / $dist_far_off * $dist_near + $intersect_y;
+        $far_x = ($far_off_x - $intersect_x) / $dist_far_off * $dist_near + $intersect_x;
+        $far_y = ($far_off_y - $intersect_y) / $dist_far_off * $dist_near + $intersect_y;
 
-            // calculate temporary center which is halfway on the line between
-            // "near" and "far" point. The real center is outside of the circle
-            // drawn around the intersection with the radius of "dist_near" (distance
-            // between near and intersection). The amount can be calculated using
-            // a² + b² = c² where c = a + k and b as the far end is defined by
-            // the angle between a and c: b = sin(angle) * (a+k). With that we get
-            // a² + sin(angle)² * (a+k)² = (a+k)² where only one variable (k) is
-            // unknown and can be solved. a is the radius of the circle around
-            // the intersection, k is the "addon" to the actual arc/bend center,
-            // both being distance values. angle is half the angle between
-            // the two vectors which span the triangle to contain the circle
-            // (near and far together with intersection).
+        // calculate temporary center which is halfway on the line between
+        // "near" and "far" point. The real center is outside of the circle
+        // drawn around the intersection with the radius of "dist_near" (distance
+        // between near and intersection). The amount can be calculated using
+        // a² + b² = c² where c = a + k and b as the far end is defined by
+        // the angle between a and c: b = sin(angle) * (a+k). With that we get
+        // a² + sin(angle)² * (a+k)² = (a+k)² where only one variable (k) is
+        // unknown and can be solved. a is the radius of the circle around
+        // the intersection, k is the "addon" to the actual arc/bend center,
+        // both being distance values. angle is half the angle between
+        // the two vectors which span the triangle to contain the circle
+        // (near and far together with intersection).
         if (!$skipCurve) {
 
             // pointer from intersection to potential center of the arc/bend
@@ -438,7 +438,7 @@ class ArithmeticHelper
             return false;
         }
 
-        if(!$skipCurve) {
+        if (!$skipCurve) {
 
             // As noted above, $alpha is direction less. Instead of acos()
             // atan2() can be used, which sorts things into quadrants and an
@@ -528,11 +528,13 @@ class ArithmeticHelper
             $curve = array();
             $curve[] = array($near_prev_x, $near_prev_y, $near_prev_z);
             $curve[] = array($near_x, $near_y, $near_z);
-            $straight = $this->vec_abs($far_x - $far_off_x, $far_y - $far_off_y);
         } else {
-            $curve[] = array($near_prev_x, $near_prev_y, $near_prev_z);
-            $straight = $this->vec_abs($far_x - $far_off_x, $far_y - $far_off_y);
+//            $curve[] = array($near_x, $near_y, $near_z);
+            $far_x = $near_x;
+            $far_y = $near_y;
+            $curveLength = 0;
         }
+        $straight = $this->vec_abs($far_x - $far_off_x, $far_y - $far_off_y);
 
 
 //    $curve2[] = array($near_x, $near_y, round($near_z)-$bedDistance);
@@ -555,7 +557,14 @@ class ArithmeticHelper
                 [$tmp_vec_x, $tmp_vec_y] = $this->vec_rotate($near_x - $arc_center_x, $near_y - $arc_center_y, $alpha_per_segment * $i);
                 $tmp_vec_x += $arc_center_x;
                 $tmp_vec_y += $arc_center_y;
-                $z = $incline * $traveledSoFar / $totalTrackLength + $near_z; //need to add the height of the starting point
+                if(isset($_POST['minimumZ']) && $_POST['minimumZ']){
+                    $z = max(
+                        $incline * $traveledSoFar / $totalTrackLength + $near_z,
+                        $this->estimateHeight($tmp_vec_x, $tmp_vec_y)+$_POST['minimumZ']
+                    ); //need to add the height of the starting point
+                } else {
+                    $z = $incline * $traveledSoFar / $totalTrackLength + $near_z; //need to add the height of the starting point
+                }
                 if (!($i % 3)) {
                     $curve2[] = array(round($tmp_vec_x), round($tmp_vec_y), round($z) - $bedDistance);
                 }
@@ -584,7 +593,14 @@ class ArithmeticHelper
             $xOnLine = $far_x + $i * $straightLength * $straight_vec_x;
             $yOnLine = $far_y + $i * $straightLength * $straight_vec_y;
 
-            $z = $incline * $traveledSoFar / $totalTrackLength + $near_z;
+            if(isset($_POST['minimumZ']) && $_POST['minimumZ']){
+                $z = max(
+                    $incline * $traveledSoFar / $totalTrackLength + $near_z,
+                    $this->estimateHeight($xOnLine, $yOnLine)+$_POST['minimumZ']
+                ); //need to add the height of the starting point
+            } else {
+                $z = $incline * $traveledSoFar / $totalTrackLength + $near_z; //need to add the height of the starting point
+            }
 //        $svg_output .= " L " . round($xOnLine * $scale) . "," . round($yOnLine * $scale);
 
             $curve[] = array(round($xOnLine), round($yOnLine), round($z));
@@ -640,6 +656,57 @@ class ArithmeticHelper
     public function estimateHeight($x, $y)
     {
 
+        $N = $this->estimateHeightArround($x, $y+100);
+        $E = $this->estimateHeightArround($x+100, $y);
+        $S = $this->estimateHeightArround($x, $y-100);
+        $W = $this->estimateHeightArround($x-100, $y);
+
+        return ($N+$E+$S+$W)/4;
+
     }
 
+    public function estimateHeightArround($x, $y)
+    {
+        $sql = 'SELECT *, SQRT((x-@x)*(x-@x)+(y-@y)*(y-@y)) as dist FROM `trees` WHERE x-1200<@x and x+1200>@x and y-1200<@y and y+1200>@y order by dist asc limit 1';
+
+        $sql = str_replace(
+            array('@x', '@y'),
+            array((int)$x, (int)$y), $sql
+        );
+        $result = $this->query($sql);
+
+        if(isset($result[0]['z'])){
+            return $result[0]['z'];
+        }
+
+        die('critical ERROR in height estimtion');
+    }
+
+    function query($sql)
+    {
+        global $dbh;
+        if (!$dbh) {
+            $this->connect();
+        }
+
+        $result = array();
+        $rh = mysqli_query($dbh, $sql);
+        while ($result[] = @mysqli_fetch_assoc($rh)) ;
+        array_pop($result);
+
+        return $result;
+    }
+
+    function connect()
+    {
+        global $dbh;
+        if (file_exists('../dbaccess.php'))
+            require '../dbaccess.php';
+        if (file_exists('dbaccess.php'))
+            require 'dbaccess.php';
+
+        $dbh = mysqli_connect($dbhost, $dbuser, $dbpassword);
+        mysqli_query($dbh, 'use ' . $dbdatabase);
+
+    }
 }

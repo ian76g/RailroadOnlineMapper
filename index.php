@@ -4,6 +4,12 @@ ini_set('session.gc_maxlifetime', 36000);
 // each client should remember their session id for EXACTLY 10 hour
 session_set_cookie_params(36000);
 session_start();
+
+if(isset($_SESSION['steamid'])&&!isset($_SESSION['steam_personaname'])){
+    header('Location: /utils/Steam/steamauth.php?update');
+    die();
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -126,13 +132,14 @@ function getMarqueeTrain()
                 </tr>
                 </thead>
                 <?php
+                $rank=0;
                 foreach (map_entries(($_GET['sortby'] ?? null), $_GET['sortorder']) as $entry) {
                     $asterix = '';
                     if ($entry['public']) {
                         $asterix = '*';
                     }
                     print('<tr>' . PHP_EOL);
-                    print('<td>' . $asterix . '<a href="map.php?name=' . $entry['name'] . '">' . $entry['name'] . '</a></td>' . PHP_EOL);
+                    print('<td data-content="'.$entry['name'].$asterix.'">#' .($rank++) . ' '. $asterix . '<a href="map.php?name=' . $entry['name'] . '" target="_map">' . $entry['name'] . '</a></td>' . PHP_EOL);
                     print('<td data-content="'.$entry['trackLength'].'">' . $entry['trackLength'] . ' km</td>' . PHP_EOL);
                     print('<td>' . $entry['numY'] . '</td>' . PHP_EOL);
                     print('<td>' . $entry['numT'] . '</td>' . PHP_EOL);
