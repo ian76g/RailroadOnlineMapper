@@ -15,6 +15,7 @@ require_once 'utils/dtStruct.php';
 require_once 'utils/dtTextProperty.php';
 require_once 'utils/GVASParser.php';
 require_once 'utils/SaveReader.php';
+require_once 'utils/functions.php';
 
 if (!isset($_POST['metalOverWood'])) {
     $_POST['metalOverWood'] = 'NO';
@@ -92,9 +93,11 @@ foreach ($files as $file) {
     $myParser = new GVASParser();
     $myParser->owner = str_replace(array('.sav'),'', basename($fileName));
     $newSaveFileContents = $myParser->parseData(file_get_contents($fileName), true, $slotNumber);
+    $sR = new SaveReader($myParser->goldenBucket);
+    $fileName = str_replace(array('-modified.', '.sav'), array('.', '-modified.sav'), $fileName);
+    $sR->updateDatabaseEntry(substr($fileName,6,-4), array(array(),array(), array()), true);
     unset($myParser);
 
-    $fileName = str_replace(array('-modified.', '.sav'), array('.', '-modified.sav'), $fileName);
     $file = fopen($fileName, 'wb');
     if ($file === false) {
         die('Unable to write file.');

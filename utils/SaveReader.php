@@ -73,7 +73,7 @@ class SaveReader
         query($sql);
     }
 
-    function updateDatabaseEntry($filename, array $tasks)
+    function updateDatabaseEntry($filename, array $tasks, $rewriteIP = false)
     {
         global $dbh;
         $this->getTrackLength();
@@ -98,13 +98,18 @@ class SaveReader
         );
         $row = query('select ip, trees, unused, tasksA, tasksAreward from stats where name="' . mysqli_real_escape_string($dbh, $filename) . '"');
         if (isset($row[0])) {
-            $values[] = $row[0]['ip'];
+            if($rewriteIP) {
+                $values[] = $this->getUserIpAddr();
+            } else {
+                $values[] = $row[0]['ip'];
+            }
             $values[] = $row[0]['trees'];
             $values[] = $row[0]['unused'];
             $values[] = sizeof($tasks[0]);
             $values[] = $sum;
-            query('replace into stats (name, length, switches, locos, carts, slope, ip, trees, unused, tasksA, tasksAreward)
-    VALUES("' . implode('","', $values) . '")');
+            $sql = 'replace into stats (name, length, switches, locos, carts, slope, ip, trees, unused, tasksA, tasksAreward)
+    VALUES("' . implode('","', $values) . '")';
+            query($sql);
         } else {
             $values[] = $this->getUserIpAddr();
             $values[] = sizeof($this->data['Removed']['Vegetation']);
