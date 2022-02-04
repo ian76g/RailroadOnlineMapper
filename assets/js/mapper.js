@@ -1076,11 +1076,10 @@ Zeichnung mit dem Uhrzeigersinn: 1
                 case 4:
                     name = 'Ironworks';
                     industry['EductsStored'].pop();
-                    industry['EductsStored'].pop();
                     industry['ProductsStored'].pop();
                     industry['ProductsStored'].pop();
                     pos = ['pipes_p.svg', 'tools_p.svg'];
-                    pis = ['iron_p.svg', 'coal_p.svg'];
+                    pis = ['iron_p.svg', 'coal_p.svg', 'lumber_p.svg'];
                     rotation = industry['Rotation'][1];
                     xoff = -50;
                     break;

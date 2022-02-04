@@ -93,6 +93,15 @@ class GVASParser
                 unset($this->goldenBucket[$key]);
                 $this->goldenBucket[$key . 's'] = $silverPlate[$key . 's'];
             }
+            if (isset($this->goldenBucket[strtolower($key)])) {
+                foreach ($this->goldenBucket[strtolower($key)] as $index => $value) {
+                    foreach ($value as $idx => $v) {
+                        $silverPlate[$key . 's'][$idx][$index] = $v;
+                    }
+                }
+                unset($this->goldenBucket[strtolower($key)]);
+                $this->goldenBucket[$key . 's'] = $silverPlate[$key . 's'];
+            }
         }
 
         //$this->owner = preg_replace('/[[:^alnum:]]/', "", $this->goldenBucket['Players'][0]['Name']) . $slotExtension;

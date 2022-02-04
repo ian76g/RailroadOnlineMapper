@@ -257,15 +257,17 @@ foreach ($textFiles as $textFile) {
                 <summary><h4>Player Info</h4></summary>
                 <div class="export__panel--player-list">
                     <?php
-                    foreach ($dataArray['Players'] as $index => $player) {
-                        ?>
-                        <div class="export__panel--player-list-item" style="text-decoration: underline"
-                             onclick="zoomTo(<?php echo
-                                 (((400000 - ($player['Location'][0] + 200000)) / 400000)) . ',' . (((400000 - ($player['Location'][1] + 200000)) / 400000));
-                             ?>)"><?= $player['Name']; ?></div>
-                        <div class="export__panel--player-list-item"><?= $player['Xp']; ?> XP</div>
-                        <div class="export__panel--player-list-item"><?= $player['Money']; ?> $</div>
-                        <?php
+                    if(isset($dataArray['Players'])){
+                        foreach ($dataArray['Players'] as $index => $player) {
+                            ?>
+                            <div class="export__panel--player-list-item" style="text-decoration: underline"
+                                 onclick="zoomTo(<?php echo
+                                     (((400000 - ($player['Location'][0] + 200000)) / 400000)) . ',' . (((400000 - ($player['Location'][1] + 200000)) / 400000));
+                                 ?>)"><?= $player['Name']; ?></div>
+                            <div class="export__panel--player-list-item"><?= $player['Xp']; ?> XP</div>
+                            <div class="export__panel--player-list-item"><?= $player['Money']; ?> $</div>
+                            <?php
+                        }
                     }
                     ?>
                 </div>
